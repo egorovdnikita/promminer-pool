@@ -1,0 +1,124 @@
+# Разбор прода pool.promminer.ru
+
+Что удалось снять с публичной части продукта (страницы `/login`, `/register`, `/restore`
+и собранные ассеты). Авторизованная часть закрыта, поэтому внутренние экраны сверялись
+по макетам, а с прода взяты фактические значения дизайн-системы, шрифты, логотип и адреса.
+
+## Стек
+
+Vue 3 + Vite (rolldown) + Tailwind + PrimeVue, иконки — собственный набор `svg-icons`
+(имена в проде вырезаны минификатором). Аналитика — Яндекс.Метрика, поддержка — HelpDeskEddy.
+
+## Роутинг
+
+| Путь | Назначение |
+|---|---|
+| `/login`, `/register`, `/restore`, `/auth` | группа входа |
+| `/r/<referral_code>` | реферальная ссылка; код кладётся в `localStorage` под ключи `referral_code` и `refferal_code` |
+| `/watcher/<token>/<любой путь>` | **режим наблюдателя** — весь набор внутренних маршрутов дублируется с префиксом токена (`duplicateRoutes.js`), имена роутов получают префикс `token-`, в `meta.hasToken = true` |
+| `/404`, `/:catchAll(*)` | не найдено |
+
+Токен наблюдателя определяется по третьему сегменту пути длиной > 30 символов; обычный
+пользователь ходит с токеном из `localStorage`.
+
+## Внешние адреса (из сборки)
+
+```
+API                 https://pmpool.ru
+Сайт / ЛК           https://pool.promminer.ru/
+База знаний         https://pmpool.ru/blog/
+  IP майнера        /blog/asic-kak-nayti-ip-adres-maynera/
+  Заводской номер   /blog/gde-nayti-zavodskoy-nomer-mayneraa/
+Документы           https://files.promminer.ru/docs/
+Бот с алертами      https://t.me/PromminerAlertbot
+Поддержка           poolsupport@promminer.ru
+Удаление аккаунта   https://promminer.ru/delete-account/
+```
+
+Документы: Публичная Оферта, Политика конфиденциальности, Пользовательское соглашение,
+Политика соглашения на обработку персональных данных, Реквизиты, Политика обработки cookie.
+
+## Дизайн-система (фактические значения из `assets/css/index-*.css`)
+
+Тёмная тема на проде включается классом `.dark` на корне; в прототипе — `[data-theme="dark"]`
+с тем же набором переопределений.
+
+### Палитра
+
+```
+indigo   400 #7086fc  500 #6366f1  600 #4f46e5      ← accent (light / dark / hover)
+neutral   50 #fafafa  100 #f5f5f5  200 #e5e5e5  300 #d4d4d4
+         400 #a3a3a3  500 #737373  600 #525252  800 #262626  900 #171717  950 #0a0a0a
+green    500 #22c55e  600 #16a34a    amber 500 #f59e0b  600 #d97706
+red      500 #ef4444  600 #dc2626    brand (знак логотипа) #5369e0
+alpha-рампы: 008 = +14, 012 = +1f, 016 = +29, 024 = +3d, 032 = +52, 048 = +7a, 064 = +a3
+             (neutral-alpha строится от #737373, indigo-alpha — от #6366f1)
+```
+
+### Семантика (light → dark)
+
+| Токен | Light | Dark |
+|---|---|---|
+| bg-base-primary | neutral-100 | neutral-950 |
+| bg-base-secondary / elevated | white | neutral-900 |
+| bg-base-tertiary | neutral-200 | neutral-800 |
+| bg-base-overlay | alpha-black-064 | alpha-black-064 |
+| content-base-primary | neutral-900 | neutral-50 |
+| content-base-secondary | neutral-500 | neutral-400 |
+| content-base-tertiary | #9ca3af | neutral-500 |
+| border-base-container / divider | neutral-alpha-016 | neutral-alpha-016 |
+| control-primary | indigo-400 | indigo-500 |
+| control-primary-hover | indigo-500 | indigo-600 |
+| control-neutral | neutral-alpha-012 | neutral-alpha-016 |
+| border-focus | indigo-alpha-048 | indigo-alpha-048 |
+
+### Размеры
+
+```
+radius   2 4 6 8 12 16 24 32 48 999      base: 3xs 2, 2xs 4, 1xs 6, xs 8, s 12, m 16, l 16→24, xl 24→32
+size     24 28 32 36 40 44 48 56 64      base: 2xs 24, xs 28, s 32, m 36, l 40, xl 44, 1xl 48, 2xl 56, 3xl 64
+spacing  2 4 8 12 16 20 24 28 32 40 48 60 72
+модалка  ширина 375 (mobile) → 600 (desktop), высота до 720
+```
+
+### Типографика (Gilroy, mobile → desktop)
+
+```
+title-1     56/64 → 72/80        headline-4  20/26 → 24/30
+title-2     48/56 → 64/72        headline-5  16/20 → 20/24
+title-3     48/56 → 56/64        headline-6  16/20 → 20/24
+headline-1  40/48 → 48/56        body-1 18/22   body-2 16/20   body-3 14/18   body-4 12/16
+headline-2  32/40 → 40/48        caption-1 12/16  caption-2 10/12
+headline-3  28/34 → 32/38        label-1 16/20 (-0.18)  label-2 14/18 (-0.16)  label-3 12/16 (-0.12)
+веса        100 200 300 400 500 600 700 800 900
+```
+
+## Экраны входа (сняты с DOM)
+
+- Лист белый (`bg-white`), колонка `max-width: 343px` на мобиле / `358px` на десктопе, по центру.
+- Логотип сверху по центру: знак 24×24 `#5369E0` + начертание 114×22 `#111827` + «POOL» 36×16 `#7086FC`.
+- Заголовок 32/38 SemiBold по центру, подзаголовок body-2 по центру.
+- Поле: высота 56, radius 16, фон `#6b72801f`, паддинги 12, gap 12, placeholder SemiBold `#9ca3af`;
+  у пароля — кнопка-глаз справа.
+- Кнопка: `w-button--xl` — высота 56, radius 16, `#7086fc`, 16/20 SemiBold, во всю ширину,
+  `opacity .5` пока не приняты согласия.
+- Три чекбокса согласий с ссылками на PDF; «Забыли пароль?» — ссылка справа над ними.
+- Внизу — «© 2026 Promminer Pool. Все права защищены».
+- Заголовки вкладок: «Авторизация — Promminer», «Регистрация — Promminer»,
+  «Восстановление пароля — Promminer».
+- В сборке есть `useOtpClipboard` и `usePhoneMask` — значит после регистрации/восстановления
+  идёт шаг с кодом из СМС и маска телефона.
+
+## Что из этого перенесено в прототип
+
+- Gilroy (5 весов, woff2 прямо с прода) — вшит в `index.html` через base64.
+- Полный набор токенов и тёмная тема.
+- Настоящий логотип и favicon.
+- Экраны `/login`, `/register`, `/restore` и шаг ввода кода.
+- Все внешние адреса: документы, база знаний, бот алертов, реферальная ссылка, ссылка наблюдателя.
+
+## Что перенести нельзя
+
+Внутренние экраны прода закрыты авторизацией — сверка по ним идёт только по макетам Figma.
+Имена иконок в сборке вырезаны минификатором, поэтому набор иконок собирается из дизайн-системы,
+а не из прод-бандла.
