@@ -55,11 +55,16 @@ python3 -m http.server 4173
 
 ## Дизайн
 
-Токены, размеры контролов, типографика и иконки (Solar Bold Duotone) перенесены из
-[💙 Дизайн-системы](https://www.figma.com/design/8rrL0jaovYD3jsrq7WF1L1/).
+Токены, размеры контролов и типографика сняты с прод-сборки дизайн-системы —
+точные значения и таблицы в [docs/prod-analysis.md](docs/prod-analysis.md).
+Шрифт Gilroy (5 начертаний, woff2 с прода) вшит в `index.html`, поэтому прототип
+рендерится тем же шрифтом, что и продукт, на любой машине.
+Иконки — Solar Bold Duotone из [💙 Дизайн-системы](https://www.figma.com/design/8rrL0jaovYD3jsrq7WF1L1/).
+Есть тёмная тема — переключатель в хедере.
 Список всех макетов — в [docs/context.md](docs/context.md).
 
 ## Документация
 
 - [docs/context.md](docs/context.md) — исходное ТЗ, ссылки на макеты, договорённости
+- [docs/prod-analysis.md](docs/prod-analysis.md) — разбор прода: роутинг, адреса, токены
 - [docs/roadmap.md](docs/roadmap.md) — что сделано и что дальше
