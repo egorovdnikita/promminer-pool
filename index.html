@@ -373,7 +373,7 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .acard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);padding:12px 14px;margin-bottom:8px}
 .acard.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .acard b.t{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);font-weight:600;margin-bottom:8px}
-.kv{display:flex;align-items:center;gap:8px;font-size:var(--fs-s);line-height:26px;color:var(--c2);font-weight:500}
+.kv{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;font-size:var(--fs-s);line-height:26px;color:var(--c2);font-weight:500}
 .kv span{margin-left:auto;color:var(--c1);font-weight:600}
 /* плитки-карточки внутри карточек (суб-аккаунты, наблюдатели) */
 .tile2{background:var(--bg);border-radius:var(--r-m);padding:16px;min-width:0}
@@ -415,7 +415,7 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 :root[data-theme="dark"] .avat{background:#78350f;color:#fde68a}
 :root[data-theme="dark"] .linkfield{background:var(--ctrl2)}
 :root[data-theme="dark"] .badge{color:#fbbf24}
-@media(max-width:1150px){.g3,.g4{grid-template-columns:1fr}.sb{display:none}}
+@media(max-width:1150px){.g3,.g4,.cols2{grid-template-columns:1fr!important}.sb{display:none}}
 </style>
 </head>
 <body>
@@ -1180,7 +1180,7 @@ function subTile(m,s){
     <div class="kv">Общий баланс<span class="mono">${s.main?nf(m.bal[0].usd):'0,00'} $</span></div>
     <div class="kv">Хэшрейт, BTC<span class="mono">${s.btc} TH/s</span></div>
     <div class="kv">Хэшрейт, LTC<span class="mono">${s.ltc} GH/s</span></div>
-    <div class="kv">Воркеры<span class="spacer row" style="gap:10px">${dots.map(([n,c])=>`<span class="row" style="gap:5px"><i class="dot" style="background:${c}"></i><b class="mono" style="font-weight:600">${ni(n)}</b></span>`).join('')}</span></div>
+    <div class="kv">Воркеры<span class="spacer row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end">${dots.map(([n,c])=>`<span class="row" style="gap:5px"><i class="dot" style="background:${c}"></i><b class="mono" style="font-weight:600">${ni(n)}</b></span>`).join('')}</span></div>
   </div>`;
 }
 function obsTile(o){
@@ -1201,15 +1201,15 @@ V.profile=m=>{
   const vs=S.verif==='yes'?['Пройдена','g']:S.verif==='pending'?['На проверке','y']:['Не пройдена','r'];
   const notes=[['Воркер Ant07 ушел в оффлайн','12 мин назад'],['Выплата отправлена','1 ч назад'],['Новый реферал','вчера']];
   return `${profTabs('profile',m)}
-<div class="grid" style="grid-template-columns:1.9fr 1fr;align-items:start">
+<div class="grid cols2" style="grid-template-columns:1.9fr 1fr;align-items:start">
   <div>
     ${card(`<div class="ch"><h2>Мои суб-аккаунты</h2><button class="btn link spacer bs" data-go="subaccounts">Смотреть все</button></div>
       <div class="grid g2" style="margin:0">${subsOf(m).slice(0,1).map(s=>subTile(m,s)).join('')}
-        <button class="dashed" data-modal="subacct">${I.pl}Создать суб-аккаунт</button></div>`)}
+        ${S.role==='owner'?`<button class="dashed" data-modal="subacct">${I.pl}Создать суб-аккаунт</button>`:''}</div>`)}
     <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Мои наблюдатели</h2><button class="btn link spacer bs" data-go="observers">Смотреть все</button></div>
       <div class="grid g3" style="margin:0">${obsOf(m).map(obsTile).join('')}
-        <button class="dashed" data-modal="observer">${I.pl}Добавить наблюдателя</button></div>`)}
+        ${S.role==='owner'?`<button class="dashed" data-modal="observer">${I.pl}Добавить наблюдателя</button>`:''}</div>`)}
   </div>
   <div>
     ${card(`<div class="ch"><h2>Мой профиль</h2></div>
