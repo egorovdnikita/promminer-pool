@@ -33,7 +33,9 @@
   --focus:#6366f17a;
   --inv-bg:var(--n900); --inv-fg:#fff;
   /* скругления по шкале DS: 2 4 6 8 12 16 24 32 48 */
-  --r-xs:4px; --r-s:12px; --r-m:16px; --r-l:24px; --r-f:999px;
+  /* шкала скруглений как в DS (колонка Desktop): 2 4 6 8 12 16 24 32 48 / full */
+  --r-3xs:2px; --r-2xs:4px; --r-1xs:6px; --r-xs:8px; --r-s:12px;
+  --r-m:16px; --r-l:24px; --r-xl:32px; --r-2xl:48px; --r-f:999px;
   --shadow:0 4px 24px 0 #CBD0E966;
   --font:'Gilroy',-apple-system,'Segoe UI',Roboto,sans-serif;
   --sb:252px;
@@ -130,7 +132,7 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .pop button .i3{color:var(--c3);display:flex;flex:0 0 auto}
 .pop button.on{background:var(--accent-sub);color:var(--accent)}
 .pop .hr{height:1px;background:var(--border);margin:5px 8px}
-.note{display:flex;gap:10px;padding:10px;border-radius:var(--r-xs);align-items:flex-start}
+.note{display:flex;gap:10px;padding:10px;border-radius:var(--r-2xs);align-items:flex-start}
 .note:hover{background:var(--ctrl2)}
 .note i{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:5px;flex:0 0 auto}
 .note.read i{background:var(--bg3)}
@@ -232,7 +234,7 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .tag.n{background:var(--ctrl);color:var(--c2)}
 .pager{display:flex;align-items:center;gap:8px;padding-top:12px}
 .pager .pg{display:flex;gap:2px;margin-left:auto}
-.pager .pg button{width:28px;height:28px;border-radius:var(--r-xs);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--c2)}
+.pager .pg button{width:28px;height:28px;border-radius:var(--r-2xs);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--c2)}
 .pager .pg button.on{background:var(--surface);box-shadow:0 0 0 1px var(--border);color:var(--c1)}
 .empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:44px 0 36px;text-align:center}
 .empty .art{width:92px;height:72px;border-radius:var(--r-s);background:var(--accent-ghost);display:grid;place-items:center;color:var(--accent);font-size:24px;font-weight:800;margin-bottom:4px}
@@ -291,8 +293,8 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .inp{background:var(--ctrl);border-radius:var(--r-m);padding:12px;margin-bottom:12px;min-height:var(--h-field);display:flex;flex-direction:column;justify-content:center}
 .inp .k{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
 .inp input{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
-.tabs2{display:flex;gap:2px;background:var(--bg);border-radius:var(--r-xs);padding:3px;margin-bottom:18px}
-.tabs2 button{flex:1;text-align:center;padding:8px;border-radius:var(--r-xs);font-size:14px;font-weight:600;color:var(--c2)}
+.tabs2{display:flex;gap:2px;background:var(--bg);border-radius:var(--r-2xs);padding:3px;margin-bottom:18px}
+.tabs2 button{flex:1;text-align:center;padding:8px;border-radius:var(--r-2xs);font-size:14px;font-weight:600;color:var(--c2)}
 .tabs2 button.on{background:var(--surface);color:var(--c1);box-shadow:0 1px 2px #1a1a1a14}
 
 /* modal */
@@ -329,11 +331,11 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .scg{margin-bottom:14px}
 .scg>label{display:block;font-size:12px;font-weight:700;color:var(--c3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
 .sco{display:flex;flex-wrap:wrap;gap:6px}
-.sco button{padding:7px 11px;border-radius:var(--r-xs);background:var(--bg);font-size:12px;font-weight:600;color:var(--c2)}
+.sco button{padding:7px 11px;border-radius:var(--r-2xs);background:var(--bg);font-size:12px;font-weight:600;color:var(--c2)}
 .sco button.on{background:var(--accent);color:#fff}
 .scx{position:absolute;right:14px;top:12px;color:var(--c3);font-size:22px}
 .scf{border-top:1px solid var(--border);padding-top:14px;display:flex;gap:8px;flex-wrap:wrap}
-.scf button{padding:8px 12px;border-radius:var(--r-xs);background:var(--bg);font-size:12px;font-weight:700}
+.scf button{padding:8px 12px;border-radius:var(--r-2xs);background:var(--bg);font-size:12px;font-weight:700}
 /* ===== СОСТОЯНИЯ И ИНТЕРАКТИВ ===== */
 .btn,.chip,.seg button,.ib,.ni,.kid,.cb,.tog,.tile,.pop button,.pager .pg button{transition:background .15s,color .15s,box-shadow .15s,border-color .15s,opacity .15s}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
@@ -395,7 +397,7 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .linkfield{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:var(--r-s);padding:0 8px 0 12px;height:40px;font-size:var(--fs-s);color:var(--c2);min-width:0}
 .linkfield span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cnt{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:var(--r-f);background:var(--neg);color:#fff;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600}
-.badge{display:inline-block;padding:4px 10px;border-radius:var(--r-xs);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;background:#f59e0b29;color:#d97706}
+.badge{display:inline-block;padding:4px 10px;border-radius:var(--r-2xs);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;background:#f59e0b29;color:#d97706}
 /* строка «иконка — текст — шеврон» в карточке профиля */
 .rowline{display:flex;align-items:center;gap:12px;padding:12px 0;width:100%;text-align:left}
 .rowline+.rowline{border-top:1px solid var(--border)}
