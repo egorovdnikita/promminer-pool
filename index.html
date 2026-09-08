@@ -209,7 +209,7 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 /* текстовая кнопка: h28, без паддинга, Body/M accent */
 .btn.link{height:28px;padding:0;background:none;box-shadow:none;color:var(--accent);border-radius:var(--r-s);font-size:var(--fs-m);line-height:var(--lh-m)}
 .btn[disabled]{opacity:.45;pointer-events:none}
-.tog{width:34px;height:19px;border-radius:var(--r-f);background:var(--bg3);position:relative;transition:background .15s}
+.tog{display:inline-block;width:34px;height:19px;border-radius:var(--r-f);background:var(--bg3);position:relative;transition:background .15s;flex:0 0 auto;cursor:pointer}
 .tog::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:transform .15s}
 .tog.on{background:var(--accent)}.tog.on::after{transform:translateX(15px)}
 
@@ -566,6 +566,7 @@ const I={
   ok:sv('<path d="M10.2 16.6 6 12.4l1.7-1.7 2.5 2.5 6.1-6.1 1.7 1.7-7.8 7.8Z"/>',18),
   excl:sv('<path d="M10.8 5.4h2.4l-.4 8.4h-1.6l-.4-8.4Zm1.2 10.2a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z"/>',18),
   pause:sv('<path d="M8.6 6.6h2.2v10.8H8.6zM13.2 6.6h2.2v10.8h-2.2z"/>',18),
+  pc:sv('<path opacity=".5" d="M2.6 7.4c0-2.3 0-3.4.7-4.1.7-.7 1.8-.7 4.1-.7h9.2c2.3 0 3.4 0 4.1.7.7.7.7 1.8.7 4.1v4.4c0 2.3 0 3.4-.7 4.1-.7.7-1.8.7-4.1.7H7.4c-2.3 0-3.4 0-4.1-.7-.7-.7-.7-1.8-.7-4.1V7.4Z"/><path d="M9.6 16.6h4.8l.6 2.6h2.6a.9.9 0 0 1 0 1.8H6.4a.9.9 0 0 1 0-1.8H9l.6-2.6Z"/>'),
   qr:sv('<path opacity=".5" d="M3 4.6c0-.9.7-1.6 1.6-1.6h4c.9 0 1.6.7 1.6 1.6v4c0 .9-.7 1.6-1.6 1.6h-4c-.9 0-1.6-.7-1.6-1.6v-4Zm0 10.8c0-.9.7-1.6 1.6-1.6h4c.9 0 1.6.7 1.6 1.6v4c0 .9-.7 1.6-1.6 1.6h-4c-.9 0-1.6-.7-1.6-1.6v-4Zm10.8-10.8c0-.9.7-1.6 1.6-1.6h4c.9 0 1.6.7 1.6 1.6v4c0 .9-.7 1.6-1.6 1.6h-4c-.9 0-1.6-.7-1.6-1.6v-4Z"/><path d="M5.4 5.4h2.4v2.4H5.4zM5.4 16.2h2.4v2.4H5.4zM16.2 5.4h2.4v2.4h-2.4zM13.8 13.8h2.4v2.4h-2.4zM18.6 13.8H21v2.4h-2.4zM13.8 18.6h2.4V21h-2.4zM18.6 18.6H21V21h-2.4z"/>',20),
   /* Рубль для баланса пула */
   rub:sv('<circle cx="12" cy="12" r="10" fill="#22c55e"/><path d="M9.2 17.4V7.4h3.6a3.2 3.2 0 0 1 0 6.4h-1.8v.9h2.6v1.4h-2.6v1.3H9.2Zm2-5h1.6a1.5 1.5 0 0 0 0-3h-1.6v3Z" fill="#fff"/><path d="M8.2 14.7h4.6v1.4H8.2z" fill="#fff"/>'),
@@ -1147,25 +1148,38 @@ V.refpayouts=m=>V.payouts(m);
 /* Порядок и подписи — как в выпадающем меню на проде */
 const PROF=[['profile','Мой профиль','user'],['security','Безопасность','lock'],['verification','Верификация и реквизиты','doc'],
   ['subaccounts','Центр суб-аккаунтов','ref'],['observers','Наблюдатели','eye'],['notifsettings','Уведомления','bell']];
-const PROF_N={subaccounts:3,observers:2};
-const profTabs=cur=>`<div class="tabs">${PROF.map(([id,t])=>`<button class="tab ${cur===id?'on':''}" data-go="${id}">${t}${PROF_N[id]?`<u>${PROF_N[id]}</u>`:''}</button>`).join('')}</div>`;
 
-/* Сводка профиля — пересобрана по проду: суб-аккаунты и наблюдатели карточками
-   слева, карточка профиля и последние уведомления справа. */
-const SUBS=[['natarusso',1],['alfred',0],['ivanivanov',0]];
+/* ===== Данные раздела «Личный кабинет» — один источник для сводки и вкладок ===== */
+const SUBS=[
+  {name:'natarusso',main:1,workers:672,btc:'10 400',ltc:'0',created:'12.03.2024',active:1},
+  {name:'alfred',   main:0,workers:28, btc:'5 600', ltc:'0',created:'04.11.2025',active:1},
+  {name:'ivanivanov',main:0,workers:0, btc:'0',     ltc:'0',created:'18.02.2026',active:0}];
 const OBSERVERS=[
-  {name:'natarusso',coins:['LTC','DOGE'],label:'Для бухгалтера',access:'Воркеры',term:'Бессрочно',token:'a71f2c9e4b8d5f1a3c7e0b6d9f24'},
-  {name:'natarusso',coins:['BTC'],label:'ФНС отчет 04.2026',access:'Финансы',term:'До 31.12.2026',token:'9c2b7e1d4a6f8c0b5e3d2a9f7c14'}];
+  {name:'natarusso',coins:['LTC','DOGE'],label:'Для бухгалтера',access:'Воркеры',term:'Бессрочно',
+   created:'04.05.2026',last:'сегодня, 09:12',token:'a71f2c9e4b8d5f1a3c7e0b6d9f24'},
+  {name:'natarusso',coins:['BTC'],label:'ФНС отчет 04.2026',access:'Финансы',term:'До 31.12.2026',
+   created:'04.05.2026',last:'—',token:'9c2b7e1d4a6f8c0b5e3d2a9f7c14'}];
+const SESSIONS=[
+  {dev:'Apple Macintosh, Chrome (macOS)',ip:'89.23.14.201',loc:'Москва',when:'сейчас',cur:1},
+  {dev:'iPhone 15, Safari (iOS)',        ip:'212.90.4.18', loc:'Санкт-Петербург',when:'2 часа назад',cur:0},
+  {dev:'Windows 11, Chrome',             ip:'77.88.12.9',  loc:'Казань',when:'вчера, 18:40',cur:0}];
+/* Сценарий «Пусто» — свежий аккаунт: только основной, без наблюдателей и чужих сессий */
+const subsOf=m=>m.empty?[{...SUBS[0],workers:0,btc:'0',ltc:'0'}]:SUBS;
+const obsOf=m=>m.empty?[]:OBSERVERS;
+const sessOf=m=>m.empty?SESSIONS.slice(0,1):SESSIONS;
+/* Счётчики на вкладках — из тех же данных, а не константой */
+const profTabs=(cur,m)=>{const n={subaccounts:subsOf(m).length,observers:obsOf(m).length};
+  return `<div class="tabs">${PROF.map(([id,t])=>`<button class="tab ${cur===id?'on':''}" data-go="${id}">${t}${n[id]?`<u>${n[id]}</u>`:''}</button>`).join('')}</div>`};
 
-function subTile(m,[a,main],i){
-  const h=main?m.h:{a:0,l:0,o:0,f:0};
+function subTile(m,s){
+  const h=s.main&&!m.empty?m.h:{a:0,l:0,o:0,f:0};
   const dots=[[h.a,'var(--pos)'],[h.l,'var(--warn)'],[h.o,'var(--neg)'],[h.f,'var(--neu)']];
   return `<div class="tile2">
-    <b class="t" style="display:flex;align-items:center;gap:8px;font-size:var(--fs-m);font-weight:600;margin-bottom:10px">${a}
-      ${main?'<span class="tag spacer">Основной</span>':'<span class="tag n spacer">Суб-аккаунт</span>'}</b>
-    <div class="kv">Общий баланс<span class="mono">${main?nf(m.bal[0].usd):'0,00'} $</span></div>
-    <div class="kv">Хэшрейт, BTC<span class="mono">${main&&S.coin==='btc'?m.avg:'0'} TH/s</span></div>
-    <div class="kv">Хэшрейт, LTC<span class="mono">${main&&S.coin==='ltc'?m.avg:'0'} GH/s</span></div>
+    <b class="t" style="display:flex;align-items:center;gap:8px;font-size:var(--fs-m);font-weight:600;margin-bottom:10px">${s.name}
+      ${s.main?'<span class="tag spacer">Основной</span>':'<span class="tag n spacer">Суб-аккаунт</span>'}</b>
+    <div class="kv">Общий баланс<span class="mono">${s.main?nf(m.bal[0].usd):'0,00'} $</span></div>
+    <div class="kv">Хэшрейт, BTC<span class="mono">${s.btc} TH/s</span></div>
+    <div class="kv">Хэшрейт, LTC<span class="mono">${s.ltc} GH/s</span></div>
     <div class="kv">Воркеры<span class="spacer row" style="gap:10px">${dots.map(([n,c])=>`<span class="row" style="gap:5px"><i class="dot" style="background:${c}"></i><b class="mono" style="font-weight:600">${ni(n)}</b></span>`).join('')}</span></div>
   </div>`;
 }
@@ -1186,15 +1200,15 @@ V.profile=m=>{
   const n=NOTIF_N[S.notif];
   const vs=S.verif==='yes'?['Пройдена','g']:S.verif==='pending'?['На проверке','y']:['Не пройдена','r'];
   const notes=[['Воркер Ant07 ушел в оффлайн','12 мин назад'],['Выплата отправлена','1 ч назад'],['Новый реферал','вчера']];
-  return `${profTabs('profile')}
+  return `${profTabs('profile',m)}
 <div class="grid" style="grid-template-columns:1.9fr 1fr;align-items:start">
   <div>
     ${card(`<div class="ch"><h2>Мои суб-аккаунты</h2><button class="btn link spacer bs" data-go="subaccounts">Смотреть все</button></div>
-      <div class="grid g2" style="margin:0">${SUBS.slice(0,1).map((s,i)=>subTile(m,s,i)).join('')}
+      <div class="grid g2" style="margin:0">${subsOf(m).slice(0,1).map(s=>subTile(m,s)).join('')}
         <button class="dashed" data-modal="subacct">${I.pl}Создать суб-аккаунт</button></div>`)}
     <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Мои наблюдатели</h2><button class="btn link spacer bs" data-go="observers">Смотреть все</button></div>
-      <div class="grid g3" style="margin:0">${OBSERVERS.map(obsTile).join('')}
+      <div class="grid g3" style="margin:0">${obsOf(m).map(obsTile).join('')}
         <button class="dashed" data-modal="observer">${I.pl}Добавить наблюдателя</button></div>`)}
   </div>
   <div>
@@ -1203,8 +1217,8 @@ V.profile=m=>{
         <b style="font-size:20px;font-weight:600">${acct}</b>
         <button class="lnk" style="color:var(--accent)" data-copy="${acct}">${I.cp}</button>
         <button class="lnk spacer dim" data-toast="Редактирование профиля">${I.edit}</button></div>
-      <button class="rowline" data-go="security"><span class="iconbox">${I.bars}</span>
-        <span class="tx"><i>Последняя сессия</i><b>Apple Macintosh, Chrome (macOS) <i class="dot" style="display:inline-block;background:var(--pos)"></i></b></span>
+      <button class="rowline" data-go="security"><span class="iconbox">${I.pc}</span>
+        <span class="tx"><i>Последняя сессия</i><b>${SESSIONS[0].dev} <i class="dot" style="display:inline-block;background:var(--pos)"></i></b></span>
         <span class="ch2">${I.cv}</span></button>
       <button class="rowline" data-go="security"><span class="iconbox" style="background:var(--surface);box-shadow:0 0 0 1px var(--border)">${GOOGLE}</span>
         <span class="tx"><b>Google Authentication</b><span class="badge" style="margin-top:4px">Не подключено</span></span>
@@ -1220,39 +1234,65 @@ V.profile=m=>{
 </div>`;
 };
 
-V.verification=m=>`${profTabs('verification')}
+/* Верификация: набор полей зависит от выбранного типа лица */
+const VERIF_FIELDS=[
+  [['ФИО','Наталья Руссо'],['ИНН','770*******12'],['Паспорт','45 12 ****56'],
+   ['Дата рождения','12.07.1988'],['Адрес регистрации','Москва, ул. ***, д. 12'],['Телефон','+7 (996) ***-59-52']],
+  [['ФИО','Наталья Руссо'],['ИНН','770*******12'],['ОГРНИП','32077*********4'],
+   ['Расчетный счет','40802*********1234'],['Банк','АО «Тинькофф Банк»'],['БИК','044525974']],
+  [['Наименование','ООО «Руссо Майнинг»'],['ИНН','770*******12'],['КПП','7707*****1'],['ОГРН','1157*********8'],
+   ['Расчетный счет','40702*********5678'],['Банк','АО «Тинькофф Банк»'],['БИК','044525974'],['Юридический адрес','Москва, ул. ***, д. 12']]];
+V.verification=m=>{
+  const vs=S.verif==='yes'?['Пройдена','g']:S.verif==='pending'?['На проверке','y']:['Не пройдена','r'];
+  const fields=VERIF_FIELDS[segi('verif-type',1)];
+  return `${profTabs('verification',m)}
 ${card(`<div class="ch"><h2>Верификация и реквизиты</h2><div class="spacer"></div>
-  <span class="tag ${S.verif==='yes'?'g':S.verif==='pending'?'y':'r'}">${S.verif==='yes'?'Пройдена':S.verif==='pending'?'На проверке':'Не пройдена'}</span></div>
-  ${S.verif==='no'?'<div class="warnbar" style="margin-bottom:14px">⚠ Без верификации недоступны выплаты в рублях и генерация отчета о майнинге</div>':''}
+  <span class="tag ${vs[1]}">${vs[0]}</span></div>
+  ${S.verif==='no'?`<div class="warnbar" style="margin-bottom:14px">${I.inf}<div>Без верификации недоступны выплаты в рублях и генерация <button class="lnk" style="color:var(--accent)" data-go="report">отчета о майнинге</button></div></div>`:''}
+  ${S.verif==='pending'?`<div class="warnbar" style="margin-bottom:14px">${I.inf}<div>Анкета на проверке — обычно занимает до двух рабочих дней</div></div>`:''}
   <div class="ch">${seg('verif-type',['Физическое лицо','Индивидуальный предприниматель','Юридическое лицо'],1)}</div>
   <div class="grid g3" style="margin:0;gap:10px">
-    ${[['ФИО','Наталья Руссо'],['ИНН','770*******12'],['ОГРНИП','32077*********4'],['Расчетный счет','40802*********1234'],['Банк','АО «Тинькофф Банк»'],['БИК','044525974']]
-      .map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v mono">${S.verif==='no'?'—':v}</div></div>`).join('')}
+    ${fields.map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v mono">${S.verif==='no'?'—':v}</div></div>`).join('')}
   </div>
-  <div class="row" style="margin-top:14px;gap:8px"><button class="btn" ${S.role==='observer'?'disabled':''} data-toast="Анкета отправлена на проверку">Отправить на проверку</button>
-    <button class="btn g">${I.dl} Скачать анкету</button></div>`)}`;
+  <div class="row" style="margin-top:14px;gap:8px">
+    <button class="btn" ${S.role==='observer'||S.verif==='pending'?'disabled':''} data-toast="Анкета отправлена на проверку">
+      ${S.verif==='yes'?'Обновить данные':'Отправить на проверку'}</button>
+    <button class="btn g">${I.dl} Скачать анкету</button></div>`)}`};
 
-V.subaccounts=m=>`${profTabs('subaccounts')}
+V.subaccounts=m=>{
+  const rows=subsOf(m);
+  return `${profTabs('subaccounts',m)}
 ${card(`<div class="ch"><h2>Центр суб-аккаунтов</h2><div class="spacer"></div>
   <button class="btn" data-modal="subacct" ${S.role==='observer'?'disabled':''}>${I.pl} Создать суб-аккаунт</button></div>
-  <div class="tw"><table class="tbl"><thead><tr><th>Аккаунт</th><th>Роль</th><th>Воркеры</th><th>Хэшрейт, 24 ч</th><th>Создан</th><th>Статус</th><th></th></tr></thead><tbody>
-  ${[['natarusso','Основной',672,'10 400','12.03.2024',1],['alfred','Суб-аккаунт',28,'5 600','04.11.2025',1],['ivanivanov','Суб-аккаунт',0,'0','18.02.2026',0]]
-    .map(([a,r,w,h,d,on])=>`<tr><td><b>${a}</b></td><td><span class="tag ${r==='Основной'?'':'n'}">${r}</span></td>
-      <td class="mono">${ni(w)}</td><td class="mono">${h} ${m.c.unit}</td><td class="mono mut">${d}</td>
-      <td><span class="tag ${on?'g':'n'}">${on?'Активен':'Не подключен'}</span></td><td class="num dim">${I.dots}</td></tr>`).join('')}
-  </tbody></table></div>`)}`;
+  <p class="cap dim" style="margin-bottom:12px">У каждого суб-аккаунта свои адреса подключения и своя статистика — общий баланс и сводка считаются по всем сразу</p>
+  <div class="tw"><table class="tbl"><thead><tr><th>Аккаунт</th><th>Роль</th><th class="num">Воркеры</th>
+    <th class="num">Хэшрейт BTC, 24 ч</th><th class="num">Хэшрейт LTC, 24 ч</th><th>Создан</th><th>Статус</th><th></th></tr></thead><tbody>
+  ${rows.map(s=>`<tr><td><b>${s.name}</b></td><td><span class="tag ${s.main?'':'n'}">${s.main?'Основной':'Суб-аккаунт'}</span></td>
+      <td class="num mono">${ni(s.workers)}</td><td class="num mono">${s.btc} TH/s</td><td class="num mono">${s.ltc} GH/s</td>
+      <td class="mono mut">${s.created}</td>
+      <td><span class="tag ${s.active?'g':'n'}">${s.active?'Активен':'Не подключен'}</span></td>
+      <td class="num dim">${I.dots}</td></tr>`).join('')}
+  </tbody></table></div>`)}`};
 
-V.observers=m=>`${profTabs('observers')}
+V.observers=m=>{
+  const rows=obsOf(m);
+  return `${profTabs('observers',m)}
 ${card(`<div class="ch"><h2>Наблюдатели</h2><div class="spacer"></div>
   <button class="btn" data-modal="observer" ${S.role==='observer'?'disabled':''}>${I.pl} Создать ссылку</button></div>
-  <p class="cap dim" style="margin-bottom:12px">Наблюдатель видит статистику и финансы только для чтения — без доступа к выводу средств и настройкам</p>
-  <div class="tw"><table class="tbl"><thead><tr><th>Название</th><th>Ссылка</th><th>Доступ</th><th>Создана</th><th>Последний вход</th><th></th></tr></thead><tbody>
-  ${[['Для бухгалтера','https://pool.promminer.ru/w/a71f','Финансы','04.05.2026','сегодня, 09:12'],['ФНС отчет 04.2026','https://pool.promminer.ru/w/9c2b','Отчет','04.05.2026','—']]
-    .map(([n,l,ac,c,last])=>`<tr><td>${n}</td><td class="mono mut"><button class="lnk" data-copy="${l}">${l} <span style="color:var(--accent)">${I.cp}</span></button></td>
-      <td><span class="tag">${ac}</span></td><td class="mono mut">${c}</td><td class="mut">${last}</td><td class="num dim">${I.dots}</td></tr>`).join('')}
-  </tbody></table></div>`)}`;
+  <p class="cap dim" style="margin-bottom:12px">Наблюдатель открывает ссылку без пароля и видит выбранные разделы только для чтения — без доступа к выводу средств и настройкам</p>
+  ${rows.length?`<div class="tw"><table class="tbl"><thead><tr><th>Название</th><th>Монеты</th><th>Ссылка</th>
+    <th>Доступ</th><th>Срок</th><th>Создана</th><th>Последний вход</th><th></th></tr></thead><tbody>
+  ${rows.map(o=>{const url=LINKS.watcher(o.token);return `<tr><td><b>${o.label}</b></td>
+      <td><span class="row" style="gap:4px">${o.coins.map(c=>COIN_ICON[c]).join('')}</span></td>
+      <td class="mono mut"><button class="lnk" data-copy="${url}">${url.slice(0,42)}… <span style="color:var(--accent)">${I.cp}</span></button></td>
+      <td><span class="tag n">${o.access}</span></td><td class="mut">${o.term}</td>
+      <td class="mono mut">${o.created}</td><td class="mut">${o.last}</td>
+      <td class="num dim">${I.dots}</td></tr>`}).join('')}
+  </tbody></table></div>`:emptyBox('Наблюдателей пока нет','Создайте ссылку, чтобы дать бухгалтеру или партнеру доступ к статистике только для чтения')}`)}`};
 
-V.security=m=>`${profTabs('security')}
+V.security=m=>{
+  const rows=sessOf(m);
+  return `${profTabs('security',m)}
 ${card(`<div class="ch"><h2>Безопасность</h2></div>
   ${[['Двухфакторная аутентификация','Подтверждение входа через приложение-аутентификатор',0],
      ['Подтверждение вывода средств','Код на почту при каждом выводе',1],
@@ -1260,14 +1300,36 @@ ${card(`<div class="ch"><h2>Безопасность</h2></div>
      ['Белый список кошельков','Вывод только на заранее подтвержденные адреса',0]]
     .map(([t,d,on])=>`<div class="linkrow" style="padding:14px"><div><b style="font-size:14px">${t}</b><div class="cap dim" style="margin-top:2px">${d}</div></div>
       <span class="spacer"><span class="tog ${on?'on':''}" data-tog></span></span></div>`).join('')}
-  <div class="row" style="gap:8px;margin-top:10px"><button class="btn g" data-toast="Письмо для смены пароля отправлено">Сменить пароль</button><button class="btn g" data-toast="Все сессии, кроме текущей, завершены">Завершить все сессии</button></div>`)}`;
+  <div class="row" style="gap:8px;margin-top:10px"><button class="btn g" data-toast="Письмо для смены пароля отправлено">Сменить пароль</button></div>`)}
+<div style="height:12px"></div>
+${card(`<div class="ch"><h2>Активные сессии</h2><div class="spacer"></div>
+  <button class="btn g sm" ${rows.length<2?'disabled':''} data-toast="Все сессии, кроме текущей, завершены">Завершить все, кроме текущей</button></div>
+  <div class="tw"><table class="tbl"><thead><tr><th>Устройство</th><th>IP</th><th>Локация</th><th>Последняя активность</th><th></th></tr></thead><tbody>
+  ${rows.map(s=>`<tr><td><span class="row" style="gap:10px"><span class="iconbox" style="width:36px;height:36px">${I.pc}</span>
+      <span>${s.dev}${s.cur?' <span class="tag g">текущая</span>':''}</span></span></td>
+      <td class="mono mut">${s.ip}</td><td class="mut">${s.loc}</td><td class="mut">${s.when}</td>
+      <td class="num">${s.cur?'':`<button class="btn g sm" data-toast="Сессия завершена">Завершить</button>`}</td></tr>`).join('')}
+  </tbody></table></div>`)}`};
 
-V.notifsettings=m=>`${profTabs('notifsettings')}
-${card(`<div class="ch"><h2>Уведомления</h2></div>
+V.notifsettings=m=>{
+  const ch=[['Почта','na***so@mail.ru',1,'mailto:'+LINKS.support],
+            ['Телефон','+7 (996) ***-59-52',1,'tel:+79966665952'],
+            ['Telegram','—',0,LINKS.tgBot]];
+  return `${profTabs('notifsettings',m)}
+${card(`<div class="ch"><h2>Каналы уведомлений</h2></div>
+  <p class="cap dim" style="margin-bottom:12px">Telegram-алерты приходят из бота <a href="${LINKS.tgBot}" target="_blank" rel="noopener">@PromminerAlertbot</a></p>
+  <div class="grid g3" style="margin:0">
+    ${ch.map(([k,v,ok,url])=>`<div class="tile2"><div class="cap dim">${k}</div>
+      <div class="row" style="margin-top:6px"><b class="mono" style="font-size:var(--fs-m);font-weight:600">${v}</b>
+        <span class="spacer">${ok?'<span class="tag g">Подтверждён</span>'
+          :`<a class="addbtn" href="${url}" target="_blank" rel="noopener">${I.pl} Привязать</a>`}</span></div></div>`).join('')}
+  </div>`)}
+<div style="height:12px"></div>
+${card(`<div class="ch"><h2>События</h2></div>
   <div class="tw"><table class="tbl"><thead><tr><th>Событие</th><th style="text-align:center">Почта</th><th style="text-align:center">Telegram</th><th style="text-align:center">Push</th></tr></thead><tbody>
   ${[['Воркер ушел в оффлайн',1,1,1],['Низкий хэшрейт парка',1,0,1],['Выплата отправлена',1,1,0],['Реферал зарегистрировался',0,1,0],['Отчет о майнинге сгенерирован',1,0,0],['Вход с нового устройства',1,1,1]]
-    .map(r=>`<tr><td>${r[0]}</td>${[1,2,3].map(i=>`<td style="text-align:center"><span class="tog ${r[i]?'on':''}" data-tog style="display:inline-block"></span></td>`).join('')}</tr>`).join('')}
-  </tbody></table></div>`)}`;
+    .map(r=>`<tr><td>${r[0]}</td>${[1,2,3].map(i=>`<td style="text-align:center"><span class="tog ${r[i]?'on':''}" data-tog></span></td>`).join('')}</tr>`).join('')}
+  </tbody></table></div>`)}`};
 
 /* --- Авторизация: /login, /register, /restore + шаг с кодом ---
    Экраны собраны по проду: белый лист, колонка 358, поля h56 r16,
