@@ -298,7 +298,25 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 /* modal */
 .mask{position:fixed;inset:0;background:#1a1a1aa3;backdrop-filter:blur(2px);z-index:70;display:grid;place-items:center;padding:24px}
 .modal{background:var(--surface);border-radius:var(--r-l);padding:24px;width:100%;max-width:400px;box-shadow:0 24px 70px #1a1a1a3d;max-height:86vh;overflow:auto}
-.modal h2{font-size:20px;font-weight:800;margin-bottom:6px}
+.mhead{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.modal h2{font-size:20px;line-height:24px;font-weight:600;flex:1;min-width:0}
+.mx{width:32px;height:32px;border-radius:var(--r-f);background:var(--ctrl2);color:var(--c2);display:grid;place-items:center;flex:0 0 auto}
+.mx:hover{background:var(--ctrl);color:var(--c1)}
+.msteps{display:flex;gap:8px;margin-bottom:16px}
+.msteps i{flex:1;height:3px;border-radius:2px;background:var(--ctrl)}
+.msteps i.on{background:var(--accent)}
+.mrow{display:flex;align-items:center;gap:12px;padding:12px 0}
+.mrow+.mrow{border-top:1px solid var(--border)}
+.mrow .mi{color:var(--c3);display:flex;flex:0 0 auto}
+.mrow .tx{min-width:0}
+.mrow .tx i{display:block;font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
+.mrow .tx b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.mrow .act{margin-left:auto;width:32px;height:32px;border-radius:var(--r-f);background:var(--accent-sub);color:var(--accent);display:grid;place-items:center;flex:0 0 auto}
+.mcode{text-align:center}
+.mcode b{display:block;font-size:var(--fs-m);font-weight:600;margin-bottom:6px}
+.mcode p{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);margin-bottom:14px}
+.phonefield{display:flex;align-items:center;gap:10px;background:var(--ctrl);border-radius:var(--r-m);padding:0 12px;height:var(--h-field)}
+.phonefield .pre{color:var(--c2);font-weight:600}
 .modal p.s{font-size:14px;color:var(--c2);margin-bottom:18px}
 .modal .acts{display:flex;gap:8px;margin-top:20px}
 
@@ -444,7 +462,7 @@ const AXES={
 const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',acct:'main'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light'};
+let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -563,6 +581,9 @@ const I={
   excl:sv('<path d="M10.8 5.4h2.4l-.4 8.4h-1.6l-.4-8.4Zm1.2 10.2a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z"/>',18),
   pause:sv('<path d="M8.6 6.6h2.2v10.8H8.6zM13.2 6.6h2.2v10.8h-2.2z"/>',18),
   pc:sv('<path opacity=".5" d="M2.6 7.4c0-2.3 0-3.4.7-4.1.7-.7 1.8-.7 4.1-.7h9.2c2.3 0 3.4 0 4.1.7.7.7.7 1.8.7 4.1v4.4c0 2.3 0 3.4-.7 4.1-.7.7-1.8.7-4.1.7H7.4c-2.3 0-3.4 0-4.1-.7-.7-.7-.7-1.8-.7-4.1V7.4Z"/><path d="M9.6 16.6h4.8l.6 2.6h2.6a.9.9 0 0 1 0 1.8H6.4a.9.9 0 0 1 0-1.8H9l.6-2.6Z"/>'),
+  phone:sv('<path opacity=".5" d="M7.6 3.3c-.7-.7-1.9-.7-2.5.1L3.7 5c-.8 1-1 2.4-.5 3.5 2 4.9 6.4 9.3 11.3 11.3 1.1.5 2.5.3 3.5-.5l1.6-1.4c.8-.6.8-1.8.1-2.5l-2.2-2.2c-.6-.6-1.6-.7-2.3-.2l-1.4 1c-2.1-1.2-3.9-3-5.1-5.1l1-1.4c.5-.7.4-1.7-.2-2.3L7.6 3.3Z"/>'),
+  mail:sv('<path opacity=".5" d="M2.4 8.4c0-2.1 0-3.2.7-3.8.6-.7 1.7-.7 3.8-.7h10.2c2.1 0 3.2 0 3.8.7.7.6.7 1.7.7 3.8v7.2c0 2.1 0 3.2-.7 3.8-.6.7-1.7.7-3.8.7H6.9c-2.1 0-3.2 0-3.8-.7-.7-.6-.7-1.7-.7-3.8V8.4Z"/><path d="M3.6 7.3 12 12.4l8.4-5.1 1 1.7-8.9 5.4a1 1 0 0 1-1 0L2.6 9l1-1.7Z"/>'),
+  tg:sv('<path opacity=".5" d="M12 2.2a9.8 9.8 0 1 0 0 19.6 9.8 9.8 0 0 0 0-19.6Z"/><path d="m6.6 11.7 9.7-3.8c.5-.2 1 .2.8.7l-1.6 7.5c-.1.5-.7.7-1.1.4l-2.4-1.8-1.2 1.2c-.3.3-.8.2-.9-.2l-.8-2.7-2.4-.6c-.5-.1-.5-.6-.1-.7Z"/>'),
   qr:sv('<path opacity=".5" d="M3 4.6c0-.9.7-1.6 1.6-1.6h4c.9 0 1.6.7 1.6 1.6v4c0 .9-.7 1.6-1.6 1.6h-4c-.9 0-1.6-.7-1.6-1.6v-4Zm0 10.8c0-.9.7-1.6 1.6-1.6h4c.9 0 1.6.7 1.6 1.6v4c0 .9-.7 1.6-1.6 1.6h-4c-.9 0-1.6-.7-1.6-1.6v-4Zm10.8-10.8c0-.9.7-1.6 1.6-1.6h4c.9 0 1.6.7 1.6 1.6v4c0 .9-.7 1.6-1.6 1.6h-4c-.9 0-1.6-.7-1.6-1.6v-4Z"/><path d="M5.4 5.4h2.4v2.4H5.4zM5.4 16.2h2.4v2.4H5.4zM16.2 5.4h2.4v2.4h-2.4zM13.8 13.8h2.4v2.4h-2.4zM18.6 13.8H21v2.4h-2.4zM13.8 18.6h2.4V21h-2.4zM18.6 18.6H21V21h-2.4z"/>',20),
   /* Рубль для баланса пула */
   rub:sv('<circle cx="12" cy="12" r="10" fill="#22c55e"/><path d="M9.2 17.4V7.4h3.6a3.2 3.2 0 0 1 0 6.4h-1.8v.9h2.6v1.4h-2.6v1.3H9.2Zm2-5h1.6a1.5 1.5 0 0 0 0-3h-1.6v3Z" fill="#fff"/><path d="M8.2 14.7h4.6v1.4H8.2z" fill="#fff"/>'),
@@ -1239,7 +1260,7 @@ V.profile=m=>{
       <div class="row" style="gap:14px;margin-bottom:4px"><span class="avat lg">${acct[0].toUpperCase()}</span>
         <b style="font-size:20px;font-weight:600">${acct}</b>
         <button class="lnk" style="color:var(--accent)" data-copy="${acct}">${I.cp}</button>
-        <button class="lnk spacer dim" data-toast="Редактирование профиля">${I.edit}</button></div>
+        <button class="lnk spacer dim" data-modal="personal">${I.edit}</button></div>
       <button class="rowline" data-go="security"><span class="iconbox">${I.pc}</span>
         <span class="tx"><i>Последняя сессия</i><b>${SESSIONS[0].dev} <i class="dot" style="display:inline-block;background:var(--pos)"></i></b></span>
         <span class="ch2">${I.cv}</span></button>
@@ -1416,6 +1437,27 @@ const MODALS={
   subacct:{ok:'Суб-аккаунт создан',t:'Создать суб-аккаунт',s:'Суб-аккаунт получит собственные адреса подключения',b:()=>`
     <div class="inp"><div class="k">Имя аккаунта</div><input placeholder="latin, 3–20 символов"></div>
     <div class="inp"><div class="k">Комментарий</div><input placeholder="Необязательно"></div>`},
+  /* «Личные данные» и «Добавить номер телефона» — из макета «Действия с телефоном» */
+  personal:{t:'Личные данные',acts:false,b:()=>`
+    <div class="grid g3" style="margin:0;gap:8px">
+      ${['Фамилия','Имя','Отчество'].map(p=>`<div class="afield"><input placeholder="${p}"></div>`).join('')}
+    </div>
+    <div class="afield" style="margin-top:8px"><input placeholder="Дата рождения"><span class="aeye">${I.cal}</span></div>
+    <div class="cap dim" style="margin:16px 0 4px">Контакты</div>
+    <div class="mrow"><span class="mi">${I.phone}</span><span class="tx"><i>Телефон</i></span>
+      <button class="act" data-modal="phone">${I.edit}</button></div>
+    <div class="mrow"><span class="mi">${I.mail}</span><span class="tx"><i>Почта</i>
+      <b>ivanivanov2003@gmail.com <i class="dot" style="display:inline-block;background:var(--pos)"></i></b></span></div>
+    <div class="mrow"><span class="mi">${I.tg}</span><span class="tx"><i>Telegram</i></span>
+      <button class="act" data-toast="Привязка Telegram через @PromminerAlertbot">${I.edit}</button></div>`},
+  phone:{t:'Добавить номер телефона',steps:2,cta:'Продолжить',ok:'Номер телефона добавлен',b:(m,step)=>step===0?`
+    <div class="phonefield"><span class="pre">+7</span><input placeholder="(999) 999-99-99"></div>
+    <p class="cap dim" style="margin-top:10px">Вы сможете авторизовываться по номеру телефона и паролю</p>`
+    :`<div class="mcode"><b>Подтвердите действие</b>
+      <p>Мы отправили код подтверждения на указанный вами email<br>ivanivanov2003@gmail.com</p></div>
+    <div class="afield"><input placeholder="Код подтверждения"></div>
+    <div style="text-align:center;margin-top:12px"><button class="btn link" data-toast="Код вставлен из буфера">Вставить код</button></div>
+    <div style="text-align:center;margin-top:4px"><span class="cap dim">Запросить новый код через 00:59</span></div>`},
   observer:{ok:'Ссылка наблюдателя создана',t:'Создать ссылку наблюдателя',s:'Доступ только для чтения',b:()=>`
     <div class="inp"><div class="k">Название</div><input value="Для бухгалтера"></div>
     <div class="ch" style="gap:6px;margin-top:10px">${['Воркеры','Финансы','Отчет'].map((x,i)=>`<button class="chip ${i<2?'on':''}">${x}</button>`).join('')}</div>`},
@@ -1517,8 +1559,15 @@ function render(){
 }
 function modalHTML(m){
   const d=MODALS[modal];if(!d)return'';
-  return `<div class="mask" data-close><div class="modal"><h2>${d.t}</h2><p class="s">${d.s}</p>${d.b(m)}
-    <div class="acts"><button class="btn" data-close data-toast="${d.ok||'Готово'}">Подтвердить</button><button class="btn g" data-close>Отмена</button></div></div></div>`;
+  const step=U.step||0, steps=typeof d.steps==='function'?d.steps(m):d.steps;
+  return `<div class="mask" data-close><div class="modal">
+    <div class="mhead"><h2>${d.t}</h2><button class="mx" data-close>${I.x}</button></div>
+    ${steps?`<div class="msteps">${Array.from({length:steps},(_,i)=>`<i class="${i<=step?'on':''}"></i>`).join('')}</div>`:''}
+    ${d.s?`<p class="s">${d.s}</p>`:''}${d.b(m,step)}
+    ${d.acts===false?'':`<div class="acts">
+      <button class="btn" ${steps&&step<steps-1?`data-step="${step+1}"`:`data-close data-toast="${d.ok||'Готово'}"`}>${d.cta||'Подтвердить'}</button>
+      ${steps?'':'<button class="btn g" data-close>Отмена</button>'}</div>`}
+  </div></div>`;
 }
 
 /* ============================================================
@@ -1569,11 +1618,12 @@ document.addEventListener('click',e=>{
   const wk=t.closest('[data-wk]');if(wk){const m2=M();U.wk=workersList(m2).find(w=>w.id===+wk.dataset.wk)||null;
     route='worker';pop=null;render();scrollTo(0,0);return}
   if(t.closest('[data-readall]')){S.notif='none';pop=null;render();toast('Все уведомления отмечены как прочитанные');return}
+  const st2=t.closest('[data-step]');if(st2){U.step=+st2.dataset.step;render();return}
+  const md=t.closest('[data-modal]');if(md){modal=md.dataset.modal;U.step=0;pop=null;render();return}
   const tst=t.closest('[data-toast]');
   if(t.closest('[data-close]')){modal=null;render();if(tst)toast(tst.dataset.toast);return}
   if(tst){toast(tst.dataset.toast);return}
   const ax=t.closest('[data-axis]');if(ax){S[ax.dataset.axis]=ax.dataset.val;pop=null;render();return}
-  const md=t.closest('[data-modal]');if(md){modal=md.dataset.modal;pop=null;render();return}
   const go=t.closest('[data-go]');if(go){route=go.dataset.go;pop=null;modal=null;const g=GROUP_OF[route];if(g)openGroups[g]=true;render();scrollTo(0,0);return}
   const gp=t.closest('[data-grp]');if(gp){openGroups[gp.dataset.grp]=!openGroups[gp.dataset.grp];render();return}
   const ac=t.closest('[data-acct]');if(ac){S.acct=ac.dataset.acct;pop=null;render();return}
