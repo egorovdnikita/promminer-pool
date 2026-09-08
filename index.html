@@ -338,11 +338,20 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .scf button{padding:8px 12px;border-radius:var(--r-2xs);background:var(--bg);font-size:12px;font-weight:700}
 /* ===== СОСТОЯНИЯ И ИНТЕРАКТИВ ===== */
 .btn,.chip,.seg button,.ib,.ni,.kid,.cb,.tog,.tile,.pop button,.pager .pg button{transition:background .15s,color .15s,box-shadow .15s,border-color .15s,opacity .15s}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
-.btn:hover{filter:brightness(.95)}
-.btn:active{transform:translateY(1px)}
+/* Состояния по компонентам DS (Button, Tab): hover — следующий шаг indigo,
+   active — ещё темнее, focus — светлое кольцо вокруг формы, а не жёсткий контур */
+:focus-visible{outline:3px solid var(--focus);outline-offset:1px}
+.btn:hover{background:var(--indigo-500)}
+.btn:active{background:var(--indigo-600)}
+.btn.g:hover{background:var(--ctrl-hover)}
+.btn.g:active{background:#7373733d}
+.btn.w:hover{background:var(--ctrl2)}
+.btn.w:active{background:var(--ctrl)}
+.btn.link{transition:color .15s}
+.btn.link:hover,.btn.link:active{background:none;color:var(--indigo-500)}
 .chip:not(.on):hover{background:var(--ctrl-hover)}
-.seg button:not(.on):hover{color:var(--c1)}
+.seg button:not(.on):hover{background:var(--ctrl);color:var(--c1)}
+.seg button:not(.on):active{background:var(--ctrl-hover)}
 .ib:hover{color:var(--c1)}
 .tile{cursor:pointer}
 .tile:hover{background:var(--ctrl)}

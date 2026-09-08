@@ -20,6 +20,9 @@
   и футер делят одни левую и правую границы: горизонтальные отступы живут на `.main`,
   у `.page` их нет.
 - Прод для сверки данных и формулировок: https://pool.promminer.ru/
+- Список страниц Figma с их `node-id` — в `docs/figma-pages.md`. Получить заново:
+  `use_figma` со скриптом `return figma.root.children.map(p=>({id:p.id,name:p.name}))`
+  (`get_metadata` без `nodeId` отдаёт только первый элемент верхнего уровня).
 
 ## Структура index.html
 
