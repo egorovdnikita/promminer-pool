@@ -94,12 +94,12 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .mini-btn{margin-top:auto;display:flex;align-items:center;gap:8px;padding:12px 8px;margin:auto 16px 0;border-radius:var(--r-m);color:var(--c3);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .mini-btn:hover{background:var(--ctrl2)}
 
-.main{flex:1;min-width:0;display:flex;flex-direction:column}
-.page{padding:16px 24px 0;width:100%}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 8px}
+.page{padding:16px 0 0;width:100%}
 
 /* header */
 /* Хедер по DS: белая панель со скруглением 24 снизу */
-.top{background:var(--surface);border-radius:0 0 var(--r-l) var(--r-l);padding:20px 8px}
+.top{background:var(--surface);border-radius:0 0 var(--r-l) var(--r-l);padding:20px 8px;position:sticky;top:0;z-index:50}
 .toprow{display:flex;align-items:center;gap:16px;padding:0 16px}
 .top .h3{flex:1;min-width:0}
 .hgroup{display:flex;align-items:center;gap:16px}
@@ -169,10 +169,28 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .delta.dn{background:#22c55e29;color:var(--pos)}
 .delta.w{background:#ffffff3d;color:#fff}
 
-/* Segmented / Tabs: DS h48, radius-m */
-.seg{display:inline-flex;background:var(--ctrl2);border-radius:var(--r-m);padding:4px;gap:4px}
-.seg button{height:var(--h-btn-sm);padding:0 16px;border-radius:var(--r-s);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c2);display:inline-flex;align-items:center}
+/* Segment Control (💙 Дизайн-система): контейнер h48 radius-m, сегмент h40 radius-s */
+.seg{display:inline-flex;background:var(--ctrl2);border-radius:var(--r-m);padding:4px;gap:4px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.seg::-webkit-scrollbar{display:none}
+.seg button{height:var(--h-btn-sm);padding:0 16px;border-radius:var(--r-s);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c2);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .seg button.on{background:var(--surface);color:var(--c1);box-shadow:0 1px 2px #1a1a1a14}
+.seg.fill{display:flex;width:100%}
+.seg.fill button{flex:1;justify-content:center}
+.seg svg{display:block}
+/* Segment Control Line — подчёркивание вместо подложки */
+.segl{display:inline-flex;gap:24px;border-bottom:1px solid var(--border);max-width:100%;overflow-x:auto;scrollbar-width:none}
+.segl::-webkit-scrollbar{display:none}
+.segl button{height:var(--h-btn);padding:0;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c2);position:relative;white-space:nowrap}
+.segl button:hover{color:var(--c1)}
+.segl button.on{color:var(--c1)}
+.segl button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;border-radius:2px 2px 0 0;background:var(--accent)}
+.segl.onacc button.on{color:var(--accent)}
+.segl.fill{display:flex;width:100%}
+.segl.fill button{flex:1;text-align:center;justify-content:center}
+.segl.inv{border-bottom-color:#ffffff3d}
+.segl.inv button{color:#ffffff8a}
+.segl.inv button:hover,.segl.inv button.on{color:#fff}
+.segl.inv button.on::after{background:#fff}
 /* Chips: DS padding-12, radius-m 16, Body/M SemiBold */
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:8px;min-height:var(--h-ctrl);padding:12px;border-radius:var(--r-m);background:var(--ctrl);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1);white-space:nowrap;flex:0 0 auto}
@@ -615,6 +633,10 @@ const emptyBox=(t,p)=>`<div class="empty"><div class="art">${sv('<path d="M3 13.
 const seg=(id,opts,def=0)=>{const c=U.seg[id]??def;
   return `<div class="seg">${opts.map((o,i)=>`<button class="${i===c?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</div>`};
 const segv=(id,opts,def=0)=>opts[U.seg[id]??def];
+/* Segment Control Line — тот же контракт, что у seg(), но линейный вариант DS */
+const segLine=(id,opts,def=0,cls='')=>{const c=U.seg[id]??def;
+  return `<div class="segl ${cls}">${opts.map((o,i)=>`<button class="${i===c?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</div>`};
+const segi=(id,def=0)=>U.seg[id]??def;
 const pageSlice=(pid,total,per=10)=>{const pages=Math.max(1,Math.ceil(total/per)),cur=Math.min(U.page[pid]||1,pages),f=(cur-1)*per;return[f,Math.min(f+per,total)]};
 /* Чекбокс */
 const cb=(on,attr='')=>`<span class="cb ${on?'on':''}" ${attr}>${on?sv('<path d="M5 12.5l4.5 4.5L19 7"/>',14):''}</span>`;
@@ -980,12 +1002,9 @@ V.calc=m=>card(`
       </div>
     </div>
     <div style="width:300px;padding:16px;color:#fff;display:flex;flex-direction:column">
-      <div class="row" style="gap:0;margin-bottom:18px">
-        <button style="flex:1;padding:8px;color:#ffffff8a;font-size:14px;font-weight:700;text-align:center">Доход за 1 день</button>
-        <button style="flex:1;padding:8px;color:#fff;font-size:14px;font-weight:700;text-align:center;border-bottom:2px solid #fff">Доход за 30 дней</button>
-      </div>
-      <div class="mono" style="font-size:26px;font-weight:800">≈ 0,00048469 ${m.bal[0].s}</div>
-      <div class="mono" style="font-size:12px;opacity:.85;margin-top:4px">≈ 20,84 $ / 1 488,7 ₽</div>
+      ${segLine('calc-period',['Доход за 1 день','Доход за 30 дней'],1,'inv fill')}
+      <div class="mono" style="font-size:26px;font-weight:800;margin-top:18px">≈ ${segi('calc-period',1)?'0,00048469':'0,00001616'} ${m.bal[0].s}</div>
+      <div class="mono" style="font-size:12px;opacity:.85;margin-top:4px">≈ ${segi('calc-period',1)?'20,84 $ / 1 488,7 ₽':'0,69 $ / 49,62 ₽'}</div>
       <button class="btn w" style="margin-top:auto;justify-content:center" data-modal="connect">Начать добывать</button>
     </div>
   </div>`);
@@ -1183,7 +1202,7 @@ V.verification=m=>`${profTabs('verification')}
 ${card(`<div class="ch"><h2>Верификация и реквизиты</h2><div class="spacer"></div>
   <span class="tag ${S.verif==='yes'?'g':S.verif==='pending'?'y':'r'}">${S.verif==='yes'?'Пройдена':S.verif==='pending'?'На проверке':'Не пройдена'}</span></div>
   ${S.verif==='no'?'<div class="warnbar" style="margin-bottom:14px">⚠ Без верификации недоступны выплаты в рублях и генерация отчета о майнинге</div>':''}
-  <div class="ch" style="gap:6px">${['Физическое лицо','Индивидуальный предприниматель','Юридическое лицо'].map((t,i)=>`<button class="chip ${i===1?'on':''}">${t}</button>`).join('')}</div>
+  <div class="ch">${seg('verif-type',['Физическое лицо','Индивидуальный предприниматель','Юридическое лицо'],1)}</div>
   <div class="grid g3" style="margin:0;gap:10px">
     ${[['ФИО','Наталья Руссо'],['ИНН','770*******12'],['ОГРНИП','32077*********4'],['Расчетный счет','40802*********1234'],['Банк','АО «Тинькофф Банк»'],['БИК','044525974']]
       .map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v mono">${S.verif==='no'?'—':v}</div></div>`).join('')}
@@ -1268,7 +1287,7 @@ V.auth=()=>{
    ============================================================ */
 const MODALS={
   connect:{ok:'Воркер добавлен — данные появятся через 5–10 минут',t:'Подключить воркера',s:'Укажите адрес пула и имя воркера в прошивке устройства',b:m=>`
-    <div class="ch" style="gap:6px">${['BTC','LTC + DOGE'].map((x,i)=>`<button class="chip ${i===0?'on':''}">${x}</button>`).join('')}</div>
+    <div class="ch">${seg('connect-coin',['BTC','LTC + DOGE'],S.coin==='btc'?0:1)}</div>
     ${[3333,4444,5555].map((p,i)=>`<div class="urlrow"><div><div class="k">URL ${i+1}</div><div class="v mono">stratum+tcp://ss.promminer.ru:${p}</div></div><button class="spacer lnk" style="color:var(--accent)" data-copy="stratum+tcp://ss.promminer.ru:${p}">${I.cp}</button></div>`).join('')}
     <div class="inp" style="margin-top:10px"><div class="k">Имя воркера</div><input value="natarusso.Ant01"></div>
     <div class="inp"><div class="k">Пароль</div><input value="x"></div>`},
