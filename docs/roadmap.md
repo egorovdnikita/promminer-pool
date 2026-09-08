@@ -31,10 +31,11 @@
       Действия с телеграмом `531:19525`, Флоу подтверждения `493:9597`,
       Верификация и реквизиты `759:68419`, Центр суб-аккаунтов `840:27406`,
       Наблюдатели `882:61237`, Безопасность `588:83412`, Уведомления `940:22834`
-- [ ] Компоненты дизайн-системы, ещё не сверенные: Input, Select, Search, Checkbox,
-      Radio, Switch, Chips, Tags, Status, Alert, Notification, Tooltip, Pagination,
-      Counter, Date Picker, Table cell, Modals/Base, Header, Footer, Sidebar
-      (все id — в `docs/figma-pages.md`)
+- [ ] Компоненты дизайн-системы, ещё не сверенные: Select, Checkbox, Radio, Switch,
+      Chips, Tags, Status, Alert, Notification, Tooltip, Pagination, Counter,
+      Date Picker, Header, Footer, Sidebar (все id — в `docs/figma-pages.md`)
+- [ ] Состояния полей, которых нет в прототипе: ошибка с сообщением, кнопка очистки
+      в заполненном поле, счётчик символов у многострочного
 - [ ] Третья монета ZEC (KSol/s) — в макетах она есть, в данных прототипа только
       BTC и LTC + DOGE
 

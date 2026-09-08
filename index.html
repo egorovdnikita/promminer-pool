@@ -277,8 +277,15 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .ah{font-size:32px;line-height:38px;font-weight:600;text-align:center}
 .asub{font-size:var(--fs-m);line-height:var(--lh-m);text-align:center;font-weight:500;margin-bottom:8px}
 .asub.mut{color:var(--c2)}
-.afield{display:flex;align-items:center;gap:12px;height:var(--h-field);border-radius:var(--r-m);background:var(--ctrl);padding:0 12px;transition:background .15s}
-.afield:focus-within{background:var(--ctrl-hover);box-shadow:0 0 0 2px var(--focus)}
+/* Input по DS: Default — серая заливка, Hover — плотнее, Typed/Focus — белое поле
+   с рамкой, Error — розовая заливка и красная рамка при вводе */
+.afield{display:flex;align-items:center;gap:12px;height:var(--h-field);border-radius:var(--r-m);
+  background:var(--ctrl);border:1px solid transparent;padding:0 12px;transition:background .15s,border-color .15s}
+.afield:hover{background:var(--ctrl-hover)}
+.afield:focus-within{background:var(--surface);border-color:var(--border)}
+.afield.err{background:#ef444414}
+.afield.err:focus-within{background:var(--surface);border-color:var(--neg)}
+.afield+.errmsg{display:block;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--neg);font-weight:500;margin:6px 0 0 12px}
 .afield input{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .afield input::placeholder{color:var(--c3);font-weight:600}
 .aeye{color:var(--c3);display:flex}.aeye:hover{color:var(--c1)}
@@ -290,7 +297,9 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .afoot{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500;padding-top:24px}
 .btn.xl{height:56px;width:100%;justify-content:center;font-size:var(--fs-m);line-height:var(--lh-m)}
 .btn[disabled]{opacity:.5}
-.inp{background:var(--ctrl);border-radius:var(--r-m);padding:12px;margin-bottom:12px;min-height:var(--h-field);display:flex;flex-direction:column;justify-content:center}
+.inp{background:var(--ctrl);border:1px solid transparent;border-radius:var(--r-m);padding:12px;margin-bottom:12px;min-height:var(--h-field);display:flex;flex-direction:column;justify-content:center;transition:background .15s,border-color .15s}
+.inp:hover{background:var(--ctrl-hover)}
+.inp:focus-within{background:var(--surface);border-color:var(--border)}
 .inp .k{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
 .inp input{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .tabs2{display:flex;gap:2px;background:var(--bg);border-radius:var(--r-2xs);padding:3px;margin-bottom:18px}
@@ -317,7 +326,9 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .mcode{text-align:center}
 .mcode b{display:block;font-size:var(--fs-m);font-weight:600;margin-bottom:6px}
 .mcode p{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);margin-bottom:14px}
-.phonefield{display:flex;align-items:center;gap:10px;background:var(--ctrl);border-radius:var(--r-m);padding:0 12px;height:var(--h-field)}
+.phonefield{display:flex;align-items:center;gap:10px;background:var(--ctrl);border:1px solid transparent;border-radius:var(--r-m);padding:0 12px;height:var(--h-field);transition:background .15s,border-color .15s}
+.phonefield:hover{background:var(--ctrl-hover)}
+.phonefield:focus-within{background:var(--surface);border-color:var(--border)}
 .phonefield .pre{color:var(--c2);font-weight:600}
 .modal p.s{font-size:14px;color:var(--c2);margin-bottom:18px}
 .modal .acts{display:flex;gap:8px;margin-top:20px}
@@ -377,7 +388,9 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .promo .btn{align-self:flex-start}
 .pager .pg button:not(:disabled):hover{background:var(--ctrl2)}
 .pager .pg button:disabled{opacity:.35;pointer-events:none}
-.search:focus-within{box-shadow:0 0 0 2px var(--accent-sub)}
+.search{border:1px solid transparent;transition:background .15s,border-color .15s}
+.search:hover{background:var(--ctrl-hover)}
+.search:focus-within{background:var(--surface);border-color:var(--border)}
 .search input{font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c1)}
 /* тосты */
 #toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
