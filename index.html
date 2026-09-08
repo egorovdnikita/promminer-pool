@@ -112,6 +112,7 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .pill:hover{background:var(--ctrl2)}
 .pill.sq{border-radius:var(--r-m);height:var(--h-ctrl)}
 .pill.flat{background:var(--ctrl);border-color:transparent}
+.pill.flat.on{background:var(--accent-sub);color:var(--accent)}
 .ib{width:var(--h-ctrl);height:var(--h-ctrl);border-radius:var(--r-m);background:transparent;border:1px solid var(--border);display:grid;place-items:center;position:relative;color:var(--c3)}
 .ib:hover{background:var(--ctrl2);color:var(--c1)}
 .ib.sm{width:var(--h-btn-sm);height:var(--h-btn-sm);border-radius:var(--r-s)}
@@ -163,7 +164,7 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .tile.alert{background:#ef444414}.tile.alert .n{color:var(--neg)}
 .statcard{background:var(--surface);border-radius:var(--r-m);padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
 .statcard .n{font-size:20px;font-weight:800}
-.statcard .ic{margin-left:auto;width:var(--h-ctrl);height:var(--h-ctrl);border-radius:var(--r-f);background:var(--ctrl2);display:grid;place-items:center}
+.statcard .ic{margin-left:auto;width:var(--h-ctrl);height:var(--h-ctrl);border-radius:var(--r-f);background:var(--ctrl2);display:grid;place-items:center;color:#fff;flex:0 0 auto}
 .delta{display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:700;padding:2px 6px;border-radius:var(--r-f)}
 .delta.up{background:#ef444429;color:var(--neg)}
 .delta.dn{background:#22c55e29;color:var(--pos)}
@@ -177,6 +178,9 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .seg.fill{display:flex;width:100%}
 .seg.fill button{flex:1;justify-content:center}
 .seg svg{display:block}
+.seg u{font-style:normal;text-decoration:none;color:var(--c3);font-weight:600}
+.seg button.on u{color:var(--c2)}
+.segl u{font-style:normal;text-decoration:none;color:var(--c3);font-weight:600;margin-left:4px}
 /* Segment Control Line — подчёркивание вместо подложки */
 .segl{display:inline-flex;gap:24px;border-bottom:1px solid var(--border);max-width:100%;overflow-x:auto;scrollbar-width:none}
 .segl::-webkit-scrollbar{display:none}
@@ -336,8 +340,6 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 /* панель массовых действий */
 .bulk{display:flex;align-items:center;gap:12px;background:var(--accent-sub);border-radius:var(--r-m);padding:12px;margin-bottom:12px;font-size:var(--fs-s);line-height:var(--lh-s)}
 /* лента групп */
-.geostrip{flex:1;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
-.geostrip::-webkit-scrollbar{display:none}
 .lnk{color:inherit;font:inherit;cursor:pointer}
 .lnk:hover{color:var(--accent)}
 .linkrow svg{display:inline-block;vertical-align:-4px}
@@ -561,6 +563,9 @@ const I={
   gear:sv('<path opacity=".5" d="M12 2.2c.8 0 1.5.4 1.9 1l.6 1c.2.3.6.5 1 .5l1.2-.1a2.2 2.2 0 0 1 2.2 3.3l-.6 1c-.2.3-.2.7 0 1l.6 1a2.2 2.2 0 0 1-2.2 3.3l-1.2-.1c-.4 0-.8.2-1 .5l-.6 1a2.2 2.2 0 0 1-3.8 0l-.6-1c-.2-.3-.6-.5-1-.5l-1.2.1a2.2 2.2 0 0 1-2.2-3.3l.6-1c.2-.3.2-.7 0-1l-.6-1a2.2 2.2 0 0 1 2.2-3.3l1.2.1c.4 0 .8-.2 1-.5l.6-1c.4-.6 1.1-1 1.9-1Z"/><circle cx="12" cy="12" r="3"/>',20),
   out:sv('<path opacity=".5" d="M2.6 12c0-4 0-6.1 1.2-7.3C5 3.5 7 3.5 11 3.5h1v17h-1c-4 0-6.1 0-7.3-1.2C2.6 18.1 2.6 16 2.6 12Z"/><path d="M14.7 8.5a1 1 0 0 1 1.4 0l2.8 2.8a1 1 0 0 1 0 1.4l-2.8 2.8a1 1 0 1 1-1.4-1.4l1.1-1.1H10a1 1 0 1 1 0-2h5.8l-1.1-1.1a1 1 0 0 1 0-1.4Z"/>',20),
   checkall:sv('<path opacity=".5" d="M2.6 6.8c0-2 0-3 .6-3.6.6-.6 1.6-.6 3.6-.6h10.4c2 0 3 0 3.6.6.6.6.6 1.6.6 3.6v10.4c0 2 0 3-.6 3.6-.6.6-1.6.6-3.6.6H6.8c-2 0-3 0-3.6-.6-.6-.6-.6-1.6-.6-3.6V6.8Z"/><path d="m10.6 15.6-3.2-3.2 1.4-1.4 1.8 1.8 4.6-4.6 1.4 1.4-6 6Z"/>',20),
+  ok:sv('<path d="M10.2 16.6 6 12.4l1.7-1.7 2.5 2.5 6.1-6.1 1.7 1.7-7.8 7.8Z"/>',18),
+  excl:sv('<path d="M10.8 5.4h2.4l-.4 8.4h-1.6l-.4-8.4Zm1.2 10.2a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z"/>',18),
+  pause:sv('<path d="M8.6 6.6h2.2v10.8H8.6zM13.2 6.6h2.2v10.8h-2.2z"/>',18),
   qr:sv('<path opacity=".5" d="M3 4.6c0-.9.7-1.6 1.6-1.6h4c.9 0 1.6.7 1.6 1.6v4c0 .9-.7 1.6-1.6 1.6h-4c-.9 0-1.6-.7-1.6-1.6v-4Zm0 10.8c0-.9.7-1.6 1.6-1.6h4c.9 0 1.6.7 1.6 1.6v4c0 .9-.7 1.6-1.6 1.6h-4c-.9 0-1.6-.7-1.6-1.6v-4Zm10.8-10.8c0-.9.7-1.6 1.6-1.6h4c.9 0 1.6.7 1.6 1.6v4c0 .9-.7 1.6-1.6 1.6h-4c-.9 0-1.6-.7-1.6-1.6v-4Z"/><path d="M5.4 5.4h2.4v2.4H5.4zM5.4 16.2h2.4v2.4H5.4zM16.2 5.4h2.4v2.4h-2.4zM13.8 13.8h2.4v2.4h-2.4zM18.6 13.8H21v2.4h-2.4zM13.8 18.6h2.4V21h-2.4zM18.6 18.6H21V21h-2.4z"/>',20),
   /* Рубль для баланса пула */
   rub:sv('<circle cx="12" cy="12" r="10" fill="#22c55e"/><path d="M9.2 17.4V7.4h3.6a3.2 3.2 0 0 1 0 6.4h-1.8v.9h2.6v1.4h-2.6v1.3H9.2Zm2-5h1.6a1.5 1.5 0 0 0 0-3h-1.6v3Z" fill="#fff"/><path d="M8.2 14.7h4.6v1.4H8.2z" fill="#fff"/>'),
@@ -692,7 +697,7 @@ ${S.role==='observer'?'<div class="obs">👁 Режим наблюдателя �
 <div class="grid g3">
   ${card(`<div class="ch"><h2>Доход</h2>${S.role==='owner'?'<a class="spacer" href="#" style="font-size:14px;font-weight:600">Продать</a>':''}</div>
     <div class="hero"><div style="display:flex;gap:20px;flex:1;min-width:0">
-      ${m.bal.map(b=>`<div><div class="l">Текущий баланс</div><div class="v mono">${nf(b.v,b.s==='DOGE'?2:4)} ${b.s}</div><div class="s mono">≈ ${nf(b.usd)} $ • ${nf(b.rub)} ₽</div></div>`).join('')}
+      ${m.bal.map(b=>`<div><div class="l">Текущий баланс</div><div class="v mono">${nf(b.v,b.s==='DOGE'?2:8)} ${b.s}</div><div class="s mono">≈ ${nf(b.usd)} $ • ${nf(b.rub)} ₽</div></div>`).join('')}
     </div><span class="cv">${I.cv}</span></div>
     <div class="stats"><div><div class="l">За 24 ч</div>${m.d24.map(b=>`<div class="v mono">${nf(b.v,b.s==='DOGE'?2:8)} ${b.s}</div>`).join('')}</div>
       <div><div class="l">За все время</div>${m.all.map(b=>`<div class="v mono">${nf(b.v,b.s==='DOGE'?2:8)} ${b.s}</div>`).join('')}</div></div>`)}
@@ -736,8 +741,11 @@ function incomeTable(m,n,pid){
   let from=0,to=n;
   if(pid){const per=10,pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
   return `<div class="tw"><table class="tbl"><thead><tr>
-    <th>Дата и время</th><th>Хэшрейт ${I.inf}</th><th class="num">Доход, ${u}</th><th class="num">Доход с 1 ${m.c.short}, ${u}</th>
-    <th class="num">Доход, $ ${I.inf}</th><th class="num">Доход, ₽ ${I.inf}</th><th class="num">Баланс, ${u}</th><th class="num">Цена ${u}, ₽</th></tr></thead><tbody>
+    <th>Дата и время</th><th>Хэшрейт ${I.inf}</th>
+    <th class="num"><span class="thico">${COIN_ICON[u]} Доход, ${u}</span></th><th class="num">Доход с 1 ${m.c.short}, ${u}</th>
+    <th class="num"><span class="thico">${USD_ICON} Доход, $ ${I.inf}</span></th>
+    <th class="num"><span class="thico">${I.rub} Доход, ₽ ${I.inf}</span></th>
+    <th class="num">Баланс, ${u}</th><th class="num">Цена ${u}, ₽</th></tr></thead><tbody>
     ${Array.from({length:to-from},(_,j)=>{const i=from+j;return `<tr><td class="mono">${d[i%10]}</td><td class="mono">${hs[i%10]} ${m.c.unit}</td>
       <td class="num mono">${R.amount}</td><td class="num mono">${R.per}</td><td class="num mono">35,00 $</td>
       <td class="num mono">1 000,56 ₽</td><td class="num mono">${R.bal}</td><td class="num mono">${R.price} ₽</td></tr>`}).join('')}
@@ -779,6 +787,9 @@ const tierTrack=m=>`<div class="track"><div class="tbar"><div class="tfill" styl
   <div class="tpts">${TIERS.map((x,i)=>`<div class="pt ${!m.empty&&i<=+S.tier?'on':''}"><i style="${!m.empty&&i<=+S.tier?'background:'+x.c:''}"></i><span>${x.p}</span></div>`).join('')}</div></div>`;
 
 /* --- Воркеры --- */
+/* Группы площадок — лента Segment Control Line из макета «Воркеры» */
+const GEO=[['Все','5 979'],['Москва','2 398'],['Псков','789'],['Ростов','15'],['Питер','16'],
+  ['Пермь','16'],['Воронеж','16'],['Калининград','16'],['Нижний','16'],['Хабаровск','16'],['Казань','16']];
 const WST={ok:['Активен','var(--pos)'],low:['Низкий хэшрейт','var(--warn)'],off:['Отключен','var(--neg)'],fail:['Оффлайн','var(--neu)']};
 function workersList(m){
   if(m.empty) return [];
@@ -810,9 +821,12 @@ const sortTh=(k,label)=>{const s=U.sort.workers, on=s&&s.k===k;
   return `<th class="srt ${on?'on':''}" data-sortk="${k}">${label}${on?(s.d>0?I.sortUp:I.sortDn):I.sortv}</th>`};
 
 V.workers=m=>{
-  const st=[['Активные',m.h.a,'var(--pos)'],['Низкий хэшрейт',m.h.l,'var(--warn)'],['Отключены',m.h.o,'var(--neg)'],['Оффлайн',m.h.f,'var(--neu)']];
+  const st=[['Активные',m.h.a,'var(--pos)',I.ok],['Низкий хэшрейт',m.h.l,'var(--warn)',I.excl],
+            ['Отключены',m.h.o,'var(--neg)',I.x],['Оффлайн',m.h.f,'var(--neu)',I.pause]];
   const all=workersList(m), shown=workersRows(m);
-  const cnt=k=>k==='all'?all.length:all.filter(w=>w.st===k).length;
+  /* Счётчики в фильтре — по всему парку, как в макете (таблица показывает выборку) */
+  const PC={all:m.total,ok:m.h.a,low:m.h.l,off:m.h.o,fail:m.h.f};
+  const cnt=k=>PC[k];
   const per=10, pages=Math.max(1,Math.ceil(shown.length/per));
   const cur=Math.min(U.page.workers||1,pages);
   const page=shown.slice((cur-1)*per,cur*per);
@@ -837,18 +851,18 @@ V.workers=m=>{
       <div><div class="cap dim">Uptime за 24 ч</div><div class="mono" style="font-size:20px;font-weight:800">${m.empty?'0%':m.c.up} <span class="delta dn">▲ 10%</span></div></div>
     </div>`)}
   </div>
-  <div class="grid g4">${st.map(([l,n,c])=>`<div class="statcard"><div><div class="cap dim">${l}</div><div class="n mono">${ni(n)}</div></div>
-    <div class="ic"><i class="dot" style="background:${c};width:14px;height:14px"></i></div></div>`).join('')}</div>
-  <div class="row" style="gap:8px;margin-bottom:12px;overflow:hidden">
-    <button class="ib sm" data-scroll="-1">${I.cl}</button>
-    <div class="chips geostrip" id="geostrip">${['Москва 2 398','Псков 789','Ростов 15','Питер 16','Пермь 16','Воронеж 16','Калининград 16','Нижний 16','Общая 16','Хабаровск 16','Казань 16','Ставрополь 16','Вологда 16'].map(x=>`<button class="chip ${U.geo===x?'on':''}" data-geo="${x}">${x}</button>`).join('')}</div>
-    <button class="ib sm" data-scroll="1">${I.cv}</button>
-    ${S.role==='owner'?`<button class="btn g sm" data-modal="group">${I.pl} Создать группу</button>`:''}
+  <div class="grid g4">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap dim">${l}</div><div class="n mono">${ni(n)}</div></div>
+    <div class="ic" style="background:${c}">${g}</div></div>`).join('')}</div>
+  <!-- Лента групп — Segment Control Line из макета: текстовые вкладки со счётчиками -->
+  <div class="row" style="gap:16px;margin-bottom:12px;min-width:0">
+    <div class="segl" style="flex:1;min-width:0">
+      ${GEO.map(([g,n])=>`<button class="${(U.geo||'Все')===g?'on':''}" data-geo="${g}">${g} <u>${n}</u></button>`).join('')}</div>
+    ${S.role==='owner'?`<button class="btn link" data-modal="group" style="flex:0 0 auto">${I.pl} Создать группу</button>`:''}
   </div>
   ${card(`<div class="ch">
-    <div class="chips">
+    <div class="seg">
       ${[['all','Все',''],['ok','Активные','var(--pos)'],['low','Низкий хэшрейт','var(--warn)'],['off','Отключены','var(--neg)'],['fail','Оффлайн','var(--neu)']]
-        .map(([k,l,c])=>`<button class="chip ${U.wfilter===k?'on':''}" data-wf="${k}">${c?`<i class="dot" style="background:${c}"></i>`:''}${l} <b>${ni(cnt(k))}</b></button>`).join('')}
+        .map(([k,l,c])=>`<button class="${U.wfilter===k?'on':''}" data-wf="${k}">${c?`<i class="dot" style="background:${c}"></i>`:''}${l} <u>${ni(cnt(k))}</u></button>`).join('')}
     </div></div>
   <div class="ch">
     <button class="chip" data-modal="filters">${I.flt} Фильтры</button>
@@ -917,27 +931,34 @@ V.assets=m=>{
         <td class="num"><button class="btn sm" ${m.empty||S.role==='observer'?'disabled':''} data-modal="withdraw">${tab===0?'Вывести':'Продать'}</button></td></tr>`).join('')}
   </tbody></table></div>`)};
 
+/* Доход — по макету: индиго-карточка баланса и две белые, периоды отдельными
+   пилюлями (на этом экране в макете это не Segment Control), иконки валют в шапке. */
+const perPills=(id,opts,def=null)=>`<span class="row" style="gap:8px">${opts.map((o,i)=>
+  `<button class="pill flat sq ${(U.seg[id]??def)===i?'on':''}" style="height:36px;padding:0 14px;font-size:12px" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</span>`;
 V.income=m=>`
 <div class="grid g3">
-  ${card(`<div class="hero" style="min-height:96px"><div><div class="l">Текущий баланс</div>
-    <div class="v mono" style="font-size:26px">${nf(m.bal[0].v,8)} ${m.bal[0].s}</div>
-    <div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div><span class="cv">${I.cv}</span></div>`)}
+  <section class="card hero" style="flex-direction:column;justify-content:center;min-height:132px">
+    <div class="row" style="width:100%;align-items:flex-start"><div>
+      <div class="l">Текущий баланс</div>
+      <div class="v mono" style="font-size:30px;line-height:36px">${nf(m.bal[0].v,8)} ${m.bal[0].s}</div>
+      <div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div>
+      <span class="spacer cv">${I.cv}</span></div></section>
   ${card(`<div class="cap dim" style="margin-bottom:8px">Доход за 24 часа</div>
-    <div class="mono" style="font-size:26px;font-weight:800">${nf(m.d24[0].v,7)} ${m.d24[0].s}</div>
-    <div class="cap dim mono" style="margin-top:4px">≈ 14,71 $ • 1 157,16 ₽</div>`)}
+    <div class="mono" style="font-size:30px;line-height:36px;font-weight:800">${nf(m.d24[0].v,8)} ${m.d24[0].s}</div>
+    <div class="cap dim mono" style="margin-top:6px">≈ 14,71 $ • 1 157,16 ₽</div>`)}
   ${card(`<div class="cap dim" style="margin-bottom:8px">Доход за все время</div>
-    <div class="mono" style="font-size:26px;font-weight:800">${nf(m.all[0].v,7)} ${m.all[0].s}</div>
-    <div class="cap dim mono" style="margin-top:4px">≈ 14,71 $ • 1 157,16 ₽</div>`)}
+    <div class="mono" style="font-size:30px;line-height:36px;font-weight:800">${nf(m.all[0].v,8)} ${m.all[0].s}</div>
+    <div class="cap dim mono" style="margin-top:6px">≈ 14,71 $ • 1 157,16 ₽</div>`)}
 </div>
 ${card(`<div class="ch"><h2>График дохода (${m.bal[0].s})</h2><div class="spacer"></div>
-  ${seg('income-chart',['7 дн','30 дн','90 дн'],1)}
-  <span class="pill flat sq" style="font-size:12px">Выберите дату ${I.cal}</span>
+  ${perPills('income-chart',['7 дн','30 дн','90 дн'],0)}
+  <span class="pill flat sq" style="height:36px;font-size:12px">Выберите дату ${I.cal}</span>
   <button class="ib sm">${I.zi}</button><button class="ib sm">${I.zo}</button></div>
   ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:['15.07','16.07','17.07','18.07','19.07','20.07','21.07']})}`)}
 <div style="height:12px"></div>
 ${card(`<div class="ch"><h2>История дохода</h2><div class="spacer"></div>
-  ${seg('income-hist',['7 дн','30 дн','90 дн'],1)}
-  <span class="pill flat sq" style="font-size:12px">Выберите дату ${I.cal}</span><button class="ib sm">${I.dl}</button></div>
+  ${perPills('income-hist',['7 дн','30 дн','90 дн'],0)}
+  <span class="pill flat sq" style="height:36px;font-size:12px">Выберите дату ${I.cal}</span><button class="ib sm">${I.dl}</button></div>
   ${incomeTable(m,m.empty?0:48,'income')}`)}`;
 
 V.payouts=m=>{
@@ -1091,9 +1112,10 @@ ${card(`<div class="ch"><h2>Настройка реферальных выпла
     <span class="mut">Заполните форму, как Юридическое лицо или Индивидуальный предприниматель в разделе <a href="#" data-go="verification">Верификация и реквизиты</a></span></div>
     <button class="spacer dim">${I.x}</button></div>
   <div class="tw"><table class="tbl"><thead><tr><th>Монеты</th><th>Баланс</th><th>Баланс, $</th><th>Баланс, ₽</th><th>Реквизиты</th><th>Порог автовыплат ${I.inf}</th><th>Автовыплаты ${I.inf}</th><th></th></tr></thead><tbody>
-  ${[['BTC','#F7931A','0.001 BTC'],['LTC','#345D9D','0.001 LTC'],['DOGE','#C2A633','1 DOGE']].map(([s,c,th])=>`<tr>
+  ${[['BTC','WU/****9uG1','0.001 BTC'],['LTC','','0.001 LTC'],['DOGE','DKb/****7uJT','1 DOGE']].map(([s,req,th])=>`<tr>
     <td><span class="coin">${COIN_ICON[s]}${s}</span></td>
-    <td class="mono">0 ${s}</td><td class="mono">0 $</td><td class="mono">0 ₽</td><td><a href="#" data-modal="wallet">+ Добавить</a></td>
+    <td class="mono">0 ${s}</td><td class="mono">0 $</td><td class="mono">0 ₽</td>
+    <td>${req?`<span class="pill flat sq mono" style="height:32px;font-size:12px">${req} ${I.edit}</span>`:`<button class="addbtn" data-modal="wallet">${I.pl} Добавить</button>`}</td>
     <td><span class="pill flat sq mono" style="height:28px;font-size:12px">${th} ${I.edit}</span></td>
     <td><span class="tog" data-tog></span></td><td class="num"><button class="btn sm" disabled>Вывести</button></td></tr>`).join('')}
   </tbody></table></div>`)}
@@ -1456,10 +1478,8 @@ document.addEventListener('click',e=>{
     page=rows.slice((cur-1)*per,cur*per), on=page.every(w=>U.sel.has(w.id));
     page.forEach(w=>on?U.sel.delete(w.id):U.sel.add(w.id));render();return}
   if(t.closest('[data-selclear]')){U.sel.clear();render();return}
-  const geo=t.closest('[data-geo]');if(geo){U.geo=U.geo===geo.dataset.geo?'':geo.dataset.geo;render();return}
+  const geo=t.closest('[data-geo]');if(geo){U.geo=geo.dataset.geo==='Все'?'':geo.dataset.geo;U.page.workers=1;render();return}
   const tf=t.closest('[data-tilef]');if(tf){U.wfilter=tf.dataset.tilef;U.page.workers=1;route='workers';render();scrollTo(0,0);return}
-  const sc2=t.closest('[data-scroll]');if(sc2){const s2=document.getElementById('geostrip');
-    if(s2)s2.scrollBy({left:+sc2.dataset.scroll*320,behavior:'smooth'});return}
   const cp=t.closest('[data-copy]');if(cp){navigator.clipboard?.writeText(cp.dataset.copy);toast('Скопировано');return}
   const wk=t.closest('[data-wk]');if(wk){const m2=M();U.wk=workersList(m2).find(w=>w.id===+wk.dataset.wk)||null;
     route='worker';pop=null;render();scrollTo(0,0);return}
