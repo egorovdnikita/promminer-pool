@@ -19,14 +19,14 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "types": [
-      "vite/client"
+      "vite/client",
+      "node"
     ],
     "paths": {
       "@/*": [
         "./src/*"
       ]
-    },
-    "baseUrl": "."
+    }
   },
   "include": [
     "src",

@@ -7,20 +7,34 @@
 
 ## Что это
 
-Один самодостаточный файл [`index.html`](index.html) — HTML + CSS + ванильный JS, без сборки
-и без зависимостей (кроме шрифта Manrope с Google Fonts как fallback для Gilroy).
-Всё состояние приложения живёт в URL-хэше, поэтому любой сценарий можно скинуть ссылкой команде.
+Vite + React + TypeScript, роутер — TanStack Router (файловый), стили — CSS дизайн-системы
+плюс Tailwind v4. Сценарий приложения живёт в хэше ссылки, поэтому любую комбинацию
+можно скинуть команде одним URL.
 
-## Как открыть
+Прежняя однофайловая версия сохранена в [`archive/index.html`](archive/index.html):
+она открывается двойным кликом без сборки и служит эталоном внешнего вида,
+пока экраны переезжают в TSX.
+
+## Как запустить
 
 ```bash
-open index.html
+npm install
+npm run dev
 ```
 
-Либо через локальный сервер:
+Откроется на http://localhost:5173. Сборка и проверка типов — `npm run build`,
+просмотр собранного — `npm run preview`.
 
-```bash
-python3 -m http.server 4173
+## Структура
+
+```
+src/
+  main.tsx              точка входа
+  routes/               маршруты: __root.tsx (каркас), index.tsx (Главная), $route.tsx (разделы)
+  state/store.tsx       состояние сценария и интерфейса, обработка кликов, синхронизация с хэшем
+  components/           каркас: Sidebar, Header, Coinbar, Footer, Modal, ScenarioPanel, Toasts
+  legacy/prototype.js   движок из архива: данные, иконки, экраны, модалки — переезжает в TSX по частям
+  styles/               app.css (дизайн-система), react.css, index.css
 ```
 
 ## Сценарии
@@ -57,8 +71,8 @@ python3 -m http.server 4173
 
 Токены, размеры контролов и типографика сняты с прод-сборки дизайн-системы —
 точные значения и таблицы в [docs/prod-analysis.md](docs/prod-analysis.md).
-Шрифт Gilroy (5 начертаний, woff2 с прода) вшит в `index.html`, поэтому прототип
-рендерится тем же шрифтом, что и продукт, на любой машине.
+Шрифт Gilroy (5 начертаний, woff2 с прода) лежит в `public/fonts` и подключается
+из `src/styles/app.css`, поэтому прототип рендерится тем же шрифтом, что и продукт.
 Иконки — Solar Bold Duotone из [💙 Дизайн-системы](https://www.figma.com/design/8rrL0jaovYD3jsrq7WF1L1/).
 Есть тёмная тема — переключатель в хедере.
 Список всех макетов — в [docs/context.md](docs/context.md).
