@@ -54,8 +54,13 @@ Button, Tab, Input, Modals/Base, Table cell, Checkbox, Radio, Switch, Select,
 Chips, Tags, Status, Alert, Notification, Tooltip, Pagination, Counter,
 Date Picker, Header, Footer, Sidebar.
 
+**UI icons** (`140:124`) — 1263 компонент-сета вида `UI icons / Группа / Имя`,
+у каждого варианты по стилю. 45 иконок прототипа выгружены отсюда (Bold Duotone),
+плюс Telegram со страницы **Brands** (`140:127`). Подробности — в `docs/icons.md`.
+Остальные страницы иконок: `140:125` Flags, `140:126` Payments, `140:123` IconBox.
+
 Не смотрели: Scroll, Search, Indicator, Color picker, Tabbar (мобильный),
-Logo, IconBox, UI icons, Loader, Skeleton и составные страницы
+Logo, Loader, Skeleton и составные страницы
 (Workers, Finance, My referrals, Profile, Sub-accounts).
 
 Остальное: `140:739` Modals/Base, `40001644:465` Table cell,
