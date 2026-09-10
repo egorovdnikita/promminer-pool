@@ -849,14 +849,14 @@ V.profile=m=>{
   <div>
     ${card(`<div class="ch"><h2>Мои суб-аккаунты</h2><button class="btn link spacer bs" data-go="subaccounts">Смотреть все</button></div>
       <div class="grid g3" style="margin:0">${subs.map(s=>subTile(m,s)).join('')}
-        ${S.role==='owner'?`<button class="dashed" data-modal="subacct">${I.pl}Создать суб-аккаунт</button>`:''}</div>`)}
+        ${S.role==='owner'?`<button class="dashed" style="grid-column:span ${Math.max(1,3-subs.length%3||3)}" data-modal="subacct">${I.pl}Создать суб-аккаунт</button>`:''}</div>`)}
     <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Мои наблюдатели</h2>${obs.length?'<button class="btn link spacer bs" data-go="observers">Смотреть все</button>':''}</div>
       ${obs.length?`<div class="grid g3" style="margin:0">${obs.map(obsTile).join('')}
         ${S.role==='owner'?`<button class="dashed" data-modal="observer">${I.pl}Добавить наблюдателя</button>`:''}</div>`
-      :`<div class="empty" style="padding:24px 0 20px"><div class="art">${I.eye}</div>
-          <p style="max-width:320px">У вас еще нет созданных ссылок наблюдателей</p>
-          ${S.role==='owner'?`<button class="btn g sm" style="margin-top:10px" data-modal="observer">${I.pl} Создать</button>`:''}</div>`}`)}
+      :`<div class="empty" style="padding:48px 0 40px"><div class="art">${I.eye}</div>
+          <p style="max-width:340px">У вас еще нет созданных ссылок наблюдателей</p>
+          ${S.role==='owner'?`<button class="btn out sm" style="margin-top:16px" data-modal="observer">${I.pl} Создать</button>`:''}</div>`}`)}
     <div style="height:12px"></div>
     <div class="grid g2" style="margin:0">
       ${PROMOS.map(([t,b])=>`<section class="promo"><div class="orb"></div>
@@ -877,11 +877,11 @@ V.profile=m=>{
         <span class="tx"><b>Google Authentication</b><span class="badge" style="margin-top:4px">Не подключено</span></span>
         <span class="ch2">${I.cv}</span></button>`)}
     <div style="height:12px"></div>
-    ${card(`<div class="ch"><h2>Последние уведомления</h2>${n?`<span class="cnt">${n}</span>`:''}
+    ${card(`<div class="ch"><h2>Последние уведомления</h2>
       <button class="btn link spacer dim" data-go="notifsettings">${I.cv}</button></div>
       ${n?`${notes.slice(0,Math.min(n,4)).map(([t,d,dt])=>`<div class="note"><i></i><div><b>${t}</b><p>${d}</p><span>${dt}</span></div></div>`).join('')}
         <div style="text-align:center;padding-top:8px"><button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button></div>`
-        :`<div class="empty" style="padding:24px 0"><p>Уведомлений пока нет</p></div>`}`)}
+        :`<div class="empty" style="padding:96px 0"><p>Уведомлений пока нет</p></div>`}`)}
   </div>
 </div>`;
 };

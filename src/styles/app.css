@@ -490,8 +490,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .acard[data-acct]{cursor:pointer}
 .acard[data-acct]:hover{border-color:var(--accent)}
 .acard b.t{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);font-weight:600;margin-bottom:8px}
-.kv{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;font-size:var(--fs-s);line-height:26px;color:var(--c2);font-weight:500}
-.kv span{margin-left:auto;color:var(--c1);font-weight:600}
+.kv{display:flex;align-items:center;gap:8px;min-width:0;font-size:var(--fs-s);line-height:26px;color:var(--c2);font-weight:500;white-space:nowrap}
+.kv span{margin-left:auto;color:var(--c1);font-weight:600;flex:0 0 auto}
+.kv .row{white-space:normal;flex:0 1 auto}
 /* плитки-карточки внутри карточек (суб-аккаунты, наблюдатели) */
 .tile2{background:var(--bg);border-radius:var(--r-m);padding:16px;min-width:0}
 .dashed{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg);border-radius:var(--r-m);padding:16px;min-height:150px;color:var(--accent);font-size:var(--fs-s);font-weight:600;width:100%}
