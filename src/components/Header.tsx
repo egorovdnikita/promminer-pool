@@ -46,10 +46,11 @@ export function Header({ m }: { m: Model }) {
               <div className="pop" style={{ minWidth: 280 }}>
                 <div className="phead">
                   <span className="avat">{acct[0].toUpperCase()}</span>
-                  <b style={{ fontSize: 18, fontWeight: 600 }}>{acct}</b>
-                  <button className="spacer lnk" style={{ color: 'var(--accent)' }} data-copy={acct}>
-                    <Ico html={I.cp} />
-                  </button>
+                  <span className="uname">
+                    <b>{acct}<button className="lnk" style={{ color: 'var(--accent)' }} data-copy={acct}>
+                      <Ico html={I.cp} /></button></b>
+                    <i>Иванов Иван</i>
+                  </span>
                 </div>
                 {PROF.map(([id, t, ic]) => (
                   <button data-go={id} key={id}><Ico className="i3" html={I[ic]} />{t}</button>

@@ -148,7 +148,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 
 /* popovers */
 .pop-wrap{position:relative}
-.pop{position:absolute;right:0;top:calc(100% + 8px);z-index:40;background:var(--surface);border-radius:var(--r-m);box-shadow:var(--shadow);padding:8px 12px 4px;min-width:230px;max-height:60vh;overflow:auto}
+.pop{position:absolute;right:0;top:calc(100% + 8px);z-index:40;background:var(--surface);border-radius:var(--r-l);box-shadow:var(--shadow);padding:16px;min-width:250px;max-height:70vh;overflow:auto}
 .pop.left{right:auto;left:0}
 .pop b.ph{display:block;font-size:12px;color:var(--c3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 0 6px}
 .pop button:not(.btn):not(.ra):not(.lnk):not(.dp-nav){display:flex;align-items:center;gap:8px;width:100%;padding:8px 0;min-height:40px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
@@ -476,8 +476,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .toast.in{opacity:1;transform:none}
 /* ===== БЛОКИ, СВЕРЕННЫЕ С ПРОДОМ ===== */
 /* попоуверы хедера */
-.pop.wide{min-width:484px;padding:16px;border-radius:var(--r-l)}
-.pop.mid{min-width:330px;padding:12px;border-radius:var(--r-l)}
+.pop.wide{min-width:484px;padding:20px;border-radius:var(--r-l)}
+.pop.mid{min-width:330px;padding:16px;border-radius:var(--r-l)}
 .nhead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .nhead b{font-size:20px;line-height:24px;font-weight:600;white-space:nowrap}
 .nhead .ra{margin-left:auto;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
@@ -595,3 +595,23 @@ body.mini .ni .spacer.lbl{display:none!important}
 .subtbl tbody tr.total td:first-child{border-radius:var(--r-s) 0 0 var(--r-s)}
 .subtbl tbody tr.total td:last-child{border-radius:0 var(--r-s) var(--r-s) 0}
 .subtbl .thico svg{width:20px;height:20px}
+
+/* Уведомления в попоувере: без подложки, строки разделены снизу (макет «Оболочки») */
+.nplist{display:flex;flex-direction:column;margin:4px 0 16px}
+.nitem{display:grid;grid-template-columns:8px 1fr;gap:12px;padding:14px 0;align-items:start}
+.nitem+.nitem{border-top:1px solid var(--border)}
+.nitem>.dot{width:8px;height:8px;margin-top:5px;background:var(--accent)}
+.nitem.read>.dot{background:transparent}
+.nitem .nb{display:flex;align-items:baseline;gap:12px}
+.nitem .nt{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
+.nitem .nd{margin-left:auto;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);white-space:nowrap}
+.nitem p{margin-top:4px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nempty{padding:32px 0 36px;gap:0}
+.nempty img{display:block;margin:0 auto 16px}
+.nempty p{color:var(--c2)}
+.nhead .ra.off{opacity:.4;pointer-events:none}
+/* Имя пользователя в меню: логин и полное имя под ним */
+.uname{display:flex;flex-direction:column;gap:2px;min-width:0}
+.uname b{display:flex;align-items:center;gap:8px;font-size:18px;line-height:22px;font-weight:600}
+.uname i{font-style:normal;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}

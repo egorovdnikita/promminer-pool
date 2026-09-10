@@ -1137,33 +1137,37 @@ const MODALS={
    внизу кнопка «Посмотреть все» во всю ширину. */
 function notifications(){
   const n=NOTIF_N[S.notif];
-  const list=[['Воркер Ant07 ушел в оффлайн','Последняя шара 2 часа назад','12 мин назад'],
-    ['Выплата отправлена','0,01254 BTC на bc1q…4f2a','1 ч назад'],
-    ['Новый реферал','miner_1042 зарегистрировался по вашей ссылке','вчера'],
-    ['Отчет за апрель сгенерирован','Доступен для скачивания','2 дня назад']];
+  const list=[['Средства выведены успешно','Вывод 74.768854 DOGE на ваш аккаунт accou…','22/07/2025 07:20'],
+    ['Выплата отправлена','0,01254 BTC на bc1q…4f2a','22/07/2025 07:20'],
+    ['Новый реферал','miner_1042 зарегистрировался по вашей ссылке','21/07/2025 19:04'],
+    ['Отчет за апрель сгенерирован','Доступен для скачивания','20/07/2025 11:32'],
+    ['Вход с нового IP','Выполнен вход с нового IP –45.234.123.345','19/07/2025 08:10']];
   return `<div class="pop wide">
-    <div class="nhead"><b>${n?'Новые уведомления':'Уведомления'}</b>${n?`<span class="cnt">${n>99?'99+':n}</span>`:''}
-      ${n?`<button class="ra" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall}Прочитать все</button>`:''}</div>
-    ${n?list.map((x,i)=>`<div class="note ${i>=n?'read':''}"><i></i><div><b>${x[0]}</b><p>${x[1]}</p><span>${x[2]}</span></div></div>`).join('')
-       :`<div class="empty" style="padding:24px 0 20px"><div class="art">${I.bell}</div><p>Уведомлений пока нет</p></div>`}
-    <button class="btn xl" style="margin-top:12px" data-go="notifsettings">Посмотреть все</button></div>`;
+    <div class="nhead"><b>Новые уведомления</b>${n?`<span class="cnt">${n>99?'99+':n}</span>`:''}
+      <button class="ra ${n?'':'off'}" ${n?'data-readall data-toast="Все уведомления отмечены как прочитанные"':'disabled'}>${I.checkall}Прочитать все</button></div>
+    ${n?`<div class="nplist">${list.slice(0,Math.min(n,5)).map(([t,d,dt])=>`<div class="nitem"><i class="dot"></i>
+        <div><div class="nb"><span class="nt">${t}</span><span class="nd">${dt}</span></div><p>${d}</p></div></div>`).join('')}</div>`
+      :`<div class="empty nempty"><img src="/empty-state.svg" alt="" width="120" height="95">
+         <p>Уведомлений пока нет</p></div>`}
+    <button class="btn xl" data-go="notifsettings">Посмотреть все</button></div>`;
 }
 /* Попоувер баланса — «Сводка по аккаунтам», как на проде */
 function acctSummary(m){
   const cur=S.acct==='main'?'natarusso':'alfred';
-  const rows=S.acct==='main'?[['natarusso',1]]:[['natarusso',1],['alfred',0]];
+  const rows=subsOf(m);
   return `<div class="pop mid">
     <div class="acard"><b class="t">Сводка по аккаунтам</b>
-      <div class="kv">Общий баланс<span class="mono">${nf(m.bal.reduce((s,x)=>s+x.usd,0))} $</span></div>
+      <div class="kv">Общий баланс<span class="mono">${nf(rows.reduce((a,r)=>a+r.bal,0))} $</span></div>
       <div class="kv">Количество аккаунтов<span class="mono">${rows.length}</span></div></div>
     <div class="hr"></div>
-    ${rows.map(([a,main],i)=>`<div class="acard ${a===cur?'sel':''}" data-acct="${i===0?'main':'sub'}">
-      <b class="t">${a}${main?'<span class="tag sel spacer">Основной</span>':''}</b>
-      <div class="kv">Общий баланс<span class="mono">${main?nf(m.bal[0].usd):'0,00'} $</span></div>
-      <div class="kv">Хэшрейт, BTC<span class="mono">${main&&S.coin==='btc'?m.avg:'0'} TH/s</span></div>
-      <div class="kv">Хэшрейт, LTC<span class="mono">${main&&S.coin==='ltc'?m.avg:'0'} GH/s</span></div></div>`).join('')}
+    ${rows.map((r,i)=>`<div class="acard ${r.name===cur?'sel':''}" data-acct="${i===0?'main':'sub'}">
+      <b class="t">${r.name}<span class="tag ${r.main?'sel':'n'} spacer">${r.main?'Основной':'Суб-аккаунт'}</span></b>
+      <div class="kv">Общий баланс<span class="mono">${nf(r.bal)} $</span></div>
+      <div class="kv">Хэшрейт, BTC<span class="mono">${ni(r.h[0])} TH/s</span></div>
+      <div class="kv">Хэшрейт, LTC<span class="mono">${ni(r.h[1])} GH/s</span></div></div>`).join('')}
     <button class="btn out" style="width:100%;justify-content:center" data-modal="subacct">${I.pl} Добавить суб-аккаунт</button></div>`;
 }
+
 
 /* ============================================================
    Мост в React
