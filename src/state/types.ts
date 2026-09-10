@@ -7,6 +7,8 @@ export interface Scenario {
   tier: string
   verif: string
   notif: string
+  subs: string
+  obs: string
   acct: string
 }
 

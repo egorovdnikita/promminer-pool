@@ -18,9 +18,11 @@ const AXES={
   tier:{label:'Уровень рефералки',opts:[['0','5%'],['1','10%'],['2','15%'],['3','20%'],['4','25%']]},
   verif:{label:'Верификация',opts:[['no','Не пройдена'],['pending','На проверке'],['yes','Пройдена']]},
   notif:{label:'Уведомления',opts:[['many','12 новых'],['few','2 новых'],['none','Нет']]},
+  subs:{label:'Суб-аккаунты',opts:[['many','3'],['few','1'],['none','Только основной']]},
+  obs:{label:'Наблюдатели',opts:[['many','3'],['few','1'],['none','Нет']]},
   acct:{label:'Аккаунт',opts:[['main','Основной'],['sub','Суб-аккаунт']]},
 };
-const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',acct:'main'};
+const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',acct:'main'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
 let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
@@ -769,8 +771,8 @@ const PROF=[['profile','Мой профиль','user'],['security','Безопа
    считается итоговая строка «Все аккаунты». Поля workers/btc/ltc/zec
    оставлены для плиток в сводке профиля. */
 const SUBS=[
-  {name:'natarusso', main:1,arch:0,bal:10800.45,w:[8900,2,10,3456],h:[1400,0,0],inc:[0.003,0.0035,0.0005,0.0005],
-   workers:672,btc:'1 399',ltc:'0',zec:'0',created:'12.03.2024',active:1},
+  {name:'natarusso', main:1,arch:0,bal:10800.45,w:[99,23,10,77],h:[1400,0,0],inc:[0.003,0.0035,0.0005,0.0005],
+   workers:209,btc:'1 399',ltc:'0',zec:'0',created:'12.03.2024',active:1},
   {name:'larusso',   main:0,arch:0,bal:0,       w:[0,0,0,0],       h:[0,0,0],   inc:[0,0,0,0],
    workers:0,  btc:'0',    ltc:'0',zec:'0',created:'04.11.2025',active:1},
   {name:'alfred',    main:0,arch:0,bal:2000,    w:[40,145,0,5],    h:[600,0,0], inc:[0.00000009,0.0015,0.0004,0.0004],
@@ -792,9 +794,13 @@ const SESSIONS=[
   {dev:'iPhone 15, Safari (iOS)',        ip:'212.90.4.18', loc:'Санкт-Петербург',when:'2 часа назад',cur:0},
   {dev:'Windows 11, Chrome',             ip:'77.88.12.9',  loc:'Казань',when:'вчера, 18:40',cur:0}];
 /* Сценарий «Пусто» — свежий аккаунт: только основной, без наблюдателей и чужих сессий */
-const subsOf=m=>m.empty?[{...SUBS[0],workers:0,btc:'0',ltc:'0',bal:0,w:[0,0,0,0],h:[0,0,0],inc:[0,0,0,0]}]
-  :SUBS.filter(x=>U.arch||!x.arch);
-const obsOf=m=>m.empty?[]:OBSERVERS;
+const CNT={many:3,few:1,none:0};
+const subsOf=m=>{
+  const all=m.empty?[{...SUBS[0],workers:0,btc:'0',ltc:'0',bal:0,w:[0,0,0,0],h:[0,0,0],inc:[0,0,0,0]}]
+    :SUBS.filter(x=>U.arch||!x.arch);
+  return all.slice(0,Math.max(1,CNT[S.subs]??3));
+};
+const obsOf=m=>m.empty?[]:OBSERVERS.slice(0,CNT[S.obs]??3);
 const sessOf=m=>m.empty?SESSIONS.slice(0,1):SESSIONS;
 /* Вкладки — Segment Control из макета: общий контейнер, белый активный сегмент.
    Счётчики показываются и при нуле (в макете «Наблюдатели 0»). */
@@ -804,8 +810,8 @@ const profTabs=(cur,m)=>{const n={subaccounts:subsOf(m).length,observers:obsOf(m
     id==='notifsettings'&&nn?`<span class="cnt">${nn>99?'99+':nn}</span>`:''}${t}${id in n?`<u>${n[id]}</u>`:''}</button>`).join('')}</div>`};
 
 function subTile(m,s){
-  const h=s.main&&!m.empty?m.h:{a:0,l:0,o:0,f:0};
-  const dots=[[h.a,'var(--pos)'],[h.l,'var(--warn)'],[h.o,'var(--neg)'],[h.f,'var(--neu)']];
+  const w=m.empty?[0,0,0,0]:s.w;
+  const dots=[[w[0],'var(--pos)'],[w[1],'var(--warn)'],[w[2],'var(--neg)'],[w[3],'var(--neu)']];
   return `<div class="tile2">
     <b class="t" style="display:flex;align-items:center;gap:8px;font-size:var(--fs-m);font-weight:600;margin-bottom:10px">${s.name}
       ${s.main?'<span class="tag spacer">Основной</span>':'<span class="tag n spacer">Суб-аккаунт</span>'}</b>
@@ -834,8 +840,8 @@ function obsTile(o){
   </div>`;
 }
 /* Промо-баннеры внизу сводки — оба есть в макете */
-const PROMOS=[['Снизили порог для<br>продажи ЦВ до 10 000 ₽','Продать'],
-              ['Начните формировать свой<br>пассивный доход, став<br>партнером Promminer','Узнать больше']];
+const PROMOS=[['Снизили порог для<br>продажи ЦВ до 10 000 ₽','Продать','/banner-sell.png'],
+              ['Начните формировать свой<br>пассивный доход, став<br>партнером Promminer','Узнать больше','/banner-referral.png']];
 V.profile=m=>{
   const acct=S.acct==='main'?'natarusso':'alfred';
   const n=NOTIF_N[S.notif];
@@ -852,15 +858,15 @@ V.profile=m=>{
     <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Мои наблюдатели</h2>${obs.length?'<button class="btn link spacer bs" data-go="observers">Смотреть все</button>':''}</div>
       ${obs.length?`<div class="grid g3" style="margin:0">${obs.map(obsTile).join('')}
-        ${S.role==='owner'?`<button class="dashed" data-modal="observer">${I.pl}Добавить наблюдателя</button>`:''}</div>`
+        ${S.role==='owner'&&obs.length<3?`<button class="dashed" style="grid-column:span ${3-obs.length}" data-modal="observer">${I.pl}Добавить наблюдателя</button>`:''}</div>`
       :`<div class="empty" style="padding:48px 0 40px"><div class="art">${I.eye}</div>
           <p style="max-width:340px">У вас еще нет созданных ссылок наблюдателей</p>
           ${S.role==='owner'?`<button class="btn out sm" style="margin-top:16px" data-modal="observer">${I.pl} Создать</button>`:''}</div>`}`)}
     <div style="height:12px"></div>
     <div class="grid g2" style="margin:0">
-      ${PROMOS.map(([t,b])=>`<section class="promo"><div class="orb"></div>
-        <button class="lnk dim" style="position:absolute;right:12px;top:12px;z-index:1" data-toast="Баннер скрыт">${I.x}</button>
-        <h2>${t}</h2><button class="btn" style="margin-top:20px">${b}</button></section>`).join('')}
+      ${PROMOS.map(([t,b,img])=>`<section class="promo"><img class="art" src="${img}" alt="">
+        <button class="pclose" data-toast="Баннер скрыт">${I.x}</button>
+        <h2>${t}</h2><button class="btn">${b}</button></section>`).join('')}
     </div>
   </div>
   <div>
@@ -878,7 +884,8 @@ V.profile=m=>{
     <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Последние уведомления</h2>
       <button class="btn link spacer dim" data-go="notifsettings">${I.cv}</button></div>
-      ${n?`${notes.slice(0,Math.min(n,4)).map(([t,d,dt])=>`<div class="note"><i></i><div><b>${t}</b><p>${d}</p><span>${dt}</span></div></div>`).join('')}
+      ${n?`<div class="nplist">${notes.slice(0,Math.min(n,4)).map(([t,d,dt])=>`<div class="nitem"><i class="dot"></i>
+          <div><div class="nb"><span class="nt">${t}</span><span class="nd">${dt}</span></div><p>${d}</p></div></div>`).join('')}</div>
         <div style="text-align:center;padding-top:8px"><button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button></div>`
         :`<div class="empty" style="padding:96px 0"><p>Уведомлений пока нет</p></div>`}`)}
   </div>
