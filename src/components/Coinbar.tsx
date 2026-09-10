@@ -1,4 +1,4 @@
-import { AXES, COIN_ICON, I, type Model } from '@/legacy/prototype'
+import { AXES, CHECK, COIN_ICON, I, type Model } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico } from './Raw'
 
@@ -21,7 +21,8 @@ export function Coinbar({ m }: { m: Model }) {
             {AXES.coin.opts.map(([v, t]) => (
               <button className={S.coin === v ? 'on' : ''} data-axis="coin" data-val={v} key={v}>
                 <Ico html={COIN_ICON[v === 'btc' ? 'BTC' : 'LTC']} />
-                {t}{S.coin === v ? ' ✓' : ''}
+                {t}
+                {S.coin === v && <Ico className="ck" html={CHECK} />}
               </button>
             ))}
           </div>

@@ -49,6 +49,11 @@ return figma.root.children.map((p,i)=>({i, id:p.id, name:p.name}));
 | Indicator | `40003231:867` | | Tags | `214:4822` |
 | Notification | `40001812:5858` | | Tooltip | `40001512:4126` |
 
+Разобраны и перенесены: Button, Tab, Input, Modals/Base, Table cell,
+**Checkbox, Radio, Switch, Select** (спецификации — в `docs/prod-analysis.md`).
+Осталось: Chips, Tags, Status, Alert, Notification, Tooltip, Pagination, Counter,
+Date Picker, Header, Footer, Sidebar.
+
 Остальное: `140:739` Modals/Base, `40001644:465` Table cell,
 `140:141` Header, `140:142` Footer, `140:143` Sidebar, `140:144` Tabbar,
 `140:147` Workers, `140:148` Finance, `140:152` My referrals, `140:154` Profile,

@@ -41,7 +41,12 @@ export declare function segv(id: string, opts: string[], def?: number): string
 export declare function segLine(id: string, opts: string[], def?: number, cls?: string): string
 export declare function segi(id: string, def?: number): number
 export declare function pageSlice(pid: string, total: number, per?: number): [number, number]
-export declare function cb(on: boolean, attr?: string): string
+/** Checkbox дизайн-системы. cls: 'ind' (частично), 'err', 'dis'. */
+export declare function cb(on: boolean, attr?: string, cls?: string): string
+/** Radio дизайн-системы. cls: 'dis'. */
+export declare function rd(on: boolean, attr?: string, cls?: string): string
+/** Инлайн-галка 12×12 для пунктов меню и чекбоксов. */
+export declare const CHECK: string
 export declare function pager(id: string, total: number, per?: number): string
 export declare function chart(m: Model, opts?: any): string
 

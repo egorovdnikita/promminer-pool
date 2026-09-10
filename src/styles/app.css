@@ -28,7 +28,8 @@
   --c1:var(--n900); --c2:var(--n500); --c3:#9ca3af;
   --pos:#22c55e; --warn:#f59e0b; --neg:#ef4444; --neu:#6b7280;
   --pos-sub:#22c55e29; --warn-sub:#f59e0b29; --neg-sub:#ef444429;
-  --border:#73737329; --ctrl:#7373731f; --ctrl2:#73737314; --ctrl-hover:#73737329;
+  --border:#6b728029; --ctrl:#6b72801f; --ctrl2:#6b728014; --ctrl-hover:#6b728029;
+  --ctrl-line:#6b728029; --ctrl-line-h:#6b728052;
   --focus:#6366f17a;
   --inv-bg:var(--n900); --inv-fg:#fff;
   /* скругления по шкале DS: 2 4 6 8 12 16 24 32 48 */
@@ -49,7 +50,8 @@
   --accent:var(--indigo-500);
   --bg:var(--n950); --surface:var(--n900); --bg3:var(--n800);
   --c1:var(--n50); --c2:var(--n400); --c3:var(--n500);
-  --ctrl:#73737329; --ctrl2:#7373731f; --ctrl-hover:#7373733d;
+  --ctrl:#6b728029; --ctrl2:#6b72801f; --ctrl-hover:#6b72803d;
+  --ctrl-line:#6b72803d; --ctrl-line-h:#6b728052;
   --shadow:0 4px 24px 0 #00000066;
   --inv-bg:var(--n50); --inv-fg:var(--n950);
   color-scheme:dark;
@@ -109,10 +111,14 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .hbtn.sq{width:48px;padding:0}
 .hbtn.tight{padding:0 12px;gap:4px}
 .hbtn .i3{color:var(--c3);display:flex}
-.pill{display:inline-flex;align-items:center;gap:8px;height:var(--h-ctrl);padding:0 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;white-space:nowrap}
+.pill{display:inline-flex;align-items:center;gap:4px;height:var(--h-ctrl);padding:0 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;white-space:nowrap}
 .pill:hover{background:var(--ctrl2)}
 .pill.sq{border-radius:var(--r-m);height:var(--h-ctrl)}
 .pill.flat{background:var(--ctrl);border-color:transparent}
+.pill.out{background:transparent;border-color:var(--ctrl-line)}
+.pill.out:hover{background:transparent;border-color:var(--ctrl-line-h)}
+.pill.err{border-color:var(--neg)}
+.pill.dis{opacity:.4;pointer-events:none}
 .pill.flat.on{background:var(--accent-sub);color:var(--accent)}
 .ib{width:var(--h-ctrl);height:var(--h-ctrl);border-radius:var(--r-m);background:transparent;border:1px solid var(--border);display:grid;place-items:center;position:relative;color:var(--c3)}
 .ib:hover{background:var(--ctrl2);color:var(--c1)}
@@ -123,14 +129,17 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 
 /* popovers */
 .pop-wrap{position:relative}
-.pop{position:absolute;right:0;top:calc(100% + 8px);z-index:40;background:var(--surface);border-radius:var(--r-s);box-shadow:0 12px 40px #1a1a1a29;padding:6px;min-width:230px;max-height:60vh;overflow:auto}
+.pop{position:absolute;right:0;top:calc(100% + 8px);z-index:40;background:var(--surface);border-radius:var(--r-m);box-shadow:var(--shadow);padding:8px 12px 4px;min-width:230px;max-height:60vh;overflow:auto}
 .pop.left{right:auto;left:0}
-.pop b.ph{display:block;font-size:12px;color:var(--c3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:8px 10px 6px}
-.pop button{display:flex;align-items:center;gap:12px;width:100%;padding:12px;min-height:var(--h-ctrl);border-radius:var(--r-s);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
-.pop button:hover{background:var(--ctrl2)}
-.pop button .i3{color:var(--c3);display:flex;flex:0 0 auto}
-.pop button.on{background:var(--accent-sub);color:var(--accent)}
-.pop .hr{height:1px;background:var(--border);margin:5px 8px}
+.pop b.ph{display:block;font-size:12px;color:var(--c3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 0 6px}
+.pop button:not(.btn):not(.ra):not(.lnk){display:flex;align-items:center;gap:8px;width:100%;padding:8px 0;min-height:40px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
+.pop button:not(.btn):not(.ra):not(.lnk):hover{color:var(--accent)}
+.pop button:not(.btn):not(.ra):not(.lnk):hover .i3{color:var(--accent)}
+.pop button .i3{color:var(--c3);display:flex;flex:0 0 auto;transition:color .15s}
+.pop button.dang{color:var(--neg)}
+.pop button.dis{opacity:.4;pointer-events:none}
+.pop .ck{margin-left:auto;color:var(--accent);display:flex;flex:0 0 auto}
+.pop .hr{height:1px;background:var(--border);margin:4px 0}
 .note{display:flex;gap:10px;padding:10px;border-radius:var(--r-2xs);align-items:flex-start}
 .note:hover{background:var(--ctrl2)}
 .note i{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:5px;flex:0 0 auto}
@@ -211,9 +220,13 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 /* текстовая кнопка: h28, без паддинга, Body/M accent */
 .btn.link{height:28px;padding:0;background:none;box-shadow:none;color:var(--accent);border-radius:var(--r-s);font-size:var(--fs-m);line-height:var(--lh-m)}
 .btn[disabled]{opacity:.45;pointer-events:none}
-.tog{display:inline-block;width:34px;height:19px;border-radius:var(--r-f);background:var(--bg3);position:relative;transition:background .15s;flex:0 0 auto;cursor:pointer}
-.tog::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:#fff;transition:transform .15s}
-.tog.on{background:var(--accent)}.tog.on::after{transform:translateX(15px)}
+/* Switch (💙 DS): 40×24, ползунок 20, отступ 2. */
+.tog{display:inline-block;width:40px;height:24px;border-radius:var(--r-f);background:var(--ctrl);position:relative;transition:background .15s,opacity .15s;flex:0 0 auto;cursor:pointer}
+.tog:hover{background:var(--ctrl-hover)}
+.tog::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}
+.tog.on{background:var(--accent)}.tog.on:hover{background:var(--brand)}.tog.on::after{transform:translateX(16px)}
+.tog:active{opacity:.8}
+.tog.dis{opacity:.4;pointer-events:none}
 
 /* tables */
 .tw{overflow-x:auto}
@@ -374,9 +387,24 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .srt:hover{color:var(--c1)}
 .srt.on{color:var(--accent)}
 /* чекбокс */
-.cb{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border);display:inline-grid;place-items:center;background:var(--surface);cursor:pointer;color:#fff;flex:0 0 auto}
-.cb.on{background:var(--accent);border-color:var(--accent)}
-.cb svg{display:block;margin:0}
+/* Checkbox (💙 DS): бокс 18, radius 6, обводка 1px; галка 10×7, «много» — полоска 8×2. */
+.cb{width:18px;height:18px;border-radius:var(--r-1xs);border:1px solid var(--ctrl-line);display:inline-grid;place-items:center;background:var(--ctrl);cursor:pointer;color:#fff;flex:0 0 auto}
+.cb:hover{background:var(--ctrl-hover)}
+.cb.on,.cb.ind{background:var(--accent);border-color:transparent}
+.cb.on:hover,.cb.ind:hover{background:var(--brand)}
+.cb:active{opacity:.8}
+.cb.err{border-color:var(--neg)}
+.cb.dis{opacity:.4;pointer-events:none}
+.cb.ind::after{content:"";width:8px;height:2px;border-radius:var(--r-f);background:#fff}
+.cb svg{display:block;margin:0;width:12px;height:12px}
+/* Radio (💙 DS): тот же бокс кругом, точка 10. */
+.rd{width:18px;height:18px;border-radius:var(--r-f);border:1px solid var(--ctrl-line);display:inline-grid;place-items:center;background:var(--ctrl);cursor:pointer;flex:0 0 auto}
+.rd:hover{background:var(--ctrl-hover)}
+.rd.on{background:var(--accent);border-color:transparent}
+.rd.on:hover{background:var(--brand)}
+.rd:active{opacity:.8}
+.rd.dis{opacity:.4;pointer-events:none}
+.rd.on::after{content:"";width:10px;height:10px;border-radius:var(--r-f);background:#fff}
 /* панель массовых действий */
 .bulk{display:flex;align-items:center;gap:12px;background:var(--accent-sub);border-radius:var(--r-m);padding:12px;margin-bottom:12px;font-size:var(--fs-s);line-height:var(--lh-s)}
 /* лента групп */
@@ -448,7 +476,8 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 :root[data-theme="dark"] .obs{background:#f59e0b29;border-color:#f59e0b52;color:#fbbf24}
 :root[data-theme="dark"] .warnbar{background:#f59e0b1f}
 :root[data-theme="dark"] .promo .orb{opacity:.5}
-:root[data-theme="dark"] .cb{background:var(--ctrl2)}
+:root[data-theme="dark"] .cb:not(.on):not(.ind),
+:root[data-theme="dark"] .rd:not(.on){background:var(--ctrl2)}
 :root[data-theme="dark"] .avat{background:#78350f;color:#fde68a}
 :root[data-theme="dark"] .linkfield{background:var(--ctrl2)}
 :root[data-theme="dark"] .badge{color:#fbbf24}

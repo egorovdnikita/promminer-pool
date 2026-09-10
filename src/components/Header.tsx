@@ -1,5 +1,5 @@
 import {
-  ACCOUNTS, I, NOTIF_N, PROF, TITLES, acctSummary, nf, notifications, type Model,
+  ACCOUNTS, CHECK, I, NOTIF_N, PROF, TITLES, acctSummary, nf, notifications, type Model,
 } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico, Raw } from './Raw'
@@ -47,6 +47,7 @@ export function Header({ m }: { m: Model }) {
                 {ACCOUNTS.map((a, i) => (
                   <button className={a === acct ? 'on' : ''} data-acct={i === 0 ? 'main' : 'sub'} key={a}>
                     {a}{i === 0 ? ' · основной' : ''}
+                    {a === acct && <Ico className="ck" html={CHECK} />}
                   </button>
                 ))}
                 <div className="hr" />

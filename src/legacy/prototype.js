@@ -221,7 +221,10 @@ const segLine=(id,opts,def=0,cls='')=>{const c=U.seg[id]??def;
 const segi=(id,def=0)=>U.seg[id]??def;
 const pageSlice=(pid,total,per=10)=>{const pages=Math.max(1,Math.ceil(total/per)),cur=Math.min(U.page[pid]||1,pages),f=(cur-1)*per;return[f,Math.min(f+per,total)]};
 /* Чекбокс */
-const cb=(on,attr='')=>`<span class="cb ${on?'on':''}" ${attr}>${on?sv('<path d="M5 12.5l4.5 4.5L19 7"/>',14):''}</span>`;
+/* Checkbox и Radio дизайн-системы. cls: on|ind|err|dis. */
+const CHECK='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+const cb=(on,attr='',cls='')=>`<span class="cb ${on?'on':''} ${cls}" ${attr}>${on?CHECK:''}</span>`;
+const rd=(on,attr='',cls='')=>`<span class="rd ${on?'on':''} ${cls}" ${attr}></span>`;
 /* Пагинация — кликабельная */
 function pager(id,total,per=10){
   const pages=Math.max(1,Math.ceil(total/per)), cur=Math.min(U.page[id]||1,pages);
@@ -1065,7 +1068,7 @@ export function applyState(next){
 export {
   AXES, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON,
-  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, pager, chart,
+  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, CHECK, pager, chart,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VERIF_FIELDS,
   S, U, route, pop, modal, openGroups, mini,
 };
