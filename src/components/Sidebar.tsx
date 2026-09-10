@@ -3,7 +3,7 @@ import { useApp } from '@/state/store'
 import { Ico } from './Raw'
 
 export function Sidebar() {
-  const { route, openGroups } = useApp()
+  const { route, openGroups, mini } = useApp()
 
   return (
     <aside className="sb">
@@ -14,13 +14,13 @@ export function Sidebar() {
             const active = GROUP_OF[route] === o.g
             const open = openGroups[o.g!] || active
             return (
-              <div className="slot" key={o.g}>
+              <div className="ngroup" key={o.g}>
                 <button className={`ni ${open ? 'open' : ''} ${active ? 'act' : ''}`} data-grp={o.g}>
                   <Ico className="nic" html={I[o.ic]} />
                   <span className="lbl">{o.t}</span>
                   <Ico className="chev lbl" html={I.cd} />
                 </button>
-                {open && (
+                {(open || mini) && (
                   <div className="kids">
                     {o.kids.map(([id, t]) => (
                       <button className={`kid ${route === id ? 'on' : ''}`} data-go={id} key={id}>{t}</button>
