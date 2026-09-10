@@ -224,6 +224,8 @@ const pageSlice=(pid,total,per=10)=>{const pages=Math.max(1,Math.ceil(total/per)
 /* Checkbox и Radio дизайн-системы. cls: on|ind|err|dis. */
 const CHECK='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 const cb=(on,attr='',cls='')=>`<span class="cb ${on?'on':''} ${cls}" ${attr}>${on?CHECK:''}</span>`;
+/* Status дизайн-системы: точка 8 + подпись 12 Bold. t: ok|err|warn|off. */
+const status=(t,label)=>`<span class="status ${t}"><i class="dot"></i>${label}</span>`;
 const rd=(on,attr='',cls='')=>`<span class="rd ${on?'on':''} ${cls}" ${attr}></span>`;
 /* Пагинация — кликабельная */
 function pager(id,total,per=10){
@@ -273,7 +275,7 @@ function chart(m,opts={}){
 const V={};
 
 V.home=m=>`
-${S.role==='observer'?'<div class="obs">👁 Режим наблюдателя — действия с балансом и настройками скрыты</div>':''}
+${S.role==='observer'?'<div class="alert warn mb">👁 Режим наблюдателя — действия с балансом и настройками скрыты</div>':''}
 <div class="grid g3">
   ${card(`<div class="ch"><h2>Доход</h2>${S.role==='owner'?'<a class="spacer" href="#" style="font-size:14px;font-weight:600">Продать</a>':''}</div>
     <div class="hero"><div style="display:flex;gap:20px;flex:1;min-width:0">
@@ -581,7 +583,7 @@ ${card(`<div class="callout" style="margin-bottom:14px"><button class="x">${I.x}
     ['Февраль','2026','natarusso, larusso','01.04.2026 11:07','err'],['Январь','2026','natarusso, larusso','22.01.2026 11:07','ok']]
     .map(([mo,y,a,d,st])=>`<tr><td>${mo}</td><td class="mono">${y}</td>
       <td class="mut" style="max-width:420px;overflow:hidden;text-overflow:ellipsis">${m.empty?'':a}</td><td class="mono mut">${m.empty?'':d}</td>
-      <td><span class="tag ${st==='ok'?'g':st==='err'?'r':'n'}">${st==='ok'?'● СГЕНЕРИРОВАН':st==='err'?'● ЕСТЬ ОШИБКИ':'● ОЖИДАЕТ'}</span></td>
+      <td>${status(st==='ok'?'ok':st==='err'?'err':'off',st==='ok'?'СГЕНЕРИРОВАН':st==='err'?'ЕСТЬ ОШИБКИ':'ОЖИДАЕТ')}</td>
       <td class="num"><button class="btn sm" ${S.role==='observer'?'disabled':''} data-toast="Отчёт за ${mo} ${y} поставлен в очередь">Сгенерировать</button></td>
       <td class="num"><button class="btn g sm" ${st==='ok'?'':'disabled'}>${I.dl} Скачать</button></td></tr>`).join('')}
   </tbody></table></div>`)}`;
@@ -620,7 +622,7 @@ V.tax=m=>card(`
         <div class="field" style="display:flex;align-items:center"><div style="flex:1"><div class="k">Статус</div><div class="v">ИП (УСН 6%)</div></div><span class="dim">${I.cd}</span></div>
         <div class="field"><div class="k">Период</div><div class="v">2026, I квартал</div></div>
       </div>
-      <div class="warnbar" style="margin-top:12px">⚠ Расчет предварительный и не является налоговой консультацией</div>
+      <div class="alert warn" style="margin-top:12px">⚠ Расчет предварительный и не является налоговой консультацией</div>
     </div>
     <div class="hero" style="flex-direction:column;align-items:stretch;min-height:200px">
       <div class="l">Налог к уплате</div>
@@ -688,7 +690,7 @@ V.ref=m=>`
       <p style="font-size:14px;font-weight:700;position:relative;max-width:70%">Начните формировать свой пассивный доход, став партнером Promminer уже сегодня</p></div>`)}
 </div>
 ${card(`<div class="ch"><h2>Настройка реферальных выплат</h2></div>
-  <div class="warnbar" style="margin-bottom:12px"><div><b>Если хотите выводить в рублях</b><br>
+  <div class="alert warn" style="margin-bottom:12px"><div><b>Если хотите выводить в рублях</b><br>
     <span class="mut">Заполните форму, как Юридическое лицо или Индивидуальный предприниматель в разделе <a href="#" data-go="verification">Верификация и реквизиты</a></span></div>
     <button class="spacer dim">${I.x}</button></div>
   <div class="tw"><table class="tbl"><thead><tr><th>Монеты</th><th>Баланс</th><th>Баланс, $</th><th>Баланс, ₽</th><th>Реквизиты</th><th>Порог автовыплат ${I.inf}</th><th>Автовыплаты ${I.inf}</th><th></th></tr></thead><tbody>
@@ -852,9 +854,9 @@ V.verification=m=>{
   const fields=VERIF_FIELDS[segi('verif-type',1)];
   return `${profTabs('verification',m)}
 ${card(`<div class="ch"><h2>Верификация и реквизиты</h2><div class="spacer"></div>
-  <span class="tag ${vs[1]}">${vs[0]}</span></div>
-  ${S.verif==='no'?`<div class="warnbar" style="margin-bottom:14px">${I.inf}<div>Без верификации недоступны выплаты в рублях и генерация <button class="lnk" style="color:var(--accent)" data-go="report">отчета о майнинге</button></div></div>`:''}
-  ${S.verif==='pending'?`<div class="warnbar" style="margin-bottom:14px">${I.inf}<div>Анкета на проверке — обычно занимает до двух рабочих дней</div></div>`:''}
+  ${status(vs[1]==='g'?'ok':vs[1]==='y'?'warn':'err',vs[0])}</div>
+  ${S.verif==='no'?`<div class="alert warn" style="margin-bottom:14px">${I.inf}<div>Без верификации недоступны выплаты в рублях и генерация <button class="lnk" style="color:var(--accent)" data-go="report">отчета о майнинге</button></div></div>`:''}
+  ${S.verif==='pending'?`<div class="alert warn" style="margin-bottom:14px">${I.inf}<div>Анкета на проверке — обычно занимает до двух рабочих дней</div></div>`:''}
   <div class="ch">${seg('verif-type',['Физическое лицо','Индивидуальный предприниматель','Юридическое лицо'],1)}</div>
   <div class="grid g3" style="margin:0;gap:10px">
     ${fields.map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v mono">${S.verif==='no'?'—':v}</div></div>`).join('')}
@@ -875,7 +877,7 @@ ${card(`<div class="ch"><h2>Центр суб-аккаунтов</h2><div class=
   ${rows.map(s=>`<tr><td><b>${s.name}</b></td><td><span class="tag ${s.main?'':'n'}">${s.main?'Основной':'Суб-аккаунт'}</span></td>
       <td class="num mono">${ni(s.workers)}</td><td class="num mono">${s.btc} TH/s</td><td class="num mono">${s.ltc} GH/s</td>
       <td class="mono mut">${s.created}</td>
-      <td><span class="tag ${s.active?'g':'n'}">${s.active?'Активен':'Не подключен'}</span></td>
+      <td>${status(s.active?'ok':'off',s.active?'Активен':'Не подключен')}</td>
       <td class="num dim">${I.dots}</td></tr>`).join('')}
   </tbody></table></div>`)}`};
 
@@ -991,7 +993,7 @@ const MODALS={
   wallet:{ok:'Кошелёк добавлен',t:'Добавить кошелек',s:'Адрес будет использоваться для выводов по этой монете',b:()=>`
     <div class="inp"><div class="k">Сеть</div><input value="Bitcoin (BTC)"></div>
     <div class="inp"><div class="k">Адрес кошелька</div><input placeholder="bc1q…"></div>
-    <div class="warnbar" style="margin-top:10px">⚠ Проверьте адрес — транзакции в блокчейне необратимы</div>`},
+    <div class="alert warn" style="margin-top:10px">⚠ Проверьте адрес — транзакции в блокчейне необратимы</div>`},
   withdraw:{ok:'Заявка на вывод создана',t:'Вывод средств',s:'Средства уйдут на подтвержденный адрес',b:m=>`
     <div class="inp"><div class="k">Сумма, ${m.bal[0].s}</div><input value="${nf(m.bal[0].v,8)}"></div>
     <div class="inp"><div class="k">Кошелек</div><input value="bc1q…4f2a"></div>
@@ -1068,7 +1070,7 @@ export function applyState(next){
 export {
   AXES, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON,
-  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, CHECK, pager, chart,
+  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VERIF_FIELDS,
   S, U, route, pop, modal, openGroups, mini,
 };

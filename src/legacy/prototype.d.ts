@@ -45,6 +45,8 @@ export declare function pageSlice(pid: string, total: number, per?: number): [nu
 export declare function cb(on: boolean, attr?: string, cls?: string): string
 /** Radio дизайн-системы. cls: 'dis'. */
 export declare function rd(on: boolean, attr?: string, cls?: string): string
+/** Status дизайн-системы: точка + подпись. */
+export declare function status(t: 'ok'|'err'|'warn'|'off', label: string): string
 /** Инлайн-галка 12×12 для пунктов меню и чекбоксов. */
 export declare const CHECK: string
 export declare function pager(id: string, total: number, per?: number): string

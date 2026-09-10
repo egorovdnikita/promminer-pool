@@ -209,7 +209,9 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 /* Chips: DS padding-12, radius-m 16, Body/M SemiBold */
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:8px;min-height:var(--h-ctrl);padding:12px;border-radius:var(--r-m);background:var(--ctrl);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1);white-space:nowrap;flex:0 0 auto}
-.chip.on{background:var(--accent-sub);color:var(--accent)}
+.chip.on{background:#6b7280;color:#fff}
+.chip.sm{min-height:40px}
+.chip.dis{background:var(--ctrl2);opacity:.4;pointer-events:none}
 .chip b{font-weight:600;color:inherit;opacity:.65}
 .search{display:flex;align-items:center;gap:8px;height:var(--h-ctrl);background:var(--ctrl);border-radius:var(--r-m);padding:0 12px;min-width:220px;color:var(--c3);font-size:var(--fs-m);line-height:var(--lh-m)}
 /* Button: DS h48 / px24 / radius-m 16 / Body-S SemiBold */
@@ -239,11 +241,26 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .tbl tr.hl td{background:var(--accent-ghost)}
 .tbl .num{text-align:right}
 .tbl th svg,.tbl td svg{display:inline-block;vertical-align:middle;margin-left:4px}
-.tag{display:inline-block;padding:4px 10px;border-radius:var(--r-s);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;background:var(--accent-sub);color:var(--accent)}
-.tag.y{background:#f59e0b29;color:#d97706}
-.tag.g{background:#22c55e29;color:#16a34a}
-.tag.r{background:#ef444429;color:#dc2626}
-.tag.n{background:var(--ctrl);color:var(--c2)}
+/* Tags (💙 DS): высота 32, radius 12, 14/18 SemiBold, заливка цвета с альфой 29. */
+.tag{display:inline-flex;align-items:center;gap:2px;height:32px;padding:0 12px;border-radius:var(--r-s);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;background:#7086fc1f;color:var(--accent);white-space:nowrap}
+.tag:hover{opacity:.8}
+.tag.y{background:#f59e0b29;color:#f59e0b}
+.tag.g{background:#22c55e29;color:#22c55e}
+.tag.r{background:#ef444429;color:#ef4444}
+.tag.b{background:#3b82f629;color:#3b82f6}
+.tag.n{background:#6b728029;color:var(--c1)}
+.tag.sel{background:var(--accent);color:#fff}
+.tag.sel.y{background:#f59e0b}.tag.sel.g{background:#22c55e}
+.tag.sel.r{background:#ef4444}.tag.sel.b{background:#3b82f6}.tag.sel.n{background:#6b7280}
+.tag .x{margin-left:2px;display:flex;opacity:.7}
+/* Status (💙 DS 214:4829): высота 24, radius 8, 12/16 Bold, точка 8. */
+.status{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:var(--r-xs);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:700;white-space:nowrap}
+.status:hover{opacity:.8}
+.status .dot{width:8px;height:8px}
+.status.ok{background:#22c55e29;color:#22c55e}.status.ok .dot{background:#22c55e}
+.status.err{background:#ef444429;color:#ef4444}.status.err .dot{background:#ef4444}
+.status.warn{background:#f59e0b29;color:#f59e0b}.status.warn .dot{background:#f59e0b}
+.status.off{background:#6b72801f;color:#9ca3af}.status.off .dot{background:#6b7280}
 .pager{display:flex;align-items:center;gap:8px;padding-top:12px}
 .pager .pg{display:flex;gap:2px;margin-left:auto}
 .pager .pg button{width:28px;height:28px;border-radius:var(--r-2xs);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--c2)}
@@ -258,7 +275,16 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .callout b{font-size:14px;font-weight:700;display:block;margin-bottom:8px}
 .callout ol{margin-left:18px;font-size:14px;color:var(--c2);line-height:20px}
 .callout .x{position:absolute;right:12px;top:12px;color:var(--c3)}
-.warnbar{display:flex;gap:10px;align-items:flex-start;background:#f59e0b14;border-radius:var(--r-s);padding:12px 14px;font-size:14px;position:relative}
+.alert{display:flex;gap:8px;align-items:flex-start;border-radius:var(--r-m);padding:12px 16px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;position:relative}
+.alert b{display:block;font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+.alert>svg{flex:0 0 auto;margin-top:2px;width:16px;height:16px}
+.alert.ok{background:#22c55e29;color:#22c55e}
+.alert.warn{background:#f59e0b29;color:#f59e0b}
+.alert.err{background:#ef444429;color:#ef4444}
+.alert.info{background:#3b82f629;color:#3b82f6}
+.alert.fill{color:#fff}
+.alert.fill.ok{background:#22c55e}.alert.fill.warn{background:#f59e0b}
+.alert.fill.err{background:#ef4444}.alert.fill.info{background:#3b82f6}
 /* Поля: DS Input h56 / p12 / radius-m / label Caption-M + value Body-M */
 .field{background:var(--ctrl);border-radius:var(--r-m);padding:12px;min-height:var(--h-field);display:flex;flex-direction:column;justify-content:center}
 .field .k{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
@@ -279,7 +305,7 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .pt i{width:22px;height:22px;border-radius:7px;background:var(--bg3);border:3px solid var(--surface)}
 .pt span{font-size:12px;font-weight:700;color:var(--c3)}
 .pt.on span{color:var(--c1)}
-.obs{display:flex;gap:10px;align-items:center;background:#f59e0b14;border:1px solid #f59e0b29;color:#d97706;border-radius:var(--r-s);padding:10px 14px;margin-bottom:12px;font-size:14px;font-weight:700}
+.alert.mb{margin-bottom:12px}
 .foot{display:flex;gap:16px;padding:20px 0 24px;font-size:12px;color:var(--c3);font-weight:600;flex-wrap:wrap}
 .foot .l{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap}
 
@@ -372,7 +398,8 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .btn.w:active{background:var(--ctrl)}
 .btn.link{transition:color .15s}
 .btn.link:hover,.btn.link:active{background:none;color:var(--indigo-500)}
-.chip:not(.on):hover{background:var(--ctrl-hover)}
+.chip:not(.on):hover{background:var(--ctrl);box-shadow:inset 0 0 0 1px var(--ctrl-line)}
+.chip.on:hover{opacity:.8}
 .seg button:not(.on):hover{background:var(--ctrl);color:var(--c1)}
 .seg button:not(.on):active{background:var(--ctrl-hover)}
 .ib:hover{color:var(--c1)}
@@ -473,8 +500,12 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 :root[data-theme="dark"] .tag.g{color:#4ade80}
 :root[data-theme="dark"] .tag.r{color:#f87171}
 :root[data-theme="dark"] .tag.y{color:#fbbf24}
-:root[data-theme="dark"] .obs{background:#f59e0b29;border-color:#f59e0b52;color:#fbbf24}
-:root[data-theme="dark"] .warnbar{background:#f59e0b1f}
+:root[data-theme="dark"] .alert.warn{color:#fbbf24}
+:root[data-theme="dark"] .alert.ok{color:#4ade80}
+:root[data-theme="dark"] .alert.err{color:#f87171}
+:root[data-theme="dark"] .status.ok{color:#4ade80}
+:root[data-theme="dark"] .status.err{color:#f87171}
+:root[data-theme="dark"] .status.warn{color:#fbbf24}
 :root[data-theme="dark"] .promo .orb{opacity:.5}
 :root[data-theme="dark"] .cb:not(.on):not(.ind),
 :root[data-theme="dark"] .rd:not(.on){background:var(--ctrl2)}
