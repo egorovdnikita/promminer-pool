@@ -566,3 +566,22 @@ body.mini .ni .spacer.lbl{display:none!important}
 .dp-d:hover{background:var(--ctrl)}
 .dp-d.sel{background:#7086fc1f;color:var(--accent)}
 .dp-d.mut{color:var(--c3);pointer-events:none}
+
+/* Список уведомлений (макет «Уведомления» профиля) */
+.nlist{display:flex;flex-direction:column}
+.nrow{display:grid;grid-template-columns:8px minmax(180px,240px) 1fr auto;gap:16px;align-items:start;padding:14px 0}
+.nrow+.nrow{border-top:1px solid var(--border)}
+.nrow>.dot{width:8px;height:8px;margin-top:6px;background:var(--accent)}
+.nrow.read>.dot{background:transparent}
+.nrow b{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.nrow p{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c1)}
+.nrow .dt{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);white-space:nowrap}
+.nrow.read b,.nrow.read p,.nrow.read .dt{color:var(--c2)}
+/* Настройка уведомлений: шапка с каналами и группы событий */
+.ntbl th{vertical-align:top}
+.ntbl th .nch{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1);margin-bottom:2px}
+.ntbl th .lnk{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.ntbl td.num{text-align:center}
+.ntbl tr.ngrp td{padding-top:24px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:600;background:none}
+.tabseg .cnt{margin-right:6px}
+.pager .perpage{display:flex;align-items:center;gap:8px;margin-right:16px}

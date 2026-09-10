@@ -214,7 +214,7 @@ const NAV=[
 const TITLES={home:'Главная',workers:'Воркеры',worker:'Ant01',assets:'Мои активы',income:'Доход',payouts:'Выплаты',
   report:'Отчет о майнинге',calc:'Калькулятор доходности',tax:'Калькулятор налогов',monitor:'Главная сводки',
   ref:'Promminer: реферальная программа',reflist:'Список рефералов',refincome:'Реферальный доход',refpayouts:'Реферальные выплаты',
-  profile:'Личный кабинет',security:'Личный кабинет',notifsettings:'Личный кабинет',subaccounts:'Личный кабинет',
+  profile:'Личный кабинет',security:'Личный кабинет',notifsettings:'Личный кабинет',notifconfig:'Личный кабинет',subaccounts:'Личный кабинет',
   observers:'Личный кабинет',verification:'Личный кабинет',auth:'Вход'};
 const GROUP_OF={assets:'fin',income:'fin',payouts:'fin',calc:'tools',tax:'tools',ref:'ref',reflist:'ref',refincome:'ref',refpayouts:'ref'};
 
@@ -259,7 +259,9 @@ function pager(id,total,per=10){
   const pages=Math.max(1,Math.ceil(total/per)), cur=Math.min(U.page[id]||1,pages);
   const from=total?(cur-1)*per+1:0, to=Math.min(cur*per,total);
   const nums=[];for(let i=1;i<=pages;i++){if(i===1||i===pages||Math.abs(i-cur)<=1)nums.push(i);else if(nums[nums.length-1]!=='…')nums.push('…')}
-  return `<div class="pager"><span class="cap dim">Показано ${from}–${to} из ${ni(total)}</span>
+  return `<div class="pager"><span class="perpage"><span class="cap dim">Показать</span>
+    <button class="pill flat sq" data-toast="Количество строк на странице">${per} строк ${I.cd}</button></span>
+    <span class="cap dim">Показано ${from}–${to} из ${ni(total)}</span>
     <span class="pg"><button data-page="${id}" data-p="${cur-1}" ${cur<=1?'disabled':''}>${I.cl}</button>
     ${nums.map(n=>n==='…'?'<button disabled>…</button>':`<button class="${n===cur?'on':''}" data-page="${id}" data-p="${n}">${n}</button>`).join('')}
     <button data-page="${id}" data-p="${cur+1}" ${cur>=pages?'disabled':''}>${I.cv}</button></span></div>`;
@@ -783,7 +785,9 @@ const sessOf=m=>m.empty?SESSIONS.slice(0,1):SESSIONS;
 /* Вкладки — Segment Control из макета: общий контейнер, белый активный сегмент.
    Счётчики показываются и при нуле (в макете «Наблюдатели 0»). */
 const profTabs=(cur,m)=>{const n={subaccounts:subsOf(m).length,observers:obsOf(m).length};
-  return `<div class="seg tabseg">${PROF.map(([id,t])=>`<button class="${cur===id?'on':''}" data-go="${id}">${t}${id in n?`<u>${n[id]}</u>`:''}</button>`).join('')}</div>`};
+  const nn=NOTIF_N[S.notif];
+  return `<div class="seg tabseg">${PROF.map(([id,t])=>`<button class="${cur===id?'on':''}" data-go="${id}">${
+    id==='notifsettings'&&nn?`<span class="cnt">${nn>99?'99+':nn}</span>`:''}${t}${id in n?`<u>${n[id]}</u>`:''}</button>`).join('')}</div>`};
 
 function subTile(m,s){
   const h=s.main&&!m.empty?m.h:{a:0,l:0,o:0,f:0};
@@ -946,25 +950,60 @@ ${card(`<div class="ch"><h2>Активные сессии</h2><div class="spacer
       <td class="num">${s.cur?'':`<button class="btn g sm" data-toast="Сессия завершена">Завершить</button>`}</td></tr>`).join('')}
   </tbody></table></div>`)}`};
 
+/* Список уведомлений — вкладка «Уведомления» в профиле (макет 2219:245853).
+   Настройка каналов вынесена отдельным экраном за кнопкой «Настройка». */
+const NOTES_ALL=[
+  ['Вход с нового IP','Выполнен вход с нового IP –45.234.123.345. Аккаунт: natarusso','11.02.2026 14:32',0],
+  ['Средства выведены успешно','Вывод 74.768854 DOGE на ваш суб-аккаунт account20101','11.02.2026 12:17',0],
+  ['Изменения в политике выплат','Внимание! Обратите внимание на изменения в политике платежей. Вывод средств на ваш аккаунт account20101 может занять больше времени, чем ожидалось. Пожалуйста, следите за обновлениями.','10.02.2026 09:10',0],
+  ['Вход с нового IP','Выполнен вход с нового IP –40.224.987.3876. Аккаунт: natarusso','09.02.2026 02:56',0],
+  ['Средства выведены успешно','Вывод 0.0005 BTC на ваш аккаунт natarusso','07.02.2026 12:20',1],
+  ['Изменения в политике выплат','Внимание! Обратите внимание на изменения в политике платежей. Вывод средств на ваш аккаунт account20101 может занять больше времени, чем ожидало…','03.02.2026 09:14',1],
+];
+const noteRow=([t,d,dt,read])=>`<div class="nrow ${read?'read':''}"><i class="dot"></i>
+  <b>${t}</b><p>${d}</p><span class="dt mono">${dt}</span></div>`;
+
 V.notifsettings=m=>{
-  const ch=[['Почта','na***so@mail.ru',1,'mailto:'+LINKS.support],
-            ['Телефон','+7 (996) ***-59-52',1,'tel:+79966665952'],
-            ['Telegram','—',0,LINKS.tgBot]];
+  const n=NOTIF_N[S.notif];
+  const rows=n?NOTES_ALL.slice(0,Math.max(n,2)):[];
   return `${profTabs('notifsettings',m)}
-${card(`<div class="ch"><h2>Каналы уведомлений</h2></div>
-  <p class="cap dim" style="margin-bottom:12px">Telegram-алерты приходят из бота <a href="${LINKS.tgBot}" target="_blank" rel="noopener">@PromminerAlertbot</a></p>
-  <div class="grid g3" style="margin:0">
-    ${ch.map(([k,v,ok,url])=>`<div class="tile2"><div class="cap dim">${k}</div>
-      <div class="row" style="margin-top:6px"><b class="mono" style="font-size:var(--fs-m);font-weight:600">${v}</b>
-        <span class="spacer">${ok?'<span class="tag g">Подтверждён</span>'
-          :`<a class="addbtn" href="${url}" target="_blank" rel="noopener">${I.pl} Привязать</a>`}</span></div></div>`).join('')}
-  </div>`)}
-<div style="height:12px"></div>
-${card(`<div class="ch"><h2>События</h2></div>
-  <div class="tw"><table class="tbl"><thead><tr><th>Событие</th><th style="text-align:center">Почта</th><th style="text-align:center">Telegram</th><th style="text-align:center">Push</th></tr></thead><tbody>
-  ${[['Воркер ушел в оффлайн',1,1,1],['Низкий хэшрейт парка',1,0,1],['Выплата отправлена',1,1,0],['Реферал зарегистрировался',0,1,0],['Отчет о майнинге сгенерирован',1,0,0],['Вход с нового устройства',1,1,1]]
-    .map(r=>`<tr><td>${r[0]}</td>${[1,2,3].map(i=>`<td style="text-align:center"><span class="tog ${r[i]?'on':''}" data-tog></span></td>`).join('')}</tr>`).join('')}
-  </tbody></table></div>`)}`};
+${card(`<div class="ch"><h2>Уведомления</h2><div class="spacer"></div>
+  ${rows.length?`<button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button>
+  <span class="pop-wrap"><button class="pill flat sq" data-pop="nfilter">${segv('nfilter',['Все уведомления','Непрочитанные','Прочитанные'])} ${I.cd}</button>
+    ${pop==='nfilter'?`<div class="pop" style="min-width:230px">${['Все уведомления','Непрочитанные','Прочитанные'].map((o,i)=>
+      `<button class="${segi('nfilter')===i?'on':''}" data-seg="nfilter" data-i="${i}">${o}${segi('nfilter')===i?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`:''}
+  <button class="btn w sm" data-go="notifconfig">${I.tune} Настройка</button></div>
+  ${rows.length?`<div class="nlist">${rows.map(noteRow).join('')}</div>`
+    :`<div class="empty" style="padding:64px 0"><div class="art">${I.bell}</div>
+        <b>Уведомлений пока не было</b>
+        <p style="max-width:260px">Как только у вас появятся уведомления, вы увидите их здесь</p></div>`}
+  ${pager('notif',rows.length,20)}`)}`;
+};
+
+/* Настройка уведомлений (макет 2219:246155): события по группам, пять каналов. */
+const NCHAN=['ЛК','Push','SMS','Email','Telegram'];
+const NEVENTS=[
+  ['Майнинг',[['Подключен воркер'],['Изменен статус воркера'],['Низкий хэшрейт',1],['Общий реджект выше',1,'5%']]],
+  ['Финансы',[['Изменен адрес кошелька'],['Изменен расчетный счет'],['Вознаграждение за майнинг (ежедневно)'],
+    ['Произведена выплата'],['Произведена автовыплата'],['Заказана продажа ЦВ'],['Произведена продажа ЦВ'],
+    ['Изменен лимит на вывод средств']]],
+  ['Реферальная программа',[['Зарегистрировался реферал'],['Получен реферальный доход'],['Произведена реферальная выплата']]],
+];
+V.notifconfig=m=>`${profTabs('notifsettings',m)}
+${card(`<div class="ch"><button class="ib sm" data-go="notifsettings">${I.cl}</button>
+  <h2 style="margin-left:4px">Настройка уведомлений</h2></div>
+  <div class="tw"><table class="tbl ntbl"><thead><tr>
+    <th>События для отправки уведомлений</th>
+    ${NCHAN.map((c,i)=>`<th><span class="nch">${c}</span>
+      <button class="lnk" style="color:var(--accent)" data-toast="${i<2?'Канал выключен для всех событий':'Канал включен для всех событий'}">${i<2?'Выключить все':'Включить все'}</button></th>`).join('')}
+  </tr></thead><tbody>
+  ${NEVENTS.map(([g,rows])=>`<tr class="ngrp"><td colspan="${NCHAN.length+1}">${g}</td></tr>
+    ${rows.map(([t,inf,val])=>`<tr><td><span class="row" style="gap:8px">${t}
+      ${val?`<span class="pill flat sq" style="height:28px;padding:0 10px;font-size:var(--fs-c)">${val}</span>`:''}
+      ${inf?`<span class="tipi" data-tip="Порог, при котором придёт уведомление">${I.inf}</span>`:''}</span></td>
+      ${NCHAN.map((c,i)=>`<td class="num"><span class="tog ${i<2?'on':''}" data-tog></span></td>`).join('')}</tr>`).join('')}`).join('')}
+  </tbody></table></div>
+  <p class="cap dim" style="margin-top:16px">Promminer Pool вправе присылать системные уведомления пользователю, без возможности отписаться от них.</p>`)}`;
 
 /* --- Авторизация: /login, /register, /restore + шаг с кодом ---
    Экраны собраны по проду: белый лист, колонка 358, поля h56 r16,
