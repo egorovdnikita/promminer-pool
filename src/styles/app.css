@@ -176,7 +176,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
-.card{background:var(--surface);border-radius:var(--r-m);padding:16px;box-shadow:var(--shadow);min-width:0}
+.card{background:var(--surface);border-radius:var(--r-l);padding:24px;box-shadow:none;min-width:0}
 .ch{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .ch h2{font-size:18px;line-height:22px;font-weight:800}
 .hero{background:var(--accent);border-radius:var(--r-s);padding:12px 14px;color:#fff;display:flex;gap:12px;align-items:flex-start;min-height:76px}
@@ -206,7 +206,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .seg{display:inline-flex;background:var(--ctrl2);border-radius:var(--r-m);padding:4px;gap:4px;max-width:100%;overflow-x:auto;scrollbar-width:none}
 .seg::-webkit-scrollbar{display:none}
 .seg button{height:var(--h-btn-sm);padding:0 16px;border-radius:var(--r-s);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c2);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
-.seg button.on{background:var(--surface);color:var(--c1);box-shadow:0 1px 2px #1a1a1a14}
+.seg button.on{background:var(--surface);color:var(--c1)}
 .seg.fill{display:flex;width:100%}
 .seg.fill button{flex:1;justify-content:center}
 .seg svg{display:block}
@@ -617,10 +617,16 @@ body.mini .ni .spacer.lbl{display:none!important}
 .uname i{font-style:normal;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
 
 /* Сводка по аккаунтам: шапка без рамки, прокручивается только список */
-.asum{padding:0 2px 2px}
+.asum{padding:12px 14px}
 .asum b.t{display:block;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;margin-bottom:8px}
 .alist{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;margin-bottom:12px;padding-right:4px}
 .alist .acard{margin-bottom:0;flex:0 0 auto}
 /* Шеврон кнопки хедера разворачивается, когда попоувер открыт */
 .hbtn.open .ico svg{transform:rotate(180deg)}
 .hbtn .ico svg{transition:transform .15s}
+
+/* Заголовки блоков в макете крупнее: 24 SemiBold */
+.card>.ch h2,.card h2{font-size:24px;line-height:30px;font-weight:600}
+/* Segment Control профиля живёт в шапке и тянется на всю её ширину */
+.top .tabseg{display:flex;margin:16px 0 0;width:100%}
+.top .tabseg button{flex:0 0 auto}

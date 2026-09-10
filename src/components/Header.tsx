@@ -1,11 +1,14 @@
 import {
-  CHECK, I, NOTIF_N, PROF, TITLES, acctSummary, nf, notifications, type Model,
+  CHECK, I, NOTIF_N, PROF, TITLES, acctSummary, nf, notifications, profTabs, type Model,
 } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico, Raw } from './Raw'
 
 /* Хедер по DS: белая панель, снизу radius-l 24, padding 20/8, ряд px16 gap16.
    Контролы h48, border 1px, radius-m 16, без тени. Заголовок H3 32/38 SemiBold. */
+/* Вкладки профиля по макету — часть шапки, а не отдельный блок страницы. */
+const PROFILE_ROUTES = [...PROF.map(([id]) => id), 'notifconfig']
+
 export function Header({ m }: { m: Model }) {
   const { S, route, pop } = useApp()
   const n = NOTIF_N[S.notif]
@@ -64,6 +67,7 @@ export function Header({ m }: { m: Model }) {
           </span>
         </div>
       </div>
+      {PROFILE_ROUTES.includes(route) && <Raw html={profTabs(route === 'notifconfig' ? 'notifsettings' : route, m)} />}
     </header>
   )
 }

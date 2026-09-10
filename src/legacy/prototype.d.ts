@@ -62,6 +62,8 @@ export declare const MODALS: Record<string, {
   steps?: number | ((m: Model) => number)
   b: (m: Model, step: number) => string
 }>
+/** Вкладки профиля — рисуются в шапке. */
+export declare function profTabs(cur: string, m: Model): string
 export declare function notifications(): string
 export declare function acctSummary(m: Model): string
 export declare function workersList(m: Model): any[]

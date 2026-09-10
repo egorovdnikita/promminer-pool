@@ -844,12 +844,11 @@ V.profile=m=>{
     ['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03'],
     ['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03'],
     ['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03']];
-  return `${profTabs('profile',m)}
-<div class="grid cols2" style="grid-template-columns:1.9fr 1fr;align-items:start">
+  return `<div class="grid cols2" style="grid-template-columns:1.9fr 1fr;align-items:start">
   <div>
     ${card(`<div class="ch"><h2>Мои суб-аккаунты</h2><button class="btn link spacer bs" data-go="subaccounts">Смотреть все</button></div>
       <div class="grid g3" style="margin:0">${subs.map(s=>subTile(m,s)).join('')}
-        ${S.role==='owner'?`<button class="dashed" style="grid-column:span ${Math.max(1,3-subs.length%3||3)}" data-modal="subacct">${I.pl}Создать суб-аккаунт</button>`:''}</div>`)}
+        ${S.role==='owner'&&subs.length<3?`<button class="dashed" style="grid-column:span ${3-subs.length}" data-modal="subacct">${I.pl}Создать суб-аккаунт</button>`:''}</div>`)}
     <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Мои наблюдатели</h2>${obs.length?'<button class="btn link spacer bs" data-go="observers">Смотреть все</button>':''}</div>
       ${obs.length?`<div class="grid g3" style="margin:0">${obs.map(obsTile).join('')}
@@ -897,8 +896,7 @@ const VERIF_FIELDS=[
 V.verification=m=>{
   const vs=S.verif==='yes'?['Пройдена','g']:S.verif==='pending'?['На проверке','y']:['Не пройдена','r'];
   const fields=VERIF_FIELDS[segi('verif-type',1)];
-  return `${profTabs('verification',m)}
-${card(`<div class="ch"><h2>Верификация и реквизиты</h2><div class="spacer"></div>
+  return `${card(`<div class="ch"><h2>Верификация и реквизиты</h2><div class="spacer"></div>
   ${status(vs[1]==='g'?'ok':vs[1]==='y'?'warn':'err',vs[0])}</div>
   ${S.verif==='no'?`<div class="alert warn" style="margin-bottom:14px">${I.inf}<div>Без верификации недоступны выплаты в рублях и генерация <button class="lnk" style="color:var(--accent)" data-go="report">отчета о майнинге</button></div></div>`:''}
   ${S.verif==='pending'?`<div class="alert warn" style="margin-bottom:14px">${I.inf}<div>Анкета на проверке — обычно занимает до двух рабочих дней</div></div>`:''}
@@ -921,8 +919,7 @@ V.subaccounts=m=>{
     ${r.w.map((v,i)=>`<td class="num mono${i===0?' gs':''}">${ni(v)}</td>`).join('')}
     ${r.h.map((v,i)=>`<td class="num mono${i===0?' gs':''}">${ni(v)} ${HU[i]}</td>`).join('')}
     ${r.inc.map((v,i)=>`<td class="num mono${i===0?' gs':''}">${dec(v)} ${IC[i]}</td>`).join('')}`;
-  return `${profTabs('subaccounts',m)}
-${card(`<div class="ch"><h2>Центр суб-аккаунтов</h2><div class="spacer"></div>
+  return `${card(`<div class="ch"><h2>Центр суб-аккаунтов</h2><div class="spacer"></div>
   <label class="row" style="gap:10px;cursor:pointer"><span class="tog ${U.arch?'on':''}" data-arch></span>
     <span class="bs">Показать аккаунты в архиве</span></label>
   <button class="btn" data-modal="subacct" ${S.role==='observer'?'disabled':''}>${I.pl} Добавить суб-аккаунт</button></div>
@@ -952,8 +949,7 @@ ${card(`<div class="ch"><h2>Центр суб-аккаунтов</h2><div class=
 
 V.observers=m=>{
   const rows=obsOf(m);
-  return `${profTabs('observers',m)}
-${card(`<div class="ch"><h2>Наблюдатели</h2><div class="spacer"></div>
+  return `${card(`<div class="ch"><h2>Наблюдатели</h2><div class="spacer"></div>
   <button class="btn" data-modal="observer" ${S.role==='observer'?'disabled':''}>${I.pl} Создать ссылку</button></div>
   <p class="cap dim" style="margin-bottom:12px">Наблюдатель открывает ссылку без пароля и видит выбранные разделы только для чтения — без доступа к выводу средств и настройкам</p>
   ${rows.length?`<div class="tw"><table class="tbl"><thead><tr><th>Название</th><th>Монеты</th><th>Ссылка</th>
@@ -969,8 +965,7 @@ ${card(`<div class="ch"><h2>Наблюдатели</h2><div class="spacer"></div
 
 V.security=m=>{
   const rows=sessOf(m);
-  return `${profTabs('security',m)}
-${card(`<div class="ch"><h2>Безопасность</h2></div>
+  return `${card(`<div class="ch"><h2>Безопасность</h2></div>
   ${[['Двухфакторная аутентификация','Подтверждение входа через приложение-аутентификатор',0],
      ['Подтверждение вывода средств','Код на почту при каждом выводе',1],
      ['Уведомления о входе','Письмо при входе с нового устройства',1],
@@ -1004,8 +999,7 @@ const noteRow=([t,d,dt,read])=>`<div class="nrow ${read?'read':''}"><i class="do
 V.notifsettings=m=>{
   const n=NOTIF_N[S.notif];
   const rows=n?NOTES_ALL.slice(0,Math.max(n,2)):[];
-  return `${profTabs('notifsettings',m)}
-${card(`<div class="ch"><h2>Уведомления</h2><div class="spacer"></div>
+  return `${card(`<div class="ch"><h2>Уведомления</h2><div class="spacer"></div>
   ${rows.length?`<button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button>
   <span class="pop-wrap"><button class="pill flat sq" data-pop="nfilter">${segv('nfilter',['Все уведомления','Непрочитанные','Прочитанные'])} ${I.cd}</button>
     ${pop==='nfilter'?`<div class="pop" style="min-width:230px">${['Все уведомления','Непрочитанные','Прочитанные'].map((o,i)=>
@@ -1027,8 +1021,7 @@ const NEVENTS=[
     ['Изменен лимит на вывод средств']]],
   ['Реферальная программа',[['Зарегистрировался реферал'],['Получен реферальный доход'],['Произведена реферальная выплата']]],
 ];
-V.notifconfig=m=>`${profTabs('notifsettings',m)}
-${card(`<div class="ch"><button class="ib sm" data-go="notifsettings">${I.cl}</button>
+V.notifconfig=m=>`${card(`<div class="ch"><button class="ib sm" data-go="notifsettings">${I.cl}</button>
   <h2 style="margin-left:4px">Настройка уведомлений</h2></div>
   <div class="tw"><table class="tbl ntbl"><thead><tr>
     <th>События для отправки уведомлений</th>
@@ -1165,7 +1158,7 @@ function acctSummary(m){
   const cur=S.acct==='main'?'natarusso':'alfred';
   const rows=acctList(m);
   return `<div class="pop mid">
-    <div class="asum"><b class="t">Сводка по аккаунтам</b>
+    <div class="acard asum"><b class="t">Сводка по аккаунтам</b>
       <div class="kv">Общий баланс<span class="mono">${nf(rows.reduce((a,r)=>a+r.bal,0))} $</span></div>
       <div class="kv">Количество аккаунтов<span class="mono">${rows.length}</span></div></div>
     <div class="hr"></div>
@@ -1189,7 +1182,7 @@ export function applyState(next){
 export {
   AXES, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON,
-  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker,
+  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VERIF_FIELDS,
   S, U, route, pop, modal, openGroups, mini,
 };
