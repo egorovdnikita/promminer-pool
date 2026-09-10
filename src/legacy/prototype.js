@@ -224,6 +224,21 @@ const pageSlice=(pid,total,per=10)=>{const pages=Math.max(1,Math.ceil(total/per)
 /* Checkbox и Radio дизайн-системы. cls: on|ind|err|dis. */
 const CHECK='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 const cb=(on,attr='',cls='')=>`<span class="cb ${on?'on':''} ${cls}" ${attr}>${on?CHECK:''}</span>`;
+/* Date Picker дизайн-системы: месяц сеткой, выбранный диапазон подсвечен.
+   Данные статичные — прототипу хватает января 2026 с диапазоном 29–30. */
+function datePicker(sel=[29,30]){
+  const dows=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const lead=3, days=31; /* 1 января 2026 — четверг */
+  const cells=[];
+  for(let i=0;i<lead;i++)cells.push(`<span class="dp-d mut">${29+i}</span>`); /* хвост декабря */
+  for(let d=1;d<=days;d++)cells.push(`<span class="dp-d ${sel.includes(d)?'sel':''}">${d}</span>`);
+  for(let d=1;cells.length%7;d++)cells.push(`<span class="dp-d mut">${d}</span>`); /* начало февраля */
+  return `<div class="pop dp">
+    <div class="dp-top"><button class="dp-nav">${I.cl}</button><b>Январь 2026</b><button class="dp-nav">${I.cv}</button></div>
+    <div class="dp-div"></div>
+    <div class="dp-grid">${dows.map(d=>`<span class="dp-dow">${d}</span>`).join('')}${cells.join('')}</div>
+  </div>`;
+}
 /* Status дизайн-системы: точка 8 + подпись 12 Bold. t: ok|err|warn|off. */
 const status=(t,label)=>`<span class="status ${t}"><i class="dot"></i>${label}</span>`;
 const rd=(on,attr='',cls='')=>`<span class="rd ${on?'on':''} ${cls}" ${attr}></span>`;
@@ -291,7 +306,7 @@ ${S.role==='observer'?'<div class="alert warn mb">👁 Режим наблюда
 </div>
 ${card(`<div class="ch"><h2>График изменения хэшрейта (${S.coin==='btc'?'BTC':'LTC'})</h2>
   <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],2)}
-  <span class="pill flat sq mono" style="font-size:12px">29.01.2026 – 30.01.2026 ${I.cal}</span>
+  <span class="pop-wrap"><button class="pill flat sq mono" data-pop="date">29.01.2026 – 30.01.2026 ${I.cal}</button>${pop==='date'?datePicker():''}</span>
   <button class="ib sm" data-tip="Приблизить">${I.zi}</button><button class="ib sm" data-tip="Отдалить">${I.zo}</button></div>${chart(m)}`)}
 <div style="height:12px"></div>
 ${card(`<div class="ch">${seg('home-tab',['Доход','Выплаты'],0)}
@@ -1070,7 +1085,7 @@ export function applyState(next){
 export {
   AXES, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON,
-  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart,
+  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VERIF_FIELDS,
   S, U, route, pop, modal, openGroups, mini,
 };

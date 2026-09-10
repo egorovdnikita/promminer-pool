@@ -51,6 +51,8 @@ export declare function status(t: 'ok'|'err'|'warn'|'off', label: string): strin
 export declare const CHECK: string
 export declare function pager(id: string, total: number, per?: number): string
 export declare function chart(m: Model, opts?: any): string
+/** Календарь дизайн-системы; sel — подсвеченные числа. */
+export declare function datePicker(sel?: number[]): string
 
 export declare const V: Record<string, (m: Model) => string>
 export declare const MODALS: Record<string, {
