@@ -1,5 +1,5 @@
 import {
-  ACCOUNTS, CHECK, I, NOTIF_N, PROF, TITLES, acctSummary, nf, notifications, type Model,
+  CHECK, I, NOTIF_N, PROF, TITLES, acctSummary, nf, notifications, type Model,
 } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico, Raw } from './Raw'
@@ -16,16 +16,9 @@ export function Header({ m }: { m: Model }) {
       <div className="toprow">
         <h1 className="h3">{TITLES[route] || ''}</h1>
         <div className="hgroup">
-          <span className="pop-wrap">
-            <button className="hbtn" data-pop="bal">
-              <Ico html={I.rub} />
-              <span className="mono">{nf(m.pool)}</span>
-            </button>
-            {pop === 'bal' && <Raw html={acctSummary(m)} />}
-          </span>
-
-          <button className="hbtn sq" data-theme-toggle data-tip="Светлая и тёмная тема">
-            <Ico className="i3" html={I.moon} />
+          <button className="hbtn" data-go="assets">
+            <Ico html={I.rub} />
+            <span className="mono">{nf(m.pool)}</span>
           </button>
 
           <span className="pop-wrap">
@@ -41,20 +34,7 @@ export function Header({ m }: { m: Model }) {
               {route === 'monitor' ? 'Сводка по аккаунтам (46)' : acct}
               <Ico html={I.cd} />
             </button>
-            {pop === 'acct' && (
-              <div className="pop">
-                <b className="ph">Аккаунты</b>
-                {ACCOUNTS.map((a, i) => (
-                  <button className={a === acct ? 'on' : ''} data-acct={i === 0 ? 'main' : 'sub'} key={a}>
-                    {a}{i === 0 ? ' · основной' : ''}
-                    {a === acct && <Ico className="ck" html={CHECK} />}
-                  </button>
-                ))}
-                <div className="hr" />
-                <button data-go="subaccounts"><Ico html={I.pl} />Управление суб-аккаунтами</button>
-                <button data-go="monitor"><Ico html={I.bars} />Сводка по аккаунтам</button>
-              </div>
-            )}
+            {pop === 'acct' && <Raw html={acctSummary(m)} />}
           </span>
 
           <span className="pop-wrap">

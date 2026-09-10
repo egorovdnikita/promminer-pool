@@ -148,8 +148,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (n === 'done') { u.auth = 'login'; go(HOME); toast('Готово') } else { u.auth = n }
       return bump()
     }
-    if (at('[data-theme-toggle]')) {
-      u.theme = u.theme === 'dark' ? 'light' : 'dark'
+    const th = at('[data-theme-set]')
+    if (th) {
+      u.theme = th.dataset.themeSet as 'light' | 'dark'
       document.documentElement.setAttribute('data-theme', u.theme)
       return bump()
     }

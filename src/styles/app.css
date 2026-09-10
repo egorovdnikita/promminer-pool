@@ -84,8 +84,8 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .nic{color:var(--c3);display:flex;flex:0 0 auto}
 .ni.on .nic,.ni.act .nic{color:var(--accent)}
 .ni:hover{background:var(--surface)}
-.ni.on{background:var(--surface);color:var(--c1)}
-.ni.on::after{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:4px 0 0 4px;background:var(--accent)}
+.ni.on,.ni.act{background:var(--surface);color:var(--c1)}
+.ni.on::after,.ni.act::after{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:4px 0 0 4px;background:var(--accent)}
 .ni .chev{margin-left:auto;color:var(--c1);display:flex;transition:transform .15s}
 .ni.open .chev{transform:rotate(180deg)}
 .kids{display:flex;flex-direction:column;gap:1px;padding:2px 0 4px}
@@ -126,7 +126,7 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .ib.sm{width:var(--h-btn-sm);height:var(--h-btn-sm);border-radius:var(--r-s)}
 /* Counter (💙 DS): 20×20, 12/16 SemiBold, белый текст; S — точка 8×8. */
 .bdg,.cnt{min-width:20px;height:20px;padding:0 4px;border-radius:var(--r-f);background:var(--neg);color:#fff;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;display:inline-grid;place-items:center}
-.bdg{position:absolute;left:21px;top:7px}
+.bdg{position:absolute;top:-6px;right:-6px}
 .cnt.s,.bdg.s{min-width:8px;width:8px;height:8px;padding:0;font-size:0}
 .cnt.pri{background:var(--accent)}.cnt.neu{background:#6b7280}
 .cnt.ok{background:var(--pos)}.cnt.info{background:#3b82f6}
@@ -228,6 +228,8 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .btn{display:inline-flex;align-items:center;gap:8px;height:var(--h-btn);padding:0 24px;border-radius:var(--r-m);background:var(--accent);color:#fff;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;white-space:nowrap}
 .btn.g{background:var(--ctrl);color:var(--c1);box-shadow:none}
 .btn.w{background:var(--surface);color:var(--c1);box-shadow:var(--shadow)}
+.btn.out{background:var(--surface);color:var(--c1);border:1px solid var(--ctrl-line);box-shadow:none}
+.btn.out:hover{background:var(--ctrl2)}
 .btn.sm{height:var(--h-btn-sm);padding:0 16px;border-radius:var(--r-s)}
 /* текстовая кнопка: h28, без паддинга, Body/M accent */
 .btn.link{height:28px;padding:0;background:none;box-shadow:none;color:var(--accent);border-radius:var(--r-s);font-size:var(--fs-m);line-height:var(--lh-m)}
@@ -472,7 +474,9 @@ body.mini .sb .lbl,body.mini .sb .chev,body.mini .kids{display:none}
 .avat{width:48px;height:48px;border-radius:var(--r-f);background:#f59e0b29;color:#f59e0b;display:grid;place-items:center;font-size:24px;line-height:30px;font-weight:600;flex:0 0 auto}
 .avat.lg{width:64px;height:64px;font-size:28px}
 .acard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);padding:12px 14px;margin-bottom:8px}
-.acard.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.acard.sel{border-color:var(--accent);background:var(--accent-ghost)}
+.acard[data-acct]{cursor:pointer}
+.acard[data-acct]:hover{border-color:var(--accent)}
 .acard b.t{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);font-weight:600;margin-bottom:8px}
 .kv{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;font-size:var(--fs-s);line-height:26px;color:var(--c2);font-weight:500}
 .kv span{margin-left:auto;color:var(--c1);font-weight:600}

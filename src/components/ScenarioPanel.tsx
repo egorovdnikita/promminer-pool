@@ -4,7 +4,7 @@ import type { Scenario } from '@/state/types'
 
 /** Панель сценариев: состояние прототипа в ссылке. Клавиша S открывает и закрывает. */
 export function ScenarioPanel() {
-  const { S, route, panel } = useApp()
+  const { S, U, route, panel } = useApp()
 
   return (
     <>
@@ -24,6 +24,13 @@ export function ScenarioPanel() {
               </div>
             </div>
           ))}
+          <div className="scg">
+            <label>Тема</label>
+            <div className="sco">
+              <button data-theme-set="light" className={U.theme === 'light' ? 'on' : ''}>Светлая</button>
+              <button data-theme-set="dark" className={U.theme === 'dark' ? 'on' : ''}>Тёмная</button>
+            </div>
+          </div>
           <div className="scg">
             <label>Экран</label>
             <div className="sco">
