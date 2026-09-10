@@ -23,6 +23,8 @@ export interface Ui {
   qfocus: boolean
   auth: string
   consent: Set<number>
+  /** Показывать ли архивные суб-аккаунты. */
+  arch: boolean
   theme: 'light' | 'dark'
   step: number
 }

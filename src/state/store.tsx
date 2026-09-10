@@ -12,7 +12,7 @@ export const routeOf = (pathname: string) => pathname.replace(/^\/+|\/+$/g, '') 
 
 const freshUi = (): Ui => ({
   seg: {}, sort: {}, page: {}, sel: new Set(), q: '', wfilter: 'all', geo: '',
-  wk: null, qfocus: false, auth: 'login', consent: new Set(), theme: 'light', step: 0,
+  wk: null, qfocus: false, auth: 'login', consent: new Set(), arch: false, theme: 'light', step: 0,
 })
 
 /** Сценарий из хэша ссылки, иначе из localStorage, иначе дефолт. */
@@ -154,6 +154,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       document.documentElement.setAttribute('data-theme', u.theme)
       return bump()
     }
+    if (at('[data-arch]')) { u.arch = !u.arch; return bump() }
     const sg = at('[data-seg]')
     if (sg) { u.seg[sg.dataset.seg!] = +sg.dataset.i!; return bump() }
     const wf = at('[data-wf]')

@@ -28,6 +28,11 @@ let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qf
 /* ============================================================
    2. ДАННЫЕ
    ============================================================ */
+/* Дробные суммы дохода: до 8 знаков, хвостовые нули не показываем. */
+const dec=(v,max=8)=>{
+  if(!v) return '0';
+  return Number(v).toLocaleString('ru-RU',{minimumFractionDigits:0,maximumFractionDigits:max});
+};
 const nf=(v,d=2)=>Number(v).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
 const ni=v=>Number(v).toLocaleString('ru-RU');
 const rng=s=>()=>{s=(s*1664525+1013904223)%4294967296;return s/4294967296};
@@ -428,8 +433,8 @@ function workersRows(m){
     return (typeof x==='string'?String(x).localeCompare(String(y)):x-y)*s.d});
   return rows;
 }
-const sortTh=(k,label)=>{const s=U.sort.workers, on=s&&s.k===k;
-  return `<th class="srt ${on?'on':''}" data-sortk="${k}">${label}${on?(s.d>0?I.sortUp:I.sortDn):I.sortv}</th>`};
+const sortTh=(k,label,gs)=>{const s=U.sort.workers, on=s&&s.k===k;
+  return `<th class="srt ${on?'on':''} ${gs?'gs':''}" data-sortk="${k}">${label}${on?(s.d>0?I.sortUp:I.sortDn):I.sortv}</th>`};
 
 V.workers=m=>{
   const st=[['Активные',m.h.a,'var(--pos)',I.ok],['Низкий хэшрейт',m.h.l,'var(--warn)',I.excl],
@@ -760,10 +765,18 @@ const PROF=[['profile','Мой профиль','user'],['security','Безопа
   ['subaccounts','Центр суб-аккаунтов','ref'],['observers','Наблюдатели','eye'],['notifsettings','Уведомления','bell']];
 
 /* ===== Данные раздела «Личный кабинет» — один источник для сводки и вкладок ===== */
+/* Суб-аккаунты по макету 2300:135215. Числа хранятся числами — из них
+   считается итоговая строка «Все аккаунты». Поля workers/btc/ltc/zec
+   оставлены для плиток в сводке профиля. */
 const SUBS=[
-  {name:'natarusso', main:1,workers:672,btc:'1 399',ltc:'0',zec:'0',created:'12.03.2024',active:1},
-  {name:'testaccount',main:0,workers:0, btc:'1 399',ltc:'270',zec:'0',created:'04.11.2025',active:1},
-  {name:'ivanivanov',main:0,workers:0,  btc:'1 399',ltc:'0',zec:'0',created:'18.02.2026',active:0}];
+  {name:'natarusso', main:1,arch:0,bal:10800.45,w:[8900,2,10,3456],h:[1400,0,0],inc:[0.003,0.0035,0.0005,0.0005],
+   workers:672,btc:'1 399',ltc:'0',zec:'0',created:'12.03.2024',active:1},
+  {name:'larusso',   main:0,arch:0,bal:0,       w:[0,0,0,0],       h:[0,0,0],   inc:[0,0,0,0],
+   workers:0,  btc:'0',    ltc:'0',zec:'0',created:'04.11.2025',active:1},
+  {name:'alfred',    main:0,arch:0,bal:2000,    w:[40,145,0,5],    h:[600,0,0], inc:[0.00000009,0.0015,0.0004,0.0004],
+   workers:190,btc:'600',  ltc:'0',zec:'0',created:'18.02.2026',active:1},
+  {name:'ivanivanov',main:0,arch:1,bal:0,       w:[0,0,0,0],       h:[0,0,0],   inc:[0,0,0,0],
+   workers:0,  btc:'0',    ltc:'0',zec:'0',created:'21.06.2024',active:0}];
 const OBSERVERS=[
   {name:'natarusso',extra:1,coins:['LTC','DOGE'],label:'Для бухгалтера',off:0,
    access:['Воркеры','Мои активы','Уведомления'],term:'Бессрочно',expired:0,
@@ -779,7 +792,8 @@ const SESSIONS=[
   {dev:'iPhone 15, Safari (iOS)',        ip:'212.90.4.18', loc:'Санкт-Петербург',when:'2 часа назад',cur:0},
   {dev:'Windows 11, Chrome',             ip:'77.88.12.9',  loc:'Казань',when:'вчера, 18:40',cur:0}];
 /* Сценарий «Пусто» — свежий аккаунт: только основной, без наблюдателей и чужих сессий */
-const subsOf=m=>m.empty?[{...SUBS[0],workers:0,btc:'0',ltc:'0'}]:SUBS;
+const subsOf=m=>m.empty?[{...SUBS[0],workers:0,btc:'0',ltc:'0',bal:0,w:[0,0,0,0],h:[0,0,0],inc:[0,0,0,0]}]
+  :SUBS.filter(x=>U.arch||!x.arch);
 const obsOf=m=>m.empty?[]:OBSERVERS;
 const sessOf=m=>m.empty?SESSIONS.slice(0,1):SESSIONS;
 /* Вкладки — Segment Control из макета: общий контейнер, белый активный сегмент.
@@ -899,18 +913,42 @@ ${card(`<div class="ch"><h2>Верификация и реквизиты</h2><di
 
 V.subaccounts=m=>{
   const rows=subsOf(m);
+  const sum=i=>rows.reduce((a,r)=>a+r.w[i],0);
+  const sumH=i=>rows.reduce((a,r)=>a+r.h[i],0);
+  const sumI=i=>rows.reduce((a,r)=>a+r.inc[i],0);
+  const HU=['TH/s','GH/s','KSol/s'], IC=['BTC','LTC','DOGE','ZEC'];
+  const cells=r=>`<td class="num mono">${nf(r.bal)} $</td>
+    ${r.w.map((v,i)=>`<td class="num mono${i===0?' gs':''}">${ni(v)}</td>`).join('')}
+    ${r.h.map((v,i)=>`<td class="num mono${i===0?' gs':''}">${ni(v)} ${HU[i]}</td>`).join('')}
+    ${r.inc.map((v,i)=>`<td class="num mono${i===0?' gs':''}">${dec(v)} ${IC[i]}</td>`).join('')}`;
   return `${profTabs('subaccounts',m)}
 ${card(`<div class="ch"><h2>Центр суб-аккаунтов</h2><div class="spacer"></div>
-  <button class="btn" data-modal="subacct" ${S.role==='observer'?'disabled':''}>${I.pl} Создать суб-аккаунт</button></div>
-  <p class="cap dim" style="margin-bottom:12px">У каждого суб-аккаунта свои адреса подключения и своя статистика — общий баланс и сводка считаются по всем сразу</p>
-  <div class="tw"><table class="tbl"><thead><tr><th>Аккаунт</th><th>Роль</th><th class="num">Воркеры</th>
-    <th class="num">Хэшрейт BTC, 24 ч</th><th class="num">Хэшрейт LTC, 24 ч</th><th>Создан</th><th>Статус</th><th></th></tr></thead><tbody>
-  ${rows.map(s=>`<tr><td><b>${s.name}</b></td><td><span class="tag ${s.main?'':'n'}">${s.main?'Основной':'Суб-аккаунт'}</span></td>
-      <td class="num mono">${ni(s.workers)}</td><td class="num mono">${s.btc} TH/s</td><td class="num mono">${s.ltc} GH/s</td>
-      <td class="mono mut">${s.created}</td>
-      <td>${status(s.active?'ok':'off',s.active?'Активен':'Не подключен')}</td>
-      <td class="num dim">${I.dots}</td></tr>`).join('')}
-  </tbody></table></div>`)}`};
+  <label class="row" style="gap:10px;cursor:pointer"><span class="tog ${U.arch?'on':''}" data-arch></span>
+    <span class="bs">Показать аккаунты в архиве</span></label>
+  <button class="btn" data-modal="subacct" ${S.role==='observer'?'disabled':''}>${I.pl} Добавить суб-аккаунт</button></div>
+  <div class="tw"><table class="tbl subtbl">
+  <thead>
+    <tr class="grp"><th colspan="2"></th><th colspan="4" class="gs">Воркеры</th>
+      <th colspan="3" class="gs">Хэшрейт, 24 ч</th><th colspan="4" class="gs">Доход</th><th></th></tr>
+    <tr><th>Аккаунт</th>${sortTh('bal','Общий баланс')}
+      ${['Активные','Низкий хэш','Отключены','Оффлайн'].map((t,i)=>sortTh('w'+i,t,i===0)).join('')}
+      ${['BTC','LTC','ZEC'].map((t,i)=>sortTh('h'+i,t,i===0)).join('')}
+      ${IC.map((t,i)=>sortTh('i'+i,`<span class="thico">${COIN_ICON[t]||''} ${t}</span>`,i===0)).join('')}
+      <th></th></tr>
+  </thead><tbody>
+  ${rows.map(r=>`<tr><td><b>${r.name}</b><div style="margin-top:4px">
+      <span class="tag ${r.main?'sel':'n'}">${r.main?'Основной':'Суб-аккаунт'}</span>
+      ${r.arch?'<span class="tag n">В архиве</span>':''}</div></td>
+    ${cells(r)}
+    <td class="num">${r.main?'':`<button class="ib sm" data-toast="Просмотр статистики суб-аккаунта">${I.eye}</button>`}</td></tr>`).join('')}
+  <tr class="total"><td><b>Все аккаунты</b></td>
+    <td class="num mono">${nf(rows.reduce((a,r)=>a+r.bal,0))} $</td>
+    ${[0,1,2,3].map(i=>`<td class="num mono${i===0?' gs':''}">${ni(sum(i))}</td>`).join('')}
+    ${[0,1,2].map(i=>`<td class="num mono${i===0?' gs':''}">${ni(sumH(i))} ${HU[i]}</td>`).join('')}
+    ${[0,1,2,3].map(i=>`<td class="num mono${i===0?' gs':''}">${dec(sumI(i))} ${IC[i]}</td>`).join('')}
+    <td></td></tr>
+  </tbody></table></div>
+  ${pager('subs',rows.length,20)}`)}`};
 
 V.observers=m=>{
   const rows=obsOf(m);

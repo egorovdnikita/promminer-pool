@@ -17,6 +17,8 @@ export declare function M(): Model
 
 export declare function nf(v: number | string, d?: number): string
 export declare function ni(v: number | string): string
+/** Дробная сумма без хвостовых нулей, до `max` знаков. */
+export declare function dec(v: number, max?: number): string
 export declare function rng(seed: number): () => number
 export declare function sv(path: string, w?: number): string
 

@@ -585,3 +585,12 @@ body.mini .ni .spacer.lbl{display:none!important}
 .ntbl tr.ngrp td{padding-top:24px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:600;background:none}
 .tabseg .cnt{margin-right:6px}
 .pager .perpage{display:flex;align-items:center;gap:8px;margin-right:16px}
+
+/* Центр суб-аккаунтов: сгруппированная шапка и итоговая строка (макет 2300:135215) */
+.subtbl thead tr.grp th{padding:12px 12px 4px;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:500;
+  color:var(--c2);text-align:center;background:var(--ctrl2)}
+.subtbl th.gs,.subtbl td.gs{border-left:1px solid var(--border)}
+.subtbl tbody tr.total td{background:var(--ctrl);font-weight:600;color:var(--c1)}
+.subtbl tbody tr.total td:first-child{border-radius:var(--r-s) 0 0 var(--r-s)}
+.subtbl tbody tr.total td:last-child{border-radius:0 var(--r-s) var(--r-s) 0}
+.subtbl .thico svg{width:20px;height:20px}
