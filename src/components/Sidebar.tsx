@@ -43,11 +43,11 @@ export function Sidebar() {
         <a className="ni" href={LINKS.kb} target="_blank" rel="noopener">
           <Ico className="nic" html={I.book} />
           <span className="lbl">База знаний</span>
-          <Ico className="spacer lbl nic" html={I.ext} />
+          <Ico className="spacer lbl ico" html={I.ext} />
         </a>
       </div>
       <button className="mini-btn" data-mini>
-        <Ico className="nic" html={I.cl} />
+        <Ico className="nic" html={mini ? I.cv : I.cl} />
         <span className="lbl">Свернуть</span>
       </button>
     </aside>

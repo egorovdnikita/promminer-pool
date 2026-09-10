@@ -476,12 +476,12 @@ body.mini .ni .spacer.lbl{display:none!important}
 .toast.in{opacity:1;transform:none}
 /* ===== БЛОКИ, СВЕРЕННЫЕ С ПРОДОМ ===== */
 /* попоуверы хедера */
-.pop.wide{min-width:460px;padding:16px;border-radius:var(--r-l)}
+.pop.wide{min-width:484px;padding:16px;border-radius:var(--r-l)}
 .pop.mid{min-width:330px;padding:12px;border-radius:var(--r-l)}
-.nhead{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.nhead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .nhead b{font-size:20px;line-height:24px;font-weight:600;white-space:nowrap}
-.nhead .ra{margin-left:auto;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;color:var(--c3);font-size:var(--fs-s);font-weight:600}
-.nhead .ra:hover{color:var(--c1)}
+.nhead .ra{margin-left:auto;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.nhead .ra:hover{opacity:.8}
 .phead{display:flex;align-items:center;gap:12px;padding:8px 8px 12px}
 .avat{width:48px;height:48px;border-radius:var(--r-f);background:#f59e0b29;color:#f59e0b;display:grid;place-items:center;font-size:24px;line-height:30px;font-weight:600;flex:0 0 auto}
 .avat.lg{width:64px;height:64px;font-size:28px}

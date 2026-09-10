@@ -1065,7 +1065,7 @@ function notifications(){
     ['Новый реферал','miner_1042 зарегистрировался по вашей ссылке','вчера'],
     ['Отчет за апрель сгенерирован','Доступен для скачивания','2 дня назад']];
   return `<div class="pop wide">
-    <div class="nhead"><b>${n?'Новые уведомления':'Уведомления'}</b>
+    <div class="nhead"><b>${n?'Новые уведомления':'Уведомления'}</b>${n?`<span class="cnt">${n>99?'99+':n}</span>`:''}
       ${n?`<button class="ra" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall}Прочитать все</button>`:''}</div>
     ${n?list.map((x,i)=>`<div class="note ${i>=n?'read':''}"><i></i><div><b>${x[0]}</b><p>${x[1]}</p><span>${x[2]}</span></div></div>`).join('')
        :`<div class="empty" style="padding:24px 0 20px"><div class="art">${I.bell}</div><p>Уведомлений пока нет</p></div>`}
