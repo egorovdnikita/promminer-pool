@@ -477,7 +477,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* ===== БЛОКИ, СВЕРЕННЫЕ С ПРОДОМ ===== */
 /* попоуверы хедера */
 .pop.wide{min-width:484px;padding:20px;border-radius:var(--r-l)}
-.pop.mid{min-width:330px;padding:16px;border-radius:var(--r-l)}
+.pop.mid{min-width:330px;padding:16px;border-radius:var(--r-l);max-height:none;overflow:visible;display:flex;flex-direction:column}
 .nhead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .nhead b{font-size:20px;line-height:24px;font-weight:600;white-space:nowrap}
 .nhead .ra{margin-left:auto;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;color:var(--accent);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
@@ -615,3 +615,12 @@ body.mini .ni .spacer.lbl{display:none!important}
 .uname{display:flex;flex-direction:column;gap:2px;min-width:0}
 .uname b{display:flex;align-items:center;gap:8px;font-size:18px;line-height:22px;font-weight:600}
 .uname i{font-style:normal;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
+
+/* Сводка по аккаунтам: шапка без рамки, прокручивается только список */
+.asum{padding:0 2px 2px}
+.asum b.t{display:block;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;margin-bottom:8px}
+.alist{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;margin-bottom:12px;padding-right:4px}
+.alist .acard{margin-bottom:0;flex:0 0 auto}
+/* Шеврон кнопки хедера разворачивается, когда попоувер открыт */
+.hbtn.open .ico svg{transform:rotate(180deg)}
+.hbtn .ico svg{transition:transform .15s}

@@ -30,7 +30,7 @@ export function Header({ m }: { m: Model }) {
           </span>
 
           <span className="pop-wrap">
-            <button className="hbtn" data-pop="acct">
+            <button className={`hbtn ${pop === 'acct' ? 'open' : ''}`} data-pop="acct">
               {route === 'monitor' ? 'Сводка по аккаунтам (46)' : acct}
               <Ico html={I.cd} />
             </button>
@@ -38,7 +38,7 @@ export function Header({ m }: { m: Model }) {
           </span>
 
           <span className="pop-wrap">
-            <button className="hbtn tight" data-pop="user">
+            <button className={`hbtn tight ${pop === 'user' ? 'open' : ''}`} data-pop="user">
               <Ico className="i3" html={I.user} />
               <Ico html={I.cd} />
             </button>

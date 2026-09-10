@@ -1152,21 +1152,31 @@ function notifications(){
     <button class="btn xl" data-go="notifsettings">Посмотреть все</button></div>`;
 }
 /* Попоувер баланса — «Сводка по аккаунтам», как на проде */
+/* Сводка по аккаунтам (макеты «Оболочки» 66:13325/13331/13337).
+   Сводка и кнопка закреплены, прокручивается только список аккаунтов. */
+const acctList=m=>{
+  const base=subsOf(m);
+  if(S.data!=='huge') return base;
+  const extra=[];
+  for(let i=1;i<=43;i++) extra.push({name:'account'+(20100+i),main:0,bal:485.45,h:[335,0,0]});
+  return base.concat(extra);
+};
 function acctSummary(m){
   const cur=S.acct==='main'?'natarusso':'alfred';
-  const rows=subsOf(m);
+  const rows=acctList(m);
   return `<div class="pop mid">
-    <div class="acard"><b class="t">Сводка по аккаунтам</b>
+    <div class="asum"><b class="t">Сводка по аккаунтам</b>
       <div class="kv">Общий баланс<span class="mono">${nf(rows.reduce((a,r)=>a+r.bal,0))} $</span></div>
       <div class="kv">Количество аккаунтов<span class="mono">${rows.length}</span></div></div>
     <div class="hr"></div>
-    ${rows.map((r,i)=>`<div class="acard ${r.name===cur?'sel':''}" data-acct="${i===0?'main':'sub'}">
-      <b class="t">${r.name}<span class="tag ${r.main?'sel':'n'} spacer">${r.main?'Основной':'Суб-аккаунт'}</span></b>
+    <div class="alist">${rows.map((r,i)=>`<div class="acard ${r.name===cur?'sel':''}" data-acct="${i===0?'main':'sub'}">
+      <b class="t">${r.name}<span class="tag ${r.main?'sel':''} spacer">${r.main?'Основной':'Суб-аккаунт'}</span></b>
       <div class="kv">Общий баланс<span class="mono">${nf(r.bal)} $</span></div>
       <div class="kv">Хэшрейт, BTC<span class="mono">${ni(r.h[0])} TH/s</span></div>
-      <div class="kv">Хэшрейт, LTC<span class="mono">${ni(r.h[1])} GH/s</span></div></div>`).join('')}
+      <div class="kv">Хэшрейт, LTC<span class="mono">${ni(r.h[1])} GH/s</span></div></div>`).join('')}</div>
     <button class="btn out" style="width:100%;justify-content:center" data-modal="subacct">${I.pl} Добавить суб-аккаунт</button></div>`;
 }
+
 
 
 /* ============================================================
