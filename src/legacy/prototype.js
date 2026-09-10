@@ -292,7 +292,7 @@ ${S.role==='observer'?'<div class="alert warn mb">👁 Режим наблюда
 ${card(`<div class="ch"><h2>График изменения хэшрейта (${S.coin==='btc'?'BTC':'LTC'})</h2>
   <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],2)}
   <span class="pill flat sq mono" style="font-size:12px">29.01.2026 – 30.01.2026 ${I.cal}</span>
-  <button class="ib sm">${I.zi}</button><button class="ib sm">${I.zo}</button></div>${chart(m)}`)}
+  <button class="ib sm" data-tip="Приблизить">${I.zi}</button><button class="ib sm" data-tip="Отдалить">${I.zo}</button></div>${chart(m)}`)}
 <div style="height:12px"></div>
 ${card(`<div class="ch">${seg('home-tab',['Доход','Выплаты'],0)}
   <div class="spacer"></div>${S.coin==='ltc'?`<span class="pill flat sq">${COIN_ICON.LTC} LTC ${I.cd}</span>`:''}<button class="ib sm">${I.dl}</button></div>
@@ -458,7 +458,7 @@ V.workers=m=>{
   ${all.length?(shown.length?`<div class="tw"><table class="tbl"><thead><tr>
       <th>${cb(allSel,'data-selall')}</th>${sortTh('name','Наименование')}${sortTh('model','Модель')}${sortTh('st','Статус')}
       ${sortTh('h5','Хэшрейт, 5 мин')}${sortTh('h1','Хэшрейт, 1 ч')}${sortTh('h24','Хэшрейт, 24 ч')}${sortTh('rej','Реджект, 24 ч')}
-      <th>Uptime ${I.inf}</th><th>Отпр. шары</th><th>Мои теги</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+      <th>Uptime <span class="tipi" data-tip="Доля времени за 24 часа, когда воркер присылал шары">${I.inf}</span></th><th>Отпр. шары</th><th>Мои теги</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
       ${pager('workers',shown.length,per)}`
     :emptyBox('Ничего не найдено','Измените фильтр или поисковый запрос'))
     :emptyBox('Воркеров пока нет','Подключите первый воркер, чтобы увидеть статистику по парку')}`)}`;

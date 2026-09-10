@@ -24,7 +24,7 @@ export function Header({ m }: { m: Model }) {
             {pop === 'bal' && <Raw html={acctSummary(m)} />}
           </span>
 
-          <button className="hbtn sq" data-theme-toggle title="Светлая / тёмная тема">
+          <button className="hbtn sq" data-theme-toggle data-tip="Светлая и тёмная тема">
             <Ico className="i3" html={I.moon} />
           </button>
 
