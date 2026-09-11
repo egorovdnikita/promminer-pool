@@ -18,7 +18,10 @@ const AXES={
   role:{g:'Аккаунт',label:'Роль',opts:[['owner','Владелец'],['observer','Наблюдатель']]},
   acct:{g:'Аккаунт',label:'Аккаунт',opts:[['main','Основной'],['sub','Суб-аккаунт']]},
   name:{g:'Аккаунт',label:'Имя аккаунта',opts:[['yes','Задано'],['no','Не задано']]},
-  verif:{g:'Аккаунт',label:'Верификация',opts:[['no','Не пройдена'],['pending','На проверке'],['yes','Пройдена']]},
+  verif:{g:'Верификация',label:'Данные',opts:[['no','Не заполнены'],['yes','Заполнены']]},
+  vdoc:{g:'Верификация',label:'Выписка из реестра',opts:[['no','Не добавлена'],['yes','Добавлена']]},
+  vacc:{g:'Верификация',label:'Расчетный счет',opts:[['no','Не добавлен'],['yes','Добавлен']]},
+  verr:{g:'Верификация',label:'Ошибка в поле',opts:[['no','Нет'],['tax','Код налоговой'],['inn','ИНН'],['bank','Банк не выбран']]},
   subs:{g:'Профиль',label:'Суб-аккаунты',opts:[['many','3'],['few','1'],['none','Только основной']]},
   obs:{g:'Профиль',label:'Наблюдатели',opts:[['many','3'],['few','1'],['none','Нет']]},
   notif:{g:'Профиль',label:'Уведомления',opts:[['many','12 новых'],['few','2 новых'],['none','Нет']]},
@@ -34,16 +37,16 @@ const AXES={
 /* Готовые связки состояний — один клик вместо десяти переключателей */
 const PRESETS=[
   ['Свежий аккаунт','Ничего не настроено и нет данных',
-    {data:'empty',name:'no',subs:'none',obs:'none',notif:'none',verif:'no',phone:'no',mail:'no',tg:'no'}],
+    {data:'empty',name:'no',subs:'none',obs:'none',notif:'none',verif:'no',vdoc:'no',vacc:'no',phone:'no',mail:'no',tg:'no'}],
   ['Активный майнер','Всё заполнено и работает',
-    {data:'normal',health:'ok',name:'yes',subs:'many',obs:'many',notif:'many',verif:'yes',phone:'yes',mail:'yes',tg:'yes'}],
+    {data:'normal',health:'ok',name:'yes',subs:'many',obs:'many',notif:'many',verif:'yes',vdoc:'yes',vacc:'yes',phone:'yes',mail:'yes',tg:'yes'}],
   ['Авария на парке','Воркеры отваливаются',{data:'normal',health:'critical',notif:'many'}],
   ['Наблюдатель','Доступ только на чтение',{role:'observer',subs:'few',obs:'none'}],
-  ['Крупный клиент','Большие значения и много записей',{data:'huge',subs:'many',obs:'many',tier:'4',verif:'yes'}],
+  ['Крупный клиент','Большие значения и много записей',{data:'huge',subs:'many',obs:'many',tier:'4',verif:'yes',vdoc:'yes',vacc:'yes'}],
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
 const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
-  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no'};
+  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
 let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
@@ -227,6 +230,15 @@ const COIN_ICON={
 };
 const GOOGLE=`<svg width="24" height="24" viewBox="0 0 24 24"><path fill="#4285F4" d="M21.6 12.2c0-.6-.1-1.3-.2-1.9H12v3.6h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.2Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2L6.4 14Z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8C16.9 3 14.7 2 12 2a10 10 0 0 0-8.9 5.4L6.4 10c.8-2.3 3-4.1 5.6-4.1Z"/></svg>`;
 /* Flags / ru — флаг в строке «Выбор языка» */
+/* Логотипы банков для «Расчетного счета» — выгружены из макета 759:69050.
+   У каждого свои цвета и clipPath, поэтому обёртка sv() не подходит. */
+const BANKS={
+  tbank:{name:'Т-Банк',short:'Т-банк',svg:`<svg viewBox="0 0 24 24" fill="none"><g clip-path="url(#bkT)"><path d="M6 0.2998H18C21.148 0.2998 23.7002 2.85198 23.7002 6V18C23.7002 21.148 21.148 23.7002 18 23.7002H6C2.85198 23.7002 0.299805 21.148 0.299805 18V6C0.299805 2.85198 2.85198 0.2998 6 0.2998Z" fill="#FFDD2D" stroke="white" stroke-width="0.6"/><path d="M18 6H6V12.0351C6 13.5823 6.82536 15.0119 8.16514 15.7856L12 18L15.8348 15.7856C17.1747 15.0119 18 13.5823 18 12.0351V6Z" fill="white"/><path fill-rule="evenodd" clip-rule="evenodd" d="M15 9V11.2793C14.7155 10.9273 14.1982 10.6891 13.6068 10.6891H12.9641V13.3387C12.9641 14.0436 13.1389 14.6606 13.3983 15H10.6027C10.8615 14.6603 11.0359 14.0441 11.0359 13.34V10.6891H10.3932C9.80176 10.6891 9.28451 10.9273 9 11.2793V9H15Z" fill="#333333"/></g><defs><clipPath id="bkT"><path d="M0 6C0 2.68629 2.68629 0 6 0H18C21.3137 0 24 2.68629 24 6V18C24 21.3137 21.3137 24 18 24H6C2.68629 24 0 21.3137 0 18V6Z" fill="white"/></clipPath></defs></svg>`},
+  alfa:{name:'Альфа-Банк',short:'Альфа-Банк',svg:`<svg viewBox="0 0 24 24" fill="none"><path d="M6 0.5H18C21.0376 0.5 23.5 2.96243 23.5 6V18C23.5 21.0376 21.0376 23.5 18 23.5H6C2.96243 23.5 0.5 21.0376 0.5 18V6C0.5 2.96243 2.96243 0.5 6 0.5Z" fill="#EF3124" stroke="white"/><g clip-path="url(#bkA)"><path d="M16.0167 16.3906H8V18.0336H16.0167V16.3906Z" fill="white"/><path d="M13.4662 7.20329C13.237 6.53096 12.9737 6 12.0712 6C11.1687 6 10.8878 6.52849 10.6478 7.20329L8.16699 14.1575H9.81199L10.3845 12.5047H13.5495L14.0803 14.1575H15.8295L13.4662 7.20329ZM10.8637 11.1082L11.9878 7.81233H12.0295L13.0912 11.1082H10.8628H10.8637Z" fill="white"/></g><defs><clipPath id="bkA"><rect width="8" height="12" fill="white" transform="translate(8 6)"/></clipPath></defs></svg>`},
+  sber:{name:'СберБанк',short:'СберБанк',svg:`<svg viewBox="0 0 24 24" fill="none"><path d="M6 0.5H18C21.0376 0.5 23.5 2.96243 23.5 6V18C23.5 21.0376 21.0376 23.5 18 23.5H6C2.96243 23.5 0.5 21.0376 0.5 18V6C0.5 2.96243 2.96243 0.5 6 0.5Z" fill="#20AA4D" stroke="white"/><g clip-path="url(#bkS)"><path d="M18.7706 12.0284C18.7707 11.6203 18.7343 11.2129 18.6618 10.8113L17.1986 11.8891C17.1986 11.9353 17.1986 11.9822 17.1986 12.025C17.2002 13.1945 16.81 14.3308 16.0904 15.2526C15.3707 16.1744 14.3629 16.8286 13.228 17.1107C12.0931 17.3928 10.8963 17.2866 9.82881 16.8091C8.76128 16.3316 7.88447 15.5102 7.33832 14.4761C6.79217 13.442 6.60814 12.2547 6.81562 11.1038C7.0231 9.95289 7.61013 8.90464 8.48301 8.12635C9.35589 7.34806 10.4643 6.88458 11.6314 6.80989C12.7985 6.7352 13.957 7.0536 14.9219 7.71427L16.2438 6.73971C15.0443 5.77178 13.5515 5.2403 12.0102 5.23251C10.4689 5.22471 8.97075 5.74106 7.76156 6.69681C6.55238 7.65256 5.70398 8.99095 5.35559 10.4924C5.0072 11.9938 5.17951 13.569 5.84424 14.9596C6.50898 16.3502 7.62665 17.4735 9.01387 18.1452C10.4011 18.817 11.9754 18.9972 13.4786 18.6564C14.9817 18.3156 16.3244 17.474 17.2862 16.2696C18.2481 15.0653 18.7719 13.5697 18.7719 12.0284H18.7706Z" fill="white"/><path d="M17.3527 7.87305C17.6758 8.2904 17.9495 8.74378 18.1683 9.22412L11.975 13.7884L9.3877 12.1662V10.215L11.975 11.8365L17.3527 7.87305Z" fill="white"/></g><defs><clipPath id="bkS"><rect width="14" height="14" fill="white" transform="translate(5 5)"/></clipPath></defs></svg>`},
+  vtb:{name:'ВТБ',short:'ВТБ',svg:`<svg viewBox="0 0 24 24" fill="none"><path d="M6 0.5H18C21.0376 0.5 23.5 2.96243 23.5 6V18C23.5 21.0376 21.0376 23.5 18 23.5H6C2.96243 23.5 0.5 21.0376 0.5 18V6C0.5 2.96243 2.96243 0.5 6 0.5Z" fill="#3262EC" stroke="white"/><path fill-rule="evenodd" clip-rule="evenodd" d="M8.53124 7.67188L7.80716 9.73854H17.8413L18.5654 7.67188H8.53124ZM7.44489 10.7714L6.72081 12.8376H16.755L17.4791 10.7714H7.44489ZM6.3608 13.8709L5.63672 15.9371H15.6709L16.3945 13.8709H6.3608Z" fill="white"/></svg>`},
+  sovcom:{name:'Совкомбанк',short:'Совкомбанк',svg:`<svg viewBox="0 0 24 24" fill="none"><path d="M6 0.5H18C21.0376 0.5 23.5 2.96243 23.5 6V18C23.5 21.0376 21.0376 23.5 18 23.5H6C2.96243 23.5 0.5 21.0376 0.5 18V6C0.5 2.96243 2.96243 0.5 6 0.5Z" fill="#003790" stroke="white"/><path d="M5 12.0095C5 15.8677 8.13234 19 12.0096 19C12.1051 19 12.2006 19 12.2961 19V16.3452H12.0096C9.60301 16.3452 7.67395 14.397 7.67395 12.0095C7.67395 9.6221 9.62211 7.67394 12.0096 7.67394H12.2961V5C12.2006 5 12.1051 5 12.0096 5C8.13234 5 5 8.13233 5 12.0095Z" fill="white"/><path d="M13.4034 5.13477V8.78279H12.0091C10.2137 8.78279 8.78125 10.2153 8.78125 12.0106C8.78125 13.7869 10.2328 15.2384 12.0091 15.2384H13.4034V18.8865C16.593 18.2371 18.9995 15.4103 18.9995 12.0297C18.9995 8.61089 16.593 5.78415 13.4034 5.13477Z" fill="white"/></svg>`},
+};
 const FLAG_RU=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><g clip-path="url(#flagRU)"><path d="M23.3172 16C23.7594 14.7489 24 13.4025 24 12C24 10.5975 23.7594 9.2511 23.3172 7.99998H0.682834C0.240621 9.2511 0 10.5975 0 12C0 13.4025 0.240613 14.7489 0.682812 16H23.3172Z" fill="#0052B4"/><path d="M23.3172 16C21.6698 20.6608 17.2249 24 12 24C6.77513 24 2.33018 20.6608 0.682831 16H23.3172Z" fill="#D80027"/><path d="M23.3172 8H0.682816C2.33016 3.33923 6.77512 0 12 0C17.2249 0 21.6698 3.33923 23.3172 8Z" fill="#F3F5F9"/></g><path d="M12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5C5.64873 23.5 0.5 18.3513 0.5 12C0.5 5.64873 5.64873 0.5 12 0.5Z" stroke="#6B7280" stroke-opacity="0.16"/><defs><clipPath id="flagRU"><path d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z" fill="white"/></clipPath></defs></svg>`;
 const USD_ICON=`<svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#22c55e"/><path fill="#fff" d="M11.2 4.6h1.6v1.6h-1.6zM11.2 17.8h1.6v1.6h-1.6zM12 6.8c2.2 0 3.8 1.1 4 2.9h-2.1c-.2-.7-.9-1.1-1.9-1.1s-1.8.4-1.8 1.1c0 .6.5 1 1.7 1.2l1.2.2c2.2.4 3.2 1.3 3.2 2.9 0 1.9-1.7 3.1-4.2 3.1s-4.1-1.1-4.3-3h2.1c.2.8 1 1.2 2.2 1.2 1.2 0 2-.5 2-1.2 0-.6-.5-.9-1.7-1.2l-1.3-.2C10 12.3 9 11.4 9 9.8c0-1.8 1.6-3 3.9-3Z"/></svg>`;
 
@@ -964,29 +976,76 @@ V.profile=m=>{
 </div>`;
 };
 
-/* Верификация: набор полей зависит от выбранного типа лица */
-const VERIF_FIELDS=[
-  [['ФИО','Наталья Руссо'],['ИНН','770*******12'],['Паспорт','45 12 ****56'],
-   ['Дата рождения','12.07.1988'],['Адрес регистрации','Москва, ул. ***, д. 12'],['Телефон','+7 (996) ***-59-52']],
-  [['ФИО','Наталья Руссо'],['ИНН','770*******12'],['ОГРНИП','32077*********4'],
-   ['Расчетный счет','40802*********1234'],['Банк','АО «Тинькофф Банк»'],['БИК','044525974']],
-  [['Наименование','ООО «Руссо Майнинг»'],['ИНН','770*******12'],['КПП','7707*****1'],['ОГРН','1157*********8'],
-   ['Расчетный счет','40702*********5678'],['Банк','АО «Тинькофф Банк»'],['БИК','044525974'],['Юридический адрес','Москва, ул. ***, д. 12']]];
+/* ===== Верификация и реквизиты (страница 759:68419) =====
+   Слева правовая форма и памятка, справа анкета и реквизиты.
+   Светлый вариант макета — секция 778:17706, состояния и флоу — 2219:146235. */
+const VFORMS=[['ip','Индивидуальный предприниматель'],['ur','Юридическое лицо'],['fiz','Физическое лицо']];
+/* Поля анкеты по строкам: [подпись, значение, ключ ошибки] */
+const FIO=[['Фамилия','Иванов'],['Имя','Иван'],['Отчество (необязательно)','Иванович']];
+const TAXR=[['Код налоговой','123456','tax'],['ИНН','123456566788','inn']];
+const VFIELDS={
+  ip:[FIO,TAXR], fiz:[FIO,TAXR],
+  ur:[[['Наименование организации','ООО «Руссо Майнинг»'],['Код налоговой','123456','tax']],
+      [['ИНН','123456566788','inn'],['КПП','770701001']]]};
+const VERR={tax:'Код налоговой должен содержать 4 цифры',inn:'ИНН должен содержать 12 цифр'};
+/* Памятка о правовых формах — блоки с синим заголовком (778:2677) */
+const VHINTS=[
+  ['Как физическое лицо вы можете:',
+   ['Майнить цифровую валюту (ЦВ)','Выводить майнинговые и реферальные вознаграждения на кошельки','Не подавать отчет о майнинге']],
+  ['Как ИП/юридическое лицо вы можете:',
+   ['Майнить цифровую валюту (ЦВ)','Выводить майнинговые вознаграждения на кошельки',
+    'Выводить реферальные вознаграждения на расчетный счет','Ежемесячно подавать отчеты о майнинге']]];
+/* Поддержка — одни и те же контакты на экране и в модалке счета */
+const VHELP=[['mail','Почта','poolsupport@promminer.ru','mailto:poolsupport@promminer.ru'],
+  ['tg','Telegram','@PoolSupport','https://t.me/PoolSupport']];
+const helpRow=([ic,k,v,u])=>`<a class="vhelp" href="${u}" target="_blank" rel="noopener">
+  <span class="vhi">${I[ic]}</span><span class="k">${k}</span>
+  <span class="spacer v">${v}${I.ext}</span></a>`;
+/* Поле анкеты: пустое — плейсхолдер, заполненное — подпись 12 сверху */
+const vField=([label,val,key])=>{
+  const err=key&&S.verr===key, v=err?'12':(S.verif==='yes'?val:'');
+  return `<div class="vfield">
+    <div class="inp ${err?'err':''}" style="margin:0">
+      <span class="tx">${v?`<div class="k">${label}</div>`:''}
+        <input placeholder="${v?'':label}" value="${v}"></span>
+      <button class="vclear" data-clear>${I.x}</button></div>
+    ${err?`<div class="errmsg">${VERR[key]}</div>`:''}</div>`;
+};
+const bankLogo=(k,size=24)=>`<span class="blogo" style="width:${size}px;height:${size}px">${BANKS[k].svg}</span>`;
 V.verification=m=>{
-  const vs=S.verif==='yes'?['Пройдена','g']:S.verif==='pending'?['На проверке','y']:['Не пройдена','r'];
-  const fields=VERIF_FIELDS[segi('verif-type',1)];
-  return `${card(`<div class="ch"><h2>Верификация и реквизиты</h2><div class="spacer"></div>
-  ${status(vs[1]==='g'?'ok':vs[1]==='y'?'warn':'err',vs[0])}</div>
-  ${S.verif==='no'?`<div class="alert warn" style="margin-bottom:14px">${I.inf}<div>Без верификации недоступны выплаты в рублях и генерация <button class="lnk" style="color:var(--accent)" data-go="report">отчета о майнинге</button></div></div>`:''}
-  ${S.verif==='pending'?`<div class="alert warn" style="margin-bottom:14px">${I.inf}<div>Анкета на проверке — обычно занимает до двух рабочих дней</div></div>`:''}
-  <div class="ch">${seg('verif-type',['Физическое лицо','Индивидуальный предприниматель','Юридическое лицо'],1)}</div>
-  <div class="grid g3" style="margin:0;gap:10px">
-    ${fields.map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v mono">${S.verif==='no'?'—':v}</div></div>`).join('')}
+  const form=VFORMS[segi('vform',0)][0];
+  const full=form!=='fiz';
+  const doc=S.vdoc==='yes', acc=S.vacc==='yes';
+  const head=(t,d)=>`<div class="vhead"><h2>${t}</h2><p>${d}</p></div>`;
+  return `<div class="grid" style="grid-template-columns:460fr 1176fr;gap:16px;margin:0;align-items:start">
+  <div class="vcol">
+    ${card(`<div class="vform">
+      <span class="vico">${I.uid}</span>
+      <div class="vhead"><h2>Правовая форма</h2><p class="dim">Выберите правовую форму</p></div></div>
+      <div class="vlist">${VFORMS.map(([,label],i)=>
+        `<button class="chip ${i===segi('vform',0)?'on':''}" data-seg="vform" data-i="${i}">${label}</button>`).join('')}</div>`)}
+    <div class="vnote">${VHINTS.map(([t,list])=>`<div class="vnb"><b>${t}</b>
+      <ul>${list.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>
   </div>
-  <div class="row" style="margin-top:14px;gap:8px">
-    <button class="btn" ${S.role==='observer'||S.verif==='pending'?'disabled':''} data-toast="Анкета отправлена на проверку">
-      ${S.verif==='yes'?'Обновить данные':'Отправить на проверку'}</button>
-    <button class="btn g">${I.dl} Скачать анкету</button></div>`)}`};
+  <div class="vcol">
+    ${card(`<h2 class="vh2">Верификация</h2>
+      <div class="vrows">${VFIELDS[form].map(row=>
+        `<div class="vrow" style="grid-template-columns:repeat(${row.length},1fr)">${row.map(vField).join('')}</div>`).join('')}</div>`)}
+    ${full?card(`${head('Выписка из реестра майнеров','Добавьте, если хотите продавать намайненную цифровую валюту на нашей платформе')}
+      ${doc?`<div class="vstate"><span class="vok">${I.ok}</span>Добавлена</div>`:''}
+      <button class="btn ${doc?'g':''}" data-modal="vdocm">${doc?'Изменить выписку':'Добавить выписку'}</button>`,'vsec'):''}
+    ${full?card(`${head('Расчетный счет','Добавьте, если хотите выводить намайненную цифровую валюту в рублях')}
+      ${acc?`<div class="vpay">${bankLogo('tbank',40)}
+        <span class="tx"><i>Расчетный счет</i><b>12345678901234567890</b></span></div>`:''}
+      <button class="btn ${acc?'g':''}" data-modal="vaccm">${acc?'Изменить расчетный счет':'Добавить счет'}</button>
+      <div class="vbanks"><p>Допустимые счета банков:</p>
+        <div class="row" style="gap:20px;flex-wrap:wrap">${Object.keys(BANKS).map(k=>
+          `<span class="vbank">${bankLogo(k)}${BANKS[k].short}</span>`).join('')}</div></div>`,'vsec')
+      :''}
+    ${full?card(`<h2 class="vh2">Помощь с открытием счета</h2>
+      <div class="vrow" style="grid-template-columns:1fr 1fr">${VHELP.map(helpRow).join('')}</div>`):''}
+  </div></div>`;
+};
 
 V.subaccounts=m=>{
   const rows=subsOf(m);
@@ -1538,6 +1597,61 @@ Object.assign(MODALS,{
         data-toast="Заявка на удаление аккаунта создана">Удалить аккаунт</button>`},
 });
 
+/* ===== Модалки верификации: выписка (2219:147552) и счет (2219:147444) ===== */
+const DOC_REQ=[['Документ выгружается из личного кабинета (ЛК)'],
+  ['Дата выгрузки должна совпадать с датой подачи заявки'],
+  ['На документе должны быть видны:',['полное имя / название заявителя','дата выгрузки','регистрационный номер (если есть)']]];
+Object.assign(MODALS,{
+  /* Добавить выписку: зона загрузки, карточка файла и требования */
+  vdocm:{t:'Добавить выписку',acts:false,
+    b:()=>{const file=U.vfile;
+      return `<div class="mstack" style="gap:16px">
+      <button class="vdrop" data-vfile>
+        <span class="vdi">${I.up}</span>
+        <span class="vdt"><b><em>Выберите файл</em> или перетащите</b>
+          <i>Не более 4 МБ, в формате PDF</i></span></button>
+      ${file?`<div class="vfile"><span class="vfi">${I.doc}</span>
+        <span class="tx"><b>fns_devices_template_2026-05-21_0</b><i>53.0 КБ</i></span>
+        <button class="btn link vdel spacer" data-vfile="off">Удалить</button></div>`:''}
+      <div class="vreq"><b>Требования к документу:</b>
+        ${DOC_REQ.map(([t,sub])=>`<div class="vrq"><span class="vok">${I.ok}</span><span>${t}</span></div>
+          ${sub?`<div class="vsub">${sub.map(x=>`<span>${x}</span>`).join('')}</div>`:''}`).join('')}
+      </div></div>`},
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" ${U.vfile?'':'disabled'} data-close data-axis="vdoc" data-val="yes"
+        data-toast="Выписка успешно добавлена">Сохранить</button>`},
+  /* Добавить счет: выбор банка и номер, затем экран успеха */
+  vaccm:{t:'Добавить счет',acts:false,tall:4,
+    b:(m,step)=>{const b=U.vbank, err=S.verr==='bank'&&!b;
+      return step===0?`<div class="mstack" style="gap:20px">${prog(0,2)}
+        <div>
+          <span class="pop-wrap full" style="display:block">
+            <button class="selbox full ${err?'err':''}" data-pop="vbank">
+              ${b?`${bankLogo(b)}${BANKS[b].name}`:'<span class="mut">Выберите банк</span>'}
+              <span class="spacer">${I.cd}</span></button>
+            ${pop==='vbank'?`<div class="pop menu row" style="top:calc(100% + 8px)">
+              ${Object.keys(BANKS).map(k=>`<button data-vbank="${k}">${bankLogo(k)}${BANKS[k].name}</button>`).join('')}
+            </div>`:''}</span>
+          ${err?'<div class="errmsg" style="margin-top:8px">Поле обязательно для заполнения</div>':''}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="inp" style="margin:0"><div class="k">Расчетный счет</div>
+            <input value="12345678901234567890"></div>
+          <button class="btn link" style="width:100%;justify-content:center" data-toast="Номер вставлен из буфера">Вставить</button>
+        </div>
+        <div class="hr" style="margin:0"></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <p class="mtext mut" style="font-weight:500">Нужна помощь с открытием счета?</p>
+          <div style="display:flex;flex-direction:column;gap:8px">${VHELP.map(helpRow).join('')}</div>
+        </div></div>`
+      :`<div class="mstack" style="gap:20px">${prog(1,2)}
+        <div class="cstep mid">${doneBlock('Счет успешно добавлен')}</div></div>`},
+    foot:(m,step)=>step===0
+      ? `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="1">Добавить</button>`
+      : `<button class="btn" style="flex:1" data-close data-axis="vacc" data-val="yes"
+          data-toast="Счет успешно добавлен">Отлично</button>`},
+});
+
 Object.assign(MODALS, contactModals());
 
 /* ===== Попоуверы хедера (из секции 8 архива) ===== */
@@ -1594,6 +1708,6 @@ export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON,
   NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
-  V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VERIF_FIELDS,
+  V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS,
   S, U, route, pop, modal, openGroups, mini,
 };

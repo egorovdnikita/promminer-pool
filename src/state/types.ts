@@ -19,6 +19,9 @@ export interface Scenario {
   fa: string
   sess: string
   del: string
+  vdoc: string
+  vacc: string
+  verr: string
 }
 
 /** Эфемерное состояние интерфейса — в ссылку не попадает. */
@@ -27,6 +30,10 @@ export interface Ui {
   sort: Record<string, { k: string; d: number } | null>
   /** Индекс уведомления, открытого в модалке. */
   note?: number
+  /** Выписка приложена в модалке «Добавить выписку». */
+  vfile?: boolean
+  /** Выбранный банк в модалке «Добавить счет». */
+  vbank?: string
   /** Фильтр в панели сценариев. */
   scq?: string
   page: Record<string, number>

@@ -214,7 +214,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const st = at('[data-step]')
     if (st) { u.step = +st.dataset.step!; return bump() }
     const md = at('[data-modal]')
-    if (md) { modal.current = md.dataset.modal!; u.step = 0; pop.current = null; return bump() }
+    if (md) { modal.current = md.dataset.modal!; u.step = 0; u.vfile = false; u.vbank = undefined; pop.current = null; return bump() }
     const tst = at('[data-toast]')
     /* Ось сценария применяем до закрытия: кнопки модалок несут и data-axis,
        и data-close, а ветка закрытия выходит из обработчика. */
@@ -246,6 +246,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       eye.classList.toggle('on')
       return
     }
+    /* Крестик в поле анкеты — очищает значение */
+    const clr = at('[data-clear]')
+    if (clr) {
+      const inp = clr.closest('.inp')?.querySelector('input') as HTMLInputElement | null
+      if (inp) { inp.value = ''; inp.focus() }
+      return
+    }
+    /* Выписка в модалке: зона загрузки прикладывает файл, «Удалить» убирает */
+    const vf = at('[data-vfile]')
+    if (vf) { U.current.vfile = vf.dataset.vfile !== 'off'; return bump() }
+    const vb = at('[data-vbank]')
+    if (vb) { U.current.vbank = vb.dataset.vbank!; pop.current = null; return bump() }
     const tg = at('[data-tog]')
     if (tg) { tg.classList.toggle('on'); return }
     if (at('[data-mini]')) { mini.current = !mini.current; document.body.classList.toggle('mini', mini.current); return bump() }

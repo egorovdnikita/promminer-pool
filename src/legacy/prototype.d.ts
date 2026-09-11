@@ -87,7 +87,9 @@ export declare const PROF: [string, string, string][]
 export declare const SUBS: any[]
 export declare const OBSERVERS: any[]
 export declare const SESSIONS: any[]
-export declare const VERIF_FIELDS: any[]
+export declare const VFIELDS: Record<string, any[]>
+export declare const VFORMS: [string, string][]
+export declare const BANKS: Record<string, { name: string; short: string; svg: string }>
 
 export declare const S: Scenario
 export declare const U: Ui
