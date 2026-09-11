@@ -21,6 +21,9 @@ const AXES={
   verif:{g:'Верификация',label:'Данные',opts:[['no','Не заполнены'],['yes','Заполнены']]},
   vdoc:{g:'Верификация',label:'Выписка из реестра',opts:[['no','Не добавлена'],['yes','Добавлена']]},
   vacc:{g:'Верификация',label:'Расчетный счет',opts:[['no','Не добавлен'],['yes','Добавлен']]},
+  saerr:{g:'Суб-аккаунты',label:'Имя суб-аккаунта',opts:[['no','Пусто'],['ok','Свободно'],
+    ['req','Не заполнено'],['short','Коротко и капсом'],['caps','Есть заглавные'],
+    ['busy','Уже занято'],['load','Проверяем']]},
   verr:{g:'Верификация',label:'Ошибка в поле',opts:[['no','Нет'],['tax','Код налоговой'],['inn','ИНН'],['bank','Банк не выбран'],['file','Файл больше 4 МБ']]},
   subs:{g:'Профиль',label:'Суб-аккаунты',opts:[['many','3'],['few','1'],['none','Только основной']]},
   obs:{g:'Профиль',label:'Наблюдатели',opts:[['many','3'],['few','1'],['none','Нет']]},
@@ -46,7 +49,7 @@ const PRESETS=[
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
 const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
-  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no'};
+  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
 let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
@@ -476,8 +479,8 @@ function workersRows(m){
     return (typeof x==='string'?String(x).localeCompare(String(y)):x-y)*s.d});
   return rows;
 }
-const sortTh=(k,label,gs)=>{const s=U.sort.workers, on=s&&s.k===k;
-  return `<th class="srt ${on?'on':''} ${gs?'gs':''}" data-sortk="${k}">${label}${on?(s.d>0?I.sortUp:I.sortDn):I.sortv}</th>`};
+const sortTh=(k,label,gs,cls='')=>{const s=U.sort.workers, on=s&&s.k===k;
+  return `<th class="srt ${on?'on':''} ${gs?'gs':''} ${cls}" data-sortk="${k}">${label}${on?(s.d>0?I.sortUp:I.sortDn):I.sortv}</th>`};
 
 V.workers=m=>{
   const st=[['Активные',m.h.a,'var(--pos)',I.ok],['Низкий хэшрейт',m.h.l,'var(--warn)',I.excl],
@@ -851,16 +854,18 @@ const SESSIONS=[
 /* Сценарий «Пусто» — свежий аккаунт: только основной, без наблюдателей и чужих сессий */
 const CNT={many:3,few:1,none:0};
 const subsOf=m=>{
-  const all=m.empty?[{...SUBS[0],workers:0,btc:'0',ltc:'0',bal:0,w:[0,0,0,0],h:[0,0,0],inc:[0,0,0,0]}]
-    :SUBS.filter(x=>U.arch||!x.arch);
-  return all.slice(0,Math.max(1,CNT[S.subs]??3));
+  if(m.empty) return [{...SUBS[0],workers:0,btc:'0',ltc:'0',bal:0,w:[0,0,0,0],h:[0,0,0],inc:[0,0,0,0]}];
+  const act=SUBS.filter(x=>!x.arch).slice(0,Math.max(1,CNT[S.subs]??3));
+  /* архивные показываются поверх лимита — тогл добавляет строки, а не подменяет их */
+  return U.arch?act.concat(SUBS.filter(x=>x.arch)):act;
 };
 const obsOf=m=>m.empty?[]:OBSERVERS.slice(0,CNT[S.obs]??3);
 const SESS_N={one:1,few:2,many:6};
 const sessOf=m=>SESSIONS.slice(0,m.empty?1:(SESS_N[S.sess]??6));
 /* Вкладки — Segment Control из макета: общий контейнер, белый активный сегмент.
    Счётчики показываются и при нуле (в макете «Наблюдатели 0»). */
-const profTabs=(cur,m)=>{const n={subaccounts:subsOf(m).length,observers:obsOf(m).length};
+/* счётчик вкладки — без архивных: в макете он не меняется от тогла */
+const profTabs=(cur,m)=>{const n={subaccounts:subsOf(m).filter(x=>!x.arch).length,observers:obsOf(m).length};
   const nn=NOTIF_N[S.notif];
   return `<div class="seg tabseg">${PROF.map(([id,t])=>`<button class="${cur===id?'on':''}" data-go="${id}">${t}${
     id==='notifsettings'&&nn?`<span class="cnt">${nn>99?'99+':nn}</span>`:''}${id in n?`<u>${n[id]}</u>`:''}</button>`).join('')}</div>`};
@@ -1054,43 +1059,62 @@ V.verification=m=>{
   </div></div>`;
 };
 
+/* ===== Центр суб-аккаунтов (секция 1482:83256) =====
+   Карточка с паддингом 8, внутри шапка 80 с паддингом 16 и таблица:
+   две шапки (группы 32 и колонки 48) с чередующимися полосами,
+   строки 74 и отдельная полоса «Все аккаунты» с радиусом 16. */
+/* Состояния имени суб-аккаунта — ось saerr (кадры 1482:83893…1482:83968) */
+const SA_RULES=['От 5 до 15 символов','Только строчные буквы (a−z) и цифры'];
+const SA_VAL={ok:'larusso',short:'wR',caps:'wRfffffs',busy:'ivan',load:'larusso'};
+const SA_BAD={short:[0,1],caps:[1]};
+const SA_MSG={req:'Поле обязательно для заполнения',
+  busy:'Данное имя суб-аккаунта уже используется в системе'};
+const SUB_COLS=[
+  ['Аккаунт','a',154],['Общий баланс','a',154],
+  ['Активные','b',129],['Низкий хэш','b',129],['Отключены','b',129],['Оффлайн','b',129],
+  ['BTC','a',93],['LTC','a',93],['ZEC','a',94],
+  ['BTC','b',121],['LTC','b',121],['DOGE','b',121],['ZEC','b',121]];
+const SUB_GROUPS=[['',2,'a'],['Воркеры',4,'b'],['Хэшрейт, 24 ч',3,'a'],['Доход',4,'b']];
 V.subaccounts=m=>{
+  if(S.name==='no') return card(`<div class="ch subhead"><h2>Центр суб-аккаунтов</h2></div>
+    <div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
+      <p>Чтобы начать добывать цифровую валюту<br>необходимо добавить имя аккаунта</p>
+      <button class="btn" data-modal="subacct">Добавить имя аккаунта</button></div>`,'tblcard');
   const rows=subsOf(m);
   const sum=i=>rows.reduce((a,r)=>a+r.w[i],0);
   const sumH=i=>rows.reduce((a,r)=>a+r.h[i],0);
   const sumI=i=>rows.reduce((a,r)=>a+r.inc[i],0);
   const HU=['TH/s','GH/s','KSol/s'], IC=['BTC','LTC','DOGE','ZEC'];
-  const cells=r=>`<td class="num mono">${nf(r.bal)} $</td>
-    ${r.w.map((v,i)=>`<td class="num mono${i===0?' gs':''}">${ni(v)}</td>`).join('')}
-    ${r.h.map((v,i)=>`<td class="num mono${i===0?' gs':''}">${ni(v)} ${HU[i]}</td>`).join('')}
-    ${r.inc.map((v,i)=>`<td class="num mono${i===0?' gs':''}">${dec(v)} ${IC[i]}</td>`).join('')}`;
-  return `${card(`<div class="ch"><h2>Центр суб-аккаунтов</h2><div class="spacer"></div>
-  <label class="row" style="gap:10px;cursor:pointer"><span class="tog ${U.arch?'on':''}" data-arch></span>
+  const cells=r=>`<td class="mono">${nf(r.bal)} $</td>
+    ${r.w.map(v=>`<td class="mono">${ni(v)}</td>`).join('')}
+    ${r.h.map((v,i)=>`<td class="mono">${ni(v)} ${HU[i]}</td>`).join('')}
+    ${r.inc.map((v,i)=>`<td class="mono">${dec(v)} ${IC[i]}</td>`).join('')}`;
+  return card(`<div class="ch subhead"><h2>Центр суб-аккаунтов</h2><div class="spacer"></div>
+  <label class="row" style="gap:12px;cursor:pointer"><span class="tog ${U.arch?'on':''}" data-arch></span>
     <span class="bs">Показать аккаунты в архиве</span></label>
   <button class="btn" data-modal="subacct" ${S.role==='observer'?'disabled':''}>${I.pl} Добавить суб-аккаунт</button></div>
   <div class="tw"><table class="tbl subtbl">
   <thead>
-    <tr class="grp"><th colspan="2"></th><th colspan="4" class="gs">Воркеры</th>
-      <th colspan="3" class="gs">Хэшрейт, 24 ч</th><th colspan="4" class="gs">Доход</th><th></th></tr>
-    <tr><th>Аккаунт</th>${sortTh('bal','Общий баланс')}
-      ${['Активные','Низкий хэш','Отключены','Оффлайн'].map((t,i)=>sortTh('w'+i,t,i===0)).join('')}
-      ${['BTC','LTC','ZEC'].map((t,i)=>sortTh('h'+i,t,i===0)).join('')}
-      ${IC.map((t,i)=>sortTh('i'+i,`<span class="thico">${COIN_ICON[t]||''} ${t}</span>`,i===0)).join('')}
-      <th></th></tr>
+    <tr class="grp">${SUB_GROUPS.map(([t,n,b])=>`<th class="b${b}" colspan="${n}">${t}</th>`).join('')}<th class="ba"></th></tr>
+    <tr>${SUB_COLS.map(([t,b],i)=>{
+      const ico=i>=9?`<span class="thico">${COIN_ICON[t]||''}</span>`:'';
+      return sortTh('c'+i,ico+t,false,'b'+b)}).join('')}<th class="ba"></th></tr>
   </thead><tbody>
-  ${rows.map(r=>`<tr><td><b>${r.name}</b><div style="margin-top:4px">
-      <span class="tag ${r.main?'sel':'n'}">${r.main?'Основной':'Суб-аккаунт'}</span>
-      ${r.arch?'<span class="tag n">В архиве</span>':''}</div></td>
+  ${rows.map(r=>`<tr><td><span class="subname"><b>${r.name}</b>
+      <span class="badge acc ${r.main?'on':''}">${r.main?'Основной':'Суб-аккаунт'}</span></span></td>
     ${cells(r)}
-    <td class="num">${r.main?'':`<button class="ib sm" data-toast="Просмотр статистики суб-аккаунта">${I.eye}</button>`}</td></tr>`).join('')}
-  <tr class="total"><td><b>Все аккаунты</b></td>
-    <td class="num mono">${nf(rows.reduce((a,r)=>a+r.bal,0))} $</td>
-    ${[0,1,2,3].map(i=>`<td class="num mono${i===0?' gs':''}">${ni(sum(i))}</td>`).join('')}
-    ${[0,1,2].map(i=>`<td class="num mono${i===0?' gs':''}">${ni(sumH(i))} ${HU[i]}</td>`).join('')}
-    ${[0,1,2,3].map(i=>`<td class="num mono${i===0?' gs':''}">${dec(sumI(i))} ${IC[i]}</td>`).join('')}
-    <td></td></tr>
-  </tbody></table></div>
-  ${pager('subs',rows.length,20)}`)}`};
+    <td class="num">${r.main?'':`<button class="ibr dim"
+      ${r.arch?'data-toast="Суб-аккаунт успешно активирован"':'data-modal="subarch"'}
+      title="${r.arch?'Активировать':'Архивировать'}">${I.eyed}</button>`}</td></tr>`).join('')}
+  </tbody>
+  <tfoot><tr class="total"><td><b>Все аккаунты</b></td>
+    <td class="mono">${nf(rows.reduce((a,r)=>a+r.bal,0))} $</td>
+    ${[0,1,2,3].map(i=>`<td class="mono">${ni(sum(i))}</td>`).join('')}
+    ${[0,1,2].map(i=>`<td class="mono">${ni(sumH(i))} ${HU[i]}</td>`).join('')}
+    ${[0,1,2,3].map(i=>`<td class="mono">${dec(sumI(i))} ${IC[i]}</td>`).join('')}
+    <td></td></tr></tfoot>
+  </table></div>
+  ${pager('subs',rows.length,20)}`,'tblcard')};
 
 V.observers=m=>{
   const rows=obsOf(m);
@@ -1484,14 +1508,32 @@ const MODALS={
     <div class="inp"><div class="k">Кошелек</div><input value="bc1q…4f2a"></div>
     <div class="field" style="margin-top:8px"><div class="k">Комиссия сети</div><div class="v mono">0,00004 ${m.bal[0].s}</div></div>`},
   /* Добавить суб-аккаунт (макет 880:41731): подсказка, поле и два правила под ним */
-  subacct:{t:'Добавить суб-аккаунт',acts:false,b:()=>`
-    <div class="mstack">
-      <p class="mtext">После создания изменить имя суб-аккаунта будет нельзя</p>
-      ${inpField('Имя суб-аккаунта')}
-      <ul class="mhints"><li>От 4 до 15 символов</li><li>Только строчные буквы (a−z) и цифры</li></ul>
-    </div>`,
+  /* Добавить суб-аккаунт (1482:83893 и соседние кадры): два шага,
+     инфо-алерт, подсказки краснеют по нарушенному правилу */
+  subacct:{t:'Добавить суб-аккаунт',acts:false,tall:5,
+    b:(m,step)=>{
+      const e=S.saerr, val=SA_VAL[e]??'', bad=SA_BAD[e]||[];
+      const msg=SA_MSG[e];
+      return step===0?`<div class="mstack" style="gap:20px">${prog(0,2)}
+        <div class="alert info" style="margin:0">${I.inf}
+          <div>После создания изменить имя суб-аккаунта будет невозможно</div></div>
+        ${inpField('Имя суб-аккаунта',val,(msg||bad.length)?'err soft':'')}
+        ${e==='load'
+          ? '<p class="mtext mut" style="font-weight:500">Проверяем имя суб-аккаунта на уникальность. Это займет несколько секунд</p>'
+          : msg?`<div class="errmsg">${msg}</div>`
+          : `<ul class="mhints">${SA_RULES.map((r,i)=>`<li class="${bad.includes(i)?'bad':''}">${r}</li>`).join('')}</ul>`}
+        </div>`
+      :`<div class="cstep mid">${prog(1,2)}${doneBlock('Суб-аккаунт успешно создан')}</div>`},
+    foot:(m,step)=>step===0
+      ? (S.saerr==='load'
+        ? `<button class="btn g" style="flex:1" data-close>Свернуть</button>`
+        : `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="1">Добавить</button>`)
+      : `<button class="btn" style="flex:1" data-close data-toast="Суб-аккаунт успешно создан">Отлично</button>`},
+  /* Архивирование и активация суб-аккаунта (1482:83662) */
+  subarch:{t:'Вы действительно хотите добавить суб-аккаунт в архив?',img:'/modal-archive.png',acts:false,
+    b:()=>`<div class="mstack"><p class="mtext">Вы можете отобразить его, нажав «Показать аккаунты в архиве»</p></div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
-      <button class="btn" data-close data-toast="Суб-аккаунт создан">Создать</button>`},
+      <button class="btn danger" data-close data-toast="Суб-аккаунт добавлен в архив">Архивировать</button>`},
   /* «Личные данные» и «Добавить номер телефона» — из макета «Действия с телефоном» */
   personal:{t:'Личные данные',acts:false,b:()=>`
     <div class="mstack">
@@ -1656,8 +1698,7 @@ Object.assign(MODALS,{
           <p class="mtext mut" style="font-weight:500">Нужна помощь с открытием счета?</p>
           <div style="display:flex;flex-direction:column;gap:8px">${VHELP.map(helpRow).join('')}</div>
         </div></div>`
-      :`<div class="mstack" style="gap:20px">${prog(1,2)}
-        <div class="cstep mid">${doneBlock('Счет успешно добавлен')}</div></div>`},
+      :`<div class="cstep mid">${prog(1,2)}${doneBlock('Счет успешно добавлен')}</div>`},
     foot:(m,step)=>step===0
       ? `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="1">Добавить</button>`
       : `<button class="btn" style="flex:1" data-close data-axis="vacc" data-val="yes"

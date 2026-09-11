@@ -438,6 +438,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mbody.tall2{height:506px;flex:0 0 auto}
 .mbody.tall3{height:356px;flex:0 0 auto}
 .mbody.tall4{height:544px;flex:0 0 auto}
+.mbody.tall5{height:326px;flex:0 0 auto}
 .pwdform{display:flex;flex-direction:column;gap:24px}
 /* Поле пароля: подпись со значением слева, глаз справа */
 .inp.pwd{flex-direction:row;align-items:center;gap:12px}
@@ -852,13 +853,6 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .pager .perpage{display:flex;align-items:center;gap:8px;margin-right:16px}
 
 /* Центр суб-аккаунтов: сгруппированная шапка и итоговая строка (макет 2300:135215) */
-.subtbl thead tr.grp th{padding:12px 12px 4px;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:500;
-  color:var(--c2);text-align:center;background:var(--ctrl2)}
-.subtbl th.gs,.subtbl td.gs{border-left:1px solid var(--border)}
-.subtbl tbody tr.total td{background:var(--ctrl);font-weight:600;color:var(--c1)}
-.subtbl tbody tr.total td:first-child{border-radius:var(--r-s) 0 0 var(--r-s)}
-.subtbl tbody tr.total td:last-child{border-radius:0 var(--r-s) var(--r-s) 0}
-.subtbl .thico svg{width:20px;height:20px}
 
 /* Уведомления в попоувере: без подложки, строки разделены снизу (макет «Оболочки») */
 .nplist{display:flex;flex-direction:column;margin:4px 0 16px}
@@ -1023,3 +1017,40 @@ html{scrollbar-gutter:stable}
 .selbox.full{width:100%}
 .selbox .blogo{width:24px;height:24px;margin-right:4px}
 .pop.menu>button .blogo{width:24px;height:24px}
+
+/* ===== Центр суб-аккаунтов (макеты 1482:83256) ===== */
+.card.tblcard{padding:8px}
+.card.tblcard>.ch.subhead{padding:16px;margin:0;min-height:80px;gap:16px}
+.card.tblcard .tw{padding-bottom:8px}
+.subtbl{table-layout:auto}
+/* полосы групп: светлая и чуть темнее — так в макете отделены «Воркеры» и «Доход» */
+.subtbl th.ba{background:var(--ctrl2)}
+.subtbl th.bb{background:var(--ctrl)}
+.subtbl thead tr.grp th{height:32px;padding:4px 12px;font-size:var(--fs-s);line-height:var(--lh-s);
+  font-weight:500;color:var(--c3);border-radius:0;text-align:left}
+.subtbl thead tr:last-child th{height:48px;padding:12px;font-size:var(--fs-s);line-height:var(--lh-s);
+  font-weight:500;color:var(--c3);border-radius:0;text-align:left}
+.subtbl thead tr.grp th:first-child{border-radius:var(--r-s) 0 0 0}
+.subtbl thead tr.grp th:last-child{border-radius:0 var(--r-s) 0 0}
+.subtbl thead tr:last-child th:first-child{border-radius:0 0 0 var(--r-s)}
+.subtbl thead tr:last-child th:last-child{border-radius:0 0 var(--r-s) 0}
+.subtbl td{height:74px;padding:12px;font-size:var(--fs-s);line-height:var(--lh-s);
+  font-weight:500;color:var(--c1);text-align:left}
+.subtbl .subname{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.subtbl .subname b{font-weight:500}
+.subtbl .thico{display:inline-flex;vertical-align:middle;margin-right:4px}
+.subtbl .thico svg{width:20px;height:20px;margin:0}
+.subtbl tfoot tr.total td{height:74px;background:#7086fc1f;border-bottom:0;font-weight:500}
+.subtbl tfoot tr.total td:first-child{border-radius:var(--r-m) 0 0 var(--r-m)}
+.subtbl tfoot tr.total td:last-child{border-radius:0 var(--r-m) var(--r-m) 0}
+.subtbl tbody tr:last-child td{border-bottom:1px solid var(--border)}
+.badge.acc.on{background:var(--accent);border-color:transparent;color:#fff}
+/* пустой экран без имени аккаунта (1482:83305) */
+.subempty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+  padding:96px 16px;text-align:center}
+.subempty img{width:210px;height:167px}
+.subempty p{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
+/* подсказки к имени: нарушенное правило краснеет */
+.inp.err.soft{background:#ef444429;box-shadow:none}
+.mhints li.bad{color:var(--neg)}
+.mhints li.bad::before{background:var(--neg)}

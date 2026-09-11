@@ -22,6 +22,7 @@ export interface Scenario {
   vdoc: string
   vacc: string
   verr: string
+  saerr: string
 }
 
 /** Эфемерное состояние интерфейса — в ссылку не попадает. */
