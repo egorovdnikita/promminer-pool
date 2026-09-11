@@ -122,7 +122,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 
 /* header */
 /* Хедер по DS: белая панель со скруглением 24 снизу */
-.top{background:var(--surface);border-radius:0 0 var(--r-l) var(--r-l);padding:20px 8px;position:sticky;top:0;z-index:50}
+.top{background:var(--surface);border-radius:0 0 var(--r-l) var(--r-l);padding:20px 8px 8px;position:sticky;top:0;z-index:50}
 .toprow{display:flex;align-items:center;gap:16px;padding:0 16px}
 .top .h3{flex:1;min-width:0}
 .hgroup{display:flex;align-items:center;gap:16px}
@@ -144,6 +144,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .ib{width:var(--h-ctrl);height:var(--h-ctrl);border-radius:var(--r-m);background:transparent;border:1px solid var(--border);display:grid;place-items:center;position:relative;color:var(--c3);flex:0 0 auto}
 .ib:hover{background:var(--ctrl2);color:var(--c1)}
 .ib.sm{width:var(--h-btn-sm);height:var(--h-btn-sm);border-radius:var(--r-s)}
+/* Белая иконка-кнопка на серой подложке — QR ссылки наблюдателя */
+.ib.w{width:48px;height:48px;border-radius:var(--r-m);background:var(--surface);border-color:transparent;color:var(--c2)}
+.ib.w:hover{color:var(--c1)}
 /* Counter (💙 DS): 20×20, 12/16 SemiBold, белый текст; S — точка 8×8. */
 .bdg,.cnt{min-width:20px;height:20px;padding:0 4px;border-radius:var(--r-f);background:var(--neg);color:#fff;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;display:inline-grid;place-items:center}
 .bdg{position:absolute;top:-6px;right:-6px}
@@ -330,8 +333,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .urlrow .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .linkrow{display:flex;align-items:center;gap:8px;color:var(--c1);background:var(--accent-sub);border-radius:var(--r-m);padding:12px;min-height:var(--h-field);margin-bottom:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 /* Баннер из макета 1981:32563: градиент, угловая фигура и иллюстрация с выносом за край */
-.promo{background:linear-gradient(115deg,#dfe3fb,#eef0fd 45%,#e4e8fc);border-radius:var(--r-l);padding:24px;position:relative;overflow:hidden;box-shadow:none;display:flex;flex-direction:column;min-height:188px}
-.promo::before{content:'';position:absolute;inset:0;background:url('/banner-shape.svg') right center/auto 200% no-repeat;opacity:.55;pointer-events:none}
+.promo{background:#eef0fd url('/banner-bg.png') center/cover;border-radius:var(--r-l);padding:24px;position:relative;overflow:hidden;box-shadow:none;display:flex;flex-direction:column;min-height:188px}
+
 .promo h2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;max-width:54%;position:relative;color:var(--c1)}
 .promo .art{position:absolute;right:0;bottom:0;height:113%;width:auto;max-width:46%;object-fit:contain;object-position:right bottom;pointer-events:none}
 .promo .pclose{position:absolute;right:16px;top:16px;z-index:1;width:40px;height:40px;border-radius:var(--r-f);display:grid;place-items:center;background:#52525229;color:var(--c1)}
@@ -594,7 +597,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .tile2{background:#6b728014;border-radius:var(--r-m);padding:16px;min-width:0}
 .dashed{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg);border-radius:var(--r-m);padding:16px;min-height:150px;color:var(--accent);font-size:var(--fs-s);font-weight:600;width:100%}
 .dashed:hover{background:var(--ctrl)}
-.linkfield{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:var(--r-s);padding:0 8px 0 12px;height:40px;font-size:var(--fs-s);color:var(--c2);min-width:0}
+.linkfield{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:var(--r-m);padding:0 12px;height:48px;font-size:var(--fs-s);color:var(--c2);min-width:0}
 .linkfield span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .badge{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:var(--r-xs);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;background:var(--warn);color:#fff}
 /* строка «иконка — текст — шеврон» в карточке профиля */
@@ -728,7 +731,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Заголовки блоков в макете крупнее: 24 SemiBold */
 .card>.ch h2,.card h2{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
 /* Segment Control профиля живёт в шапке и тянется на всю её ширину */
-.top .tabseg{display:inline-flex;margin:16px 0 0;width:auto;max-width:100%}
+.top .tabseg{display:inline-flex;margin:16px 0 0;width:auto;max-width:100%;padding:2px}
+.top .tabseg button{height:44px}
 
 /* Ссылки в подвале — серые, как в макете */
 .foot a{color:inherit}

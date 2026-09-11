@@ -886,7 +886,7 @@ function obsTile(o){
     ${o.off?'':`<div class="row" style="gap:8px">
       <span class="linkfield" style="flex:1"><span class="mono">${url}</span>
         <button class="lnk spacer" style="color:var(--accent)" data-copy="${url}">${I.cp}</button></span>
-      <button class="ib sm" data-modal="qr">${I.qr}</button></div>`}
+      <button class="ib w" data-modal="qr">${I.qr}</button></div>`}
   </div>`;
 }
 /* Промо-баннеры внизу сводки — оба есть в макете */
