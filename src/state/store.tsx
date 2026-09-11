@@ -214,7 +214,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const md = at('[data-modal]')
     if (md) { modal.current = md.dataset.modal!; u.step = 0; pop.current = null; return bump() }
     const tst = at('[data-toast]')
-    if (at('[data-close]')) { modal.current = null; bump(); if (tst) toast(tst.dataset.toast!); return }
+    const cl = at('[data-close]')
+    /* Маска тоже помечена data-close, но закрывать по ней нужно только при клике
+       мимо окна — иначе модалка схлопывается от клика по любому полю внутри. */
+    if (cl && (!cl.classList.contains('mask') || t === cl)) {
+      modal.current = null; bump(); if (tst) toast(tst.dataset.toast!); return
+    }
     if (tst) return toast(tst.dataset.toast!)
     const ax = at('[data-axis]')
     if (ax) { (S.current as any)[ax.dataset.axis!] = ax.dataset.val; pop.current = null; return bump() }
