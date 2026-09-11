@@ -26,7 +26,7 @@
   --accent:var(--indigo-400); --accent-sub:#6366f11f; --accent-ghost:#6366f114;
   --bg:var(--n100); --surface:#fff; --bg3:var(--n200);
   --c1:var(--n900); --c2:var(--n500); --c3:#9ca3af;
-  --pos:#22c55e; --warn:#f59e0b; --neg:#ef4444; --neu:#6b7280; --info:#3b82f6;
+  --pos:#22c55e; --warn:#f59e0b; --neg:#ef4444; --neu:#6b7280;
   --pos-sub:#22c55e29; --warn-sub:#f59e0b29; --neg-sub:#ef444429;
   --border:#6b728029; --ctrl:#6b72801f; --ctrl2:#6b728014; --ctrl-hover:#6b728029;
   --ctrl-line:#6b728029; --ctrl-line-h:#6b728052;
@@ -238,7 +238,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Segment Control (💙 Дизайн-система): контейнер h48 radius-m, сегмент h40 radius-s */
 .seg{display:inline-flex;background:var(--ctrl2);border-radius:var(--r-m);padding:2px;gap:4px;max-width:100%;overflow-x:auto;scrollbar-width:none}
 .seg::-webkit-scrollbar{display:none}
-.seg button{height:44px;padding:0 16px;border-radius:var(--r-m);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c2);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.seg button{height:44px;padding:0 16px;border-radius:var(--r-m);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c3);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .seg button.on{background:var(--surface);color:var(--c1)}
 .seg.fill{display:flex;width:100%}
 .seg.fill button{flex:1;justify-content:center}
@@ -676,8 +676,8 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .btn.link:hover,.btn.link:active{background:none;color:var(--indigo-500)}
 .chip:not(.on):hover{background:var(--ctrl);box-shadow:inset 0 0 0 1px var(--ctrl-line)}
 .chip.on:hover{opacity:.8}
-.seg button:not(.on):hover{background:var(--ctrl);color:var(--c1)}
-.seg button:not(.on):active{background:var(--ctrl-hover)}
+.seg button:not(.on):hover{background:var(--ctrl2)}
+.seg button:not(.on):active{background:var(--ctrl)}
 .ib:hover{color:var(--c1)}
 .tile{cursor:pointer}
 .tile:hover{background:var(--ctrl)}
@@ -949,7 +949,7 @@ html{scrollbar-gutter:stable}
 /* памятка о правовых формах: белая карточка с синими заголовками */
 .vnote{background:var(--surface);border-radius:var(--r-m);padding:16px;display:flex;flex-direction:column;gap:16px}
 .vnb{display:flex;flex-direction:column;gap:8px}
-.vnb b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--info)}
+.vnb b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
 .vnb ul{display:flex;flex-direction:column;gap:4px;margin:0;padding:0;list-style:none}
 .vnb li{position:relative;padding-left:14px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
 .vnb li::before{content:'•';position:absolute;left:2px}

@@ -21,7 +21,7 @@ const AXES={
   verif:{g:'Верификация',label:'Данные',opts:[['no','Не заполнены'],['yes','Заполнены']]},
   vdoc:{g:'Верификация',label:'Выписка из реестра',opts:[['no','Не добавлена'],['yes','Добавлена']]},
   vacc:{g:'Верификация',label:'Расчетный счет',opts:[['no','Не добавлен'],['yes','Добавлен']]},
-  verr:{g:'Верификация',label:'Ошибка в поле',opts:[['no','Нет'],['tax','Код налоговой'],['inn','ИНН'],['bank','Банк не выбран']]},
+  verr:{g:'Верификация',label:'Ошибка в поле',opts:[['no','Нет'],['tax','Код налоговой'],['inn','ИНН'],['bank','Банк не выбран'],['file','Файл больше 4 МБ']]},
   subs:{g:'Профиль',label:'Суб-аккаунты',opts:[['many','3'],['few','1'],['none','Только основной']]},
   obs:{g:'Профиль',label:'Наблюдатели',opts:[['many','3'],['few','1'],['none','Нет']]},
   notif:{g:'Профиль',label:'Уведомления',opts:[['many','12 новых'],['few','2 новых'],['none','Нет']]},
@@ -987,7 +987,12 @@ const VFIELDS={
   ip:[FIO,TAXR], fiz:[FIO,TAXR],
   ur:[[['Наименование организации','ООО «Руссо Майнинг»'],['Код налоговой','123456','tax']],
       [['ИНН','123456566788','inn'],['КПП','770701001']]]};
-const VERR={tax:'Код налоговой должен содержать 4 цифры',inn:'ИНН должен содержать 12 цифр'};
+/* Ошибки полей — переключаются осью verr; у ИНН текст зависит от правовой формы
+   (12 цифр у ИП и физлица, 10 у юрлица — макеты 2219:146974 и 2219:147107) */
+const VERR={tax:()=>'Код налоговой должен содержать 4 цифры',
+  inn:form=>`ИНН должен содержать ${form==='ur'?10:12} цифр`,
+  bank:()=>'Поле обязательно для заполнения',
+  file:()=>'Размер файла не может превышать 4 МБ'};
 /* Памятка о правовых формах — блоки с синим заголовком (778:2677) */
 const VHINTS=[
   ['Как физическое лицо вы можете:',
@@ -1008,10 +1013,10 @@ const inpField=(label,val='',cls='')=>`<div class="inp fl ${cls}" style="margin:
     <input placeholder="${label}" value="${val}"></span>
   <button class="vclear" data-clear>${I.x}</button></div>`;
 /* Поле анкеты — то же поле плюс подпись ошибки */
-const vField=([label,val,key])=>{
+const vField=([label,val,key],form)=>{
   const err=key&&S.verr===key, v=err?'12':(S.verif==='yes'?val:'');
   return `<div class="vfield">${inpField(label,v,err?'err':'')}
-    ${err?`<div class="errmsg">${VERR[key]}</div>`:''}</div>`;
+    ${err?`<div class="errmsg">${VERR[key](form)}</div>`:''}</div>`;
 };
 const bankLogo=(k,size=24)=>`<span class="blogo" style="width:${size}px;height:${size}px">${BANKS[k].svg}</span>`;
 V.verification=m=>{
@@ -1032,7 +1037,7 @@ V.verification=m=>{
   <div class="vcol">
     ${card(`<h2 class="vh2">Верификация</h2>
       <div class="vrows">${VFIELDS[form].map(row=>
-        `<div class="vrow" style="grid-template-columns:repeat(${row.length},1fr)">${row.map(vField).join('')}</div>`).join('')}</div>`)}
+        `<div class="vrow" style="grid-template-columns:repeat(${row.length},1fr)">${row.map(f=>vField(f,form)).join('')}</div>`).join('')}</div>`)}
     ${full?card(`${head('Выписка из реестра майнеров','Добавьте, если хотите продавать намайненную цифровую валюту на нашей платформе')}
       ${doc?`<div class="vstate"><span class="vok">${I.ok}</span>Добавлена</div>`:''}
       <button class="btn ${doc?'g':''}" data-modal="vdocm">${doc?'Изменить выписку':'Добавить выписку'}</button>`,'vsec'):''}
@@ -1606,15 +1611,16 @@ const DOC_REQ=[['Документ выгружается из личного к�
 Object.assign(MODALS,{
   /* Добавить выписку: зона загрузки, карточка файла и требования */
   vdocm:{t:'Добавить выписку',acts:false,
-    b:()=>{const file=U.vfile;
+    b:()=>{const file=U.vfile, big=file&&S.verr==='file';
       return `<div class="mstack" style="gap:16px">
       <button class="vdrop" data-vfile>
         <span class="vdi">${I.up}</span>
         <span class="vdt"><b><em>Выберите файл</em> или перетащите</b>
           <i>Не более 4 МБ, в формате PDF</i></span></button>
-      ${file?`<div class="vfile"><span class="vfi">${I.doc}</span>
-        <span class="tx"><b>fns_devices_template_2026-05-21_0</b><i>53.0 КБ</i></span>
-        <button class="btn link vdel spacer" data-vfile="off">Удалить</button></div>`:''}
+      ${file?`<div><div class="vfile"><span class="vfi">${I.doc}</span>
+        <span class="tx"><b>fns_devices_template_2026-05-21_0</b><i>${big?'4.1 МБ':'53.0 КБ'}</i></span>
+        <button class="btn link vdel spacer" data-vfile="off">Удалить</button></div>
+        ${big?`<div class="errmsg" style="margin-top:8px">${VERR.file()}</div>`:''}</div>`:''}
       <div class="vreq"><b>Требования к документу:</b>
         ${DOC_REQ.map(([t,sub])=>`<div class="vrq"><span class="vok">${I.ok}</span><span>${t}</span></div>
           ${sub?`<div class="vsub">${sub.map(x=>`<span>${x}</span>`).join('')}</div>`:''}`).join('')}
@@ -1634,7 +1640,7 @@ Object.assign(MODALS,{
             ${pop==='vbank'?`<div class="pop menu row" style="top:calc(100% + 8px)">
               ${Object.keys(BANKS).map(k=>`<button data-vbank="${k}">${bankLogo(k)}${BANKS[k].name}</button>`).join('')}
             </div>`:''}</span>
-          ${err?'<div class="errmsg" style="margin-top:8px">Поле обязательно для заполнения</div>':''}
+          ${err?`<div class="errmsg" style="margin-top:8px">${VERR.bank()}</div>`:''}
         </div>
         <div style="display:flex;flex-direction:column;gap:12px">
           ${inpField('БИК')}
