@@ -912,6 +912,9 @@ function subTile(m,s){
   </div>`;
 }
 /* Форма наблюдателя — общая для «Создать» и «Изменить» (макет 2219:32420) */
+/* Срок действия ссылки: пресеты из макета 1441:118880 */
+const OTERM=[['Бессрочно','Бессрочно'],['7 д','до 08.04.2026'],['30 д','до 01.05.2026'],
+  ['60 д','до 31.05.2026'],['90 д','до 30.06.2026']];
 const OBS_REQ={acc:'Выберите хотя бы 1 аккаунт',perm:'Выберите хотя бы 1 разрешение',coin:'Выберите хотя бы 1 монету'};
 function obsList(label,items,two,key){
   const on=i=>U.ochk.has(key+':'+i);
@@ -941,8 +944,14 @@ function obsForm(desc){
           <input value="alfred" readonly></span></div>`
       : obsList('Аккаунт',accs,true,'acc')}
     <div class="mlists">${obsList('Разрешения',OBS_PERMS,0,'perm')}${obsList('Монеты',OBS_COINS,0,'coin')}</div>
-    <div class="msel"><div class="lb">Срок действия</div>
-      <div class="selbox">Бессрочно<span class="spacer">${I.cd}</span></div></div>
+    ${(()=>{const i=segi('oterm',0);
+      return `<div class="msel"><div class="lb">Срок действия</div>
+      <span class="pop-wrap full" style="display:block">
+        <button class="selbox full" data-pop="oterm">${OTERM[i][1]}<span class="spacer">${I.cd}</span></button>
+        ${pop==='oterm'?`<div class="pop menu row up oterm">
+          ${seg('oterm',OTERM.map(t=>t[0]),0)}
+          ${datePicker([]).replace('class="pop dp"','class="dp"')}</div>`:''}
+      </span></div>`})()}
   </div>`;
 }
 function obsTile(o,i){

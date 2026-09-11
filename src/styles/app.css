@@ -561,6 +561,11 @@ body.mini .ni .spacer.lbl{display:none!important}
 .marea.err .cnt2{color:var(--neg)}
 .mlist.err{box-shadow:0 0 0 1px var(--neg) inset}
 .mlist.err .errmsg{padding:0 12px 12px}
+/* срок действия: сегменты и календарь в выпадашке над полем */
+.pop.menu.row.oterm{padding:12px;display:flex;flex-direction:column;gap:12px;width:auto}
+.pop.menu.row.oterm .dp{position:static;width:auto;box-shadow:none;padding:0;background:none}
+.pop.menu.row.oterm .seg{width:100%}
+.pop.menu.row.oterm .seg button{flex:1;justify-content:center}
 /* QR-код наблюдателя — 290×290 со скруглением 24 */
 .qrbox{width:290px;height:290px;border-radius:var(--r-l);display:block;margin:0 auto;
   border:1px solid var(--border);background:#fff}
