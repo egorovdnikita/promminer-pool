@@ -321,7 +321,7 @@ const V={};
 V.home=m=>`
 ${S.role==='observer'?'<div class="alert warn mb">👁 Режим наблюдателя — действия с балансом и настройками скрыты</div>':''}
 <div class="grid g3">
-  ${card(`<div class="ch"><h2>Доход</h2>${S.role==='owner'?'<a class="spacer" href="#" style="font-size:14px;font-weight:600">Продать</a>':''}</div>
+  ${card(`<div class="ch"><h2>Доход</h2>${S.role==='owner'?'<a class="spacer" href="#" style="font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600">Продать</a>':''}</div>
     <div class="hero"><div style="display:flex;gap:20px;flex:1;min-width:0">
       ${m.bal.map(b=>`<div><div class="l">Текущий баланс</div><div class="v mono">${nf(b.v,b.s==='DOGE'?2:8)} ${b.s}</div><div class="s mono">≈ ${nf(b.usd)} $ • ${nf(b.rub)} ₽</div></div>`).join('')}
     </div><span class="cv">${I.cv}</span></div>
@@ -394,20 +394,20 @@ function refBlock(m){
   <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
     <div class="hex" style="background:${t.c}">${m.empty?'0%':t.p}</div>
     <div style="display:flex;gap:26px;padding-top:6px;flex-wrap:wrap">
-      <div><div class="cap dim">Ваша комиссия</div><div style="font-size:16px;font-weight:700">${m.empty?'0%':t.p+' ('+t.n+')'}</div></div>
-      <div><div class="cap dim">Хэшрейт рефералов</div><div class="mono" style="font-size:16px;font-weight:700">${m.empty?'0 '+m.c.unit:m.c.refHash}</div></div>
-      <div><div class="cap dim">Монета</div><div style="font-size:16px;font-weight:700">${m.c.refCoin[0]}<div class="cap dim">${m.c.refCoin[1]}</div></div></div>
+      <div><div class="cap dim">Ваша комиссия</div><div style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?'0%':t.p+' ('+t.n+')'}</div></div>
+      <div><div class="cap dim">Хэшрейт рефералов</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?'0 '+m.c.unit:m.c.refHash}</div></div>
+      <div><div class="cap dim">Монета</div><div style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.c.refCoin[0]}<div class="cap dim">${m.c.refCoin[1]}</div></div></div>
     </div>
     <div style="flex:1;min-width:290px;background:var(--accent-ghost);border-radius:var(--r-s);padding:14px 16px">
-      <h3 style="font-size:15px;font-weight:800;margin-bottom:10px">Общие данные по всем монетам</h3>
+      <h3 style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;margin-bottom:10px">Общие данные по всем монетам</h3>
       <div style="display:flex;gap:26px;flex-wrap:wrap">
-        <div><div class="cap dim">Активные рефералы</div><div class="mono" style="font-size:16px;font-weight:700">${m.empty?0:20}</div></div>
-        <div><div class="cap dim">Все рефералы</div><div class="mono" style="font-size:16px;font-weight:700">${m.empty?0:50}</div></div>
-        <div><div class="cap dim">Текущий баланс</div><div class="mono" style="font-size:16px;font-weight:700">${m.empty?'0 ₽':'7 500,56 ₽'}</div></div>
-        <div><div class="cap dim">Доход за все время</div><div class="mono" style="font-size:16px;font-weight:700">${m.empty?'0 ₽':'90 000,99 ₽'}</div></div>
+        <div><div class="cap dim">Активные рефералы</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?0:20}</div></div>
+        <div><div class="cap dim">Все рефералы</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?0:50}</div></div>
+        <div><div class="cap dim">Текущий баланс</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?'0 ₽':'7 500,56 ₽'}</div></div>
+        <div><div class="cap dim">Доход за все время</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?'0 ₽':'90 000,99 ₽'}</div></div>
       </div></div>
   </div>${tierTrack(m)}
-  <div style="text-align:center;margin-top:14px"><a href="#" data-go="ref" style="font-size:14px;font-weight:600">Подробно о программе</a></div>`;
+  <div style="text-align:center;margin-top:14px"><a href="#" data-go="ref" style="font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600">Подробно о программе</a></div>`;
 }
 const tierTrack=m=>`<div class="track"><div class="tbar"><div class="tfill" style="width:${m.empty?0:(+S.tier)/4*100}%"></div></div>
   <div class="tpts">${TIERS.map((x,i)=>`<div class="pt ${!m.empty&&i<=+S.tier?'on':''}"><i style="${!m.empty&&i<=+S.tier?'background:'+x.c:''}"></i><span>${x.p}</span></div>`).join('')}</div></div>`;
@@ -469,12 +469,12 @@ V.workers=m=>{
   return `
   <div class="grid" style="grid-template-columns:1.15fr 1fr;gap:12px">
     ${card(`<div class="hero" style="min-height:104px;align-items:center"><div><div class="l">Средний хэшрейт за 24 ч</div>
-      <div class="v" style="font-size:32px;line-height:38px">${m.avg} ${m.c.unit} <span class="delta w">▲ 10%</span></div></div></div>`,'')}
+      <div class="v" style="font-size:var(--fs-h3);line-height:var(--lh-h3)">${m.avg} ${m.c.unit} <span class="delta w">▲ 10%</span></div></div></div>`,'')}
     ${card(`<div class="grid g2" style="gap:14px;margin:0">
-      <div><div class="cap dim">Средний хэшрейт за 5 мин</div><div class="mono" style="font-size:20px;font-weight:800">${m.h5} ${m.c.unit}</div></div>
-      <div><div class="cap dim">Реджект за 24 ч</div><div class="mono" style="font-size:20px;font-weight:800">${m.empty?'0%':m.c.rej} <span class="delta up">▲ 10%</span></div></div>
-      <div><div class="cap dim">Средний хэшрейт за 1 ч</div><div class="mono" style="font-size:20px;font-weight:800">${m.h1} ${m.c.unit}</div></div>
-      <div><div class="cap dim">Uptime за 24 ч</div><div class="mono" style="font-size:20px;font-weight:800">${m.empty?'0%':m.c.up} <span class="delta dn">▲ 10%</span></div></div>
+      <div><div class="cap dim">Средний хэшрейт за 5 мин</div><div class="mono" style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${m.h5} ${m.c.unit}</div></div>
+      <div><div class="cap dim">Реджект за 24 ч</div><div class="mono" style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${m.empty?'0%':m.c.rej} <span class="delta up">▲ 10%</span></div></div>
+      <div><div class="cap dim">Средний хэшрейт за 1 ч</div><div class="mono" style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${m.h1} ${m.c.unit}</div></div>
+      <div><div class="cap dim">Uptime за 24 ч</div><div class="mono" style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${m.empty?'0%':m.c.up} <span class="delta dn">▲ 10%</span></div></div>
     </div>`)}
   </div>
   <div class="grid g4">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap dim">${l}</div><div class="n mono">${ni(n)}</div></div>
@@ -538,8 +538,8 @@ V.assets=m=>{
   return card(`
   <div class="hero" style="min-height:120px;align-items:center;margin:-16px -16px 16px;border-radius:var(--r-m) var(--r-m) 0 0;padding:20px 24px">
     <div><div class="l" style="font-size:var(--fs-s)">Общий баланс</div>
-      <div class="v" style="font-size:40px;line-height:48px">${nf(ASSETS.reduce((s,a)=>s+a[2],0)*k,0)} $
-        <span style="font-size:16px;font-weight:600;opacity:.8">≈ ${nf(ASSETS.reduce((s,a)=>s+a[3],0)*k,0)} ₽</span></div></div>
+      <div class="v" style="font-size:var(--fs-h2);line-height:var(--lh-h2)">${nf(ASSETS.reduce((s,a)=>s+a[2],0)*k,0)} $
+        <span style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;opacity:.8">≈ ${nf(ASSETS.reduce((s,a)=>s+a[3],0)*k,0)} ₽</span></div></div>
     <div class="heroact">
       <button data-go="income"><span class="ic2">${COIN_ICON.BTC}</span><span class="lb">Доход <span class="spacer">${I.cv}</span></span></button>
       <button data-go="payouts"><span class="ic2">${I.card}</span><span class="lb">Выплаты <span class="spacer">${I.cv}</span></span></button>
@@ -552,7 +552,7 @@ V.assets=m=>{
         <td><span class="coin">${COIN_ICON[s]}${s}</span></td>
         <td class="mono">${nf(v*k,s==='DOGE'?4:4)} ${s}</td><td class="mono">${nf(u*k)} $</td><td class="mono">${nf(r*k)} ₽</td>
         <td><button class="addbtn" data-modal="wallet">${I.pl} Добавить</button></td>
-        <td><span class="pill flat sq mono" style="height:32px;font-size:12px">${th} ${I.edit}</span></td>
+        <td><span class="pill flat sq mono" style="height:32px;font-size:var(--fs-c);line-height:var(--lh-c)">${th} ${I.edit}</span></td>
         <td><span class="tog ${i===0&&!m.empty?'on':''}" data-tog></span></td>
         <td class="num"><button class="btn sm" ${m.empty||S.role==='observer'?'disabled':''} data-modal="withdraw">${tab===0?'Вывести':'Продать'}</button></td></tr>`).join('')}
   </tbody></table></div>`)};
@@ -560,38 +560,38 @@ V.assets=m=>{
 /* Доход — по макету: индиго-карточка баланса и две белые, периоды отдельными
    пилюлями (на этом экране в макете это не Segment Control), иконки валют в шапке. */
 const perPills=(id,opts,def=null)=>`<span class="row" style="gap:8px">${opts.map((o,i)=>
-  `<button class="pill flat sq ${(U.seg[id]??def)===i?'on':''}" style="height:36px;padding:0 14px;font-size:12px" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</span>`;
+  `<button class="pill flat sq ${(U.seg[id]??def)===i?'on':''}" style="height:36px;padding:0 14px;font-size:var(--fs-c);line-height:var(--lh-c)" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</span>`;
 V.income=m=>`
 <div class="grid g3">
   <section class="card hero" style="flex-direction:column;justify-content:center;min-height:132px">
     <div class="row" style="width:100%;align-items:flex-start"><div>
       <div class="l">Текущий баланс</div>
-      <div class="v mono" style="font-size:30px;line-height:36px">${nf(m.bal[0].v,8)} ${m.bal[0].s}</div>
+      <div class="v mono" style="font-size:var(--fs-h3);line-height:var(--lh-h3)">${nf(m.bal[0].v,8)} ${m.bal[0].s}</div>
       <div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div>
       <span class="spacer cv">${I.cv}</span></div></section>
   ${card(`<div class="cap dim" style="margin-bottom:8px">Доход за 24 часа</div>
-    <div class="mono" style="font-size:30px;line-height:36px;font-weight:800">${nf(m.d24[0].v,8)} ${m.d24[0].s}</div>
+    <div class="mono" style="font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600">${nf(m.d24[0].v,8)} ${m.d24[0].s}</div>
     <div class="cap dim mono" style="margin-top:6px">≈ 14,71 $ • 1 157,16 ₽</div>`)}
   ${card(`<div class="cap dim" style="margin-bottom:8px">Доход за все время</div>
-    <div class="mono" style="font-size:30px;line-height:36px;font-weight:800">${nf(m.all[0].v,8)} ${m.all[0].s}</div>
+    <div class="mono" style="font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600">${nf(m.all[0].v,8)} ${m.all[0].s}</div>
     <div class="cap dim mono" style="margin-top:6px">≈ 14,71 $ • 1 157,16 ₽</div>`)}
 </div>
 ${card(`<div class="ch"><h2>График дохода (${m.bal[0].s})</h2><div class="spacer"></div>
   ${perPills('income-chart',['7 дн','30 дн','90 дн'],0)}
-  <span class="pill flat sq" style="height:36px;font-size:12px">Выберите дату ${I.cal}</span>
+  <span class="pill flat sq" style="height:36px;font-size:var(--fs-c);line-height:var(--lh-c)">Выберите дату ${I.cal}</span>
   <button class="ib sm">${I.zi}</button><button class="ib sm">${I.zo}</button></div>
   ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:['15.07','16.07','17.07','18.07','19.07','20.07','21.07']})}`)}
 <div style="height:12px"></div>
 ${card(`<div class="ch"><h2>История дохода</h2><div class="spacer"></div>
   ${perPills('income-hist',['7 дн','30 дн','90 дн'],0)}
-  <span class="pill flat sq" style="height:36px;font-size:12px">Выберите дату ${I.cal}</span><button class="ib sm">${I.dl}</button></div>
+  <span class="pill flat sq" style="height:36px;font-size:var(--fs-c);line-height:var(--lh-c)">Выберите дату ${I.cal}</span><button class="ib sm">${I.dl}</button></div>
   ${incomeTable(m,m.empty?0:48,'income')}`)}`;
 
 V.payouts=m=>{
   const N=m.empty?0:(S.data==='few'?3:28), [pf,pt]=pageSlice('payouts',N);
   return card(`<div class="ch"><h2>Выплаты</h2><div class="spacer"></div>
   ${seg('payouts-range',['7 дн','30 дн','90 дн'],1)}
-  <span class="pill flat sq" style="font-size:12px">Выберите дату ${I.cal}</span>
+  <span class="pill flat sq" style="font-size:var(--fs-c);line-height:var(--lh-c)">Выберите дату ${I.cal}</span>
   <button class="ib sm" data-toast="Выгрузка выплат готовится">${I.dl}</button></div>
   ${N?`<div class="tw"><table class="tbl"><thead><tr><th>Дата и время</th><th>Кошелек</th><th class="num">Сумма, ${m.bal[0].s}</th>
     <th class="num">Сумма, $</th><th class="num">Сумма, ₽</th><th>Статус</th><th>TxID</th></tr></thead><tbody>
@@ -605,7 +605,7 @@ V.payouts=m=>{
 /* --- Отчет о майнинге --- */
 V.report=m=>`
 <div class="row" style="align-items:flex-start;gap:20px;margin-bottom:14px;flex-wrap:wrap">
-  <div style="flex:1;min-width:320px;font-size:14px;line-height:19px;color:var(--c2)">
+  <div style="flex:1;min-width:320px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)">
     <b style="color:var(--c1)">Важно</b> <a href="#">Как это работает?</a><br>
     Отчет о майнинге необходимо подавать <b style="color:var(--c1)">до 20 числа</b> месяца, следующего за отчетным.<br>
     Если вы подключились к пулу после начала отчетного периода, данные в отчете будут неполными.<br>
@@ -640,7 +640,7 @@ V.calc=m=>card(`
         <div class="spacer"></div><a href="#">Сбросить</a></div>
       <div class="grid g3" style="margin:0;gap:10px">
         <div class="field" style="display:flex;align-items:center"><div style="flex:1"><div class="k">Курс ${S.coin==='btc'?'BTC':'LTC'}</div><div class="v mono">3 071 428,57</div></div>
-          <span class="pill flat sq" style="height:28px;font-size:12px">₽ ${I.cd}</span></div>
+          <span class="pill flat sq" style="height:28px;font-size:var(--fs-c);line-height:var(--lh-c)">₽ ${I.cd}</span></div>
         <div class="field"><div class="k">Хэшрейт, ${m.c.unit}</div><div class="v mono">100</div></div>
         <div class="field"><div class="k">Комиссия пула, %</div><div class="v mono">0,0</div></div>
         <div class="field"><div class="k">Потребление, кВтч</div><div class="v mono">0,00</div></div>
@@ -650,8 +650,8 @@ V.calc=m=>card(`
     </div>
     <div style="width:300px;padding:16px;color:#fff;display:flex;flex-direction:column">
       ${segLine('calc-period',['Доход за 1 день','Доход за 30 дней'],1,'inv fill')}
-      <div class="mono" style="font-size:26px;font-weight:800;margin-top:18px">≈ ${segi('calc-period',1)?'0,00048469':'0,00001616'} ${m.bal[0].s}</div>
-      <div class="mono" style="font-size:12px;opacity:.85;margin-top:4px">≈ ${segi('calc-period',1)?'20,84 $ / 1 488,7 ₽':'0,69 $ / 49,62 ₽'}</div>
+      <div class="mono" style="font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;margin-top:18px">≈ ${segi('calc-period',1)?'0,00048469':'0,00001616'} ${m.bal[0].s}</div>
+      <div class="mono" style="font-size:var(--fs-c);line-height:var(--lh-c);opacity:.85;margin-top:4px">≈ ${segi('calc-period',1)?'20,84 $ / 1 488,7 ₽':'0,69 $ / 49,62 ₽'}</div>
       <button class="btn w" style="margin-top:auto;justify-content:center" data-modal="connect">Начать добывать</button>
     </div>
   </div>`);
@@ -670,7 +670,7 @@ V.tax=m=>card(`
     </div>
     <div class="hero" style="flex-direction:column;align-items:stretch;min-height:200px">
       <div class="l">Налог к уплате</div>
-      <div class="v mono" style="font-size:30px">64 122,00 ₽</div>
+      <div class="v mono" style="font-size:var(--fs-h3);line-height:var(--lh-h3)">64 122,00 ₽</div>
       <div class="s">Налоговая база: 1 068 700,00 ₽ · ставка 6%</div>
       <button class="btn w" style="margin-top:auto;justify-content:center" data-toast="Расчёт выгружен в XLSX">${I.dl} Выгрузить расчет</button>
     </div>
@@ -719,19 +719,19 @@ V.ref=m=>`
 <div class="grid" style="grid-template-columns:1.25fr 1fr 1fr">
   ${card(`<div class="row" style="align-items:flex-start;gap:16px">
     <div class="hex" style="background:${m.empty?'var(--bg3)':m.tier.c};color:${m.empty?'var(--c3)':'#fff'}">${m.empty?'0%':m.tier.p}</div>
-    <div style="flex:1"><div class="cap dim">Ваша комиссия</div><div style="font-size:17px;font-weight:800;margin-bottom:8px">${m.empty?'0%':m.tier.p}</div>
-      <div class="cap dim">Хэшрейт рефералов</div><div class="mono" style="font-size:17px;font-weight:800">${m.empty?'0 '+m.c.unit:m.c.refHash}</div></div>
+    <div style="flex:1"><div class="cap dim">Ваша комиссия</div><div style="font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600;margin-bottom:8px">${m.empty?'0%':m.tier.p}</div>
+      <div class="cap dim">Хэшрейт рефералов</div><div class="mono" style="font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600">${m.empty?'0 '+m.c.unit:m.c.refHash}</div></div>
     <span class="pill flat sq">${COIN_ICON[m.bal[0].s]} ${m.c.refCoin[0]} ${I.cd}</span></div>
     <div class="cap dim" style="margin-top:12px">До первого уровня: 200 ${m.c.short}/s</div>${tierTrack(m)}
     <div style="margin-top:12px"><a href="#">Все об уровнях ${I.cv}</a></div>`)}
   ${card(`<div class="ch"><h2>Общие данные</h2></div><div class="grid g2" style="margin:0;gap:10px">
     ${[['Активные рефералы',m.empty?0:20],['Все рефералы',m.empty?0:50],['Текущий баланс',(m.empty?0:'7 500,56')+' ₽'],['Доход за все время',(m.empty?0:'90 000,99')+' ₽']]
-      .map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v mono" style="font-size:20px">${v}</div></div>`).join('')}</div>`)}
+      .map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v mono" style="font-size:var(--fs-h5);line-height:var(--lh-h5)">${v}</div></div>`).join('')}</div>`)}
   ${card(`<div class="ch"><h2>Реферальная ссылка</h2></div>
     <p class="cap dim" style="margin-bottom:10px">Отправляйте эту ссылку друзьям или делитесь в соцсетях</p>
     <div class="urlrow"><div class="v mono">${LINKS.ref(49282838)}</div><button class="spacer lnk" style="color:var(--accent)" data-copy="${LINKS.ref(49282838)}">${I.cp}</button></div>
     <div class="promo" style="padding:14px;box-shadow:none"><div class="orb" style="width:120px;height:120px;right:-16px;bottom:-30px"></div>
-      <p style="font-size:14px;font-weight:700;position:relative;max-width:70%">Начните формировать свой пассивный доход, став партнером Promminer уже сегодня</p></div>`)}
+      <p style="font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;position:relative;max-width:70%">Начните формировать свой пассивный доход, став партнером Promminer уже сегодня</p></div>`)}
 </div>
 ${card(`<div class="ch"><h2>Настройка реферальных выплат</h2></div>
   <div class="alert warn" style="margin-bottom:12px"><div><b>Если хотите выводить в рублях</b><br>
@@ -741,8 +741,8 @@ ${card(`<div class="ch"><h2>Настройка реферальных выпла
   ${[['BTC','WU/****9uG1','0.001 BTC'],['LTC','','0.001 LTC'],['DOGE','DKb/****7uJT','1 DOGE']].map(([s,req,th])=>`<tr>
     <td><span class="coin">${COIN_ICON[s]}${s}</span></td>
     <td class="mono">0 ${s}</td><td class="mono">0 $</td><td class="mono">0 ₽</td>
-    <td>${req?`<span class="pill flat sq mono" style="height:32px;font-size:12px">${req} ${I.edit}</span>`:`<button class="addbtn" data-modal="wallet">${I.pl} Добавить</button>`}</td>
-    <td><span class="pill flat sq mono" style="height:28px;font-size:12px">${th} ${I.edit}</span></td>
+    <td>${req?`<span class="pill flat sq mono" style="height:32px;font-size:var(--fs-c);line-height:var(--lh-c)">${req} ${I.edit}</span>`:`<button class="addbtn" data-modal="wallet">${I.pl} Добавить</button>`}</td>
+    <td><span class="pill flat sq mono" style="height:28px;font-size:var(--fs-c);line-height:var(--lh-c)">${th} ${I.edit}</span></td>
     <td><span class="tog" data-tog></span></td><td class="num"><button class="btn sm" disabled>Вывести</button></td></tr>`).join('')}
   </tbody></table></div>`)}
 <div style="height:12px"></div>
@@ -821,8 +821,8 @@ function subTile(m,s){
   const w=m.empty?[0,0,0,0]:s.w;
   const dots=[[w[0],'var(--pos)'],[w[1],'var(--warn)'],[w[2],'var(--neg)'],[w[3],'var(--neu)']];
   return `<div class="tile2" data-subinfo="${s.name}" style="cursor:pointer">
-    <b class="t" style="display:flex;align-items:center;gap:8px;font-size:var(--fs-m);font-weight:600;margin-bottom:10px">${s.name}
-      ${s.main?'<span class="tag sm sel spacer">Основной</span>':'<span class="tag sm n spacer">Суб-аккаунт</span>'}</b>
+    <b class="t" style="display:flex;align-items:center;gap:8px;font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600;margin-bottom:12px">${s.name}
+      ${s.main?'<span class="tag sm sel spacer">Основной</span>':'<span class="tag sm spacer">Суб-аккаунт</span>'}</b>
     <div class="kv big">Общий баланс<span class="mono">${s.main?nf(m.bal[0].usd):'0,00'} $</span></div>
     <div class="kv">Хэшрейт, BTC<span class="mono">${s.btc} TH/s</span></div>
     <div class="kv">Хэшрейт, LTC<span class="mono">${s.ltc} GH/s</span></div>
@@ -834,13 +834,13 @@ function obsTile(o){
   const url=LINKS.watcher(o.token);
   const tags=o.access.slice(0,2), rest=o.access.length-tags.length;
   return `<div class="tile2">
-    <div class="row" style="margin-bottom:8px"><b style="font-size:var(--fs-m);font-weight:600">${o.name}</b>
-      ${o.extra?`<span class="tag n">+${o.extra}</span>`:''}<span class="spacer dim">${I.dots}</span></div>
-    <div class="row" style="gap:6px;margin-bottom:10px">${o.coins.map(c=>COIN_ICON[c]).join('')}
-      <span class="bs ${o.off?'dim':'mut'}">${o.off?'⦸ ':''}${o.label}</span></div>
-    <div class="row" style="gap:6px;margin-bottom:10px;flex-wrap:wrap">
-      ${tags.map(t=>`<span class="tag n">${t}</span>`).join('')}${rest>0?`<span class="tag n">+${rest}</span>`:''}</div>
-    <div class="bs ${o.expired?'':'mut'}" style="margin-bottom:10px;${o.expired?'color:var(--neg)':''}">${o.term}</div>
+    <div class="row" style="margin-bottom:8px"><b style="font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600">${o.name}</b>
+      ${o.extra?`<span class="tag sm n">+${o.extra}</span>`:''}<span class="spacer dim">${I.dots}</span></div>
+    <div class="row" style="gap:4px;margin-bottom:20px"><span class="coins">${o.coins.map(c=>COIN_ICON[c]).join('')}</span>
+      <span class="bs semi ${o.off?'dim':''}">${o.off?'⦸ ':''}${o.label}</span></div>
+    <div class="row" style="gap:4px;margin-bottom:20px;flex-wrap:wrap">
+      ${tags.map(t=>`<span class="tag sm n">${t}</span>`).join('')}${rest>0?`<span class="tag sm n">+${rest}</span>`:''}</div>
+    <div class="bs semi ${o.expired?'':'mut'}" style="margin-bottom:20px;${o.expired?'color:var(--neg)':''}">${o.term}</div>
     ${o.off?'':`<div class="row" style="gap:8px">
       <span class="linkfield" style="flex:1"><span class="mono">${url}</span>
         <button class="lnk spacer" style="color:var(--accent)" data-copy="${url}">${I.cp}</button></span>
@@ -861,17 +861,17 @@ V.profile=m=>{
     ['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03']];
   return `<div class="grid cols2" style="grid-template-columns:1.9fr 1fr;align-items:start">
   <div>
-    ${card(`<div class="ch"><h2>Мои суб-аккаунты</h2><button class="btn link spacer bs" data-go="subaccounts">Смотреть все</button></div>
+    ${card(`<div class="ch"><h2>Мои суб-аккаунты</h2><button class="btn link spacer" data-go="subaccounts">Смотреть все</button></div>
       ${noname?`<div class="empty" style="padding:28px 0"><p style="max-width:372px">Чтобы начать добывать цифровую валюту необходимо добавить имя аккаунта</p>
         <button class="btn" style="margin-top:16px" data-modal="subacct">${I.pl} Добавить имя аккаунта</button></div>`
       :`<div class="grid g3" style="margin:0">${subs.map(s=>subTile(m,s)).join('')}
         ${S.role==='owner'&&subs.length<3?`<button class="dashed" style="grid-column:span ${3-subs.length}" data-modal="subacct">${I.pl}Создать суб-аккаунт</button>`:''}</div>`}`)}
     <div style="height:12px"></div>
-    ${card(`<div class="ch"><h2>Мои наблюдатели</h2>${obs.length?'<button class="btn link spacer bs" data-go="observers">Смотреть все</button>':''}</div>
+    ${card(`<div class="ch"><h2>Мои наблюдатели</h2>${obs.length?'<button class="btn link spacer" data-go="observers">Смотреть все</button>':''}</div>
       ${obs.length?`<div class="grid g3" style="margin:0">${obs.map(obsTile).join('')}
         ${S.role==='owner'&&obs.length<3?`<button class="dashed" style="grid-column:span ${3-obs.length}" data-modal="observer">${I.pl}Создать ссылку наблюдателя</button>`:''}</div>`
       :`<div class="empty" style="padding:48px 0 40px"><div class="art">${I.eye}</div>
-          <p style="max-width:340px">У вас еще нет созданных ссылок наблюдателей</p>
+          <b>У вас еще нет созданных ссылок наблюдателей</b>
           ${S.role==='owner'&&!noname?`<button class="btn out sm" style="margin-top:16px" data-modal="observer">${I.pl} Создать</button>`:''}</div>`}`)}
     <div style="height:12px"></div>
     <div class="grid ${noname?'':'g2'}" style="margin:0">
@@ -882,10 +882,10 @@ V.profile=m=>{
   </div>
   <div>
     ${card(`<div class="ch"><h2>Мой профиль</h2></div>
-      ${noname?`<div class="row" style="gap:16px;margin-bottom:4px"><span class="avat lg" style="width:64px;height:64px;font-size:24px">?</span>
+      ${noname?`<div class="row" style="gap:16px;margin-bottom:4px"><span class="avat lg" style="width:64px;height:64px;font-size:var(--fs-h4);line-height:var(--lh-h4)">?</span>
         <button class="btn out sm" data-modal="subacct">${I.pl} Добавить имя аккаунта</button></div>`
       :`<div class="row" style="gap:16px;margin-bottom:4px"><span class="avat lg">${acct[0].toUpperCase()}</span>
-        <span style="min-width:0"><span class="row" style="gap:8px"><b style="font-size:20px;line-height:24px;font-weight:600">${acct}</b>
+        <span style="min-width:0"><span class="row" style="gap:8px"><b style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${acct}</b>
           <button class="lnk" style="color:var(--accent)" data-copy="${acct}">${I.cp}</button></span>
           <div style="margin-top:2px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:#9ca3af">${FULLNAME}</div></span>
         <button class="lnk spacer dim" data-modal="personal">${I.edit}</button></div>`}
@@ -901,7 +901,7 @@ V.profile=m=>{
       ${n?`<div class="nplist">${notes.slice(0,Math.min(n,4)).map(([t,d,dt])=>`<div class="nitem"><i class="dot"></i>
           <div><div class="nb"><span class="nt">${t}</span><span class="nd">${dt}</span></div><p>${d}</p></div></div>`).join('')}</div>
         <div style="text-align:center;padding-top:8px"><button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button></div>`
-        :`<div class="empty" style="padding:96px 0"><p>Новых уведомлений нет</p></div>`}`)}
+        :`<div class="empty" style="padding:96px 0"><b class="dim">Новых уведомлений нет</b></div>`}`)}
   </div>
 </div>`;
 };
@@ -991,7 +991,7 @@ V.security=m=>{
      ['Подтверждение вывода средств','Код на почту при каждом выводе',1],
      ['Уведомления о входе','Письмо при входе с нового устройства',1],
      ['Белый список кошельков','Вывод только на заранее подтвержденные адреса',0]]
-    .map(([t,d,on])=>`<div class="linkrow" style="padding:14px"><div><b style="font-size:14px">${t}</b><div class="cap dim" style="margin-top:2px">${d}</div></div>
+    .map(([t,d,on])=>`<div class="linkrow" style="padding:14px"><div><b style="font-size:var(--fs-s);line-height:var(--lh-s)">${t}</b><div class="cap dim" style="margin-top:2px">${d}</div></div>
       <span class="spacer"><span class="tog ${on?'on':''}" data-tog></span></span></div>`).join('')}
   <div class="row" style="gap:8px;margin-top:10px"><button class="btn g" data-toast="Письмо для смены пароля отправлено">Сменить пароль</button></div>`)}
 <div style="height:12px"></div>
@@ -1212,7 +1212,7 @@ function notifications(){
     ${n?`<div class="nplist">${list.slice(0,Math.min(n,5)).map(([t,d,dt])=>`<div class="nitem"><i class="dot"></i>
         <div><div class="nb"><span class="nt">${t}</span><span class="nd">${dt}</span></div><p>${d}</p></div></div>`).join('')}</div>`
       :`<div class="empty nempty"><img src="/empty-state.svg" alt="" width="120" height="95">
-         <p>Уведомлений пока нет</p></div>`}
+         <b class="dim">Уведомлений пока нет</b></div>`}
     <button class="btn xl" data-go="notifsettings">Посмотреть все</button></div>`;
 }
 /* Попоувер баланса — «Сводка по аккаунтам», как на проде */

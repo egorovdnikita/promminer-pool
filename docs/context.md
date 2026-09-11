@@ -58,6 +58,13 @@ radius      4 / 12 / 16 / 24 / 999
 shadow      0 4px 24px 0 #CBD0E966
 шрифт       Gilroy (local) → Manrope (fallback)
 контролы    button 48, button-sm 40, input 56
-типографика Body/M 16-20, Body/S 14-18, Caption/M 12-16
+типографика только два начертания — Medium (500) и SemiBold (600);
+            Bold (700) есть единственным стилем Caption/S/Bold Caps (12-16, uppercase).
+            Размер/интерлиньяж: Caption XS 10-12, Caption S 12-16, Body S 14-18,
+            Body M 16-20, Body L 18-22, H5 20-24, H4 24-30, H3 32-38, H2 40-48,
+            H1 48-56, Display S/M/L 56-64 / 64-72 / 72-80.
+            Полный список — figma 8rrL0jaovYD3jsrq7WF1L1?node-id=64-53.
+            В коде — токены --fs-c2/--fs-c/--fs-s/--fs-m/--fs-b1/--fs-h5…--fs-h2
+            и парные --lh-*; пиксели в font-size не писать.
 sidebar     252px (свёрнутый — 72px)
 ```
