@@ -928,6 +928,8 @@ function subTile(m,s){
 /* Срок действия ссылки: пресеты из макета 1441:118880 */
 const OTERM=[['Бессрочно','Бессрочно'],['7 д','до 08.04.2026'],['30 д','до 01.05.2026'],
   ['60 д','до 31.05.2026'],['90 д','до 30.06.2026']];
+/* Строка, с которой открыли меню или QR; по умолчанию первая */
+const obsCur=m=>{const r=obsOf(m); return r[U.obs??0]||r[0]||OBSERVERS[0]};
 const OBS_REQ={acc:'Выберите хотя бы 1 аккаунт',perm:'Выберите хотя бы 1 разрешение',coin:'Выберите хотя бы 1 монету'};
 function obsList(label,items,two,key){
   const on=i=>U.ochk.has(key+':'+i);
@@ -1228,19 +1230,19 @@ V.observers=m=>{
     <td class="${o.expired?'neg':'mut'}">${o.term}</td>
     <td class="num"><span class="row" style="gap:4px;justify-content:flex-end">
       ${o.expired?'':`<button class="ibr acc" data-copy="${url}" title="Скопировать ссылку">${I.cp}</button>
-      <button class="ibr acc" data-modal="qr" title="QR-код">${I.qr}</button>`}
+      <button class="ibr acc" data-modal="qr" data-obs="${i}" title="QR-код">${I.qr}</button>`}
       <span class="pop-wrap"><button class="ibr" data-pop="ob${i}" title="Ещё">${I.dots}</button>
       ${pop==='ob'+i?`<div class="pop menu up">
-        <button data-modal="obsedit">${I.edit}Редактировать</button>
+        <button data-modal="obsedit" data-obs="${i}">${I.edit}Редактировать</button>
         <div class="hr" style="margin:0"></div>
-        <button class="del" data-modal="obsdel">${I.tr}Удалить</button></div>`:''}</span>
+        <button class="del" data-modal="obsdel" data-obs="${i}">${I.tr}Удалить</button></div>`:''}</span>
     </span></td></tr>`}).join('')}
   </tbody></table></div>
   ${pager('obs',rows.length,20)}`,'tblcard')};
 
 /* Строка сессии: плашка 56, устройство с пульсом, IP • дата и город.
    У всех сессий, кроме текущей, справа кнопка завершения. */
-const sessOut=s=>s.cur?'':`<button class="ibr spacer" data-modal="sessend"
+const sessOut=s=>s.cur?'':`<button class="ibr spacer" data-modal="sessend" data-sess="${s.dev}"
   title="Завершить сессию">${I.login3}</button>`;
 const sessRow=(s,act)=>secRow(I.monitor,
   `${s.dev}${s.act?'<i class="pulse"></i>':''}`,
@@ -1549,7 +1551,7 @@ const MODALS={
 
   /* Удаление ссылки наблюдателя (макет 1444:163287) */
   obsdel:{t:'Удалить ссылку наблюдателя?',img:'/modal-delete.png',acts:false,
-    b:()=>`<div class="mstack"><p class="mtext">Ссылка наблюдения будет удалена,
+    b:m=>`<div class="mstack"><p class="mtext">Ссылка «${obsCur(m).label}» будет удалена,
       и пользователи потеряют доступ к данным вашего аккаунта</p></div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Ссылка наблюдателя удалена">Удалить</button>`},
@@ -1565,8 +1567,8 @@ const MODALS={
 
   /* QR-код ссылки наблюдателя (макет 1445:172568) */
   qr:{t:'Отсканируйте QR-код или скачайте',acts:false,
-    b:()=>`<div class="mstack" style="align-items:center"><img class="qrbox" src="/qr-watcher.png" alt="QR-код ссылки наблюдателя" width="290" height="290"></div>`,
-    foot:()=>{const url=LINKS.watcher(OBSERVERS[0].token);
+    b:m=>`<div class="mstack" style="align-items:center"><p class="mtext mut">${obsCur(m).label}</p><img class="qrbox" src="/qr-watcher.png" alt="QR-код ссылки наблюдателя" width="290" height="290"></div>`,
+    foot:m=>{const url=LINKS.watcher(obsCur(m).token);
       return `<button class="btn out" data-copy="${url}">${I.cp} Ссылка на наблюдателя</button>
         <button class="btn" data-toast="QR-код скачан">${I.dl} Скачать QR-код</button>`}},
 
@@ -1674,7 +1676,7 @@ const MODALS={
       ? `<button class="btn" style="flex:1" data-close data-toast="Ссылка наблюдателя создана">Отлично</button>`
       : `<button class="btn out" data-close>Отменить</button><button class="btn" data-osubmit>Подтвердить</button>`},
   obsedit:{t:'Изменить наблюдателя',acts:false,
-    b:(m,step)=>step?`<div class="cstep mid">${prog(2,3)}${doneBlock('Изменения сохранены')}</div>`:obsForm(U.sub||'Для бухгалтера'),
+    b:(m,step)=>step?`<div class="cstep mid">${prog(2,3)}${doneBlock('Изменения сохранены')}</div>`:obsForm(obsCur(m).label),
     foot:(m,step)=>step
       ? `<button class="btn" style="flex:1" data-close data-toast="Изменения сохранены">Отлично</button>`
       : `<button class="btn out" data-close>Отменить</button><button class="btn" data-osubmit>Сохранить</button>`},
@@ -1739,7 +1741,9 @@ Object.assign(MODALS,{
         ${sessGroup('НЕ Активные',off,1)}
       </div>`},
     foot:()=>`<button class="btn out" data-close>Закрыть</button>`},
-  sessend:{t:'Завершить эту сессию?',img:'/modal-delete.png',center:true,acts:false,b:()=>'',
+  sessend:{t:'Завершить эту сессию?',img:'/modal-delete.png',acts:false,
+    b:()=>`<div class="mstack"><p class="mtext">${U.sess||'Устройство'} выйдет из аккаунта —
+      чтобы вернуться, понадобится войти заново</p></div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Сессия завершена">Завершить</button>`},
   sessall:{t:'Вы точно хотите завершить все сессии?',img:'/modal-delete.png',acts:false,

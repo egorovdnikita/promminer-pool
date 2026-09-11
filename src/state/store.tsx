@@ -11,7 +11,7 @@ export const pathOf = (route: string) => (route === HOME ? '/' : '/' + route)
 export const routeOf = (pathname: string) => pathname.replace(/^\/+|\/+$/g, '') || HOME
 
 const freshUi = (): Ui => ({
-  seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {}, oval: false,
+  seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {}, oval: false, obs: 0, sess: '',
   q: '', wfilter: 'all', geo: '',
   wk: null, qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
@@ -269,6 +269,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (st) { u.step = +st.dataset.step!; return bump() }
     const md = at('[data-modal]')
     if (md) {
+      if (md.dataset.obs) u.obs = +md.dataset.obs
+      if (md.dataset.sess) u.sess = md.dataset.sess
       modal.current = md.dataset.modal!; u.step = 0; u.vfile = false; u.vbank = undefined; pop.current = null
       /* формы наблюдателя открываются с отмеченными первыми двумя пунктами */
       if (md.dataset.modal === 'observer' || md.dataset.modal === 'obsedit') {

@@ -52,6 +52,10 @@ export interface Ui {
   nch: Record<string, boolean>
   /** Форму наблюдателя уже пытались отправить — показываем ошибки. */
   oval: boolean
+  /** Строка наблюдателя, с которой открыли меню или QR. */
+  obs?: number
+  /** Устройство, чью сессию завершают. */
+  sess?: string
   q: string
   wfilter: string
   geo: string
