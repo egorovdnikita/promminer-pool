@@ -1185,7 +1185,7 @@ const contactRow=k=>{const c=CONTACTS[k], on=S[k]==='yes';
   return `<div class="mrow"><span class="mi">${c.ico()}</span>
     <span class="tx"><i>${c.label}</i>${on?`<b>${c.val}<i class="dot" style="background:var(--pos);margin-left:8px"></i></b>`:''}</span>
     ${on?`<span class="pop-wrap spacer"><button class="act" data-pop="c${k}">${I.edit}</button>
-      ${pop==='c'+k?`<div class="pop menu">
+      ${pop==='c'+k?`<div class="pop menu up">
         <button data-modal="${k}edit">${I.edit}Изменить</button>
         <div class="hr" style="margin:0"></div>
         <button class="del" data-modal="${k}unlink">${I.tr}Отвязать</button></div>`:''}</span>`
@@ -1216,12 +1216,12 @@ function contactModals(){
     const pair=(ok,cta)=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn" data-close data-axis="${k}" data-val="yes" data-toast="${ok}">${cta}</button>`;
     const img=k==='tg'?{img:'/modal-tg.png'}:{};
-    out[k+'add']={t:c.add,acts:false,steps,...img,
+    out[k+'add']={t:c.add,acts:false,...img,
       b:(m,step)=>steps&&step===1?`${prog(1)}${codeStep()}`:form(''),
       foot:(m,step)=>steps&&step===0
         ? `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="1">Подтвердить</button>`
         : pair(c.okAdd,k==='tg'?'Сохранить':'Подтвердить')};
-    out[k+'edit']={t:c.edit||c.add,acts:false,steps,...img,
+    out[k+'edit']={t:c.edit||c.add,acts:false,...img,
       b:(m,step)=>steps&&step===1?`${prog(1)}${codeStep()}`:form(c.val),
       foot:(m,step)=>steps&&step===0
         ? `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="1">Подтвердить</button>`
@@ -1230,7 +1230,7 @@ function contactModals(){
       b:()=>`<div class="mstack"><p class="mtext">${c.askText}</p></div>`,
       foot:()=>`<button class="btn out" data-close>Отменить</button>
         <button class="btn danger" ${k==='tg'?`data-close data-axis="${k}" data-val="no" data-toast="${c.okDel}"`:'data-modal="'+k+'code"'}>Отвязать</button>`};
-    if(k!=='tg') out[k+'code']={t:c.unlink,acts:false,steps:2,
+    if(k!=='tg') out[k+'code']={t:c.unlink,acts:false,
       b:()=>`${prog(1)}${codeStep()}`,
       foot:()=>`<button class="btn out" data-close>Отменить</button>
         <button class="btn" data-close data-axis="${k}" data-val="no" data-toast="${c.okDel}">Далее</button>`};

@@ -3,7 +3,7 @@ import { useApp } from '@/state/store'
 import { Ico, Raw } from './Raw'
 
 export function Modal({ m }: { m: Model }) {
-  const { modal, U } = useApp()
+  const { modal, U, pop } = useApp()
   if (!modal) return null
   const d = MODALS[modal]
   if (!d) return null
@@ -27,7 +27,9 @@ export function Modal({ m }: { m: Model }) {
         ) : (
           <div className="mhead"><h2>{d.t}</h2>{close}</div>
         )}
-        <div className={hasFoot ? 'mbody' : 'mbody nofoot'}>
+        {/* Пока открыто меню контакта, тело не прокручивается: иначе
+            выпадающий список обрезается краем прокручиваемой области. */}
+        <div className={`mbody ${hasFoot ? '' : 'nofoot'} ${pop?.startsWith('c') ? 'over' : ''}`}>
           {!!steps && (
             <div className="msteps">
               {Array.from({ length: steps }, (_, i) => <i className={i <= step ? 'on' : ''} key={i} />)}

@@ -164,6 +164,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .pop.left{right:auto;left:0}
 /* Dropdown-Menu: пункты 18/22 с иконкой 24, удаление красным */
 .pop.menu{width:188px;min-width:0;border-radius:var(--r-m);padding:8px 0;display:flex;flex-direction:column;gap:8px}
+/* В модалке меню открывается вверх: снизу футер и край окна */
+.pop.menu.up{top:auto;bottom:calc(100% + 8px);z-index:60}
 .pop.menu>button{padding:8px 12px!important;min-height:40px;gap:8px!important;
   font-size:var(--fs-b1)!important;line-height:var(--lh-b1)!important;font-weight:600}
 .pop.menu>button:hover{background:var(--ctrl2)}
@@ -409,6 +411,7 @@ body.mini .ni .spacer.lbl{display:none!important}
    контента одинакова и со скроллом, и без него. */
 .mbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:0 calc(24px - var(--sbw)) 0 24px}
 .mbody.nofoot{padding-bottom:24px}
+.mbody.over{overflow:visible}
 .mbody:empty{display:none}
 .mfoot{display:flex;gap:8px;padding:24px;flex:0 0 auto}
 /* Подтверждения в макетах уже 500, а не 550 */
