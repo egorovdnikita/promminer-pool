@@ -882,19 +882,19 @@ V.profile=m=>{
   </div>
   <div>
     ${card(`<div class="ch"><h2>Мой профиль</h2></div>
-      ${noname?`<div class="row" style="gap:16px;margin-bottom:4px"><span class="avat lg" style="width:64px;height:64px;font-size:var(--fs-h4);line-height:var(--lh-h4)">?</span>
+      ${noname?`<div class="row" style="gap:16px;margin-bottom:20px"><span class="avat lg" style="width:64px;height:64px;font-size:var(--fs-h3);line-height:var(--lh-h3)">?</span>
         <button class="btn out sm" data-modal="subacct">${I.pl} Добавить имя аккаунта</button></div>`
-      :`<div class="row" style="gap:16px;margin-bottom:4px"><span class="avat lg">${acct[0].toUpperCase()}</span>
-        <span style="min-width:0"><span class="row" style="gap:8px"><b style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${acct}</b>
-          <button class="lnk" style="color:var(--accent)" data-copy="${acct}">${I.cp}</button></span>
-          <div style="margin-top:2px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:#9ca3af">${FULLNAME}</div></span>
-        <button class="lnk spacer dim" data-modal="personal">${I.edit}</button></div>`}
+      :`<div class="row" style="gap:16px;margin-bottom:20px"><span class="avat lg">${acct[0].toUpperCase()}</span>
+        <span style="min-width:0"><span class="row" style="gap:2px"><b style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${acct}</b>
+          <button class="ibr" style="color:var(--accent)" data-copy="${acct}">${I.cp}</button></span>
+          <div style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c3)">${FULLNAME}</div></span>
+        <button class="ibr spacer dim" data-modal="personal">${I.edit}</button></div>`}
       <button class="rowline" data-go="security"><span class="iconbox">${I.pc}</span>
-        <span class="tx"><i>Последняя сессия</i><b>${SESSIONS[0].dev} <i class="dot" style="display:inline-block;background:var(--pos)"></i></b></span>
-        <span class="ch2">${I.cv}</span></button>
-      ${noname?'':`<button class="rowline" data-go="security"><span class="iconbox" style="background:var(--surface);box-shadow:0 0 0 1px var(--border)">${GOOGLE}</span>
-        <span class="tx"><b>Google Authentication</b><span class="badge" style="margin-top:4px">Не подключено</span></span>
-        <span class="ch2">${I.cv}</span></button>`}`)}
+        <span class="tx"><i>Последняя сессия</i><b class="row" style="gap:0;width:100%"><span class="ell">${SESSIONS[0].dev}</span><i class="pulse"></i></b></span>
+        <span class="ch2 ibr">${I.cv}</span></button>
+      ${noname?'':`<button class="rowline" data-go="security"><span class="iconbox">${GOOGLE}</span>
+        <span class="tx"><b>Google Authentication</b><span class="badge">Не подключено</span></span>
+        <span class="ch2 ibr">${I.cv}</span></button>`}`)}
     <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Последние уведомления</h2>${n?`<span class="cnt">${n>99?'99+':n}</span>`:''}
       <button class="btn link spacer dim" data-go="notifsettings">${I.cv}</button></div>

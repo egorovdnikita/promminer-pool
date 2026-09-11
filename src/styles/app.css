@@ -183,6 +183,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .card{background:var(--surface);border-radius:var(--r-l);padding:24px;box-shadow:none;min-width:0}
 .ch{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+/* Карточки в макете — вертикальный автолэйаут с шагом 20 */
+.card>.ch{margin-bottom:20px}
 .ch h2{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
 .hero{background:var(--accent);border-radius:var(--r-s);padding:12px 14px;color:#fff;display:flex;gap:12px;align-items:flex-start;min-height:76px}
 .hero .l{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;opacity:.78;margin-bottom:4px}
@@ -470,6 +472,11 @@ body.mini .ni .spacer.lbl{display:none!important}
 .bulk{display:flex;align-items:center;gap:12px;background:var(--accent-sub);border-radius:var(--r-m);padding:12px;margin-bottom:12px;font-size:var(--fs-s);line-height:var(--lh-s)}
 /* лента групп */
 .lnk{color:inherit;font:inherit;cursor:pointer}
+.ibr{width:36px;height:36px;border-radius:var(--r-f);display:grid;place-items:center;color:inherit;flex:0 0 auto}
+.ibr:hover{background:var(--ctrl)}
+/* Пульс активной сессии — точка 8 в ореоле 16 (Sessies_Pulse) */
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--pos);box-shadow:0 0 0 4px #22c55e29;flex:0 0 auto;margin-left:12px}
+.ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .lnk:hover{color:var(--accent)}
 .linkrow svg{display:inline-block;vertical-align:-4px}
 .linkrow:hover{background:#6366f129}
@@ -495,7 +502,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .nhead .ra:hover{opacity:.8}
 .phead{display:flex;align-items:center;gap:12px;padding:8px 8px 12px}
 .avat{width:48px;height:48px;border-radius:var(--r-f);background:#f59e0b29;color:#f59e0b;display:grid;place-items:center;font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;flex:0 0 auto}
-.avat.lg{width:75px;height:75px;font-size:var(--fs-h3);line-height:var(--lh-h3)}
+.avat.lg{width:75px;height:75px;font-size:var(--fs-h2);line-height:var(--lh-h2)}
 .acard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);padding:12px 14px;margin-bottom:8px}
 .acard.sel{border-color:var(--accent);background:var(--accent-ghost)}
 .acard[data-acct]{cursor:pointer}
@@ -511,15 +518,15 @@ body.mini .ni .spacer.lbl{display:none!important}
 .dashed:hover{background:var(--ctrl)}
 .linkfield{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:var(--r-s);padding:0 8px 0 12px;height:40px;font-size:var(--fs-s);color:var(--c2);min-width:0}
 .linkfield span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.badge{display:inline-flex;align-items:center;height:28px;padding:0 8px;border-radius:var(--r-xs);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;background:#fbbf24;color:#fff}
+.badge{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:var(--r-xs);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;background:var(--warn);color:#fff}
 /* строка «иконка — текст — шеврон» в карточке профиля */
-.rowline{display:flex;align-items:center;gap:12px;padding:12px 0;width:100%;text-align:left}
-.rowline+.rowline{border-top:1px solid var(--border)}
-.iconbox{width:44px;height:44px;border-radius:var(--r-s);background:var(--ctrl2);display:grid;place-items:center;color:var(--c2);flex:0 0 auto}
-.rowline .tx{min-width:0}
+.rowline{display:flex;align-items:center;gap:12px;min-height:56px;width:100%;text-align:left}
+.rowline+.rowline{margin-top:20px}
+.iconbox{width:56px;height:56px;border-radius:var(--r-m);background:var(--ctrl2);display:grid;place-items:center;color:var(--c2);flex:0 0 auto}
+.rowline .tx{min-width:0;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .rowline .tx i{display:block;font-style:normal;font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c3);font-weight:500}
-.rowline .tx b{display:block;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
-.rowline .ch2{margin-left:auto;color:var(--c3);display:flex}
+.rowline .tx b{display:flex;align-items:center;width:100%;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.rowline .ch2{margin-left:auto;color:var(--c3)}
 /* герой «Мои активы» с двумя плитками-действиями */
 .heroact{display:flex;gap:12px;margin-left:auto;align-self:stretch}
 .heroact button{background:#ffffff26;border-radius:var(--r-m);padding:14px 16px;color:#fff;min-width:150px;display:flex;flex-direction:column;gap:14px}
