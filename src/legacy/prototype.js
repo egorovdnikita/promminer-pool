@@ -822,8 +822,8 @@ function subTile(m,s){
   const dots=[[w[0],'var(--pos)'],[w[1],'var(--warn)'],[w[2],'var(--neg)'],[w[3],'var(--neu)']];
   return `<div class="tile2" data-subinfo="${s.name}" style="cursor:pointer">
     <b class="t" style="display:flex;align-items:center;gap:8px;font-size:var(--fs-m);font-weight:600;margin-bottom:10px">${s.name}
-      ${s.main?'<span class="tag spacer">Основной</span>':'<span class="tag n spacer">Суб-аккаунт</span>'}</b>
-    <div class="kv">Общий баланс<span class="mono">${s.main?nf(m.bal[0].usd):'0,00'} $</span></div>
+      ${s.main?'<span class="tag sm sel spacer">Основной</span>':'<span class="tag sm n spacer">Суб-аккаунт</span>'}</b>
+    <div class="kv big">Общий баланс<span class="mono">${s.main?nf(m.bal[0].usd):'0,00'} $</span></div>
     <div class="kv">Хэшрейт, BTC<span class="mono">${s.btc} TH/s</span></div>
     <div class="kv">Хэшрейт, LTC<span class="mono">${s.ltc} GH/s</span></div>
     <div class="kv">Хэшрейт, ZEC<span class="mono">${s.zec} KSol/s</span></div>
@@ -887,7 +887,7 @@ V.profile=m=>{
       :`<div class="row" style="gap:16px;margin-bottom:4px"><span class="avat lg">${acct[0].toUpperCase()}</span>
         <span style="min-width:0"><span class="row" style="gap:8px"><b style="font-size:20px;line-height:24px;font-weight:600">${acct}</b>
           <button class="lnk" style="color:var(--accent)" data-copy="${acct}">${I.cp}</button></span>
-          <div class="cap dim" style="margin-top:2px">${FULLNAME}</div></span>
+          <div style="margin-top:2px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:#9ca3af">${FULLNAME}</div></span>
         <button class="lnk spacer dim" data-modal="personal">${I.edit}</button></div>`}
       <button class="rowline" data-go="security"><span class="iconbox">${I.pc}</span>
         <span class="tx"><i>Последняя сессия</i><b>${SESSIONS[0].dev} <i class="dot" style="display:inline-block;background:var(--pos)"></i></b></span>

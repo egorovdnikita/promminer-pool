@@ -272,11 +272,11 @@ body.mini .ni .spacer.lbl{display:none!important}
 .tag.g{background:#22c55e29;color:#22c55e}
 .tag.r{background:#ef444429;color:#ef4444}
 .tag.b{background:#3b82f629;color:#3b82f6}
-.tag.n{background:#6b728029;color:var(--c1)}
+.tag.n{background:#6b728029;color:var(--c2);padding:0 8px}
 .tag.sel{background:var(--accent);color:#fff}
 .tag.sel.y{background:#f59e0b}.tag.sel.g{background:#22c55e}
 .tag.sel.r{background:#ef4444}.tag.sel.b{background:#3b82f6}.tag.sel.n{background:#6b7280}
-.tag.sm{height:24px;padding:0 10px}
+.tag.sm{height:24px;padding:0 8px;gap:4px;font-size:var(--fs-c);line-height:var(--lh-c)}
 .tag .x{margin-left:2px;display:flex;opacity:.7}
 /* Status (💙 DS 214:4829): высота 24, radius 8, 12/16 Bold, точка 8. */
 .status{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:var(--r-xs);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:700;white-space:nowrap}
@@ -375,7 +375,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* modal */
 .mask{position:fixed;inset:0;background:#1a1a1aa3;backdrop-filter:blur(2px);z-index:70;display:grid;place-items:center;padding:24px}
 .modal{background:var(--surface);border-radius:var(--r-l);padding:24px;width:100%;max-width:400px;box-shadow:0 24px 70px #1a1a1a3d;max-height:86vh;overflow:auto}
-.mhead{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.mhead{display:flex;align-items:center;gap:12px;min-height:40px;margin:0 0 16px}
 .modal h2{font-size:20px;line-height:24px;font-weight:600;flex:1;min-width:0}
 .mx{width:40px;height:40px;border-radius:var(--r-f);background:var(--ctrl);color:var(--c1);display:grid;place-items:center;flex:0 0 auto}
 .mx:hover{background:var(--ctrl-hover)}
@@ -500,7 +500,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .kv span{margin-left:auto;color:var(--c1);font-weight:600;flex:0 0 auto}
 .kv .row{white-space:normal;flex:0 1 auto}
 /* плитки-карточки внутри карточек (суб-аккаунты, наблюдатели) */
-.tile2{background:var(--bg);border-radius:var(--r-m);padding:16px;min-width:0}
+.tile2{background:#6b728014;border-radius:var(--r-m);padding:16px;min-width:0}
 .dashed{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--bg);border-radius:var(--r-m);padding:16px;min-height:150px;color:var(--accent);font-size:var(--fs-s);font-weight:600;width:100%}
 .dashed:hover{background:var(--ctrl)}
 .linkfield{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:var(--r-s);padding:0 8px 0 12px;height:40px;font-size:var(--fs-s);color:var(--c2);min-width:0}
@@ -544,6 +544,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 :root[data-theme="dark"] .avat{background:#78350f;color:#fde68a}
 :root[data-theme="dark"] .linkfield{background:var(--ctrl2)}
 :root[data-theme="dark"] .badge{color:#fbbf24}
+@media(max-width:1450px){.grid.g3{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:1150px){.g3,.g4,.cols2{grid-template-columns:1fr!important}.sb{display:none}}
 
 /* Tooltip (💙 DS): подсказка на [data-tip], по умолчанию снизу. */
@@ -662,3 +663,9 @@ html{scrollbar-gutter:stable}
 ::-webkit-scrollbar-thumb:hover{background:#6b728080;background-clip:padding-box}
 ::-webkit-scrollbar-corner{background:transparent}
 .modal,.pop,.alist,.tw,.nav,.sc{scrollbar-gutter:stable}
+
+/* Баланс в плитке крупнее остальных строк (макет ProfileCard) */
+.kv.big span{font-size:var(--fs-b1);line-height:var(--lh-b1)}
+/* Значения строк плитки — 16/20 SemiBold */
+.tile2 .kv span{font-size:var(--fs-m);line-height:var(--lh-m)}
+.tile2 .kv.big span{font-size:var(--fs-b1);line-height:var(--lh-b1)}
