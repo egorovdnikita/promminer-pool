@@ -16,7 +16,7 @@ export function Modal({ m }: { m: Model }) {
 
   return (
     <div className="mask" data-close>
-      <div className="modal">
+      <div className={d.size === 'sm' ? 'modal sm' : 'modal'}>
         {d.img ? (
           // Modal HeaderA с иллюстрацией: баннер, крестик поверх, заголовок под ним
           <div className="mhead img">

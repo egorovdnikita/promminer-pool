@@ -12,6 +12,9 @@ export interface Scenario {
   name: string
   load: string
   acct: string
+  phone: string
+  mail: string
+  tg: string
 }
 
 /** Эфемерное состояние интерфейса — в ссылку не попадает. */
@@ -20,6 +23,8 @@ export interface Ui {
   sort: Record<string, { k: string; d: number } | null>
   /** Индекс уведомления, открытого в модалке. */
   note?: number
+  /** Фильтр в панели сценариев. */
+  scq?: string
   page: Record<string, number>
   sel: Set<number>
   q: string

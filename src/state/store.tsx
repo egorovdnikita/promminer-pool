@@ -3,7 +3,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { DEF, GROUP_OF, M, applyState, workersList, workersRows } from '@/legacy/prototype'
+import { DEF, PRESETS, GROUP_OF, M, applyState, workersList, workersRows } from '@/legacy/prototype'
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
@@ -131,6 +131,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const onInput = useCallback((e: React.FormEvent) => {
     const q = (e.target as HTMLElement).closest('#q') as HTMLInputElement | null
     if (q) { U.current.q = q.value; U.current.page.workers = 1; U.current.qfocus = true; bump() }
+    const sq = (e.target as HTMLElement).closest('#scq') as HTMLInputElement | null
+    if (sq) { U.current.scq = sq.value; bump() }
   }, [])
 
   const snapshot = useCallback((): AppSnapshot => ({
@@ -214,6 +216,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const md = at('[data-modal]')
     if (md) { modal.current = md.dataset.modal!; u.step = 0; pop.current = null; return bump() }
     const tst = at('[data-toast]')
+    /* Ось сценария применяем до закрытия: кнопки модалок несут и data-axis,
+       и data-close, а ветка закрытия выходит из обработчика. */
+    const ax = at('[data-axis]')
+    if (ax) {
+      (S.current as any)[ax.dataset.axis!] = ax.dataset.val
+      pop.current = null
+      if (!ax.hasAttribute('data-close')) return bump()
+    }
     const cl = at('[data-close]')
     /* Маска тоже помечена data-close, но закрывать по ней нужно только при клике
        мимо окна — иначе модалка схлопывается от клика по любому полю внутри. */
@@ -221,8 +231,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       modal.current = null; bump(); if (tst) toast(tst.dataset.toast!); return
     }
     if (tst) return toast(tst.dataset.toast!)
-    const ax = at('[data-axis]')
-    if (ax) { (S.current as any)[ax.dataset.axis!] = ax.dataset.val; pop.current = null; return bump() }
     const gt = at('[data-go]')
     if (gt) { go(gt.dataset.go!); return bump() }
     const gp = at('[data-grp]')
@@ -235,6 +243,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (tg) { tg.classList.toggle('on'); return }
     if (at('[data-mini]')) { mini.current = !mini.current; document.body.classList.toggle('mini', mini.current); return bump() }
     if (at('[data-panel]')) { panel.current = !panel.current; return bump() }
+    const pr = at('[data-preset]')
+    if (pr) {
+      const found = PRESETS.find(([n]) => n === pr.dataset.preset)
+      if (found) { S.current = { ...DEF, ...found[2] }; modal.current = null; toast(`Сценарий «${found[0]}»`) }
+      return bump()
+    }
     if (at('[data-reset]')) { S.current = { ...DEF }; modal.current = null; go(HOME); return bump() }
     if (at('[data-copylink]')) { navigator.clipboard?.writeText(location.href); return toast('Ссылка скопирована') }
     if (pop.current && !at('.pop-wrap')) { pop.current = null; bump() }

@@ -11,20 +11,35 @@ import { ICONS } from './icons.js';
    1. СЦЕНАРИИ — правится только здесь
    ============================================================ */
 const AXES={
-  coin:{label:'Монета',opts:[['btc','BTC'],['ltc','LTC + DOGE']]},
-  data:{label:'Наполнение данными',opts:[['normal','Норма'],['empty','Пусто'],['few','Мало записей'],['huge','Большие значения']]},
-  health:{label:'Здоровье парка',opts:[['ok','Всё живо'],['degraded','Деградация'],['critical','Авария']]},
-  role:{label:'Роль',opts:[['owner','Владелец'],['observer','Наблюдатель']]},
-  tier:{label:'Уровень рефералки',opts:[['0','5%'],['1','10%'],['2','15%'],['3','20%'],['4','25%']]},
-  verif:{label:'Верификация',opts:[['no','Не пройдена'],['pending','На проверке'],['yes','Пройдена']]},
-  notif:{label:'Уведомления',opts:[['many','12 новых'],['few','2 новых'],['none','Нет']]},
-  subs:{label:'Суб-аккаунты',opts:[['many','3'],['few','1'],['none','Только основной']]},
-  name:{label:'Имя аккаунта',opts:[['yes','Задано'],['no','Не задано']]},
-  load:{label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон']]},
-  obs:{label:'Наблюдатели',opts:[['many','3'],['few','1'],['none','Нет']]},
-  acct:{label:'Аккаунт',opts:[['main','Основной'],['sub','Суб-аккаунт']]},
+  coin:{g:'Данные',label:'Монета',opts:[['btc','BTC'],['ltc','LTC + DOGE']]},
+  data:{g:'Данные',label:'Наполнение данными',opts:[['normal','Норма'],['empty','Пусто'],['few','Мало записей'],['huge','Большие значения']]},
+  health:{g:'Данные',label:'Здоровье парка',opts:[['ok','Всё живо'],['degraded','Деградация'],['critical','Авария']]},
+  load:{g:'Данные',label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон']]},
+  role:{g:'Аккаунт',label:'Роль',opts:[['owner','Владелец'],['observer','Наблюдатель']]},
+  acct:{g:'Аккаунт',label:'Аккаунт',opts:[['main','Основной'],['sub','Суб-аккаунт']]},
+  name:{g:'Аккаунт',label:'Имя аккаунта',opts:[['yes','Задано'],['no','Не задано']]},
+  verif:{g:'Аккаунт',label:'Верификация',opts:[['no','Не пройдена'],['pending','На проверке'],['yes','Пройдена']]},
+  subs:{g:'Профиль',label:'Суб-аккаунты',opts:[['many','3'],['few','1'],['none','Только основной']]},
+  obs:{g:'Профиль',label:'Наблюдатели',opts:[['many','3'],['few','1'],['none','Нет']]},
+  notif:{g:'Профиль',label:'Уведомления',opts:[['many','12 новых'],['few','2 новых'],['none','Нет']]},
+  tier:{g:'Профиль',label:'Уровень рефералки',opts:[['0','5%'],['1','10%'],['2','15%'],['3','20%'],['4','25%']]},
+  phone:{g:'Контакты',label:'Телефон',opts:[['yes','Привязан'],['no','Не привязан']]},
+  mail:{g:'Контакты',label:'Почта',opts:[['yes','Привязана'],['no','Не привязана']]},
+  tg:{g:'Контакты',label:'Telegram',opts:[['no','Не привязан'],['yes','Привязан']]},
 };
-const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main'};
+/* Готовые связки состояний — один клик вместо десяти переключателей */
+const PRESETS=[
+  ['Свежий аккаунт','Ничего не настроено и нет данных',
+    {data:'empty',name:'no',subs:'none',obs:'none',notif:'none',verif:'no',phone:'no',mail:'no',tg:'no'}],
+  ['Активный майнер','Всё заполнено и работает',
+    {data:'normal',health:'ok',name:'yes',subs:'many',obs:'many',notif:'many',verif:'yes',phone:'yes',mail:'yes',tg:'yes'}],
+  ['Авария на парке','Воркеры отваливаются',{data:'normal',health:'critical',notif:'many'}],
+  ['Наблюдатель','Доступ только на чтение',{role:'observer',subs:'few',obs:'none'}],
+  ['Крупный клиент','Большие значения и много записей',{data:'huge',subs:'many',obs:'many',tier:'4',verif:'yes'}],
+  ['Скелетон','Экран во время загрузки',{load:'yes'}],
+];
+const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
+  phone:'no',mail:'yes',tg:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
 let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
@@ -1137,6 +1152,92 @@ const THEMES=[['light','Всегда светлая'],['dark','Всегда тё
 /* Данные для модалки суб-аккаунта: активный аккаунт берём из U.sub */
 const subByName=n=>SUBS.find(x=>x.name===n)||SUBS[0];
 
+/* ===== Контакты: телефон, почта, Telegram =====
+   Макеты «Действия с телефоном» (531:19524), «с почтой» (531:19523),
+   «с телеграмом» (531:19525). У телефона и почты одинаковый сценарий:
+   добавление и изменение в два шага (значение → код), отвязка — красное
+   подтверждение на 500 и отдельный шаг с кодом. У Telegram шагов нет. */
+const CONTACTS={
+  phone:{label:'Телефон',ico:()=>I.phone,val:'+7 (996) ***-59-52',
+    add:'Добавить номер телефона',edit:'Изменить номер телефона',
+    ask:'Отвязать номер телефона?',unlink:'Отвязать номер телефона',
+    hint:'Вы сможете авторизовываться по номеру телефона и паролю.',
+    askText:'Вы больше не сможете авторизовываться по номеру телефона и паролю, и больше не будет приходить код 2FA',
+    okAdd:'Номер телефона добавлен',okEdit:'Номер телефона изменён',okDel:'Номер телефона отвязан',
+    field:v=>`<div class="inpphone"><span class="pre">+7</span><input placeholder="(999) 999-99-99" ${v?`value="${v}"`:''}></div>`},
+  mail:{label:'Почта',ico:()=>I.mail,val:'ivanivanov2003@gmail.com',
+    add:'Добавить почту',edit:'Изменить почту',
+    ask:'Отвязать Email?',unlink:'Отвязать почту',
+    hint:'Вы сможете авторизовываться по Email и паролю.',
+    hint2:'Вы сможете получать уведомления на ваш Email.',
+    askText:'Вы больше не сможете авторизовываться по Email и паролю, и больше не будет приходить код 2FA',
+    okAdd:'Почта добавлена',okEdit:'Почта изменена',okDel:'Почта отвязана',
+    field:v=>`<div class="inp" style="margin:0"><input placeholder="Email" ${v?`value="${v}"`:''}></div>`},
+  tg:{label:'Telegram',ico:()=>I.tg,val:'@ivanivanov2003',
+    add:'Привязка Telegram',edit:'Изменение Telegram',
+    ask:'Отвязать Telegram?',
+    askText:'При отвязке Telegram-аккаунта вы не сможете получать уведомления от нашего TG-бота.',
+    okAdd:'Telegram привязан',okEdit:'Telegram изменён',okDel:'Telegram отвязан',
+    field:v=>`<div class="inp" style="margin:0"><input placeholder="Telegram" ${v?`value="${v}"`:''}></div>`}
+};
+/* Строка контакта в «Личных данных»: пусто — плюс, привязано — меню */
+const contactRow=k=>{const c=CONTACTS[k], on=S[k]==='yes';
+  return `<div class="mrow"><span class="mi">${c.ico()}</span>
+    <span class="tx"><i>${c.label}</i>${on?`<b>${c.val}<i class="dot" style="background:var(--pos);margin-left:8px"></i></b>`:''}</span>
+    ${on?`<span class="pop-wrap spacer"><button class="act" data-pop="c${k}">${I.edit}</button>
+      ${pop==='c'+k?`<div class="pop menu">
+        <button data-modal="${k}edit">${I.edit}Изменить</button>
+        <div class="hr" style="margin:0"></div>
+        <button class="del" data-modal="${k}unlink">${I.tr}Отвязать</button></div>`:''}</span>`
+    :`<button class="act spacer" data-modal="${k}add">${I.pl}</button>`}</div>`;
+};
+/* Шаг с кодом — общий для добавления, изменения и отвязки */
+const codeStep=()=>`<div class="mstack" style="gap:32px;align-items:center">
+  <div style="display:flex;flex-direction:column;gap:24px;align-items:center">
+    <div class="msec">Введите код</div>
+    <div class="otp">${[0,1,2,3].map(i=>`<span class="otpc ${i===0?'cur':''}" tabindex="0">${i===0?'':'·'}</span>`).join('')}</div>
+  </div>
+  <button class="btn link" disabled>Запросить новый код через 00:59</button>
+</div>`;
+const prog=n=>`<div class="mprog">${[0,1].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</div>`;
+/* Модалки контактов собираются по одному образцу */
+function contactModals(){
+  const out={};
+  for(const k of Object.keys(CONTACTS)){
+    const c=CONTACTS[k], steps=k==='tg'?0:2;
+    const form=(v)=>`<div class="mstack">
+      ${steps?prog(0):''}
+      ${k==='tg'?`<p class="mtext">Для ${v?'изменения':'получения уведомлений в'} Telegram
+        <button class="lnk" style="color:var(--accent)" data-toast="Открываем @PromminerAlertbot">${v?'перейдите в бота':'подключите бота'}</button>
+        и ${v?'измените':'добавьте'} свой аккаунт ниже</p>`:''}
+      ${c.field(v)}
+      ${c.hint?`<div class="mhints"><span>${c.hint}</span>${c.hint2?`<span>${c.hint2}</span>`:''}</div>`:''}
+    </div>`;
+    const pair=(ok,cta)=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-axis="${k}" data-val="yes" data-toast="${ok}">${cta}</button>`;
+    const img=k==='tg'?{img:'/modal-tg.png'}:{};
+    out[k+'add']={t:c.add,acts:false,steps,...img,
+      b:(m,step)=>steps&&step===1?`${prog(1)}${codeStep()}`:form(''),
+      foot:(m,step)=>steps&&step===0
+        ? `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="1">Подтвердить</button>`
+        : pair(c.okAdd,k==='tg'?'Сохранить':'Подтвердить')};
+    out[k+'edit']={t:c.edit||c.add,acts:false,steps,...img,
+      b:(m,step)=>steps&&step===1?`${prog(1)}${codeStep()}`:form(c.val),
+      foot:(m,step)=>steps&&step===0
+        ? `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="1">Подтвердить</button>`
+        : pair(c.okEdit,'Сохранить')};
+    out[k+'unlink']={t:c.ask,img:'/modal-delete.png',size:'sm',acts:false,
+      b:()=>`<div class="mstack"><p class="mtext">${c.askText}</p></div>`,
+      foot:()=>`<button class="btn out" data-close>Отменить</button>
+        <button class="btn danger" ${k==='tg'?`data-close data-axis="${k}" data-val="no" data-toast="${c.okDel}"`:'data-modal="'+k+'code"'}>Отвязать</button>`};
+    if(k!=='tg') out[k+'code']={t:c.unlink,acts:false,steps:2,
+      b:()=>`${prog(1)}${codeStep()}`,
+      foot:()=>`<button class="btn out" data-close>Отменить</button>
+        <button class="btn" data-close data-axis="${k}" data-val="no" data-toast="${c.okDel}">Далее</button>`};
+  }
+  return out;
+}
+
 const MODALS={
   /* Настройки аккаунта (макет 2219:33325): язык, часовой пояс, тема радиогруппой */
   /* Настройки (макет 2219:33334): строки с плашкой 48, разделитель, секция «Тема интерфейса» */
@@ -1265,24 +1366,11 @@ const MODALS={
       <div style="display:flex;flex-direction:column;gap:20px">
       <div class="msec">Контакты</div>
       <div>
-    <div class="mrow"><span class="mi">${I.phone}</span><span class="tx"><i>Телефон</i></span>
-      <button class="act" data-modal="phone">${I.edit}</button></div>
-    <div class="mrow"><span class="mi">${I.mail}</span><span class="tx"><i>Почта</i>
-      <b>ivanivanov2003@gmail.com <i class="dot" style="display:inline-block;background:var(--pos)"></i></b></span></div>
-    <div class="mrow"><span class="mi">${I.tg}</span><span class="tx"><i>Telegram</i></span>
-      <button class="act" data-toast="Привязка Telegram через @PromminerAlertbot">${I.edit}</button></div>
+    ${['phone','mail','tg'].map(contactRow).join('')}
       </div></div>
     </div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn" data-close data-toast="Данные успешно изменены">Сохранить</button>`},
-  phone:{t:'Добавить номер телефона',steps:2,cta:'Продолжить',ok:'Номер телефона добавлен',b:(m,step)=>step===0?`
-    <div class="phonefield"><span class="pre">+7</span><input placeholder="(999) 999-99-99"></div>
-    <p class="cap dim" style="margin-top:10px">Вы сможете авторизовываться по номеру телефона и паролю</p>`
-    :`<div class="mcode"><b>Подтвердите действие</b>
-      <p>Мы отправили код подтверждения на указанный вами email<br>ivanivanov2003@gmail.com</p></div>
-    <div class="afield"><input placeholder="Код подтверждения"></div>
-    <div style="text-align:center;margin-top:12px"><button class="btn link" data-toast="Код вставлен из буфера">Вставить код</button></div>
-    <div style="text-align:center;margin-top:4px"><span class="cap dim">Запросить новый код через 00:59</span></div>`},
   /* Создать и изменить наблюдателя — один макет с разными заголовками
      (2219:32420 и 2219:32311): описание со счётчиком, списки чекбоксов, срок действия */
   observer:{t:'Создать ссылку наблюдателя',acts:false,b:()=>obsForm(''),
@@ -1293,6 +1381,8 @@ const MODALS={
       <button class="btn" data-close data-toast="Изменения сохранены">Сохранить</button>`},
 };
 
+
+Object.assign(MODALS, contactModals());
 
 /* ===== Попоуверы хедера (из секции 8 архива) ===== */
 /* Попоувер уведомлений — по проду: заголовок + «Прочитать все», список,
@@ -1345,7 +1435,7 @@ export function applyState(next){
   pop = next.pop; modal = next.modal; openGroups = next.openGroups; mini = next.mini;
 }
 export {
-  AXES, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
+  AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON,
   NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VERIF_FIELDS,

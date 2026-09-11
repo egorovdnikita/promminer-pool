@@ -411,6 +411,15 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mbody.nofoot{padding-bottom:24px}
 .mbody:empty{display:none}
 .mfoot{display:flex;gap:8px;padding:24px;flex:0 0 auto}
+/* Подтверждения в макетах уже 500, а не 550 */
+.modal.sm{max-width:500px}
+/* Input Phone: код страны отдельной плашкой 49×48 */
+.inpphone{display:flex;align-items:center;gap:12px;height:56px;padding:4px 12px 4px 4px;
+  border-radius:var(--r-m);background:var(--ctrl)}
+.inpphone .pre{display:grid;place-items:center;width:49px;height:48px;border-radius:var(--r-s);
+  background:var(--ctrl2);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;flex:0 0 auto}
+.inpphone input{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.inpphone:focus-within{box-shadow:0 0 0 3px var(--focus)}
 .mfoot .btn{flex:1;justify-content:center;height:56px;border-radius:var(--r-m);
   font-size:var(--fs-m);line-height:var(--lh-m)}
 /* Шапка-иллюстрация: баннер 542×144 с отступом 4 и крестиком поверх */
@@ -500,7 +509,27 @@ body.mini .ni .spacer.lbl{display:none!important}
 
 /* scenario panel */
 .sct{position:fixed;right:18px;bottom:18px;z-index:80;height:44px;padding:0 18px;border-radius:var(--r-f);background:var(--inv-bg);color:var(--inv-fg);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;box-shadow:0 8px 28px #1a1a1a3d;display:flex;align-items:center;gap:8px}
-.sc{position:fixed;right:0;top:0;bottom:0;width:330px;z-index:81;background:var(--surface);box-shadow:-8px 0 40px #1a1a1a29;padding:18px;overflow-y:auto;transform:translateX(100%);transition:transform .22s}
+.sc{position:fixed;right:0;top:0;bottom:0;width:380px;z-index:81;background:var(--surface);box-shadow:-8px 0 40px #1a1a1a29;padding:18px;overflow-y:auto;transform:translateX(100%);transition:transform .22s}
+.schead{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.schead h3{flex:1}
+/* Поиск по состояниям и экранам — осей уже полтора десятка */
+.scsearch{height:36px;padding:0 12px;border-radius:var(--r-s);background:var(--ctrl);margin-bottom:16px;
+  font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500}
+.scsearch:focus{box-shadow:0 0 0 3px var(--focus)}
+.scsec{border-top:1px solid var(--border);padding-top:12px;margin-bottom:4px}
+.scsect{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:700;color:var(--c1);
+  text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+/* Готовые связки: название и пояснение */
+.scp{display:flex;flex-direction:column;gap:6px}
+.scp button{text-align:left;padding:8px 10px;border-radius:var(--r-s);background:var(--bg)}
+.scp button:hover{background:var(--ctrl)}
+.scp b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.scp i{display:block;font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
+/* Изменённая относительно значения по умолчанию ось помечена точкой */
+.scg.dirty>label::after{content:'';display:inline-block;width:6px;height:6px;margin-left:6px;
+  border-radius:50%;background:var(--accent);vertical-align:middle}
+.sct .bdg{margin-left:2px;background:var(--accent)}
+.scf button:disabled{opacity:.45;cursor:default}
 .sc.open{transform:none}
 .sc h3{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .sc .hint{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:600;margin-bottom:16px}
@@ -509,8 +538,10 @@ body.mini .ni .spacer.lbl{display:none!important}
 .sco{display:flex;flex-wrap:wrap;gap:6px}
 .sco button{padding:7px 11px;border-radius:var(--r-2xs);background:var(--bg);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--c2)}
 .sco button.on{background:var(--accent);color:#fff}
-.scx{position:absolute;right:14px;top:12px;color:var(--c3);font-size:22px}
-.scf{border-top:1px solid var(--border);padding-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+.scx{color:var(--c3);font-size:22px;width:28px;height:28px;border-radius:var(--r-f);flex:0 0 auto}
+.scx:hover{background:var(--ctrl)}
+.scf{border-top:1px solid var(--border);padding-top:14px;margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;
+  position:sticky;bottom:-18px;background:var(--surface);padding-bottom:18px}
 .scf button{padding:8px 12px;border-radius:var(--r-2xs);background:var(--bg);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600}
 /* ===== СОСТОЯНИЯ И ИНТЕРАКТИВ ===== */
 .btn,.chip,.seg button,.ib,.ni,.kid,.cb,.tog,.tile,.pop button,.pager .pg button{transition:background .15s,color .15s,box-shadow .15s,border-color .15s,opacity .15s}
