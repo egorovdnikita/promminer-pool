@@ -15,6 +15,7 @@ export interface Scenario {
   phone: string
   mail: string
   tg: string
+  cerr: string
 }
 
 /** Эфемерное состояние интерфейса — в ссылку не попадает. */

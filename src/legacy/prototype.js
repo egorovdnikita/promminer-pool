@@ -26,6 +26,7 @@ const AXES={
   phone:{g:'Контакты',label:'Телефон',opts:[['yes','Привязан'],['no','Не привязан']]},
   mail:{g:'Контакты',label:'Почта',opts:[['yes','Привязана'],['no','Не привязана']]},
   tg:{g:'Контакты',label:'Telegram',opts:[['no','Не привязан'],['yes','Привязан']]},
+  cerr:{g:'Контакты',label:'Ошибка в поле контакта',opts:[['no','Нет'],['req','Не заполнено'],['busy','Занято / нет бота'],['fmt','Неверный формат']]},
 };
 /* Готовые связки состояний — один клик вместо десяти переключателей */
 const PRESETS=[
@@ -39,7 +40,7 @@ const PRESETS=[
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
 const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
-  phone:'no',mail:'yes',tg:'no'};
+  phone:'no',mail:'yes',tg:'no',cerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
 let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
@@ -1163,22 +1164,25 @@ const CONTACTS={
     ask:'Отвязать номер телефона?',unlink:'Отвязать номер телефона',
     hint:'Вы сможете авторизовываться по номеру телефона и паролю.',
     askText:'Вы больше не сможете авторизовываться по номеру телефона и паролю, и больше не будет приходить код 2FA',
-    okAdd:'Номер телефона добавлен',okEdit:'Номер телефона изменён',okDel:'Номер телефона отвязан',
-    field:v=>`<div class="inpphone"><span class="pre">+7</span><input placeholder="(999) 999-99-99" ${v?`value="${v}"`:''}></div>`},
+    okAdd:'Номер телефона успешно добавлен',okEdit:'Номер телефона успешно изменен',
+    okDel:'Номер телефона успешно отвязан',
+    hint2:'Обратите внимание, при добавлении номера телефона вам будет приходить код 2FA.',
+    field:(v,e)=>`<div class="inpphone ${e?'err':''}"><span class="pre">+7</span>
+      <input placeholder="(999) 999-99-99" ${v?`value="${v}"`:''}></div>`},
   mail:{label:'Почта',ico:()=>I.mail,val:'ivanivanov2003@gmail.com',
     add:'Добавить почту',edit:'Изменить почту',
     ask:'Отвязать Email?',unlink:'Отвязать почту',
     hint:'Вы сможете авторизовываться по Email и паролю.',
     hint2:'Вы сможете получать уведомления на ваш Email.',
     askText:'Вы больше не сможете авторизовываться по Email и паролю, и больше не будет приходить код 2FA',
-    okAdd:'Почта добавлена',okEdit:'Почта изменена',okDel:'Почта отвязана',
-    field:v=>`<div class="inp" style="margin:0"><input placeholder="Email" ${v?`value="${v}"`:''}></div>`},
+    okAdd:'Email успешно добавлен',okEdit:'Email успешно изменен',okDel:'Email успешно отвязан',
+    field:(v,e)=>`<div class="inp ${e?'err':''}" style="margin:0"><input placeholder="Email" ${v?`value="${v}"`:''}></div>`},
   tg:{label:'Telegram',ico:()=>I.tg,val:'@ivanivanov2003',
     add:'Привязка Telegram',edit:'Изменение Telegram',
     ask:'Отвязать Telegram?',
     askText:'При отвязке Telegram-аккаунта вы не сможете получать уведомления от нашего TG-бота.',
     okAdd:'Telegram привязан',okEdit:'Telegram изменён',okDel:'Telegram отвязан',
-    field:v=>`<div class="inp" style="margin:0"><input placeholder="Telegram" ${v?`value="${v}"`:''}></div>`}
+    field:(v,e)=>`<div class="inp ${e?'err':''}" style="margin:0"><input placeholder="Telegram" ${v?`value="${v}"`:''}></div>`}
 };
 /* Строка контакта в «Личных данных»: пусто — плюс, привязано — меню */
 const contactRow=k=>{const c=CONTACTS[k], on=S[k]==='yes';
@@ -1191,49 +1195,80 @@ const contactRow=k=>{const c=CONTACTS[k], on=S[k]==='yes';
         <button class="del" data-modal="${k}unlink">${I.tr}Отвязать</button></div>`:''}</span>`
     :`<button class="act spacer" data-modal="${k}add">${I.pl}</button>`}</div>`;
 };
-/* Шаг с кодом — общий для добавления, изменения и отвязки */
-const codeStep=()=>`<div class="mstack" style="gap:32px;align-items:center">
-  <div style="display:flex;flex-direction:column;gap:24px;align-items:center">
-    <div class="msec">Введите код</div>
-    <div class="otp">${[0,1,2,3].map(i=>`<span class="otpc ${i===0?'cur':''}" tabindex="0">${i===0?'':'·'}</span>`).join('')}</div>
-  </div>
-  <button class="btn link" disabled>Запросить новый код через 00:59</button>
+/* Ошибки полей — переключаются осью cerr */
+const CERR={req:'Поле обязательно для заполнения',
+  busy:{phone:'Номер занят другим пользователем',mail:'Email занят другим пользователем',tg:'Аккаунт не привязан к боту'},
+  fmt:'Некорректный формат'};
+const cerrText=k=>{const e=S.cerr; if(!e||e==='no')return '';
+  const v=CERR[e]; return typeof v==='string'?v:(v&&v[k])||''; };
+/* Куда уходит код: смена почты подтверждается телефоном и наоборот */
+const CH={phone:{word:'номер',val:'+7 999 999-99-99',paste:0},
+          mail:{word:'email',val:'ivanivanov2003@gmail.com',paste:1}};
+const OTHER={phone:'mail',mail:'phone'};
+/* Экран ввода кода: заголовок, куда отправили, ячейки и таймер */
+const codeBlock=(title,c)=>`<div class="ccode">
+  <b class="msec">${title}</b>
+  <p class="mtext mut">Мы отправили код подтверждения<br>на указанный вами ${c.word}</p>
+  <p class="mtext">${c.val}</p>
+  <div class="otp">${[0,1,2,3].map(i=>`<span class="otpc ${i===0?'cur':''}" tabindex="0">${i===0?'':'·'}</span>`).join('')}</div>
+  ${c.paste?`<button class="btn link" data-toast="Код вставлен из буфера">Вставить код</button>`:''}
+  <button class="btn link">Запросить новый код через 00:59</button>
 </div>`;
-const prog=n=>`<div class="mprog">${[0,1].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</div>`;
-/* Модалки контактов собираются по одному образцу */
+const doneBlock=t=>`<div class="ccode" style="padding-top:40px"><b class="msec">${t}</b></div>`;
+const prog=(cur,n)=>`<div class="mprog">${Array.from({length:n},(_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('')}</div>`;
+/* Модалки контактов. Телефон и почта: 4 шага на добавление и изменение
+   (подтверждение по второму каналу → значение → код → успех) и 3 на отвязку.
+   У Telegram шагов нет — бот, поле и ошибки. */
 function contactModals(){
   const out={};
+  const foot=(l,r,attr='')=>`<button class="btn out" data-close>${l}</button>
+    <button class="btn" ${attr}>${r}</button>`;
   for(const k of Object.keys(CONTACTS)){
-    const c=CONTACTS[k], steps=k==='tg'?0:2;
-    const form=(v)=>`<div class="mstack">
-      ${steps?prog(0):''}
-      ${k==='tg'?`<p class="mtext">Для ${v?'изменения':'получения уведомлений в'} Telegram
-        <button class="lnk" style="color:var(--accent)" data-toast="Открываем @PromminerAlertbot">${v?'перейдите в бота':'подключите бота'}</button>
-        и ${v?'измените':'добавьте'} свой аккаунт ниже</p>`:''}
-      ${c.field(v)}
-      ${c.hint?`<div class="mhints"><span>${c.hint}</span>${c.hint2?`<span>${c.hint2}</span>`:''}</div>`:''}
-    </div>`;
-    const pair=(ok,cta)=>`<button class="btn out" data-close>Отменить</button>
-      <button class="btn" data-close data-axis="${k}" data-val="yes" data-toast="${ok}">${cta}</button>`;
-    const img=k==='tg'?{img:'/modal-tg.png'}:{};
-    out[k+'add']={t:c.add,acts:false,...img,
-      b:(m,step)=>steps&&step===1?`${prog(1)}${codeStep()}`:form(''),
-      foot:(m,step)=>steps&&step===0
-        ? `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="1">Подтвердить</button>`
-        : pair(c.okAdd,k==='tg'?'Сохранить':'Подтвердить')};
-    out[k+'edit']={t:c.edit||c.add,acts:false,...img,
-      b:(m,step)=>steps&&step===1?`${prog(1)}${codeStep()}`:form(c.val),
-      foot:(m,step)=>steps&&step===0
-        ? `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="1">Подтвердить</button>`
-        : pair(c.okEdit,'Сохранить')};
+    const c=CONTACTS[k];
+    const err=()=>{const t=cerrText(k); return t?`<div class="errmsg">${t}</div>`:''};
+    const hints=()=>c.hint?`<div class="mhints"><span>${c.hint}</span>${c.hint2?`<span>${c.hint2}</span>`:''}</div>`:'';
+    const value=v=>`<div class="mstack">${c.field(v,!!cerrText(k))}${err()}${hints()}</div>`;
+
+    if(k==='tg'){
+      const body=v=>`<div class="mstack">
+        <p class="mtext">${v?'Для изменения Telegram':'Для получения уведомлений в Telegram'}
+          <button class="lnk" style="color:var(--accent)" data-toast="Открываем @PromminerAlertbot">${v?'перейдите в бота':'подключите бота'}</button>
+          ${v?'и измените свой аккаунт ниже':'и добавьте свой аккаунт ниже'}</p>
+        ${c.field(v,!!cerrText(k))}${err()}</div>`;
+      out.tgadd={t:c.add,img:'/modal-tg.png',acts:false,b:()=>body(''),
+        foot:()=>foot('Отменить','Сохранить',`data-close data-axis="tg" data-val="yes" data-toast="${c.okAdd}"`)};
+      out.tgedit={t:c.edit,img:'/modal-tg.png',acts:false,b:()=>body(c.val),
+        foot:()=>foot('Отменить','Сохранить',`data-close data-axis="tg" data-val="yes" data-toast="${c.okEdit}"`)};
+      out.tgunlink={t:c.ask,img:'/modal-delete.png',size:'sm',acts:false,
+        b:()=>`<div class="mstack"><p class="mtext">${c.askText}</p></div>`,
+        foot:()=>`<button class="btn out" data-close>Отменить</button>
+          <button class="btn danger" data-close data-axis="tg" data-val="no" data-toast="${c.okDel}">Отвязать</button>`};
+      continue;
+    }
+    const o=CH[OTHER[k]], self=CH[k];
+    /* Добавление и изменение: 4 шага */
+    const four=(title,ok,cta)=>({t:title,acts:false,
+      b:(m,step)=>step===0?`${prog(0,4)}${codeBlock('Подтвердите действие',o)}`
+        :step===1?`${prog(1,4)}${value(title===c.edit?c.val:'')}`
+        :step===2?`${prog(2,4)}${codeBlock('Введите код',self)}`
+        :`${prog(3,4)}${doneBlock(ok)}`,
+      foot:(m,step)=>step===0?foot('Отменить','Далее','data-step="1"')
+        :step===1?foot('Отменить','Подтвердить','data-step="2"')
+        :step===2?foot('Отменить',cta,'data-step="3"')
+        :`<button class="btn" data-close data-axis="${k}" data-val="yes" data-toast="${ok}">Отлично</button>`});
+    out[k+'add']=four(c.add,c.okAdd,'Добавить');
+    out[k+'edit']=four(c.edit,c.okEdit,'Изменить');
+    /* Отвязка: красное подтверждение и три шага */
     out[k+'unlink']={t:c.ask,img:'/modal-delete.png',size:'sm',acts:false,
       b:()=>`<div class="mstack"><p class="mtext">${c.askText}</p></div>`,
       foot:()=>`<button class="btn out" data-close>Отменить</button>
-        <button class="btn danger" ${k==='tg'?`data-close data-axis="${k}" data-val="no" data-toast="${c.okDel}"`:'data-modal="'+k+'code"'}>Отвязать</button>`};
-    if(k!=='tg') out[k+'code']={t:c.unlink,acts:false,
-      b:()=>`${prog(1)}${codeStep()}`,
-      foot:()=>`<button class="btn out" data-close>Отменить</button>
-        <button class="btn" data-close data-axis="${k}" data-val="no" data-toast="${c.okDel}">Далее</button>`};
+        <button class="btn danger" data-modal="${k}code">Отвязать</button>`};
+    out[k+'code']={t:c.unlink,acts:false,
+      b:(m,step)=>step===0?`${prog(0,3)}${codeBlock('Подтвердите действие',o)}`
+        :step===1?`${prog(1,3)}${codeBlock('Введите код',self)}`
+        :`${prog(2,3)}${doneBlock(c.okDel)}`,
+      foot:(m,step)=>step<2?foot('Отменить','Далее',`data-step="${step+1}"`)
+        :`<button class="btn" data-close data-axis="${k}" data-val="no" data-toast="${c.okDel}">Отлично</button>`};
   }
   return out;
 }

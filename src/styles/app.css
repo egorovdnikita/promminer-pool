@@ -380,7 +380,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .afield:focus-within{background:var(--surface);border-color:var(--border)}
 .afield.err{background:#ef444414}
 .afield.err:focus-within{background:var(--surface);border-color:var(--neg)}
-.afield+.errmsg{display:block;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--neg);font-weight:500;margin:6px 0 0 12px}
+.errmsg{display:block;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--neg);font-weight:500}
+.afield+.errmsg{font-size:var(--fs-c);line-height:var(--lh-c);margin:6px 0 0 12px}
 .afield input{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .afield input::placeholder{color:var(--c3);font-weight:600}
 .aeye{color:var(--c3);display:flex}.aeye:hover{color:var(--c1)}
@@ -411,7 +412,7 @@ body.mini .ni .spacer.lbl{display:none!important}
    контента одинакова и со скроллом, и без него. */
 .mbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:0 calc(24px - var(--sbw)) 0 24px}
 .mbody.nofoot{padding-bottom:24px}
-.mbody.over{overflow:visible}
+.mbody.over{overflow:visible;padding-right:24px}
 .mbody:empty{display:none}
 .mfoot{display:flex;gap:8px;padding:24px;flex:0 0 auto}
 /* Подтверждения в макетах уже 500, а не 550 */
@@ -423,6 +424,11 @@ body.mini .ni .spacer.lbl{display:none!important}
   background:var(--ctrl2);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;flex:0 0 auto}
 .inpphone input{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .inpphone:focus-within{box-shadow:0 0 0 3px var(--focus)}
+.inpphone.err,.inp.err{box-shadow:0 0 0 1px var(--neg) inset}
+/* Экран ввода кода и успеха — по центру */
+.ccode{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;padding:8px 0}
+.ccode .otp{margin:8px 0}
+.ccode .btn.link{height:auto}
 .mfoot .btn{flex:1;justify-content:center;height:56px;border-radius:var(--r-m);
   font-size:var(--fs-m);line-height:var(--lh-m)}
 /* Шапка-иллюстрация: баннер 542×144 с отступом 4 и крестиком поверх */
