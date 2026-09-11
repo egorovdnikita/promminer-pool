@@ -181,6 +181,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 
 /* cards */
 .grid{display:grid;gap:12px;margin-bottom:12px}
+.grid>*{min-width:0}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -328,9 +329,11 @@ body.mini .ni .spacer.lbl{display:none!important}
 .urlrow .k{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
 .urlrow .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .linkrow{display:flex;align-items:center;gap:8px;color:var(--c1);background:var(--accent-sub);border-radius:var(--r-m);padding:12px;min-height:var(--h-field);margin-bottom:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
+/* Баннер из макета 1981:32563: градиент, угловая фигура и иллюстрация с выносом за край */
 .promo{background:linear-gradient(115deg,#dfe3fb,#eef0fd 45%,#e4e8fc);border-radius:var(--r-l);padding:24px;position:relative;overflow:hidden;box-shadow:none;display:flex;flex-direction:column;min-height:188px}
-.promo h2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;max-width:58%;position:relative;color:var(--c1)}
-.promo .art{position:absolute;right:0;bottom:0;height:100%;width:auto;object-fit:contain;object-position:right bottom;pointer-events:none}
+.promo::before{content:'';position:absolute;inset:0;background:url('/banner-shape.svg') right center/auto 200% no-repeat;opacity:.55;pointer-events:none}
+.promo h2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;max-width:54%;position:relative;color:var(--c1)}
+.promo .art{position:absolute;right:0;bottom:0;height:113%;width:auto;max-width:46%;object-fit:contain;object-position:right bottom;pointer-events:none}
 .promo .pclose{position:absolute;right:16px;top:16px;z-index:1;width:40px;height:40px;border-radius:var(--r-f);display:grid;place-items:center;background:#52525229;color:var(--c1)}
 .promo .pclose:hover{background:#5252523d}
 .promo .pclose svg{width:24px;height:24px}
@@ -634,6 +637,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 :root[data-theme="dark"] .linkfield{background:var(--ctrl2)}
 :root[data-theme="dark"] .badge{color:#fbbf24}
 @media(max-width:1450px){.main .grid.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1750px){.main .promos.g2{grid-template-columns:1fr}}
 @media(max-width:1150px){.main .g3,.main .g4,.main .cols2{grid-template-columns:1fr!important}.sb{display:none}}
 
 /* Tooltip (💙 DS): подсказка на [data-tip], по умолчанию снизу. */
@@ -694,6 +698,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Уведомления в попоувере: без подложки, строки разделены снизу (макет «Оболочки») */
 .nplist{display:flex;flex-direction:column;margin:4px 0 16px}
 .nitem{display:grid;grid-template-columns:8px 1fr;gap:12px;padding:14px 0;align-items:start}
+.nitem>div{min-width:0}
 .nitem+.nitem{border-top:1px solid var(--border)}
 .nitem>.dot{width:8px;height:8px;margin-top:5px;background:var(--accent)}
 .nitem.read>.dot{background:transparent}

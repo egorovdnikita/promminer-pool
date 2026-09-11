@@ -913,7 +913,7 @@ V.profile=m=>{
           <b>У вас еще нет созданных ссылок наблюдателей</b>
           ${S.role==='owner'&&!noname?`<button class="btn out sm" style="margin-top:16px" data-modal="observer">${I.pl} Создать</button>`:''}</div>`}`)}
     <div style="height:12px"></div>
-    <div class="grid ${noname?'':'g2'}" style="margin:0">
+    <div class="grid promos ${noname?'':'g2'}" style="margin:0">
       ${(noname?PROMOS.slice(1):PROMOS).map(([t,b,img])=>`<section class="promo"><img class="art" src="${img}" alt="">
         <button class="pclose" data-toast="Баннер скрыт">${I.x}</button>
         <h2>${t}</h2><button class="btn">${b}</button></section>`).join('')}
