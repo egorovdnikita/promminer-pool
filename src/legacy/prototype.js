@@ -822,7 +822,7 @@ V.refpayouts=m=>V.payouts(m);
 
 /* --- Профиль --- */
 /* Порядок и подписи — как в выпадающем меню на проде */
-const PROF=[['profile','Мой профиль','user'],['security','Безопасность','lock'],['verification','Верификация и реквизиты','doc'],
+const PROF=[['profile','Сводка','user'],['security','Безопасность','lock'],['verification','Верификация и реквизиты','doc'],
   ['subaccounts','Центр суб-аккаунтов','ref'],['observers','Наблюдатели','eye'],['notifsettings','Уведомления','bell']];
 
 /* ===== Данные раздела «Личный кабинет» — один источник для сводки и вкладок ===== */
@@ -886,16 +886,26 @@ const subsOf=m=>{
   return U.arch?act.concat(SUBS.filter(x=>x.arch)):act;
 };
 const OBS_N={many:6,few:2,none:0};
-/* без имени аккаунта ссылок наблюдателя быть не может */
-const obsOf=m=>(m.empty||S.name==='no')?[]:OBSERVERS.slice(0,OBS_N[S.obs]??6);
+/* без имени аккаунта ссылок наблюдателя быть не может;
+   под суб-аккаунтом видны только его ссылки (макет 1346:48963) */
+const obsOf=m=>{
+  if(m.empty||S.name==='no') return [];
+  const all=OBSERVERS.slice(0,OBS_N[S.obs]??6);
+  /* у суб-аккаунта свои ссылки и выбора аккаунта в них нет — чипа «+N» тоже */
+  return S.acct==='sub'?all.slice(0,2).map(o=>({...o,name:'alfred',extra:0})):all;
+};
 const SESS_N={one:1,few:2,many:6};
 const sessOf=m=>SESSIONS.slice(0,m.empty?1:(SESS_N[S.sess]??6));
 /* Вкладки — Segment Control из макета: общий контейнер, белый активный сегмент.
    Счётчики показываются и при нуле (в макете «Наблюдатели 0»). */
 /* счётчик вкладки — без архивных: в макете он не меняется от тогла */
+/* Под суб-аккаунтом доступны только сводка, наблюдатели и уведомления
+   (макет 1346:48963) */
+const SUB_TABS=['profile','observers','notifsettings'];
 const profTabs=(cur,m)=>{const n={subaccounts:subsOf(m).filter(x=>!x.arch).length,observers:obsOf(m).length};
   const nn=NOTIF_N[S.notif];
-  return `<div class="seg tabseg">${PROF.map(([id,t])=>`<button class="${cur===id?'on':''}" data-go="${id}">${t}${
+  const tabs=S.acct==='sub'?PROF.filter(([id])=>SUB_TABS.includes(id)):PROF;
+  return `<div class="seg tabseg">${tabs.map(([id,t])=>`<button class="${cur===id?'on':''}" data-go="${id}">${t}${
     id==='notifsettings'&&nn?`<span class="cnt">${nn>99?'99+':nn}</span>`:''}${id in n?`<u>${n[id]}</u>`:''}</button>`).join('')}</div>`};
 
 function subTile(m,s){

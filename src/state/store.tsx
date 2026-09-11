@@ -306,7 +306,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const gp = at('[data-grp]')
     if (gp) { const g = gp.dataset.grp!; openGroups.current[g] = !openGroups.current[g]; return bump() }
     const ac = at('[data-acct]')
-    if (ac) { S.current.acct = ac.dataset.acct!; pop.current = null; return bump() }
+    if (ac) {
+      S.current.acct = ac.dataset.acct!
+      pop.current = null
+      /* под суб-аккаунтом часть разделов профиля недоступна — уводим на сводку */
+      if (S.current.acct === 'sub' && ['security', 'verification', 'subaccounts'].includes(route)) go('profile')
+      return bump()
+    }
     const pp = at('[data-pop]')
     if (pp) { pop.current = pop.current === pp.dataset.pop ? null : pp.dataset.pop!; return bump() }
     const eye = at('[data-eye]')
