@@ -276,6 +276,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .tag.sel{background:var(--accent);color:#fff}
 .tag.sel.y{background:#f59e0b}.tag.sel.g{background:#22c55e}
 .tag.sel.r{background:#ef4444}.tag.sel.b{background:#3b82f6}.tag.sel.n{background:#6b7280}
+.tag.sm{height:24px;padding:0 10px}
 .tag .x{margin-left:2px;display:flex;opacity:.7}
 /* Status (💙 DS 214:4829): высота 24, radius 8, 12/16 Bold, точка 8. */
 .status{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:var(--r-xs);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:700;white-space:nowrap}
@@ -320,9 +321,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .promo{background:linear-gradient(115deg,#dfe3fb,#eef0fd 45%,#e4e8fc);border-radius:var(--r-l);padding:24px;position:relative;overflow:hidden;box-shadow:none;display:flex;flex-direction:column;min-height:188px}
 .promo h2{font-size:20px;line-height:26px;font-weight:600;max-width:58%;position:relative;color:var(--c1)}
 .promo .art{position:absolute;right:0;bottom:0;height:100%;width:auto;object-fit:contain;object-position:right bottom;pointer-events:none}
-.promo .pclose{position:absolute;right:16px;top:16px;z-index:1;width:32px;height:32px;border-radius:var(--r-f);display:grid;place-items:center;background:#ffffffa3;color:var(--c1)}
-.promo .pclose:hover{background:#fff}
-.promo .pclose svg{width:18px;height:18px}
+.promo .pclose{position:absolute;right:16px;top:16px;z-index:1;width:40px;height:40px;border-radius:var(--r-f);display:grid;place-items:center;background:#52525229;color:var(--c1)}
+.promo .pclose:hover{background:#5252523d}
+.promo .pclose svg{width:24px;height:24px}
 .hex{width:82px;height:82px;border-radius:22px;display:grid;place-items:center;font-size:21px;font-weight:800;color:#fff;flex:0 0 auto}
 .track{margin-top:14px}
 .tbar{height:8px;border-radius:var(--r-f);background:var(--bg3);overflow:hidden}
@@ -376,8 +377,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .modal{background:var(--surface);border-radius:var(--r-l);padding:24px;width:100%;max-width:400px;box-shadow:0 24px 70px #1a1a1a3d;max-height:86vh;overflow:auto}
 .mhead{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
 .modal h2{font-size:20px;line-height:24px;font-weight:600;flex:1;min-width:0}
-.mx{width:32px;height:32px;border-radius:var(--r-f);background:var(--ctrl2);color:var(--c2);display:grid;place-items:center;flex:0 0 auto}
-.mx:hover{background:var(--ctrl);color:var(--c1)}
+.mx{width:40px;height:40px;border-radius:var(--r-f);background:var(--ctrl);color:var(--c1);display:grid;place-items:center;flex:0 0 auto}
+.mx:hover{background:var(--ctrl-hover)}
+.mx svg{width:24px;height:24px}
 .msteps{display:flex;gap:8px;margin-bottom:16px}
 .msteps i{flex:1;height:3px;border-radius:2px;background:var(--ctrl)}
 .msteps i.on{background:var(--accent)}
@@ -503,8 +505,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .dashed:hover{background:var(--ctrl)}
 .linkfield{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:var(--r-s);padding:0 8px 0 12px;height:40px;font-size:var(--fs-s);color:var(--c2);min-width:0}
 .linkfield span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cnt{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:var(--r-f);background:var(--neg);color:#fff;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600}
-.badge{display:inline-block;padding:4px 10px;border-radius:var(--r-2xs);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;background:#f59e0b29;color:#d97706}
+.badge{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:var(--r-xs);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;background:#fbbf24;color:#fff}
 /* строка «иконка — текст — шеврон» в карточке профиля */
 .rowline{display:flex;align-items:center;gap:12px;padding:12px 0;width:100%;text-align:left}
 .rowline+.rowline{border-top:1px solid var(--border)}
@@ -650,3 +651,14 @@ body.mini .ni .spacer.lbl{display:none!important}
 .sk{border-radius:var(--r-l);background:linear-gradient(90deg,var(--ctrl2) 25%,var(--ctrl) 37%,var(--ctrl2) 63%);
   background-size:400% 100%;animation:skw 1.4s ease infinite}
 @keyframes skw{0%{background-position:100% 50%}100%{background-position:0 50%}}
+
+/* Скролл: без подложки, серый ползунок, ширина зарезервирована —
+   контент не прыгает, когда полоса появляется. */
+html{scrollbar-gutter:stable}
+*{scrollbar-width:thin;scrollbar-color:#6b728052 transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#6b728052;border-radius:var(--r-f);border:3px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:#6b728080;background-clip:padding-box}
+::-webkit-scrollbar-corner{background:transparent}
+.modal,.pop,.alist,.tw,.nav,.sc{scrollbar-gutter:stable}

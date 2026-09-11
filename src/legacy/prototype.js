@@ -1128,7 +1128,7 @@ const MODALS={
     const cell=(k,v)=>`<div class="field"><div class="k">${k}</div><div class="v mono">${v}</div></div>`;
     return `<div class="empty" style="padding:4px 0 20px"><span class="avat lg">${a.name[0].toUpperCase()}</span>
         <b style="font-size:var(--fs-b1);line-height:var(--lh-b1);margin-top:12px">${a.name}</b>
-        <span class="tag ${a.main?'sel':''}" style="margin-top:6px">${a.main?'Основной':'Суб-аккаунт'}</span></div>
+        <span class="tag sm ${a.main?'sel':''}" style="margin-top:6px">${a.main?'Основной':'Суб-аккаунт'}</span></div>
       <div class="hr"></div>
       <div style="margin-top:16px">${cell('Общий баланс',nf(a.bal)+' $')}</div>
       <div class="grid g2" style="margin:8px 0 0;gap:8px">
