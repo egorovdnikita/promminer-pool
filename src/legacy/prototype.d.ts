@@ -101,3 +101,4 @@ export declare const mini: boolean
 
 /** Отдаёт движку текущее состояние React перед рендером экрана. */
 export declare function applyState(next: AppSnapshot): void
+export declare function obsOf(m: any): any[]

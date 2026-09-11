@@ -26,7 +26,7 @@ const AXES={
     ['busy','Уже занято'],['load','Проверяем']]},
   verr:{g:'Верификация',label:'Ошибка в поле',opts:[['no','Нет'],['tax','Код налоговой'],['inn','ИНН'],['bank','Банк не выбран'],['file','Файл больше 4 МБ']]},
   subs:{g:'Профиль',label:'Суб-аккаунты',opts:[['many','3'],['few','1'],['none','Только основной']]},
-  obs:{g:'Профиль',label:'Наблюдатели',opts:[['many','3'],['few','1'],['none','Нет']]},
+  obs:{g:'Профиль',label:'Наблюдатели',opts:[['many','6'],['few','2'],['none','Нет']]},
   notif:{g:'Профиль',label:'Уведомления',opts:[['many','12 новых'],['few','2 новых'],['none','Нет']]},
   tier:{g:'Профиль',label:'Уровень рефералки',opts:[['0','5%'],['1','10%'],['2','15%'],['3','20%'],['4','25%']]},
   phone:{g:'Контакты',label:'Телефон',opts:[['yes','Привязан'],['no','Не привязан']]},
@@ -52,7 +52,7 @@ const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',veri
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
+let U={seg:{},sort:{},page:{},sel:new Set(),osel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -823,16 +823,26 @@ const SUBS=[
    workers:190,btc:'600',  ltc:'0',zec:'0',created:'18.02.2026',active:1},
   {name:'ivanivanov',main:0,arch:1,bal:0,       w:[0,0,0,0],       h:[0,0,0],   inc:[0,0,0,0],
    workers:0,  btc:'0',    ltc:'0',zec:'0',created:'21.06.2024',active:0}];
+/* Наблюдатели — данные по макету 1346:48833 */
 const OBSERVERS=[
-  {name:'natarusso',extra:1,coins:['LTC','DOGE'],label:'Для бухгалтера',off:0,
-   access:['Воркеры','Мои активы','Уведомления'],term:'Бессрочно',expired:0,
-   created:'04.05.2026',last:'сегодня, 09:12',token:'a71f2c9e4b8d5f1a3c7e0b6d9f24'},
-  {name:'natarusso',extra:1,coins:['BTC','LTC'],label:'Для почтовой',off:1,
-   access:['Воркеры','Мои активы'],term:'Бессрочно',expired:0,
-   created:'04.05.2026',last:'—',token:'9c2b7e1d4a6f8c0b5e3d2a9f7c14'},
-  {name:'natarusso',extra:0,coins:['BTC','LTC'],label:'Для второго менеджера',off:0,
-   access:['Мои активы','Наблюдатели'],term:'до 13.02.2026 (истек)',expired:1,
-   created:'11.01.2026',last:'—',token:'5d8e3b2a9c1f7e4d6b0a8c3f5e21'}];
+  {name:'alfred',extra:3,coins:['BTC','LTC'],label:'Для налоговой',off:0,
+   access:['Мои активы'],term:'Бессрочно',expired:0,changed:'01/08/2025 22:12',
+   created:'01.08.2025',last:'сегодня, 09:12',token:'a71f2c9e4b8d5f1a3c7e0b6d9f24'},
+  {name:'testaccount',extra:0,coins:['LTC'],label:'Для третьего менеджера',off:0,
+   access:['Все разрешения'],term:'до 27.05.2026',expired:0,changed:'18/07/2025 12:10',
+   created:'18.07.2025',last:'—',token:'9c2b7e1d4a6f8c0b5e3d2a9f7c14'},
+  {name:'natarusso',extra:0,coins:['BTC','LTC','ZEC'],label:'Для бухгалтера',off:0,
+   access:['Воркеры','Мои активы'],term:'Бессрочно',expired:0,changed:'02/08/2025 14:23',
+   created:'02.08.2025',last:'вчера, 18:40',token:'5d8e3b2a9c1f7e4d6b0a8c3f5e21'},
+  {name:'superuser',extra:0,coins:['DOGE'],label:'Для второго менеджера',off:0,
+   access:['Воркеры'],term:'Бессрочно',expired:0,changed:'23/07/2025 09:44',
+   created:'23.07.2025',last:'—',token:'3f6a1c8e5b2d9f4a7c0e6b3d8f52'},
+  {name:'natarusso',extra:1,coins:['BTC'],label:'[auto] Для налоговой, BTC',off:0,
+   access:['Все разрешения'],term:'до 13.02.2026 (истек)',expired:1,changed:'22/07/2025 22:12',
+   created:'22.07.2025',last:'—',token:'7b4d2f9a6c3e1b8d5f0a4c7e2b93'},
+  {name:'natarusso',extra:0,coins:['LTC','DOGE'],label:'Для хостера',off:0,
+   access:['Выплаты','Продажи'],term:'Бессрочно',expired:0,changed:'17/06/2025 14:23',
+   created:'17.06.2025',last:'—',token:'2e9c5a1f8b4d6e3a0c7f2b5d9e46'}];
 /* Уведомления — один список для карточки профиля, попоувера и модалки */
 const NOTES=[
   ['Средства выведены успешно','Вывод 74,7688 DOGE на ваш аккаунт natarusso в 13:45 22.07.2025 подтвержден и отправлен','23/07/2025 12:00'],
@@ -843,7 +853,8 @@ const NOTES=[
 /* Разрешения и монеты наблюдателя — списки из макета 2219:32420 */
 const OBS_PERMS=['Воркеры','Мои активы','Начисления','Выплаты','Продажи',
   'Список рефералов','Реферальный доход','Реферальные выплаты'];
-const OBS_COINS=['BTC','LTC','DOGE','ZEC'];
+/* монеты наблюдателя — LTC и DOGE идут одной строкой (макет 1393:165559) */
+const OBS_COINS=[{label:'BTC',ico:['BTC']},{label:'LTC + DOGE',ico:['LTC','DOGE']},{label:'ZEC',ico:['ZEC']}];
 const SESSIONS=[
   {dev:'Apple Macintosh, Chrome (macOS)',ip:'89.23.14.201',loc:'Москва, Россия',when:'19/11/2025 14:30',cur:1,act:1},
   {dev:'iPhone 15, Safari (iOS)',        ip:'212.90.4.18', loc:'Санкт-Петербург, Россия',when:'19/11/2025 12:04',cur:0,act:1},
@@ -859,7 +870,8 @@ const subsOf=m=>{
   /* архивные показываются поверх лимита — тогл добавляет строки, а не подменяет их */
   return U.arch?act.concat(SUBS.filter(x=>x.arch)):act;
 };
-const obsOf=m=>m.empty?[]:OBSERVERS.slice(0,CNT[S.obs]??3);
+const OBS_N={many:6,few:2,none:0};
+const obsOf=m=>m.empty?[]:OBSERVERS.slice(0,OBS_N[S.obs]??6);
 const SESS_N={one:1,few:2,many:6};
 const sessOf=m=>SESSIONS.slice(0,m.empty?1:(SESS_N[S.sess]??6));
 /* Вкладки — Segment Control из макета: общий контейнер, белый активный сегмент.
@@ -888,12 +900,14 @@ function obsList(label,items,two){
   return `<div class="mlist"><div class="ch"><span class="lb">${label}</span>
     <button class="btn link bs" data-toast="Выбрано всё">Выбрать все</button></div>
     <div class="opts ${two?'c2':''}">${items.map((t,i)=>
-      `<label>${cb(i<2)}<span class="ell">${t}</span></label>`).join('')}</div></div>`;
+      `<label>${cb(i<2)}${t.ico?`<span class="coins">${t.ico.map(c=>COIN_ICON[c]).join('')}</span>`:''}
+        <span class="ell">${t.label??t}</span>${t.badge?`<span class="badge acc on">${t.badge}</span>`:''}</label>`).join('')}</div></div>`;
 }
 function obsForm(desc){
-  const accs=SUBS.filter(x=>!x.arch).map(a=>a.name);
+  /* аккаунты списком в две колонки, у основного — бейдж (макет 1393:165559) */
+  const accs=SUBS.filter(x=>!x.arch).map(a=>({label:a.name,badge:a.main?'Основной':''}));
   return `<div class="mstack">
-    <div class="mprog"><i class="on"></i><i></i></div>
+    ${prog(0,3)}
     <div class="marea"><div class="box ${desc?'':'dim'}">${desc||'Описание'}</div>
       <div class="cnt2">${(desc||'').length}/100</div></div>
     ${obsList('Аккаунт',accs,true)}
@@ -930,7 +944,8 @@ const PROMOS=[['Снизили порог для<br>продажи ЦВ до 10 
 V.profile=m=>{
   const acct=S.acct==='main'?'natarusso':'alfred';
   const n=NOTIF_N[S.notif];
-  const subs=subsOf(m).filter(x=>!x.arch), obs=obsOf(m);
+  /* в сводке показываются первые три — остальные за «Смотреть все» */
+  const subs=subsOf(m).filter(x=>!x.arch), obs=obsOf(m).slice(0,3);
   const noname=S.name==='no';
   const notes=NOTES;
   return `<div class="grid cols2" style="grid-template-columns:1.9fr 1fr;align-items:start">
@@ -1118,21 +1133,49 @@ V.subaccounts=m=>{
 
 V.observers=m=>{
   const rows=obsOf(m);
-  return `${card(`<div class="ch"><h2>Наблюдатели</h2><div class="spacer"></div>
-  <button class="btn" data-modal="observer" ${S.role==='observer'?'disabled':''}>${I.pl} Создать ссылку</button></div>
-  <p class="cap dim" style="margin-bottom:12px">Наблюдатель открывает ссылку без пароля и видит выбранные разделы только для чтения — без доступа к выводу средств и настройкам</p>
-  ${rows.length?`<div class="tw"><table class="tbl"><thead><tr><th>Название</th><th>Монеты</th><th>Ссылка</th>
-    <th>Доступ</th><th>Срок</th><th>Создана</th><th>Последний вход</th><th></th></tr></thead><tbody>
-  ${rows.map(o=>{const url=LINKS.watcher(o.token);return `<tr><td><b>${o.label}</b>${o.off?' <span class="tag n">Выключена</span>':''}</td>
-      <td><span class="row" style="gap:4px">${o.coins.map(c=>COIN_ICON[c]).join('')}</span></td>
-      <td class="mono mut"><button class="lnk" data-copy="${url}">${url.slice(0,42)}… <span style="color:var(--accent)">${I.cp}</span></button></td>
-      <td><span class="row" style="gap:4px;flex-wrap:wrap">${o.access.map(t=>`<span class="tag n">${t}</span>`).join('')}</span></td>
-      <td class="${o.expired?'':'mut'}" style="${o.expired?'color:var(--neg)':''}">${o.term}</td>
-      <td class="mono mut">${o.created}</td><td class="mut">${o.last}</td>
-      <td class="num"><span class="row" style="gap:4px;justify-content:flex-end">
-        <button class="ibr dim" data-modal="obsedit" title="Изменить">${I.edit}</button>
-        <button class="ibr dim" data-modal="obsdel" title="Удалить">${I.tr}</button></span></td></tr>`}).join('')}
-  </tbody></table></div>`:emptyBox('Наблюдателей пока нет','Создайте ссылку, чтобы дать бухгалтеру или партнеру доступ к статистике только для чтения')}`)}`};
+  const head=`<div class="ch subhead"><h2>Мои наблюдатели</h2><div class="spacer"></div>
+    <button class="btn" data-modal="observer" ${S.role==='observer'?'disabled':''}>${I.pl} Создать ссылку</button></div>`;
+  const cols=['Аккаунт','Изменен','URL-адрес','Описание','Монеты','Разрешения','Срок действия'];
+  const sel=U.osel, allSel=rows.length&&rows.every((_,i)=>sel.has(i));
+  if(!rows.length) return card(`${head}
+    <div class="tw"><table class="tbl obstbl"><thead><tr>
+      <th class="cbc">${cb(false)}</th>${cols.map(c=>`<th>${c}</th>`).join('')}<th></th>
+    </tr></thead></table></div>
+    <div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
+      <b>Наблюдателей пока нет</b>
+      <p>У вас еще нет созданных ссылок<br>наблюдателей</p></div>`,'tblcard');
+  return card(`${head}
+  ${sel.size?`<div class="obulk"><b>Выбрано элементов: ${sel.size}</b><div class="spacer"></div>
+    <button class="btn link" data-oselclear>Очистить выбор</button>
+    <button class="btn danger sm" data-modal="obsdel">Удалить</button></div>`:''}
+  <div class="tw"><table class="tbl obstbl">
+  <thead><tr><th class="cbc">${cb(allSel,'data-oselall')}</th>
+    <th>Аккаунт</th>${sortTh('obs-chg','Изменен')}<th>URL-адрес</th><th>Описание</th>
+    <th>Монеты</th><th>Разрешения</th>${sortTh('obs-term','Срок действия')}<th></th></tr></thead>
+  <tbody>${rows.map((o,i)=>{const url=LINKS.watcher(o.token);
+    const rest=o.access.length-1;
+    return `<tr><td class="cbc">${cb(sel.has(i),'data-osel="'+i+'"')}</td>
+    <td><span class="row" style="gap:8px"><span class="ell">${o.name}</span>
+      ${o.extra?`<span class="chipn" data-tip="и ещё ${o.extra} ${o.extra===1?'аккаунт':'аккаунта'}">+${o.extra}</span>`:''}</span></td>
+    <td class="mut">${o.changed}</td>
+    <td class="mut"><span class="ell" style="max-width:180px;display:inline-block;vertical-align:middle">${url}</span></td>
+    <td><span class="ell" style="max-width:180px;display:inline-block;vertical-align:middle">${o.label}</span></td>
+    <td><span class="row" style="gap:4px">${o.coins.slice(0,2).map(c=>`<span class="coin1">${COIN_ICON[c]}${c}</span>`).join('')}
+      ${o.coins.length>2?`<span class="chipn" data-tip="${o.coins.slice(2).join(', ')}">+${o.coins.length-2}</span>`:''}</span></td>
+    <td><span class="row" style="gap:8px"><span class="ell">${o.access[0]}</span>
+      ${rest>0?`<span class="chipn" data-tip="${o.access.slice(1).join(', ')}">+${rest}</span>`:''}</span></td>
+    <td class="${o.expired?'neg':'mut'}">${o.term}</td>
+    <td class="num"><span class="row" style="gap:4px;justify-content:flex-end">
+      ${o.expired?'':`<button class="ibr acc" data-copy="${url}" title="Скопировать ссылку">${I.cp}</button>
+      <button class="ibr acc" data-modal="qr" title="QR-код">${I.qr}</button>`}
+      <span class="pop-wrap"><button class="ibr" data-pop="ob${i}" title="Ещё">${I.dots}</button>
+      ${pop==='ob'+i?`<div class="pop menu up">
+        <button data-modal="obsedit">${I.edit}Редактировать</button>
+        <div class="hr" style="margin:0"></div>
+        <button class="del" data-modal="obsdel">${I.tr}Удалить</button></div>`:''}</span>
+    </span></td></tr>`}).join('')}
+  </tbody></table></div>
+  ${pager('obs',rows.length,20)}`,'tblcard')};
 
 /* Строка сессии: плашка 56, устройство с пульсом, IP • дата и город.
    У всех сессий, кроме текущей, справа кнопка завершения. */
@@ -1558,7 +1601,7 @@ const MODALS={
      (2219:32420 и 2219:32311): описание со счётчиком, списки чекбоксов, срок действия */
   observer:{t:'Создать ссылку наблюдателя',acts:false,b:()=>obsForm(''),
     foot:()=>`<button class="btn out" data-close>Отменить</button>
-      <button class="btn" data-close data-toast="Ссылка наблюдателя создана">Создать</button>`},
+      <button class="btn" data-close data-toast="Ссылка наблюдателя создана">Подтвердить</button>`},
   obsedit:{t:'Изменить наблюдателя',acts:false,b:()=>obsForm(U.sub||'Для бухгалтера'),
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn" data-close data-toast="Изменения сохранены">Сохранить</button>`},
@@ -1761,6 +1804,6 @@ export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON,
   NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
-  V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS,
+  V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf,
   S, U, route, pop, modal, openGroups, mini,
 };

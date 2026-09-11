@@ -39,6 +39,8 @@ export interface Ui {
   scq?: string
   page: Record<string, number>
   sel: Set<number>
+  /** Выбранные строки наблюдателей. */
+  osel: Set<number>
   q: string
   wfilter: string
   geo: string

@@ -3,7 +3,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { DEF, PRESETS, GROUP_OF, M, applyState, workersList, workersRows } from '@/legacy/prototype'
+import { DEF, PRESETS, GROUP_OF, M, applyState, workersList, workersRows, obsOf } from '@/legacy/prototype'
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
@@ -11,7 +11,7 @@ export const pathOf = (route: string) => (route === HOME ? '/' : '/' + route)
 export const routeOf = (pathname: string) => pathname.replace(/^\/+|\/+$/g, '') || HOME
 
 const freshUi = (): Ui => ({
-  seg: {}, sort: {}, page: {}, sel: new Set(), q: '', wfilter: 'all', geo: '',
+  seg: {}, sort: {}, page: {}, sel: new Set(), osel: new Set(), q: '', wfilter: 'all', geo: '',
   wk: null, qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
 
@@ -184,6 +184,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     const pg = at('[data-page]')
     if (pg && !(pg as HTMLButtonElement).disabled) { u.page[pg.dataset.page!] = +pg.dataset.p!; return bump() }
+    /* Выбор строк наблюдателей — своя коллекция, не пересекается с воркерами */
+    const osl = at('[data-osel]')
+    if (osl) { const i = +osl.dataset.osel!; u.osel.has(i) ? u.osel.delete(i) : u.osel.add(i); return bump() }
+    if (at('[data-oselall]')) {
+      applyState(snapshot())
+      const n = obsOf(M()).length
+      const on = n > 0 && Array.from({ length: n }, (_, i) => i).every((i) => u.osel.has(i))
+      u.osel.clear()
+      if (!on) for (let i = 0; i < n; i++) u.osel.add(i)
+      return bump()
+    }
+    if (at('[data-oselclear]')) { u.osel.clear(); return bump() }
     const sl = at('[data-sel]')
     if (sl) { const id = +sl.dataset.sel!; u.sel.has(id) ? u.sel.delete(id) : u.sel.add(id); return bump() }
     if (at('[data-selall]')) {

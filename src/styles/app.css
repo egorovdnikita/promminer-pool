@@ -553,7 +553,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .marea{display:flex;flex-direction:column;gap:8px}
 .marea .box{background:var(--ctrl);border-radius:var(--r-m);padding:12px;min-height:64px;
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
-.marea .cnt2{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
+.marea .cnt2{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3);text-align:right}
 /* QR-код наблюдателя — 290×290 со скруглением 24 */
 .qrbox{width:290px;height:290px;border-radius:var(--r-l);display:block;margin:0 auto;
   border:1px solid var(--border);background:#fff}
@@ -1054,3 +1054,27 @@ html{scrollbar-gutter:stable}
 .inp.err.soft{background:#ef444429;box-shadow:none}
 .mhints li.bad{color:var(--neg)}
 .mhints li.bad::before{background:var(--neg)}
+
+/* ===== Наблюдатели: таблица со строками 48 (макет 1346:48833) ===== */
+.obstbl th{background:var(--bg);height:48px;padding:12px;font-size:var(--fs-s);line-height:var(--lh-s);
+  font-weight:500;color:var(--c3);text-align:left;border-radius:0}
+.obstbl th:first-child{border-radius:var(--r-m) 0 0 var(--r-m)}
+.obstbl th:last-child{border-radius:0 var(--r-m) var(--r-m) 0}
+.obstbl td{height:48px;padding:12px;font-size:var(--fs-s);line-height:var(--lh-s);
+  font-weight:500;color:var(--c1);border-bottom:0;text-align:left}
+.obstbl .cbc{width:36px;padding:12px 0 12px 12px}
+.obstbl td.neg{color:var(--neg)}
+.obulk{display:flex;align-items:center;gap:12px;height:72px;padding:16px;margin:0 16px 8px;
+  border-radius:var(--r-m);background:var(--bg);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.obulk .btn.link{height:40px}
+.obulk .btn.danger.sm{height:40px}
+.obstbl .ibr{width:36px;height:24px;border-radius:var(--r-xs)}
+.obstbl .ibr.acc{color:var(--accent)}
+.obstbl .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.obstbl .coin1{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.obstbl .coin1 svg{width:20px;height:20px;margin:0}
+.chipn{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;
+  padding:0 6px;border-radius:var(--r-xs);background:var(--ctrl);color:var(--c2);
+  font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600}
+.subempty b{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600;color:var(--c1)}
+.subempty b+p{margin-top:-16px}
