@@ -434,6 +434,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Экран ввода кода и успеха — по центру */
 /* Шаговые экраны контактов: в макете Modal Content фиксированные 348 */
 .mbody.tall{height:348px;flex:0 0 auto}
+.mbody.tall2{height:506px;flex:0 0 auto}
 .cstep{display:flex;flex-direction:column;height:100%}
 .cstep.g32{gap:32px}
 .cstep.g20{gap:20px}
@@ -445,6 +446,36 @@ body.mini .ni .spacer.lbl{display:none!important}
   display:grid;place-items:center;font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
 /* Заголовок шагового экрана — Body/L, а не H5 */
 .ctitle{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+/* ===== Безопасность (макет 971:102888) ===== */
+/* Заголовок карточки с подписью */
+.stitle{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.card>h2{margin-bottom:20px}
+.stitle p{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
+/* Строка секции: плашка 56, заголовок 16/20, подпись 14/18 и действие справа */
+.srow{display:flex;align-items:center;gap:16px;min-height:56px}
+.srow .sico{width:56px;height:56px;border-radius:var(--r-m);background:var(--ctrl2);color:var(--c2);
+  display:grid;place-items:center;flex:0 0 auto}
+.srow .sico svg{width:24px;height:24px}
+.srow .tx{min-width:0;display:flex;flex-direction:column;gap:4px}
+.srow .tx b{display:flex;align-items:center;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.srow .tx i{font-style:normal;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
+.srow+.srow{margin-top:20px}
+.srow .act{flex:0 0 auto}
+/* Точки-разделители в подписи сессии */
+.sdots+.sdots::before{content:'\2022';margin:0 8px;color:var(--c3)}
+/* «Это устройство» — акцентная подпись над сессией */
+.scur{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--accent);margin-bottom:20px}
+/* Мягкая красная кнопка «Удалить аккаунт» */
+.btn.soft-danger{background:#ef44441f;color:var(--neg);box-shadow:none}
+.btn.soft-danger:hover{background:#ef44442e}
+/* Код для ручного ввода в подключении 2FA */
+.gacont{display:flex;flex-direction:column;align-items:center;gap:16px}
+.gacode{display:flex;flex-direction:column;gap:12px;width:100%}
+.gakey{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--r-m);background:#7086fc1f}
+.gakey span{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
+.gakey b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.mhints.dark{color:var(--c1)}
+.mhints li{list-style:none}
 /* Ссылка на бота внутри абзаца — Button 28, из-за неё строка выше обычной */
 .mtext .lnk{display:inline-flex;align-items:center;height:28px;vertical-align:middle;font-weight:600}
 .chead{display:flex;flex-direction:column;gap:10px;text-align:center;align-items:center}

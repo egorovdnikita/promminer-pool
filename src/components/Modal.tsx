@@ -29,7 +29,7 @@ export function Modal({ m }: { m: Model }) {
         )}
         {/* Пока открыто меню контакта, тело не прокручивается: иначе
             выпадающий список обрезается краем прокручиваемой области. */}
-        <div className={`mbody ${hasFoot ? '' : 'nofoot'} ${pop ? 'over' : ''} ${d.tall ? 'tall' : ''}`}>
+        <div className={`mbody ${hasFoot ? '' : 'nofoot'} ${pop ? 'over' : ''} ${d.tall === 2 ? 'tall2' : d.tall ? 'tall' : ''}`}>
           {!!steps && (
             <div className="msteps">
               {Array.from({ length: steps }, (_, i) => <i className={i <= step ? 'on' : ''} key={i} />)}
