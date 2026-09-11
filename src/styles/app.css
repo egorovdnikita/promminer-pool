@@ -338,7 +338,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 
 .promo h2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;max-width:56%;position:relative;color:var(--c1);
   display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
-.promo .art{position:absolute;right:0;bottom:0;width:48%;height:113%;object-fit:cover;object-position:center;pointer-events:none}
+.promo .art{position:absolute;right:0;bottom:0;height:100%;width:auto;object-fit:contain;object-position:right bottom;pointer-events:none}
 .promo .pclose{position:absolute;right:16px;top:16px;z-index:1;width:40px;height:40px;border-radius:var(--r-f);display:grid;place-items:center;background:#52525229;color:var(--c1)}
 .promo .pclose:hover{background:#5252523d}
 .promo .pclose svg{width:24px;height:24px}
