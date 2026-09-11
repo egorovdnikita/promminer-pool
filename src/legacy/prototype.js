@@ -797,6 +797,28 @@ const OBSERVERS=[
   {name:'natarusso',extra:0,coins:['BTC','LTC'],label:'Для второго менеджера',off:0,
    access:['Мои активы','Наблюдатели'],term:'до 13.02.2026 (истек)',expired:1,
    created:'11.01.2026',last:'—',token:'5d8e3b2a9c1f7e4d6b0a8c3f5e21'}];
+/* Уведомления — один список для карточки профиля, попоувера и модалки */
+const NOTES=[
+  ['Средства выведены успешно','Вывод 74,7688 DOGE на ваш аккаунт natarusso в 13:45 22.07.2025 подтвержден и отправлен','23/07/2025 12:00'],
+  ['Выплата отправлена','0,01254 BTC на bc1q…4f2a','22/07/2025 07:20'],
+  ['Новый реферал','miner_1042 зарегистрировался по вашей ссылке','21/07/2025 19:04'],
+  ['Отчет за апрель сгенерирован','Доступен для скачивания','20/07/2025 11:32'],
+  ['Вход с нового IP','Выполнен вход с нового IP — 45.234.123.345','19/07/2025 08:10']];
+/* Разрешения и монеты наблюдателя — списки из макета 2219:32420 */
+const OBS_PERMS=['Воркеры','Мои активы','Начисления','Выплаты','Продажи',
+  'Список рефералов','Реферальный доход','Реферальные выплаты'];
+const OBS_COINS=['BTC','LTC','DOGE','ZEC'];
+/* Плейсхолдер QR-кода: детерминированный узор с тремя «глазами» */
+const QR=(()=>{const N=25,S=10;let seed=7;const rnd=()=>(seed=(seed*1103515245+12345)&0x7fffffff)/0x7fffffff;
+  const eye=(x,y)=>`<rect x="${x*S}" y="${y*S}" width="${7*S}" height="${7*S}" rx="${1.5*S}"/>`
+    +`<rect x="${(x+1)*S}" y="${(y+1)*S}" width="${5*S}" height="${5*S}" rx="${S}" fill="var(--surface)"/>`
+    +`<rect x="${(x+2)*S}" y="${(y+2)*S}" width="${3*S}" height="${3*S}" rx="${S/2}"/>`;
+  const inEye=(c,r)=>(c<8&&r<8)||(c>N-9&&r<8)||(c<8&&r>N-9);
+  let m='';
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(inEye(c,r))continue;if(rnd()>0.55)m+=`<rect x="${c*S}" y="${r*S}" width="${S}" height="${S}" rx="2"/>`;}
+  return `<svg width="230" height="230" viewBox="0 0 ${N*S} ${N*S}" fill="currentColor">${m}${eye(0,0)}${eye(N-7,0)}${eye(0,N-7)}</svg>`;
+})();
+
 const SESSIONS=[
   {dev:'Apple Macintosh, Chrome (macOS)',ip:'89.23.14.201',loc:'Москва',when:'сейчас',cur:1},
   {dev:'iPhone 15, Safari (iOS)',        ip:'212.90.4.18', loc:'Санкт-Петербург',when:'2 часа назад',cur:0},
@@ -830,12 +852,32 @@ function subTile(m,s){
     <div class="kv">Воркеры<span class="spacer row" style="gap:8px;flex-wrap:wrap;justify-content:flex-end">${dots.map(([n,c])=>`<span class="row" style="gap:5px"><i class="dot" style="background:${c}"></i><b class="mono" style="font-weight:600">${ni(n)}</b></span>`).join('')}</span></div>
   </div>`;
 }
+/* Форма наблюдателя — общая для «Создать» и «Изменить» (макет 2219:32420) */
+function obsList(label,items,two){
+  return `<div class="mlist"><div class="ch"><span class="lb">${label}</span>
+    <button class="btn link bs" data-toast="Выбрано всё">Выбрать все</button></div>
+    <div class="opts ${two?'c2':''}">${items.map((t,i)=>
+      `<label>${cb(i<2)}<span class="ell">${t}</span></label>`).join('')}</div></div>`;
+}
+function obsForm(desc){
+  const accs=SUBS.filter(x=>!x.arch).map(a=>a.name);
+  return `<div class="mstack">
+    <div class="mprog"><i class="on"></i><i></i></div>
+    <div class="marea"><div class="box ${desc?'':'dim'}">${desc||'Описание'}</div>
+      <div class="cnt2">${(desc||'').length}/100</div></div>
+    ${obsList('Аккаунт',accs,true)}
+    <div class="mlists">${obsList('Разрешения',OBS_PERMS)}${obsList('Монеты',OBS_COINS)}</div>
+    <div class="msel"><div class="lb">Срок действия</div>
+      <div class="selbox">Бессрочно<span class="spacer">${I.cd}</span></div></div>
+  </div>`;
+}
 function obsTile(o){
   const url=LINKS.watcher(o.token);
   const tags=o.access.slice(0,2), rest=o.access.length-tags.length;
   return `<div class="tile2">
     <div class="row" style="margin-bottom:8px"><b style="font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600">${o.name}</b>
-      ${o.extra?`<span class="tag sm n">+${o.extra}</span>`:''}<span class="spacer dim">${I.dots}</span></div>
+      ${o.extra?`<span class="tag sm n">+${o.extra}</span>`:''}
+      <button class="ibr spacer dim" data-modal="obsedit">${I.dots}</button></div>
     <div class="row" style="gap:4px;margin-bottom:20px"><span class="coins">${o.coins.map(c=>COIN_ICON[c]).join('')}</span>
       <span class="bs semi ${o.off?'dim':''}">${o.off?'⦸ ':''}${o.label}</span></div>
     <div class="row" style="gap:4px;margin-bottom:20px;flex-wrap:wrap">
@@ -844,7 +886,7 @@ function obsTile(o){
     ${o.off?'':`<div class="row" style="gap:8px">
       <span class="linkfield" style="flex:1"><span class="mono">${url}</span>
         <button class="lnk spacer" style="color:var(--accent)" data-copy="${url}">${I.cp}</button></span>
-      <button class="ib sm" data-toast="QR-код ссылки наблюдателя">${I.qr}</button></div>`}
+      <button class="ib sm" data-modal="qr">${I.qr}</button></div>`}
   </div>`;
 }
 /* Промо-баннеры внизу сводки — оба есть в макете */
@@ -855,10 +897,7 @@ V.profile=m=>{
   const n=NOTIF_N[S.notif];
   const subs=subsOf(m).filter(x=>!x.arch), obs=obsOf(m);
   const noname=S.name==='no';
-  const notes=[['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03'],
-    ['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03'],
-    ['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03'],
-    ['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03']];
+  const notes=NOTES;
   return `<div class="grid cols2" style="grid-template-columns:1.9fr 1fr;align-items:start">
   <div>
     ${card(`<div class="ch"><h2>Мои суб-аккаунты</h2><button class="btn link spacer" data-go="subaccounts">Смотреть все</button></div>
@@ -888,7 +927,8 @@ V.profile=m=>{
         <span style="min-width:0"><span class="row" style="gap:2px"><b style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${acct}</b>
           <button class="ibr" style="color:var(--accent)" data-copy="${acct}">${I.cp}</button></span>
           <div style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c3)">${FULLNAME}</div></span>
-        <button class="ibr spacer dim" data-modal="personal">${I.edit}</button></div>`}
+        <button class="ibr spacer dim" data-modal="personal">${I.edit}</button></div>
+        <div class="hr" style="margin-top:0"></div>`}
       <button class="rowline" data-go="security"><span class="iconbox">${I.pc}</span>
         <span class="tx"><i>Последняя сессия</i><b class="row" style="gap:0;width:100%"><span class="ell">${SESSIONS[0].dev}</span><i class="pulse"></i></b></span>
         <span class="ch2 ibr">${I.cv}</span></button>
@@ -898,7 +938,7 @@ V.profile=m=>{
     <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Последние уведомления</h2>${n?`<span class="cnt">${n>99?'99+':n}</span>`:''}
       <button class="btn link spacer dim" data-go="notifsettings">${I.cv}</button></div>
-      ${n?`<div class="nplist">${notes.slice(0,Math.min(n,4)).map(([t,d,dt])=>`<div class="nitem"><i class="dot"></i>
+      ${n?`<div class="nplist">${notes.slice(0,Math.min(n,4)).map(([t,d,dt],i)=>`<div class="nitem" data-note="${i}"><i class="dot"></i>
           <div><div class="nb"><span class="nt">${t}</span><span class="nd">${dt}</span></div><p>${d}</p></div></div>`).join('')}</div>
         <div style="text-align:center;padding-top:8px"><button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button></div>`
         :`<div class="empty" style="padding:96px 0"><b class="dim">Новых уведомлений нет</b></div>`}`)}
@@ -981,7 +1021,9 @@ V.observers=m=>{
       <td><span class="row" style="gap:4px;flex-wrap:wrap">${o.access.map(t=>`<span class="tag n">${t}</span>`).join('')}</span></td>
       <td class="${o.expired?'':'mut'}" style="${o.expired?'color:var(--neg)':''}">${o.term}</td>
       <td class="mono mut">${o.created}</td><td class="mut">${o.last}</td>
-      <td class="num dim">${I.dots}</td></tr>`}).join('')}
+      <td class="num"><span class="row" style="gap:4px;justify-content:flex-end">
+        <button class="ibr dim" data-modal="obsedit" title="Изменить">${I.edit}</button>
+        <button class="ibr dim" data-modal="obsdel" title="Удалить">${I.tr}</button></span></td></tr>`}).join('')}
   </tbody></table></div>`:emptyBox('Наблюдателей пока нет','Создайте ссылку, чтобы дать бухгалтеру или партнеру доступ к статистике только для чтения')}`)}`};
 
 V.security=m=>{
@@ -1102,24 +1144,56 @@ const subByName=n=>SUBS.find(x=>x.name===n)||SUBS[0];
 
 const MODALS={
   /* Настройки аккаунта (макет 2219:33325): язык, часовой пояс, тема радиогруппой */
-  settings:{t:'Настройки',cta:'Сохранить',cancel:'Отменить',ok:'Настройки сохранены',b:()=>`
-    <div class="mrow"><span class="mi">${I.doc}</span><span class="tx"><i>Язык интерфейса</i><b>Русский</b></span>
-      <span class="tag">Скоро</span></div>
-    <div class="mrow"><span class="mi">${I.cal}</span><span class="tx"><i>Часовой пояс</i><b>${segv('tz',TZ)}</b></span>
-      <span class="pop-wrap"><button class="pill flat sq" data-pop="tz">${I.cd}</button>
-      ${pop==='tz'?`<div class="pop" style="min-width:200px">${TZ.map((t,i)=>
-        `<button class="${segi('tz')===i?'on':''}" data-seg="tz" data-i="${i}">${t}${segi('tz')===i?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></div>
-    <div class="alert info" style="margin:12px 0">${I.inf}<div>Выберите таймзону для удобной связи с поддержкой. На баланс и выплаты это не влияет</div></div>
-    <div class="cap dim" style="margin:16px 0 8px">Тема интерфейса</div>
-    ${THEMES.map(([v,t])=>`<label class="rrow" data-theme-set="${v}">${rd(U.theme===v)}<span>${t}</span></label>`).join('')}`},
+  /* Настройки (макет 2219:33334): строки с плашкой 48, разделитель, секция «Тема интерфейса» */
+  settings:{t:'Настройки',acts:false,b:()=>`
+    <div class="mstack">
+      <div>
+        <div class="mrow"><span class="mi">${I.doc}</span>
+          <span class="tx"><i>Выбор языка <span class="tag sm n">Скоро</span></i><b>Русский</b></span></div>
+        <div class="mrow"><span class="mi">${I.cal}</span>
+          <span class="tx"><i>Таймзона</i><b>${segv('tz',TZ)}</b></span>
+          <span class="pop-wrap spacer"><button class="ibr dim" data-pop="tz">${I.cd}</button>
+          ${pop==='tz'?`<div class="pop" style="min-width:200px">${TZ.map((t,i)=>
+            `<button class="${segi('tz')===i?'on':''}" data-seg="tz" data-i="${i}">${t}${segi('tz')===i?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></div>
+      </div>
+      <div class="alert info" style="margin:0">${I.inf}<div>Укажите таймзону для удобной связи с поддержкой. На баланс и выплаты это не влияет</div></div>
+      <div class="hr" style="margin:0"></div>
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="msec">Тема интерфейса</div>
+        <div>${THEMES.map(([v,t],i)=>`<label class="rrow" data-theme-set="${v}">
+          <span class="mi">${[I.sun,I.moon,I.monitor][i]}</span><span>${t}</span>${rd(U.theme===v)}</label>`).join('')}</div>
+      </div>
+    </div>`,
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-toast="Настройки сохранены">Сохранить</button>`},
 
-  /* Подтверждение выхода (макет 2219:33832) */
-  logout:{t:'',acts:false,b:()=>`
-    <div class="empty" style="padding:8px 0 0"><div class="art">${I.user}</div>
-      <b style="font-size:var(--fs-b1);line-height:var(--lh-b1)">Вы действительно хотите выйти?</b></div>
-`,
+  /* Подтверждение выхода (макет 1037:55175): баннер, заголовок по центру, две кнопки */
+  logout:{t:'Вы действительно хотите выйти?',img:'/modal-logout.png',center:true,acts:false,b:()=>'',
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-go="auth" data-close>Выйти</button>`},
+
+  /* Удаление ссылки наблюдателя (макет 1444:163287) */
+  obsdel:{t:'Удалить ссылку наблюдателя?',img:'/modal-delete.png',acts:false,
+    b:()=>`<div class="mstack"><p class="mtext">Ссылка наблюдения будет удалена,
+      и пользователи потеряют доступ к данным вашего аккаунта</p></div>`,
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn danger" data-close data-toast="Ссылка наблюдателя удалена">Удалить</button>`},
+
+  /* Карточка уведомления (макет 531:69489): баннер, дата-чип, заголовок и текст */
+  noteinfo:{t:'',img:'/modal-notify.png',acts:false,
+    b:()=>{const n=NOTES[U.note??0]||NOTES[0];
+      return `<div class="mstack" style="gap:20px;padding:16px 0 0">
+        <span class="datechip">${I.clock}${n[2]}</span>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <h3 class="mh3">${n[0]}</h3><p class="mtext mut">${n[1]}</p></div></div>`},
+    foot:()=>`<button class="btn out" data-close>Закрыть</button>`},
+
+  /* QR-код ссылки наблюдателя (макет 1445:172568) */
+  qr:{t:'Отсканируйте QR-код или скачайте',acts:false,
+    b:()=>`<div class="mstack"><div class="qrbox">${QR}</div></div>`,
+    foot:()=>{const url=LINKS.watcher(OBSERVERS[0].token);
+      return `<button class="btn out" data-copy="${url}">Ссылка на наблюдателя</button>
+        <button class="btn" data-toast="QR-код скачан">Скачать QR-код</button>`}},
 
   /* Информация об аккаунте (макеты 1490:80238, 2219:31849): шапка с аватаром 64,
      значения — карточками Assets Items 16/r24 по две в ряд, футер прижат.
@@ -1170,24 +1244,40 @@ const MODALS={
     <div class="inp"><div class="k">Сумма, ${m.bal[0].s}</div><input value="${nf(m.bal[0].v,8)}"></div>
     <div class="inp"><div class="k">Кошелек</div><input value="bc1q…4f2a"></div>
     <div class="field" style="margin-top:8px"><div class="k">Комиссия сети</div><div class="v mono">0,00004 ${m.bal[0].s}</div></div>`},
-  subacct:{ok:'Суб-аккаунт создан',t:'Создать суб-аккаунт',s:'Суб-аккаунт получит собственные адреса подключения',b:()=>`
-    <div class="inp"><div class="k">Имя аккаунта</div><input placeholder="latin, 3–20 символов"></div>
-    <div class="inp"><div class="k">Комментарий</div><input placeholder="Необязательно"></div>`},
+  /* Добавить суб-аккаунт (макет 880:41731): подсказка, поле и два правила под ним */
+  subacct:{t:'Добавить суб-аккаунт',acts:false,b:()=>`
+    <div class="mstack">
+      <p class="mtext">После создания изменить имя суб-аккаунта будет нельзя</p>
+      <div class="inp" style="margin:0"><input placeholder="Имя суб-аккаунта"></div>
+      <ul class="mhints"><li>От 4 до 15 символов</li><li>Только строчные буквы (a−z) и цифры</li></ul>
+    </div>`,
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-toast="Суб-аккаунт создан">Создать</button>`},
   /* «Личные данные» и «Добавить номер телефона» — из макета «Действия с телефоном» */
-  personal:{t:'Личные данные',cta:'Сохранить',cancel:'Отменить',ok:'Данные успешно изменены',b:()=>`
-    <div class="grid g3" style="margin:0;gap:8px">
-      ${['Фамилия','Имя','Отчество'].map(p=>`<div class="afield"><input placeholder="${p}"></div>`).join('')}
-    </div>
-    <span class="pop-wrap" style="display:block">
-      <div class="afield" style="margin-top:8px"><input placeholder="Дата рождения"><button class="aeye" data-pop="bday">${I.cal}</button></div>
-      ${pop==='bday'?datePicker([]).replace('class="pop dp"','class="pop dp left" style="top:calc(100% + 8px)"'):''}</span>
-    <div class="cap dim" style="margin:16px 0 4px">Контакты</div>
+  personal:{t:'Личные данные',acts:false,b:()=>`
+    <div class="mstack">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="grid g3" style="margin:0;gap:8px">
+          ${['Фамилия','Имя','Отчество'].map(p=>`<div class="afield"><input placeholder="${p}"></div>`).join('')}
+        </div>
+        <span class="pop-wrap" style="display:block">
+          <div class="afield"><input placeholder="Дата рождения"><button class="aeye" data-pop="bday">${I.cal}</button></div>
+          ${pop==='bday'?datePicker([]).replace('class="pop dp"','class="pop dp left" style="top:calc(100% + 8px)"'):''}</span>
+      </div>
+      <div class="hr" style="margin:0"></div>
+      <div style="display:flex;flex-direction:column;gap:20px">
+      <div class="msec">Контакты</div>
+      <div>
     <div class="mrow"><span class="mi">${I.phone}</span><span class="tx"><i>Телефон</i></span>
       <button class="act" data-modal="phone">${I.edit}</button></div>
     <div class="mrow"><span class="mi">${I.mail}</span><span class="tx"><i>Почта</i>
       <b>ivanivanov2003@gmail.com <i class="dot" style="display:inline-block;background:var(--pos)"></i></b></span></div>
     <div class="mrow"><span class="mi">${I.tg}</span><span class="tx"><i>Telegram</i></span>
-      <button class="act" data-toast="Привязка Telegram через @PromminerAlertbot">${I.edit}</button></div>`},
+      <button class="act" data-toast="Привязка Telegram через @PromminerAlertbot">${I.edit}</button></div>
+      </div></div>
+    </div>`,
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-toast="Данные успешно изменены">Сохранить</button>`},
   phone:{t:'Добавить номер телефона',steps:2,cta:'Продолжить',ok:'Номер телефона добавлен',b:(m,step)=>step===0?`
     <div class="phonefield"><span class="pre">+7</span><input placeholder="(999) 999-99-99"></div>
     <p class="cap dim" style="margin-top:10px">Вы сможете авторизовываться по номеру телефона и паролю</p>`
@@ -1196,9 +1286,14 @@ const MODALS={
     <div class="afield"><input placeholder="Код подтверждения"></div>
     <div style="text-align:center;margin-top:12px"><button class="btn link" data-toast="Код вставлен из буфера">Вставить код</button></div>
     <div style="text-align:center;margin-top:4px"><span class="cap dim">Запросить новый код через 00:59</span></div>`},
-  observer:{ok:'Ссылка наблюдателя создана',t:'Создать ссылку наблюдателя',s:'Доступ только для чтения',b:()=>`
-    <div class="inp"><div class="k">Название</div><input value="Для бухгалтера"></div>
-    <div class="ch" style="gap:6px;margin-top:10px">${['Воркеры','Финансы','Отчет'].map((x,i)=>`<button class="chip ${i<2?'on':''}">${x}</button>`).join('')}</div>`},
+  /* Создать и изменить наблюдателя — один макет с разными заголовками
+     (2219:32420 и 2219:32311): описание со счётчиком, списки чекбоксов, срок действия */
+  observer:{t:'Создать ссылку наблюдателя',acts:false,b:()=>obsForm(''),
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-toast="Ссылка наблюдателя создана">Создать</button>`},
+  obsedit:{t:'Изменить наблюдателя',acts:false,b:()=>obsForm(U.sub||'Для бухгалтера'),
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-toast="Изменения сохранены">Сохранить</button>`},
 };
 
 
@@ -1207,15 +1302,11 @@ const MODALS={
    внизу кнопка «Посмотреть все» во всю ширину. */
 function notifications(){
   const n=NOTIF_N[S.notif];
-  const list=[['Средства выведены успешно','Вывод 74.768854 DOGE на ваш аккаунт accou…','22/07/2025 07:20'],
-    ['Выплата отправлена','0,01254 BTC на bc1q…4f2a','22/07/2025 07:20'],
-    ['Новый реферал','miner_1042 зарегистрировался по вашей ссылке','21/07/2025 19:04'],
-    ['Отчет за апрель сгенерирован','Доступен для скачивания','20/07/2025 11:32'],
-    ['Вход с нового IP','Выполнен вход с нового IP –45.234.123.345','19/07/2025 08:10']];
+  const list=NOTES;
   return `<div class="pop wide">
     <div class="nhead"><b>Новые уведомления</b>${n?`<span class="cnt">${n>99?'99+':n}</span>`:''}
       <button class="ra ${n?'':'off'}" ${n?'data-readall data-toast="Все уведомления отмечены как прочитанные"':'disabled'}>${I.checkall}Прочитать все</button></div>
-    ${n?`<div class="nplist">${list.slice(0,Math.min(n,5)).map(([t,d,dt])=>`<div class="nitem"><i class="dot"></i>
+    ${n?`<div class="nplist">${list.slice(0,Math.min(n,5)).map(([t,d,dt],i)=>`<div class="nitem" data-note="${i}"><i class="dot"></i>
         <div><div class="nb"><span class="nt">${t}</span><span class="nd">${dt}</span></div><p>${d}</p></div></div>`).join('')}</div>`
       :`<div class="empty nempty"><img src="/empty-state.svg" alt="" width="120" height="95">
          <b class="dim">Уведомлений пока нет</b></div>`}

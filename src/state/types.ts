@@ -18,6 +18,8 @@ export interface Scenario {
 export interface Ui {
   seg: Record<string, number>
   sort: Record<string, { k: string; d: number } | null>
+  /** Индекс уведомления, открытого в модалке. */
+  note?: number
   page: Record<string, number>
   sel: Set<number>
   q: string

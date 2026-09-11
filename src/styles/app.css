@@ -390,23 +390,73 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mhead{display:flex;align-items:center;gap:12px;min-height:40px;padding:24px 24px 16px;flex:0 0 auto}
 /* Полоса прокрутки живёт в зарезервированном жёлобе, поэтому ширина
    контента одинакова и со скроллом, и без него. */
-.mbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:20px calc(24px - var(--sbw)) 20px 24px}
+.mbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:0 calc(24px - var(--sbw)) 0 24px}
+.mbody.nofoot{padding-bottom:24px}
+.mbody:empty{display:none}
 .mfoot{display:flex;gap:8px;padding:24px;flex:0 0 auto}
-.mfoot .btn{flex:1;justify-content:center}
-.modal h2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;flex:1;min-width:0}
+.mfoot .btn{flex:1;justify-content:center;height:56px;border-radius:var(--r-m);
+  font-size:var(--fs-m);line-height:var(--lh-m)}
+/* Шапка-иллюстрация: баннер 542×144 с отступом 4 и крестиком поверх */
+.mhead.img{display:block;padding:4px 4px 0;min-height:0;position:relative}
+.mhead.img img{width:100%;height:144px;object-fit:cover;border-radius:var(--r-l);display:block}
+.mhead.img .mx{position:absolute;top:16px;right:16px;background:var(--surface);color:var(--c1)}
+.mhead.img h2{padding:24px 20px 16px}
+.mhead.img h2.c{text-align:center}
+/* Типовые куски содержимого модалок */
+.mtext{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
+.mh3{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
+.mhints{list-style:none;display:flex;flex-direction:column;gap:4px;
+  font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
+.datechip{display:inline-flex;align-self:flex-start;align-items:center;gap:4px;padding:8px;border-radius:var(--r-s);
+  background:var(--ctrl2);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.datechip svg{width:18px;height:18px}
+/* Карточка со списком чекбоксов (List 16/r16) */
+.mlist{background:var(--ctrl2);border-radius:var(--r-m);padding:16px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.mlist>.ch{margin:0;justify-content:space-between}
+.mlist .lb{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
+.mlist .opts{display:grid;gap:12px;min-width:0}
+.mlist .opts.c2{grid-template-columns:1fr 1fr}
+.mlist label{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);
+  font-weight:600;cursor:pointer;min-width:0}
+.mlists{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0}
+/* Поле-описание со счётчиком символов */
+.marea{display:flex;flex-direction:column;gap:8px}
+.marea .box{background:var(--ctrl);border-radius:var(--r-m);padding:12px;min-height:64px;
+  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.marea .cnt2{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
+/* QR-код наблюдателя — 290×290 со скруглением 24 */
+.qrbox{width:290px;height:290px;border-radius:var(--r-l);background:var(--surface);
+  box-shadow:var(--shadow);display:grid;place-items:center;margin:0 auto}
+/* Прогресс шагов в модалках наблюдателя */
+.mprog{display:flex;gap:8px}
+.mprog i{flex:1;height:4px;border-radius:var(--r-f);background:var(--ctrl)}
+.mprog i.on{background:var(--accent)}
+/* Select дизайн-системы: подпись сверху, контейнер 56 со скруглением 16 */
+.msel{display:flex;flex-direction:column;gap:8px}
+.msel .lb{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
+.selbox{display:flex;align-items:center;gap:4px;height:56px;padding:0 12px;border-radius:var(--r-m);
+  background:var(--ctrl);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
+.selbox .spacer{display:flex;color:var(--c3)}
+.nitem[data-note]{cursor:pointer}
+.nitem[data-note]:hover .nt{color:var(--accent)}
+.modal h2{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;flex:1;min-width:0}
 .mx{width:40px;height:40px;border-radius:var(--r-f);background:var(--ctrl);color:var(--c1);display:grid;place-items:center;flex:0 0 auto}
 .mx:hover{background:var(--ctrl-hover)}
 .mx svg{width:24px;height:24px}
 .msteps{display:flex;gap:8px;margin-bottom:16px}
 .msteps i{flex:1;height:3px;border-radius:2px;background:var(--ctrl)}
 .msteps i.on{background:var(--accent)}
-.mrow{display:flex;align-items:center;gap:12px;padding:12px 0}
-.mrow+.mrow{border-top:1px solid var(--border)}
-.mrow .mi{color:var(--c3);display:flex;flex:0 0 auto}
-.mrow .tx{min-width:0}
-.mrow .tx i{display:block;font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
-.mrow .tx b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
-.mrow .act{margin-left:auto;width:32px;height:32px;border-radius:var(--r-f);background:var(--accent-sub);color:var(--accent);display:grid;place-items:center;flex:0 0 auto}
+.mrow{display:flex;align-items:center;gap:12px;min-height:48px}
+.mrow+.mrow{margin-top:12px}
+.mrow .mi{width:48px;height:48px;border-radius:var(--r-m);background:var(--ctrl2);color:var(--c2);
+  display:grid;place-items:center;flex:0 0 auto}
+.mrow .tx{min-width:0;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.mrow .tx i{display:block;font-style:normal;font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c3);font-weight:500}
+.mrow .tx b{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.mrow .act{margin-left:auto;width:48px;height:48px;border-radius:var(--r-m);background:var(--accent-sub);
+  color:var(--accent);display:grid;place-items:center;flex:0 0 auto}
+/* Заголовок секции внутри модалки — Headline/H5 */
+.msec{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
 .mcode{text-align:center}
 .mcode b{display:block;font-size:var(--fs-m);font-weight:600;margin-bottom:6px}
 .mcode p{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);margin-bottom:14px}
@@ -416,6 +466,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .phonefield .pre{color:var(--c2);font-weight:600}
 .modal p.s{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);margin-bottom:18px}
 .modal .acts{display:flex;gap:8px;margin-top:20px}
+.mstack{display:flex;flex-direction:column;gap:20px;padding:20px 0}
 /* Assets Items — карточка «ключ сверху, значение снизу» из модалки аккаунта */
 .acells{display:flex;flex-direction:column;gap:8px}
 .arow{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0}
@@ -427,8 +478,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .wgrid>span{display:flex;flex-direction:column;align-items:center;gap:2px}
 .wgrid b{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 /* Шапка модалки аккаунта: аватар 64, имя и бейдж роли слева */
-.ainfo{display:flex;flex-direction:column;gap:16px;align-items:flex-start;margin-bottom:20px}
-.ainfo .atx{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.ainfo{display:flex;flex-direction:column;gap:16px;align-items:center;margin-bottom:20px}
+.ainfo .atx{display:flex;flex-direction:column;gap:8px;align-items:center}
 .ainfo .atx b{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
 
 /* scenario panel */
@@ -544,6 +595,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .linkfield span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .badge{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:var(--r-xs);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;background:var(--warn);color:#fff}
 /* строка «иконка — текст — шеврон» в карточке профиля */
+.hr{height:1px;background:var(--border);margin:20px 0}
 .rowline{display:flex;align-items:center;gap:12px;min-height:56px;width:100%;text-align:left}
 .rowline+.rowline{margin-top:20px}
 .iconbox{width:56px;height:56px;border-radius:var(--r-m);background:var(--ctrl2);display:grid;place-items:center;color:var(--c2);flex:0 0 auto}
@@ -581,8 +633,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 :root[data-theme="dark"] .avat{background:#78350f;color:#fde68a}
 :root[data-theme="dark"] .linkfield{background:var(--ctrl2)}
 :root[data-theme="dark"] .badge{color:#fbbf24}
-@media(max-width:1450px){.grid.g3{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:1150px){.g3,.g4,.cols2{grid-template-columns:1fr!important}.sb{display:none}}
+@media(max-width:1450px){.main .grid.g3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1150px){.main .g3,.main .g4,.main .cols2{grid-template-columns:1fr!important}.sb{display:none}}
 
 /* Tooltip (💙 DS): подсказка на [data-tip], по умолчанию снизу. */
 [data-tip]{position:relative}
@@ -681,8 +733,12 @@ body.mini .ni .spacer.lbl{display:none!important}
 .btn.danger{background:var(--neg);color:#fff}
 .btn.danger:hover{opacity:.9}
 /* Строка с радиокнопкой в модалке настроек */
-.rrow{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 4px;cursor:pointer;
-  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
+.rrow{display:flex;align-items:center;gap:12px;min-height:48px;cursor:pointer;
+  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.rrow+.rrow{margin-top:12px}
+.rrow .mi{width:48px;height:48px;border-radius:var(--r-m);background:var(--ctrl2);color:var(--c2);
+  display:grid;place-items:center;flex:0 0 auto}
+.rrow .rd{margin-left:auto}
 .rrow:hover{opacity:.8}
 
 /* Скелетон загрузки */

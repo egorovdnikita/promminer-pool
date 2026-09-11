@@ -156,6 +156,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     const si = at('[data-subinfo]')
     if (si) { u.sub = si.dataset.subinfo!; modal.current = 'subinfo'; return bump() }
+    const nt = at('[data-note]')
+    if (nt) { u.note = Number(nt.dataset.note); modal.current = 'noteinfo'; pop.current = null; return bump() }
     const th = at('[data-theme-set]')
     if (th) {
       const v = th.dataset.themeSet!

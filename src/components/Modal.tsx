@@ -11,15 +11,23 @@ export function Modal({ m }: { m: Model }) {
   const step = U.step || 0
   const steps = typeof d.steps === 'function' ? d.steps(m) : d.steps
   const foot = d.foot?.(m, step)
+  const hasFoot = !!foot || d.acts !== false
+  const close = <button className="mx" data-close><Ico html={I.x} /></button>
 
   return (
     <div className="mask" data-close>
       <div className="modal">
-        <div className="mhead">
-          <h2>{d.t}</h2>
-          <button className="mx" data-close><Ico html={I.x} /></button>
-        </div>
-        <div className="mbody">
+        {d.img ? (
+          // Modal HeaderA с иллюстрацией: баннер, крестик поверх, заголовок под ним
+          <div className="mhead img">
+            <img src={d.img} alt="" />
+            {close}
+            {d.t && <h2 className={d.center ? 'c' : ''}>{d.t}</h2>}
+          </div>
+        ) : (
+          <div className="mhead"><h2>{d.t}</h2>{close}</div>
+        )}
+        <div className={hasFoot ? 'mbody' : 'mbody nofoot'}>
           {!!steps && (
             <div className="msteps">
               {Array.from({ length: steps }, (_, i) => <i className={i <= step ? 'on' : ''} key={i} />)}

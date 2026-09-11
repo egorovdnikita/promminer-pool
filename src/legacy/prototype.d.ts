@@ -65,6 +65,10 @@ export declare const MODALS: Record<string, {
   b: (m: Model, step: number) => string
   /** Прижатый футер модалки — рисуется вне прокручиваемого тела. */
   foot?: (m: Model, step: number) => string
+  /** Иллюстрация в шапке (Modal HeaderA с картинкой). */
+  img?: string
+  /** Заголовок по центру — как в модалке выхода. */
+  center?: boolean
 }>
 /** Вкладки профиля — рисуются в шапке. */
 export declare function profTabs(cur: string, m: Model): string
