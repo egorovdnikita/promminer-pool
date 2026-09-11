@@ -272,6 +272,8 @@ const skBlock=h=>`<div class="sk" style="height:${h}px"></div>`;
 const skeleton=()=>`<div class="grid cols2" style="grid-template-columns:1.9fr 1fr;align-items:start">
   <div>${[258,300,186].map(skBlock).join('<div style="height:16px"></div>')}</div>
   <div>${[345,495].map(skBlock).join('<div style="height:16px"></div>')}</div></div>`;
+/* Наблюдатель видит разделы, но не управляет ими */
+const RO=()=>S.role==='observer'?'disabled':'';
 const card=(inner,cls='')=>`<section class="card ${cls}">${inner}</section>`;
 const emptyBox=(t,p)=>`<div class="empty"><div class="art">${sv('<path d="M3 13.5h4.2c.5 0 .95.28 1.17.72l.26.56c.22.44.67.72 1.17.72h4.06c.5 0 .95-.28 1.17-.72l.26-.56c.22-.44.67-.72 1.17-.72H21"/><path d="M3.5 13.5 5 6.4A3 3 0 0 1 7.94 4h8.12A3 3 0 0 1 19 6.4l1.5 7.1"/><path d="M3 14v2c0 2.2 0 3.3.68 3.98S5.5 20.7 7.7 20.7h8.6c2.2 0 3.3 0 3.98-.68S21 18.2 21 16v-2"/>',36)}</div><b>${t}</b><p>${p}</p></div>`;
 /* Сегментированный контрол — кликабельный, состояние в U.seg[id] */
@@ -878,7 +880,8 @@ const subsOf=m=>{
   return U.arch?act.concat(SUBS.filter(x=>x.arch)):act;
 };
 const OBS_N={many:6,few:2,none:0};
-const obsOf=m=>m.empty?[]:OBSERVERS.slice(0,OBS_N[S.obs]??6);
+/* без имени аккаунта ссылок наблюдателя быть не может */
+const obsOf=m=>(m.empty||S.name==='no')?[]:OBSERVERS.slice(0,OBS_N[S.obs]??6);
 const SESS_N={one:1,few:2,many:6};
 const sessOf=m=>SESSIONS.slice(0,m.empty?1:(SESS_N[S.sess]??6));
 /* Вкладки — Segment Control из макета: общий контейнер, белый активный сегмент.
@@ -1059,7 +1062,7 @@ V.verification=m=>{
       <span class="vico">${I.uid}</span>
       <div class="vhead"><h2>Правовая форма</h2><p class="dim">Выберите правовую форму</p></div></div>
       <div class="vlist">${VFORMS.map(([,label],i)=>
-        `<button class="chip ${i===segi('vform',0)?'on':''}" data-seg="vform" data-i="${i}">${label}</button>`).join('')}</div>`)}
+        `<button class="chip ${i===segi('vform',0)?'on':''}" data-seg="vform" data-i="${i}" ${RO()}>${label}</button>`).join('')}</div>`)}
     <div class="vnote">${VHINTS.map(([t,list])=>`<div class="vnb"><b>${t}</b>
       <ul>${list.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join('')}</div>
   </div>
@@ -1069,11 +1072,11 @@ V.verification=m=>{
         `<div class="vrow" style="grid-template-columns:repeat(${row.length},1fr)">${row.map(f=>vField(f,form)).join('')}</div>`).join('')}</div>`)}
     ${full?card(`${head('Выписка из реестра майнеров','Добавьте, если хотите продавать намайненную цифровую валюту на нашей платформе')}
       ${doc?`<div class="vstate"><span class="vok">${I.ok}</span>Добавлена</div>`:''}
-      <button class="btn ${doc?'g':''}" data-modal="vdocm">${doc?'Изменить выписку':'Добавить выписку'}</button>`,'vsec'):''}
+      <button class="btn ${doc?'g':''}" data-modal="vdocm" ${RO()}>${doc?'Изменить выписку':'Добавить выписку'}</button>`,'vsec'):''}
     ${full?card(`${head('Расчетный счет','Добавьте, если хотите выводить намайненную цифровую валюту в рублях')}
       ${acc?`<div class="vpay">${bankLogo('tbank',40)}
         <span class="tx"><i>Расчетный счет</i><b>12345678901234567890</b></span></div>`:''}
-      <button class="btn ${acc?'g':''}" data-modal="vaccm">${acc?'Изменить расчетный счет':'Добавить счет'}</button>
+      <button class="btn ${acc?'g':''}" data-modal="vaccm" ${RO()}>${acc?'Изменить расчетный счет':'Добавить счет'}</button>
       <div class="vbanks"><p>Допустимые счета банков:</p>
         <div class="row" style="gap:20px;flex-wrap:wrap">${Object.keys(BANKS).map(k=>
           `<span class="vbank">${bankLogo(k)}${BANKS[k].short}</span>`).join('')}</div></div>`,'vsec')
@@ -1146,6 +1149,10 @@ V.observers=m=>{
     <button class="btn" data-modal="observer" ${S.role==='observer'?'disabled':''}>${I.pl} Создать ссылку</button></div>`;
   const cols=['Аккаунт','Изменен','URL-адрес','Описание','Монеты','Разрешения','Срок действия'];
   const sel=U.osel, allSel=rows.length&&rows.every((_,i)=>sel.has(i));
+  if(S.name==='no') return card(`<div class="ch subhead"><h2>Мои наблюдатели</h2></div>
+    <div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
+      <p>Чтобы начать добывать цифровую валюту<br>необходимо добавить имя аккаунта</p>
+      <button class="btn" data-modal="subacct">Добавить имя аккаунта</button></div>`,'tblcard');
   if(!rows.length) return card(`${head}
     <div class="tw"><table class="tbl obstbl"><thead><tr>
       <th class="cbc">${cb(false)}</th>${cols.map(c=>`<th>${c}</th>`).join('')}<th></th>
@@ -1207,16 +1214,16 @@ V.security=m=>{
     ${card(`<div class="stitle"><h2>Двухфакторная аутентификация</h2>
       <p>Защитите свой аккаунт, вывод средств, изменение настроек безопасности и подтверждение с помощью 2FA</p></div>
       ${secRow(GOOGLE,'Google Authentication','2FA через код из приложения Google',
-        `<span class="tog ${fa?'on':''} spacer" data-modal="${fa?'fa2off':'fa2on'}"></span>`)}`)}
+        `<span class="tog ${fa?'on':''} spacer ${RO()?'off':''}" ${RO()?'':`data-modal="${fa?'fa2off':'fa2on'}"`}></span>`)}`)}
     ${card(`<h2>Безопасность данных</h2>
       ${secRow(I.key,'Ваш пароль','Этот пароль используется для входа в ваш аккаунт',
-        '<button class="btn g sm spacer" data-modal="pwd">Изменить</button>')}
+        `<button class="btn g sm spacer" data-modal="pwd" ${RO()}>Изменить</button>`)}
       ${S.del==='yes'
         ? secRow(I.tr2,'Удаление аккаунта',
             `Если передумали - напишите в <a class="acc" href="https://t.me/PoolSupport" target="_blank" rel="noopener">поддержку</a>`,
             '<span class="badge acc spacer">В процессе</span>')
         : secRow(I.tr2,'Удаление данных и аккаунта','Безвозратное удаление данных и всего, что связано с аккаунтом',
-            '<button class="btn soft-danger sm spacer" data-modal="acctdel">Удалить аккаунт</button>')}`)}
+            `<button class="btn soft-danger sm spacer" data-modal="acctdel" ${RO()}>Удалить аккаунт</button>`)}`)}
   </div>
   <div>
     ${(()=>{const act=rows.filter(s=>!s.cur&&s.act).slice(0,4), more=rows.length>5;
@@ -1276,13 +1283,13 @@ V.notifconfig=m=>`${card(`<div class="ch"><button class="ib sm" data-go="notifse
   <div class="tw"><table class="tbl ntbl"><thead><tr>
     <th>События для отправки уведомлений</th>
     ${NCHAN.map((c,i)=>`<th><span class="nch">${c}</span>
-      <button class="lnk" style="color:var(--accent)" data-ncol="${i}">${nchAll(i)?'Выключить все':'Включить все'}</button></th>`).join('')}
+      <button class="lnk" style="color:var(--accent)" data-ncol="${i}" ${RO()}>${nchAll(i)?'Выключить все':'Включить все'}</button></th>`).join('')}
   </tr></thead><tbody>
   ${NEVENTS.map(([g,rows],gi)=>`<tr class="ngrp"><td colspan="${NCHAN.length+1}">${g}</td></tr>
     ${rows.map(([t,inf,val],ri)=>`<tr><td><span class="row" style="gap:8px">${t}
       ${val?`<span class="pill flat sq" style="height:28px;padding:0 10px;font-size:var(--fs-c)">${val}</span>`:''}
       ${inf?`<span class="tipi" data-tip="Порог, при котором придёт уведомление">${I.inf}</span>`:''}</span></td>
-      ${NCHAN.map((c,i)=>`<td class="num"><span class="tog ${nchOn(gi,ri,i)?'on':''}" data-nch="${gi}-${ri}-${i}"></span></td>`).join('')}</tr>`).join('')}`).join('')}
+      ${NCHAN.map((c,i)=>`<td class="num"><span class="tog ${nchOn(gi,ri,i)?'on':''} ${RO()?'off':''}" ${RO()?'':`data-nch="${gi}-${ri}-${i}"`}></span></td>`).join('')}</tr>`).join('')}`).join('')}
   </tbody></table></div>
   <p class="cap dim" style="margin-top:16px">Promminer Pool вправе присылать системные уведомления пользователю, без возможности отписаться от них.</p>`)}`;
 
