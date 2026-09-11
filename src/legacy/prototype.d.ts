@@ -53,12 +53,14 @@ export declare function status(t: 'ok'|'err'|'warn'|'off', label: string): strin
 export declare const CHECK: string
 export declare function pager(id: string, total: number, per?: number): string
 export declare function chart(m: Model, opts?: any): string
+/** Скелетон загрузки страницы. */
+export declare function skeleton(): string
 /** Календарь дизайн-системы; sel — подсвеченные числа. */
 export declare function datePicker(sel?: number[]): string
 
 export declare const V: Record<string, (m: Model) => string>
 export declare const MODALS: Record<string, {
-  t: string; s?: string; ok?: string; cta?: string; acts?: false
+  t: string; s?: string; ok?: string; cta?: string; cancel?: string; acts?: false
   steps?: number | ((m: Model) => number)
   b: (m: Model, step: number) => string
 }>

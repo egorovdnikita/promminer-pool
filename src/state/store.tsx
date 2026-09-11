@@ -12,7 +12,7 @@ export const routeOf = (pathname: string) => pathname.replace(/^\/+|\/+$/g, '') 
 
 const freshUi = (): Ui => ({
   seg: {}, sort: {}, page: {}, sel: new Set(), q: '', wfilter: 'all', geo: '',
-  wk: null, qfocus: false, auth: 'login', consent: new Set(), arch: false, theme: 'light', step: 0,
+  wk: null, qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
 
 /** Сценарий из хэша ссылки, иначе из localStorage, иначе дефолт. */
@@ -103,7 +103,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   })
 
   useEffect(() => { document.body.classList.toggle('mini', mini.current) })
-  useEffect(() => { document.documentElement.setAttribute('data-theme', U.current.theme) })
+  useEffect(() => {
+    const t = U.current.theme
+    const eff = t === 'system'
+      ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : t
+    document.documentElement.setAttribute('data-theme', eff)
+  })
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -148,10 +154,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (n === 'done') { u.auth = 'login'; go(HOME); toast('Готово') } else { u.auth = n }
       return bump()
     }
+    const si = at('[data-subinfo]')
+    if (si) { u.sub = si.dataset.subinfo!; modal.current = 'subinfo'; return bump() }
     const th = at('[data-theme-set]')
     if (th) {
-      u.theme = th.dataset.themeSet as 'light' | 'dark'
-      document.documentElement.setAttribute('data-theme', u.theme)
+      const v = th.dataset.themeSet!
+      /* «Как в системе» — берём предпочтение ОС, но помним сам выбор */
+      u.theme = v as Ui['theme']
+      const eff = v === 'system'
+        ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : v
+      document.documentElement.setAttribute('data-theme', eff)
       return bump()
     }
     if (at('[data-arch]')) { u.arch = !u.arch; return bump() }

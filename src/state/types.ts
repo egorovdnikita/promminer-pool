@@ -9,6 +9,8 @@ export interface Scenario {
   notif: string
   subs: string
   obs: string
+  name: string
+  load: string
   acct: string
 }
 
@@ -27,7 +29,9 @@ export interface Ui {
   consent: Set<number>
   /** Показывать ли архивные суб-аккаунты. */
   arch: boolean
-  theme: 'light' | 'dark'
+  /** Имя аккаунта, открытого в карточке. */
+  sub: string
+  theme: 'light' | 'dark' | 'system'
   step: number
 }
 

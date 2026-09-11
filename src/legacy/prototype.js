@@ -19,10 +19,12 @@ const AXES={
   verif:{label:'Верификация',opts:[['no','Не пройдена'],['pending','На проверке'],['yes','Пройдена']]},
   notif:{label:'Уведомления',opts:[['many','12 новых'],['few','2 новых'],['none','Нет']]},
   subs:{label:'Суб-аккаунты',opts:[['many','3'],['few','1'],['none','Только основной']]},
+  name:{label:'Имя аккаунта',opts:[['yes','Задано'],['no','Не задано']]},
+  load:{label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон']]},
   obs:{label:'Наблюдатели',opts:[['many','3'],['few','1'],['none','Нет']]},
   acct:{label:'Аккаунт',opts:[['main','Основной'],['sub','Суб-аккаунт']]},
 };
-const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',acct:'main'};
+const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
 let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
@@ -59,6 +61,7 @@ const HEALTH={ok:{a:5800,l:70,o:40,f:69},degraded:{a:1398,l:1230,o:851,f:2500},c
 const TIERS=[{p:'5%',n:'Бронза',c:'#B87333'},{p:'10%',n:'Серебро',c:'#9AA3B2'},{p:'15%',n:'Золото',c:'#D8A32B'},{p:'20%',n:'Платина',c:'#7FA8C9'},{p:'25%',n:'Алмаз',c:'#4B5563'}];
 const NOTIF_N={many:12,few:2,none:0};
 const ACCOUNTS=['natarusso','alfred','ivanivanov','loricarson'];
+const FULLNAME='Иванов Иван';
 
 function M(){
   const c=COINS[S.coin], empty=S.data==='empty', huge=S.data==='huge', k=huge?1e6:1;
@@ -228,6 +231,11 @@ const GROUP_OF={assets:'fin',income:'fin',payouts:'fin',calc:'tools',tax:'tools'
 /* ============================================================
    5. ОБЩИЕ БЛОКИ
    ============================================================ */
+/* Скелетон загрузки: блоки-заглушки вместо контента (макет 474:17426). */
+const skBlock=h=>`<div class="sk" style="height:${h}px"></div>`;
+const skeleton=()=>`<div class="grid cols2" style="grid-template-columns:1.9fr 1fr;align-items:start">
+  <div>${[258,300,186].map(skBlock).join('<div style="height:16px"></div>')}</div>
+  <div>${[345,495].map(skBlock).join('<div style="height:16px"></div>')}</div></div>`;
 const card=(inner,cls='')=>`<section class="card ${cls}">${inner}</section>`;
 const emptyBox=(t,p)=>`<div class="empty"><div class="art">${sv('<path d="M3 13.5h4.2c.5 0 .95.28 1.17.72l.26.56c.22.44.67.72 1.17.72h4.06c.5 0 .95-.28 1.17-.72l.26-.56c.22-.44.67-.72 1.17-.72H21"/><path d="M3.5 13.5 5 6.4A3 3 0 0 1 7.94 4h8.12A3 3 0 0 1 19 6.4l1.5 7.1"/><path d="M3 14v2c0 2.2 0 3.3.68 3.98S5.5 20.7 7.7 20.7h8.6c2.2 0 3.3 0 3.98-.68S21 18.2 21 16v-2"/>',36)}</div><b>${t}</b><p>${p}</p></div>`;
 /* Сегментированный контрол — кликабельный, состояние в U.seg[id] */
@@ -246,8 +254,8 @@ const cb=(on,attr='',cls='')=>`<span class="cb ${on?'on':''} ${cls}" ${attr}>${o
 /* Date Picker дизайн-системы: месяц сеткой, выбранный диапазон подсвечен.
    Данные статичные — прототипу хватает января 2026 с диапазоном 29–30. */
 function datePicker(sel=[29,30]){
-  const dows=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
-  const lead=3, days=31; /* 1 января 2026 — четверг */
+  const dows=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  const lead=4, days=31; /* 1 января 2026 — четверг, неделя с воскресенья */
   const cells=[];
   for(let i=0;i<lead;i++)cells.push(`<span class="dp-d mut">${29+i}</span>`); /* хвост декабря */
   for(let d=1;d<=days;d++)cells.push(`<span class="dp-d ${sel.includes(d)?'sel':''}">${d}</span>`);
@@ -812,7 +820,7 @@ const profTabs=(cur,m)=>{const n={subaccounts:subsOf(m).length,observers:obsOf(m
 function subTile(m,s){
   const w=m.empty?[0,0,0,0]:s.w;
   const dots=[[w[0],'var(--pos)'],[w[1],'var(--warn)'],[w[2],'var(--neg)'],[w[3],'var(--neu)']];
-  return `<div class="tile2">
+  return `<div class="tile2" data-subinfo="${s.name}" style="cursor:pointer">
     <b class="t" style="display:flex;align-items:center;gap:8px;font-size:var(--fs-m);font-weight:600;margin-bottom:10px">${s.name}
       ${s.main?'<span class="tag spacer">Основной</span>':'<span class="tag n spacer">Суб-аккаунт</span>'}</b>
     <div class="kv">Общий баланс<span class="mono">${s.main?nf(m.bal[0].usd):'0,00'} $</span></div>
@@ -845,7 +853,8 @@ const PROMOS=[['Снизили порог для<br>продажи ЦВ до 10 
 V.profile=m=>{
   const acct=S.acct==='main'?'natarusso':'alfred';
   const n=NOTIF_N[S.notif];
-  const subs=subsOf(m), obs=obsOf(m);
+  const subs=subsOf(m).filter(x=>!x.arch), obs=obsOf(m);
+  const noname=S.name==='no';
   const notes=[['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03'],
     ['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03'],
     ['Средства выведены успешно','Вывод 74,7488 DOGE на ваш аккаунт зач…','22.07.2025 07:03'],
@@ -853,41 +862,46 @@ V.profile=m=>{
   return `<div class="grid cols2" style="grid-template-columns:1.9fr 1fr;align-items:start">
   <div>
     ${card(`<div class="ch"><h2>Мои суб-аккаунты</h2><button class="btn link spacer bs" data-go="subaccounts">Смотреть все</button></div>
-      <div class="grid g3" style="margin:0">${subs.map(s=>subTile(m,s)).join('')}
-        ${S.role==='owner'&&subs.length<3?`<button class="dashed" style="grid-column:span ${3-subs.length}" data-modal="subacct">${I.pl}Создать суб-аккаунт</button>`:''}</div>`)}
+      ${noname?`<div class="empty" style="padding:28px 0"><p style="max-width:372px">Чтобы начать добывать цифровую валюту необходимо добавить имя аккаунта</p>
+        <button class="btn" style="margin-top:16px" data-modal="subacct">${I.pl} Добавить имя аккаунта</button></div>`
+      :`<div class="grid g3" style="margin:0">${subs.map(s=>subTile(m,s)).join('')}
+        ${S.role==='owner'&&subs.length<3?`<button class="dashed" style="grid-column:span ${3-subs.length}" data-modal="subacct">${I.pl}Создать суб-аккаунт</button>`:''}</div>`}`)}
     <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Мои наблюдатели</h2>${obs.length?'<button class="btn link spacer bs" data-go="observers">Смотреть все</button>':''}</div>
       ${obs.length?`<div class="grid g3" style="margin:0">${obs.map(obsTile).join('')}
-        ${S.role==='owner'&&obs.length<3?`<button class="dashed" style="grid-column:span ${3-obs.length}" data-modal="observer">${I.pl}Добавить наблюдателя</button>`:''}</div>`
+        ${S.role==='owner'&&obs.length<3?`<button class="dashed" style="grid-column:span ${3-obs.length}" data-modal="observer">${I.pl}Создать ссылку наблюдателя</button>`:''}</div>`
       :`<div class="empty" style="padding:48px 0 40px"><div class="art">${I.eye}</div>
           <p style="max-width:340px">У вас еще нет созданных ссылок наблюдателей</p>
-          ${S.role==='owner'?`<button class="btn out sm" style="margin-top:16px" data-modal="observer">${I.pl} Создать</button>`:''}</div>`}`)}
+          ${S.role==='owner'&&!noname?`<button class="btn out sm" style="margin-top:16px" data-modal="observer">${I.pl} Создать</button>`:''}</div>`}`)}
     <div style="height:12px"></div>
-    <div class="grid g2" style="margin:0">
-      ${PROMOS.map(([t,b,img])=>`<section class="promo"><img class="art" src="${img}" alt="">
+    <div class="grid ${noname?'':'g2'}" style="margin:0">
+      ${(noname?PROMOS.slice(1):PROMOS).map(([t,b,img])=>`<section class="promo"><img class="art" src="${img}" alt="">
         <button class="pclose" data-toast="Баннер скрыт">${I.x}</button>
         <h2>${t}</h2><button class="btn">${b}</button></section>`).join('')}
     </div>
   </div>
   <div>
     ${card(`<div class="ch"><h2>Мой профиль</h2></div>
-      <div class="row" style="gap:14px;margin-bottom:4px"><span class="avat lg">${acct[0].toUpperCase()}</span>
-        <b style="font-size:20px;font-weight:600">${acct}</b>
-        <button class="lnk" style="color:var(--accent)" data-copy="${acct}">${I.cp}</button>
-        <button class="lnk spacer dim" data-modal="personal">${I.edit}</button></div>
+      ${noname?`<div class="row" style="gap:16px;margin-bottom:4px"><span class="avat lg" style="width:64px;height:64px;font-size:24px">?</span>
+        <button class="btn out sm" data-modal="subacct">${I.pl} Добавить имя аккаунта</button></div>`
+      :`<div class="row" style="gap:16px;margin-bottom:4px"><span class="avat lg">${acct[0].toUpperCase()}</span>
+        <span style="min-width:0"><span class="row" style="gap:8px"><b style="font-size:20px;line-height:24px;font-weight:600">${acct}</b>
+          <button class="lnk" style="color:var(--accent)" data-copy="${acct}">${I.cp}</button></span>
+          <div class="cap dim" style="margin-top:2px">${FULLNAME}</div></span>
+        <button class="lnk spacer dim" data-modal="personal">${I.edit}</button></div>`}
       <button class="rowline" data-go="security"><span class="iconbox">${I.pc}</span>
         <span class="tx"><i>Последняя сессия</i><b>${SESSIONS[0].dev} <i class="dot" style="display:inline-block;background:var(--pos)"></i></b></span>
         <span class="ch2">${I.cv}</span></button>
-      <button class="rowline" data-go="security"><span class="iconbox" style="background:var(--surface);box-shadow:0 0 0 1px var(--border)">${GOOGLE}</span>
+      ${noname?'':`<button class="rowline" data-go="security"><span class="iconbox" style="background:var(--surface);box-shadow:0 0 0 1px var(--border)">${GOOGLE}</span>
         <span class="tx"><b>Google Authentication</b><span class="badge" style="margin-top:4px">Не подключено</span></span>
-        <span class="ch2">${I.cv}</span></button>`)}
+        <span class="ch2">${I.cv}</span></button>`}`)}
     <div style="height:12px"></div>
-    ${card(`<div class="ch"><h2>Последние уведомления</h2>
+    ${card(`<div class="ch"><h2>Последние уведомления</h2>${n?`<span class="cnt">${n>99?'99+':n}</span>`:''}
       <button class="btn link spacer dim" data-go="notifsettings">${I.cv}</button></div>
       ${n?`<div class="nplist">${notes.slice(0,Math.min(n,4)).map(([t,d,dt])=>`<div class="nitem"><i class="dot"></i>
           <div><div class="nb"><span class="nt">${t}</span><span class="nd">${dt}</span></div><p>${d}</p></div></div>`).join('')}</div>
         <div style="text-align:center;padding-top:8px"><button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button></div>`
-        :`<div class="empty" style="padding:96px 0"><p>Уведомлений пока нет</p></div>`}`)}
+        :`<div class="empty" style="padding:96px 0"><p>Новых уведомлений нет</p></div>`}`)}
   </div>
 </div>`;
 };
@@ -1081,7 +1095,55 @@ V.auth=()=>{
 /* ============================================================
    7. МОДАЛКИ
    ============================================================ */
+const TZ=['UTC +3:00','UTC +4:00','UTC +5:00','UTC +6:00'];
+const THEMES=[['light','Всегда светлая'],['dark','Всегда тёмная'],['system','Как в системе']];
+/* Данные для модалки суб-аккаунта: активный аккаунт берём из U.sub */
+const subByName=n=>SUBS.find(x=>x.name===n)||SUBS[0];
+
 const MODALS={
+  /* Настройки аккаунта (макет 2219:33325): язык, часовой пояс, тема радиогруппой */
+  settings:{t:'Настройки',cta:'Сохранить',cancel:'Отменить',ok:'Настройки сохранены',b:()=>`
+    <div class="mrow"><span class="mi">${I.doc}</span><span class="tx"><i>Язык интерфейса</i><b>Русский</b></span>
+      <span class="tag">Скоро</span></div>
+    <div class="mrow"><span class="mi">${I.cal}</span><span class="tx"><i>Часовой пояс</i><b>${segv('tz',TZ)}</b></span>
+      <span class="pop-wrap"><button class="pill flat sq" data-pop="tz">${I.cd}</button>
+      ${pop==='tz'?`<div class="pop" style="min-width:200px">${TZ.map((t,i)=>
+        `<button class="${segi('tz')===i?'on':''}" data-seg="tz" data-i="${i}">${t}${segi('tz')===i?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></div>
+    <div class="alert info" style="margin:12px 0">${I.inf}<div>Выберите таймзону для удобной связи с поддержкой. На баланс и выплаты это не влияет</div></div>
+    <div class="cap dim" style="margin:16px 0 8px">Тема интерфейса</div>
+    ${THEMES.map(([v,t])=>`<label class="rrow" data-theme-set="${v}">${rd(U.theme===v)}<span>${t}</span></label>`).join('')}`},
+
+  /* Подтверждение выхода (макет 2219:33832) */
+  logout:{t:'',acts:false,b:()=>`
+    <div class="empty" style="padding:8px 0 0"><div class="art">${I.user}</div>
+      <b style="font-size:var(--fs-b1);line-height:var(--lh-b1)">Вы действительно хотите выйти?</b></div>
+    <div class="acts" style="margin-top:24px"><button class="btn out" style="flex:1;justify-content:center" data-close>Отменить</button>
+      <button class="btn danger" style="flex:1;justify-content:center" data-go="auth" data-close>Выйти</button></div>`},
+
+  /* Карточка суб-аккаунта (макеты 477:8024, 1489:79674, 1489:79826).
+     У текущего аккаунта кнопки «Выбрать этот аккаунт» нет. */
+  subinfo:{t:'Информация об аккаунте',acts:false,b:m=>{
+    const a=subByName(U.sub), cur=(S.acct==='main'?'natarusso':'alfred')===a.name;
+    const HU=['TH/s','GH/s','KSol/s'], IC=['BTC','LTC','DOGE','ZEC'];
+    const cell=(k,v)=>`<div class="field"><div class="k">${k}</div><div class="v mono">${v}</div></div>`;
+    return `<div class="empty" style="padding:4px 0 20px"><span class="avat lg">${a.name[0].toUpperCase()}</span>
+        <b style="font-size:var(--fs-b1);line-height:var(--lh-b1);margin-top:12px">${a.name}</b>
+        <span class="tag ${a.main?'sel':''}" style="margin-top:6px">${a.main?'Основной':'Суб-аккаунт'}</span></div>
+      <div class="hr"></div>
+      <div style="margin-top:16px">${cell('Общий баланс',nf(a.bal)+' $')}</div>
+      <div class="grid g2" style="margin:8px 0 0;gap:8px">
+        ${a.h.map((v,i)=>cell('Хэшрейт, '+['BTC','LTC','ZEC'][i],ni(v)+' '+HU[i])).join('')}
+        ${a.inc.map((v,i)=>cell('Доход, '+IC[i],dec(v)+' '+IC[i])).join('')}</div>
+      <div class="field" style="margin-top:8px"><div class="k">Воркера</div>
+        <div class="row" style="gap:16px;margin-top:6px;justify-content:space-between">
+          ${[['Активные','var(--pos)'],['Низкий хэш.','var(--warn)'],['Отключены','var(--neg)'],['Оффлайн','var(--neu)']]
+            .map(([t,c],i)=>`<span style="text-align:center"><span class="row" style="gap:6px;justify-content:center">
+              <i class="dot" style="background:${c}"></i><b class="mono" style="font-weight:600">${ni(a.w[i])}</b></span>
+              <div class="cap dim" style="margin-top:2px">${t}</div></span>`).join('')}</div></div>
+      ${cur?'':`<div class="acts" style="margin-top:24px"><button class="btn" style="flex:1;justify-content:center"
+        data-acct="${a.main?'main':'sub'}" data-close data-toast="Переключились на ${a.name}">Выбрать этот аккаунт</button></div>`}`;
+  }},
+
   connect:{ok:'Воркер добавлен — данные появятся через 5–10 минут',t:'Подключить воркера',s:'Укажите адрес пула и имя воркера в прошивке устройства',b:m=>`
     <div class="ch">${seg('connect-coin',['BTC','LTC + DOGE'],S.coin==='btc'?0:1)}</div>
     ${[3333,4444,5555].map((p,i)=>`<div class="urlrow"><div><div class="k">URL ${i+1}</div><div class="v mono">stratum+tcp://ss.promminer.ru:${p}</div></div><button class="spacer lnk" style="color:var(--accent)" data-copy="stratum+tcp://ss.promminer.ru:${p}">${I.cp}</button></div>`).join('')}
@@ -1106,11 +1168,13 @@ const MODALS={
     <div class="inp"><div class="k">Имя аккаунта</div><input placeholder="latin, 3–20 символов"></div>
     <div class="inp"><div class="k">Комментарий</div><input placeholder="Необязательно"></div>`},
   /* «Личные данные» и «Добавить номер телефона» — из макета «Действия с телефоном» */
-  personal:{t:'Личные данные',acts:false,b:()=>`
+  personal:{t:'Личные данные',cta:'Сохранить',cancel:'Отменить',ok:'Данные успешно изменены',b:()=>`
     <div class="grid g3" style="margin:0;gap:8px">
       ${['Фамилия','Имя','Отчество'].map(p=>`<div class="afield"><input placeholder="${p}"></div>`).join('')}
     </div>
-    <div class="afield" style="margin-top:8px"><input placeholder="Дата рождения"><span class="aeye">${I.cal}</span></div>
+    <span class="pop-wrap" style="display:block">
+      <div class="afield" style="margin-top:8px"><input placeholder="Дата рождения"><button class="aeye" data-pop="bday">${I.cal}</button></div>
+      ${pop==='bday'?datePicker([]).replace('class="pop dp"','class="pop dp left" style="top:calc(100% + 8px)"'):''}</span>
     <div class="cap dim" style="margin:16px 0 4px">Контакты</div>
     <div class="mrow"><span class="mi">${I.phone}</span><span class="tx"><i>Телефон</i></span>
       <button class="act" data-modal="phone">${I.edit}</button></div>
@@ -1189,7 +1253,7 @@ export function applyState(next){
 export {
   AXES, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON,
-  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs,
+  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VERIF_FIELDS,
   S, U, route, pop, modal, openGroups, mini,
 };

@@ -30,7 +30,7 @@ export function Modal({ m }: { m: Model }) {
             {steps && step < steps - 1
               ? <button className="btn" data-step={step + 1}>{d.cta || 'Подтвердить'}</button>
               : <button className="btn" data-close data-toast={d.ok || 'Готово'}>{d.cta || 'Подтвердить'}</button>}
-            {!steps && <button className="btn g" data-close>Отмена</button>}
+            {!steps && <button className="btn g" data-close>{d.cancel || 'Отмена'}</button>}
           </div>
         )}
       </div>

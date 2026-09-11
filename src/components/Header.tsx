@@ -59,9 +59,9 @@ export function Header({ m }: { m: Model }) {
                   <button data-go={id} key={id}><Ico className="i3" html={I[ic]} />{t}</button>
                 ))}
                 <div className="hr" />
-                <button data-toast="Раздел настроек в работе"><Ico className="i3" html={I.gear} />Настройки</button>
+                <button data-modal="settings"><Ico className="i3" html={I.gear} />Настройки</button>
                 <div className="hr" />
-                <button data-go="auth"><Ico className="i3" html={I.out} />Выйти</button>
+                <button data-modal="logout"><Ico className="i3" html={I.out} />Выйти</button>
               </div>
             )}
           </span>
