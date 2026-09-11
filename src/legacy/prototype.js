@@ -1047,7 +1047,7 @@ V.observers=m=>{
 /* Строка сессии: плашка 56, устройство с пульсом, IP • дата и город.
    У всех сессий, кроме текущей, справа кнопка завершения. */
 const sessOut=s=>s.cur?'':`<button class="ibr dim spacer" data-modal="sessend"
-  title="Завершить сессию">${I.logout3}</button>`;
+  title="Завершить сессию">${I.login3}</button>`;
 const sessRow=(s,act)=>secRow(I.monitor,
   `${s.dev}${s.act?'<i class="pulse"></i>':''}`,
   `<span class="sdots"><em>IP</em> ${s.ip}</span><span class="sdots">${s.when}</span><br>${s.loc}`,act??sessOut(s));

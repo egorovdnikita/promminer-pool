@@ -23,7 +23,7 @@
 - `unlink` — `Text Formatting / Link Broken`, кнопка «Отвязать» у контакта.
 - `key` (`Security / Key`) и `tr2` (`Trash Bin 2`) — строки экрана «Безопасность».
 - `out` — `Arrows Action / Logout 2`, пункт «Выйти» в меню аккаунта;
-  `logout3` — `Arrows Action / Logout 3`, кнопка завершения чужой сессии.
+  `login3` — `Arrows Action / Login 3`, кнопка завершения чужой сессии.
   Разные глифы намеренно: выход из своего аккаунта и завершение чужого — разные действия.
 - `eye` и `eyeoff` — `Security / Eye` и `Eye Closed`, **Linear**: показать
   и скрыть пароль. Как и стрелки, приходят обводкой — нужен `fill="none"`.
