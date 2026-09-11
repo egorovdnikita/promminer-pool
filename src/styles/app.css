@@ -217,9 +217,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .delta.w{background:#ffffff3d;color:#fff}
 
 /* Segment Control (💙 Дизайн-система): контейнер h48 radius-m, сегмент h40 radius-s */
-.seg{display:inline-flex;background:var(--ctrl2);border-radius:var(--r-m);padding:4px;gap:4px;max-width:100%;overflow-x:auto;scrollbar-width:none}
+.seg{display:inline-flex;background:var(--ctrl2);border-radius:var(--r-m);padding:2px;gap:4px;max-width:100%;overflow-x:auto;scrollbar-width:none}
 .seg::-webkit-scrollbar{display:none}
-.seg button{height:var(--h-btn-sm);padding:0 16px;border-radius:var(--r-s);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c2);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.seg button{height:44px;padding:0 16px;border-radius:var(--r-m);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c2);display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .seg button.on{background:var(--surface);color:var(--c1)}
 .seg.fill{display:flex;width:100%}
 .seg.fill button{flex:1;justify-content:center}
@@ -335,8 +335,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Баннер из макета 1981:32563: градиент, угловая фигура и иллюстрация с выносом за край */
 .promo{background:#eef0fd url('/banner-bg.png') center/cover;border-radius:var(--r-l);padding:24px;position:relative;overflow:hidden;box-shadow:none;display:flex;flex-direction:column;min-height:188px}
 
-.promo h2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;max-width:54%;position:relative;color:var(--c1)}
-.promo .art{position:absolute;right:0;bottom:0;height:113%;width:auto;max-width:46%;object-fit:contain;object-position:right bottom;pointer-events:none}
+.promo h2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;max-width:60%;position:relative;color:var(--c1);
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.promo .art{position:absolute;right:0;bottom:0;height:113%;width:auto;max-width:40%;object-fit:contain;object-position:right bottom;pointer-events:none}
 .promo .pclose{position:absolute;right:16px;top:16px;z-index:1;width:40px;height:40px;border-radius:var(--r-f);display:grid;place-items:center;background:#52525229;color:var(--c1)}
 .promo .pclose:hover{background:#5252523d}
 .promo .pclose svg{width:24px;height:24px}
@@ -640,7 +641,6 @@ body.mini .ni .spacer.lbl{display:none!important}
 :root[data-theme="dark"] .linkfield{background:var(--ctrl2)}
 :root[data-theme="dark"] .badge{color:#fbbf24}
 @media(max-width:1450px){.main .grid.g3{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:1750px){.main .promos.g2{grid-template-columns:1fr}}
 @media(max-width:1150px){.main .g3,.main .g4,.main .cols2{grid-template-columns:1fr!important}.sb{display:none}}
 
 /* Tooltip (💙 DS): подсказка на [data-tip], по умолчанию снизу. */
@@ -731,8 +731,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Заголовки блоков в макете крупнее: 24 SemiBold */
 .card>.ch h2,.card h2{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
 /* Segment Control профиля живёт в шапке и тянется на всю её ширину */
-.top .tabseg{display:inline-flex;margin:16px 0 0;width:auto;max-width:100%;padding:2px}
-.top .tabseg button{height:44px}
+.top .tabseg{display:inline-flex;margin:16px 0 0;width:auto;max-width:100%}
 
 /* Ссылки в подвале — серые, как в макете */
 .foot a{color:inherit}
