@@ -843,8 +843,8 @@ const sessOf=m=>m.empty?SESSIONS.slice(0,1):SESSIONS;
    Счётчики показываются и при нуле (в макете «Наблюдатели 0»). */
 const profTabs=(cur,m)=>{const n={subaccounts:subsOf(m).length,observers:obsOf(m).length};
   const nn=NOTIF_N[S.notif];
-  return `<div class="seg tabseg">${PROF.map(([id,t])=>`<button class="${cur===id?'on':''}" data-go="${id}">${
-    id==='notifsettings'&&nn?`<span class="cnt">${nn>99?'99+':nn}</span>`:''}${t}${id in n?`<u>${n[id]}</u>`:''}</button>`).join('')}</div>`};
+  return `<div class="seg tabseg">${PROF.map(([id,t])=>`<button class="${cur===id?'on':''}" data-go="${id}">${t}${
+    id==='notifsettings'&&nn?`<span class="cnt">${nn>99?'99+':nn}</span>`:''}${id in n?`<u>${n[id]}</u>`:''}</button>`).join('')}</div>`};
 
 function subTile(m,s){
   const w=m.empty?[0,0,0,0]:s.w;

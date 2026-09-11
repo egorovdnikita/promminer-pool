@@ -780,7 +780,7 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .ntbl th .lnk{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .ntbl td.num{text-align:center}
 .ntbl tr.ngrp td{padding-top:24px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:600;background:none}
-.tabseg .cnt{margin-right:6px}
+.tabseg .cnt{margin-left:6px}
 .pager .perpage{display:flex;align-items:center;gap:8px;margin-right:16px}
 
 /* Центр суб-аккаунтов: сгруппированная шапка и итоговая строка (макет 2300:135215) */
