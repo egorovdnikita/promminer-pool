@@ -239,6 +239,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (ac) { S.current.acct = ac.dataset.acct!; pop.current = null; return bump() }
     const pp = at('[data-pop]')
     if (pp) { pop.current = pop.current === pp.dataset.pop ? null : pp.dataset.pop!; return bump() }
+    const eye = at('[data-eye]')
+    if (eye) {
+      const inp = eye.closest('.inp')?.querySelector('input') as HTMLInputElement | null
+      if (inp) inp.type = inp.type === 'password' ? 'text' : 'password'
+      eye.classList.toggle('on')
+      return
+    }
     const tg = at('[data-tog]')
     if (tg) { tg.classList.toggle('on'); return }
     if (at('[data-mini]')) { mini.current = !mini.current; document.body.classList.toggle('mini', mini.current); return bump() }

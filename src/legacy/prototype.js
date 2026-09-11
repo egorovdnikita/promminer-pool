@@ -319,8 +319,8 @@ function chart(m,opts={}){
   const ticks=opts.ticks||[0,150,300,450,600,750,900,1050,1200,1350,1500];
   const hrs=opts.xs||['14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00','01:00','02:00','03:00','04:00','05:00','06:00'];
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" preserveAspectRatio="none">
-    <text x="${PL}" y="9" font-size="11" fill="var(--c3)" font-weight="600">${opts.yl??('Хэшрейт, '+m.c.unit)}</text>
-    ${opts.right===false?'':`<text x="${W-PR}" y="9" font-size="11" fill="var(--c3)" text-anchor="end" font-weight="600">Реджект, %</text>`}
+    <text x="${PL}" y="9" font-size="12" fill="var(--c3)" font-weight="600">${opts.yl??('Хэшрейт, '+m.c.unit)}</text>
+    ${opts.right===false?'':`<text x="${W-PR}" y="9" font-size="12" fill="var(--c3)" text-anchor="end" font-weight="600">Реджект, %</text>`}
     ${ticks.map((t,i)=>{const yy=PT+ih-(i/(ticks.length-1))*ih;return`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="var(--border)"/>
       <text x="${PL-8}" y="${yy+3}" font-size="10" fill="var(--c3)" text-anchor="end">${m.empty?0:t}</text>
       ${opts.right===false?'':`<text x="${W-PR+8}" y="${yy+3}" font-size="10" fill="var(--c3)">${i*10}</text>`}`}).join('')}
@@ -830,9 +830,12 @@ const OBS_PERMS=['Воркеры','Мои активы','Начисления','
   'Список рефералов','Реферальный доход','Реферальные выплаты'];
 const OBS_COINS=['BTC','LTC','DOGE','ZEC'];
 const SESSIONS=[
-  {dev:'Apple Macintosh, Chrome (macOS)',ip:'89.23.14.201',loc:'Москва',when:'сейчас',cur:1},
-  {dev:'iPhone 15, Safari (iOS)',        ip:'212.90.4.18', loc:'Санкт-Петербург',when:'2 часа назад',cur:0},
-  {dev:'Windows 11, Chrome',             ip:'77.88.12.9',  loc:'Казань',when:'вчера, 18:40',cur:0}];
+  {dev:'Apple Macintosh, Chrome (macOS)',ip:'89.23.14.201',loc:'Москва, Россия',when:'19/11/2025 14:30',cur:1,act:1},
+  {dev:'iPhone 15, Safari (iOS)',        ip:'212.90.4.18', loc:'Санкт-Петербург, Россия',when:'19/11/2025 12:04',cur:0,act:1},
+  {dev:'Windows 11, Chrome',             ip:'77.88.12.9',  loc:'Казань, Россия',when:'18/11/2025 18:40',cur:0,act:1},
+  {dev:'M6500QC, Chrome (Windows)',      ip:'95.24.60.11', loc:'Москва, Россия',when:'18/11/2025 09:12',cur:0,act:1},
+  {dev:'Redmi Note 12, Chrome (Android)',ip:'31.173.84.6', loc:'Сочи, Россия',when:'02/11/2025 21:35',cur:0,act:0},
+  {dev:'iPad Air, Safari (iPadOS)',      ip:'188.43.19.77',loc:'Тверь, Россия',when:'28/10/2025 08:02',cur:0,act:0}];
 /* Сценарий «Пусто» — свежий аккаунт: только основной, без наблюдателей и чужих сессий */
 const CNT={many:3,few:1,none:0};
 const subsOf=m=>{
@@ -1040,6 +1043,10 @@ V.observers=m=>{
         <button class="ibr dim" data-modal="obsdel" title="Удалить">${I.tr}</button></span></td></tr>`}).join('')}
   </tbody></table></div>`:emptyBox('Наблюдателей пока нет','Создайте ссылку, чтобы дать бухгалтеру или партнеру доступ к статистике только для чтения')}`)}`};
 
+/* Строка сессии: плашка 56, устройство с пульсом, IP • дата и город */
+const sessRow=s=>secRow(I.monitor,
+  `${s.dev}${s.act?'<i class="pulse"></i>':''}`,
+  `<span class="sdots">${s.ip}</span><span class="sdots">${s.when}</span><br>${s.loc}`,'');
 /* Безопасность (макет 971:102888): две карточки слева и «Сессии» справа.
    Строка секции — плашка 56, заголовок 16/20, подпись 14/18 и действие справа. */
 const secRow=(ic,t,d,right)=>`<div class="srow"><span class="sico">${ic}</span>
@@ -1065,8 +1072,7 @@ V.security=m=>{
   <div>
     ${card(`<div class="ch"><h2>Сессии</h2>${rows.length>1?'<button class="btn link spacer" data-modal="sessions">Все сессии</button>':''}</div>
       <div class="scur">Это устройство</div>
-      ${secRow(I.pc,`${cur.dev}<i class="pulse"></i>`,
-        `<span class="sdots">${cur.ip}</span><span class="sdots">${cur.when}</span><br>${cur.loc}`,'')}`)}
+      ${sessRow(cur)}`)}
   </div></div>`;
 };
 
@@ -1475,10 +1481,10 @@ Object.assign(MODALS,{
       :step===1?`<div class="cstep g32">${prog(1,3)}
         <div class="pwdform">
           <b class="ctitle">Придумайте новый пароль</b>
-          <div class="inp" style="margin:0"><div class="k">Новый пароль</div>
-            <input type="password" value="Kate1234!"></div>
-          <div class="inp" style="margin:0"><div class="k">Подтвердить новый пароль</div>
-            <input type="password" value="Kate1234!"></div>
+          ${['Новый пароль','Подтвердить новый пароль'].map(k=>`
+            <div class="inp pwd" style="margin:0"><span class="tx"><div class="k">${k}</div>
+              <input type="password" value="Kate1234!"></span>
+              <button class="aeye spacer" data-eye>${I.eye}</button></div>`).join('')}
           <ul class="mhints">${PWD_RULES.map(r=>`<li>${I.ok}${r}</li>`).join('')}</ul>
         </div></div>`
       :`<div class="cstep mid">${prog(2,3)}${doneBlock('Пароль успешно изменен')}</div>`,
@@ -1486,18 +1492,21 @@ Object.assign(MODALS,{
       ? `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="${step+1}">${step?'Изменить':'Далее'}</button>`
       : `<button class="btn" data-close data-toast="Пароль успешно изменен">Отлично</button>`},
   /* Все сессии (1008:48445) */
+  /* Все сессии (1008:48445): три группы — текущая, активные и неактивные */
   sessions:{t:'Все сессии',acts:false,
     b:m=>{const rows=sessOf(m);
-      return `<div class="mstack">${rows.map((s,i)=>`
-        <div>${i===0?'<div class="scur">Это устройство</div>':''}
-        ${secRow(I.pc,`${s.dev}${s.cur?'<i class="pulse"></i>':''}`,
-          `<span class="sdots">${s.ip}</span><span class="sdots">${s.when}</span><br>${s.loc}`,
-          s.cur?'':`<button class="act danger spacer" data-modal="sessend" title="Завершить">${I.unlink}</button>`)}</div>`).join('')}
+      const act=rows.filter(s=>!s.cur&&s.act), off=rows.filter(s=>!s.cur&&!s.act);
+      const group=(label,list,gray)=>list.length?`<div class="sgroup">
+        <div class="scur ${gray?'off':''}">${label}</div>${list.map(sessRow).join('')}</div>`:'';
+      return `<div class="mstack" style="gap:20px">
+        <div class="sgroup"><div class="scur">Это устройство</div>${sessRow(rows[0])}
+          ${rows.length>1?`<button class="slink" data-modal="sessall">Завершить все сессии, кроме текущей</button>`:''}</div>
+        ${act.length?'<div class="hr" style="margin:0"></div>':''}
+        ${group('Активные',act)}
+        ${off.length?'<div class="hr" style="margin:0"></div>':''}
+        ${group('НЕ Активные',off,1)}
       </div>`},
-    foot:m=>sessOf(m).length>1
-      ? `<button class="btn out" data-close>Закрыть</button>
-         <button class="btn danger" data-modal="sessall">Завершить все</button>`
-      : `<button class="btn out" data-close>Закрыть</button>`},
+    foot:()=>`<button class="btn out" data-close>Закрыть</button>`},
   sessend:{t:'Завершить эту сессию?',img:'/modal-delete.png',center:true,acts:false,b:()=>'',
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Сессия завершена">Завершить</button>`},

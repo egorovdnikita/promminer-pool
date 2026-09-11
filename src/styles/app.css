@@ -118,8 +118,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mini-btn{margin-top:auto;display:flex;align-items:center;gap:8px;padding:12px 8px;margin:auto 16px 0;border-radius:var(--r-m);color:var(--c3);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .mini-btn:hover{background:var(--ctrl2)}
 
-.main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 8px}
-.page{padding:16px 0 0;width:100%}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 8px;min-height:100vh}
+.page{padding:16px 0 0;width:100%;flex:1;display:flex;flex-direction:column;min-height:0}
+.page>*{flex:0 0 auto}
 
 /* header */
 /* Хедер по DS: белая панель со скруглением 24 снизу */
@@ -369,7 +370,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .pt span{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--c3)}
 .pt.on span{color:var(--c1)}
 .alert.mb{margin-bottom:12px}
-.foot{display:flex;gap:24px;padding:20px 0 24px;font-size:var(--fs-s);line-height:var(--lh-s);color:#9ca3af;font-weight:600;flex-wrap:wrap}
+.foot{margin-top:auto;display:flex;gap:24px;padding:20px 0 24px;font-size:var(--fs-s);line-height:var(--lh-s);color:#9ca3af;font-weight:600;flex-wrap:wrap}
 .foot .l{margin-left:auto;display:flex;gap:24px;flex-wrap:wrap}
 
 /* auth — по проду: белый лист, колонка 358, поля h56, кнопка xl h56 */
@@ -437,6 +438,10 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mbody.tall2{height:506px;flex:0 0 auto}
 .mbody.tall3{height:356px;flex:0 0 auto}
 .pwdform{display:flex;flex-direction:column;gap:24px}
+/* Поле пароля: подпись со значением слева, глаз справа */
+.inp.pwd{flex-direction:row;align-items:center;gap:12px}
+.inp.pwd .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.aeye.on{color:var(--accent)}
 .pwdform .mhints{gap:4px}
 .pwdform .mhints li{display:flex;align-items:center;gap:8px}
 .pwdform .mhints svg{width:16px;height:16px;color:var(--pos);flex:0 0 auto}
@@ -473,6 +478,12 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Точки-разделители в подписи сессии */
 .sdots+.sdots::before{content:'\2022';margin:0 8px;color:var(--c3)}
 /* «Это устройство» — акцентная подпись над сессией */
+/* Группы сессий в модалке */
+.sgroup{display:flex;flex-direction:column}
+.sgroup .srow+.srow{margin-top:20px}
+.scur.off{color:var(--c2)}
+.slink{margin-top:20px;text-align:left;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--neg)}
+.slink:hover{opacity:.75}
 .scur{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:700;text-transform:uppercase;
   letter-spacing:0;color:var(--accent);margin-bottom:20px}
 /* Мягкая красная кнопка «Удалить аккаунт» */
