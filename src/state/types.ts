@@ -23,6 +23,7 @@ export interface Scenario {
   vacc: string
   verr: string
   saerr: string
+  oerr: string
 }
 
 /** Эфемерное состояние интерфейса — в ссылку не попадает. */
@@ -49,6 +50,8 @@ export interface Ui {
   phide: Set<number>
   /** Отличия от умолчания в таблице каналов уведомлений. */
   nch: Record<string, boolean>
+  /** Форму наблюдателя уже пытались отправить — показываем ошибки. */
+  oval: boolean
   q: string
   wfilter: string
   geo: string

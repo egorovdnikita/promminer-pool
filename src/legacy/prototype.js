@@ -21,6 +21,7 @@ const AXES={
   verif:{g:'Верификация',label:'Данные',opts:[['no','Не заполнены'],['yes','Заполнены']]},
   vdoc:{g:'Верификация',label:'Выписка из реестра',opts:[['no','Не добавлена'],['yes','Добавлена']]},
   vacc:{g:'Верификация',label:'Расчетный счет',opts:[['no','Не добавлен'],['yes','Добавлен']]},
+  oerr:{g:'Наблюдатели',label:'Описание ссылки',opts:[['no','Заполнено'],['req','Не заполнено'],['long','Больше 100 символов']]},
   saerr:{g:'Суб-аккаунты',label:'Имя суб-аккаунта',opts:[['no','Пусто'],['ok','Свободно'],
     ['req','Не заполнено'],['short','Коротко и капсом'],['caps','Есть заглавные'],
     ['busy','Уже занято'],['load','Проверяем']]},
@@ -49,10 +50,10 @@ const PRESETS=[
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
 const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
-  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no'};
+  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -906,22 +907,30 @@ function subTile(m,s){
   </div>`;
 }
 /* Форма наблюдателя — общая для «Создать» и «Изменить» (макет 2219:32420) */
+const OBS_REQ={acc:'Выберите хотя бы 1 аккаунт',perm:'Выберите хотя бы 1 разрешение',coin:'Выберите хотя бы 1 монету'};
 function obsList(label,items,two,key){
   const on=i=>U.ochk.has(key+':'+i);
   const all=items.every((_,i)=>on(i));
-  return `<div class="mlist"><div class="ch"><span class="lb">${label}</span>
+  const err=U.oval&&!items.some((_,i)=>on(i));
+  return `<div class="mlist ${err?'err':''}"><div class="ch"><span class="lb">${label}</span>
     <button class="btn link bs" data-ochkall="${key}:${items.length}">${all?'Снять все':'Выбрать все'}</button></div>
     <div class="opts ${two?'c2':''}">${items.map((t,i)=>
       `<label data-ochk="${key}:${i}">${cb(on(i))}${t.ico?`<span class="coins">${t.ico.map(c=>COIN_ICON[c]).join('')}</span>`:''}
-        <span class="ell">${t.label??t}</span>${t.badge?`<span class="badge acc on">${t.badge}</span>`:''}</label>`).join('')}</div></div>`;
+        <span class="ell">${t.label??t}</span>${t.badge?`<span class="badge acc on">${t.badge}</span>`:''}</label>`).join('')}</div>
+    ${err?`<div class="errmsg">${OBS_REQ[key]}</div>`:''}</div>`;
 }
 function obsForm(desc){
   /* аккаунты списком в две колонки, у основного — бейдж (макет 1393:165559) */
   const accs=SUBS.filter(x=>!x.arch).map(a=>({label:a.name,badge:a.main?'Основной':''}));
   return `<div class="mstack">
     ${prog(0,3)}
-    <div class="marea"><div class="box ${desc?'':'dim'}">${desc||'Описание'}</div>
-      <div class="cnt2">${(desc||'').length}/100</div></div>
+    ${(()=>{const e=U.oval?S.oerr:'no';
+      const long=e==='long'?'Для четвертого менеджера с почти полным доступом к статистике аккаунта и всем монетам сразу, чтобы он мог следить':'';
+      const val=e==='req'?'':(long||desc);
+      const msg=e==='req'?'Поле обязательно для заполнения':e==='long'?'Максимум 100 символов':'';
+      return `<div class="marea ${msg?'err':''}"><div class="box ${val?'':'dim'}">${val||'Описание'}</div>
+        <div class="crow">${msg?`<span class="errmsg">${msg}</span>`:'<span></span>'}
+          <span class="cnt2">${(val||'').length}/100</span></div></div>`})()}
     ${obsList('Аккаунт',accs,true,'acc')}
     <div class="mlists">${obsList('Разрешения',OBS_PERMS,0,'perm')}${obsList('Монеты',OBS_COINS,0,'coin')}</div>
     <div class="msel"><div class="lb">Срок действия</div>
@@ -1620,12 +1629,16 @@ const MODALS={
       <button class="btn" data-close data-toast="Данные успешно изменены">Сохранить</button>`},
   /* Создать и изменить наблюдателя — один макет с разными заголовками
      (2219:32420 и 2219:32311): описание со счётчиком, списки чекбоксов, срок действия */
-  observer:{t:'Создать ссылку наблюдателя',acts:false,b:()=>obsForm(''),
-    foot:()=>`<button class="btn out" data-close>Отменить</button>
-      <button class="btn" data-close data-toast="Ссылка наблюдателя создана">Подтвердить</button>`},
-  obsedit:{t:'Изменить наблюдателя',acts:false,b:()=>obsForm(U.sub||'Для бухгалтера'),
-    foot:()=>`<button class="btn out" data-close>Отменить</button>
-      <button class="btn" data-close data-toast="Изменения сохранены">Сохранить</button>`},
+  observer:{t:'Создать ссылку наблюдателя',acts:false,
+    b:(m,step)=>step?`<div class="cstep mid">${prog(2,3)}${doneBlock('Наблюдатель успешно создан')}</div>`:obsForm(''),
+    foot:(m,step)=>step
+      ? `<button class="btn" style="flex:1" data-close data-toast="Ссылка наблюдателя создана">Отлично</button>`
+      : `<button class="btn out" data-close>Отменить</button><button class="btn" data-osubmit>Подтвердить</button>`},
+  obsedit:{t:'Изменить наблюдателя',acts:false,
+    b:(m,step)=>step?`<div class="cstep mid">${prog(2,3)}${doneBlock('Изменения сохранены')}</div>`:obsForm(U.sub||'Для бухгалтера'),
+    foot:(m,step)=>step
+      ? `<button class="btn" style="flex:1" data-close data-toast="Изменения сохранены">Отлично</button>`
+      : `<button class="btn out" data-close>Отменить</button><button class="btn" data-osubmit>Сохранить</button>`},
 };
 
 

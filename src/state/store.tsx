@@ -11,7 +11,7 @@ export const pathOf = (route: string) => (route === HOME ? '/' : '/' + route)
 export const routeOf = (pathname: string) => pathname.replace(/^\/+|\/+$/g, '') || HOME
 
 const freshUi = (): Ui => ({
-  seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {},
+  seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {}, oval: false,
   q: '', wfilter: 'all', geo: '',
   wk: null, qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
@@ -192,6 +192,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     const pg = at('[data-page]')
     if (pg && !(pg as HTMLButtonElement).disabled) { u.page[pg.dataset.page!] = +pg.dataset.p!; return bump() }
+    /* «Подтвердить» в форме наблюдателя: либо ошибки, либо экран успеха */
+    if (at('[data-osubmit]')) {
+      const empty = ['acc', 'perm', 'coin'].some(
+        (k) => !Array.from(u.ochk).some((x) => x.startsWith(k + ':')),
+      )
+      if (empty || S.current.oerr !== 'no') { u.oval = true; return bump() }
+      u.oval = false; u.step = 1; return bump()
+    }
     /* Чекбоксы в форме наблюдателя и «Выбрать все» по группе */
     const ock = at('[data-ochk]')
     if (ock) { const k = ock.dataset.ochk!; u.ochk.has(k) ? u.ochk.delete(k) : u.ochk.add(k); return bump() }
@@ -263,8 +271,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (md) {
       modal.current = md.dataset.modal!; u.step = 0; u.vfile = false; u.vbank = undefined; pop.current = null
       /* формы наблюдателя открываются с отмеченными первыми двумя пунктами */
-      if (md.dataset.modal === 'observer' || md.dataset.modal === 'obsedit')
+      if (md.dataset.modal === 'observer' || md.dataset.modal === 'obsedit') {
         u.ochk = new Set(['acc:0', 'acc:1', 'perm:0', 'perm:1', 'coin:0', 'coin:1'])
+        u.oval = false
+      }
       return bump()
     }
     const tst = at('[data-toast]')

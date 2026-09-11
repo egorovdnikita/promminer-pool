@@ -555,6 +555,12 @@ body.mini .ni .spacer.lbl{display:none!important}
 .marea .box{background:var(--ctrl);border-radius:var(--r-m);padding:12px;min-height:64px;
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .marea .cnt2{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3);text-align:right}
+/* строка под описанием: слева ошибка, справа счётчик символов */
+.marea .crow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.marea.err .box{background:#ef444429}
+.marea.err .cnt2{color:var(--neg)}
+.mlist.err{box-shadow:0 0 0 1px var(--neg) inset}
+.mlist.err .errmsg{padding:0 12px 12px}
 /* QR-код наблюдателя — 290×290 со скруглением 24 */
 .qrbox{width:290px;height:290px;border-radius:var(--r-l);display:block;margin:0 auto;
   border:1px solid var(--border);background:#fff}
