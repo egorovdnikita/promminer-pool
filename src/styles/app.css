@@ -850,7 +850,14 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .ntbl td.num{text-align:center}
 .ntbl tr.ngrp td{padding-top:24px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:600;background:none}
 .tabseg .cnt{margin-left:6px}
-.pager .perpage{display:flex;align-items:center;gap:8px;margin-right:16px}
+/* Pagination: «Показать» над селектом, счётчик по центру его коробки */
+.pager{align-items:flex-end}
+.pager .perpage{display:flex;flex-direction:column;gap:8px;margin-right:12px}
+.pager .perpage .lb{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
+.pager .selbox.sm{height:48px;width:110px;gap:4px;white-space:nowrap;
+  font-size:var(--fs-s);line-height:var(--lh-s)}
+.pager .pshown{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3);padding-bottom:15px}
+.pager .pg{align-self:flex-end}
 
 /* Центр суб-аккаунтов: сгруппированная шапка и итоговая строка (макет 2300:135215) */
 
@@ -1061,14 +1068,16 @@ html{scrollbar-gutter:stable}
 .obstbl th:first-child{border-radius:var(--r-m) 0 0 var(--r-m)}
 .obstbl th:last-child{border-radius:0 var(--r-m) var(--r-m) 0}
 .obstbl td{height:48px;padding:12px;font-size:var(--fs-s);line-height:var(--lh-s);
-  font-weight:500;color:var(--c1);border-bottom:0;text-align:left}
+  font-weight:500;color:var(--c1);border-bottom:1px solid var(--border);text-align:left}
+.obstbl tbody tr:last-child td{border-bottom:1px solid var(--border)}
 .obstbl .cbc{width:36px;padding:12px 0 12px 12px}
 .obstbl td.neg{color:var(--neg)}
 .obulk{display:flex;align-items:center;gap:12px;height:72px;padding:16px;margin:0 16px 8px;
   border-radius:var(--r-m);background:var(--bg);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .obulk .btn.link{height:40px}
 .obulk .btn.danger.sm{height:40px}
-.obstbl .ibr{width:36px;height:24px;border-radius:var(--r-xs)}
+.obstbl .ibr{width:36px;height:36px;border-radius:var(--r-f);border:1px solid var(--border)}
+.obstbl .ibr svg{width:16px;height:16px}
 .obstbl .ibr.acc{color:var(--accent)}
 .obstbl .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .obstbl .coin1{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}

@@ -310,9 +310,10 @@ function pager(id,total,per=10){
   const pages=Math.max(1,Math.ceil(total/per)), cur=Math.min(U.page[id]||1,pages);
   const from=total?(cur-1)*per+1:0, to=Math.min(cur*per,total);
   const nums=[];for(let i=1;i<=pages;i++){if(i===1||i===pages||Math.abs(i-cur)<=1)nums.push(i);else if(nums[nums.length-1]!=='…')nums.push('…')}
-  return `<div class="pager"><span class="perpage"><span class="cap dim">Показать</span>
-    <button class="pill flat sq" data-toast="Количество строк на странице">${per} строк ${I.cd}</button></span>
-    <span class="cap dim">Показано ${from}–${to} из ${ni(total)}</span>
+  /* Pagination дизайн-системы: подпись «Показать» стоит над селектом */
+  return `<div class="pager"><span class="perpage"><span class="lb">Показать</span>
+    <button class="selbox sm" data-toast="Количество строк на странице">${per} строк<span class="spacer">${I.cd}</span></button></span>
+    <span class="pshown">Показано ${from}–${to} из ${ni(total)}</span>
     <span class="pg"><button data-page="${id}" data-p="${cur-1}" ${cur<=1?'disabled':''}>${I.cl}</button>
     ${nums.map(n=>n==='…'?'<button disabled>…</button>':`<button class="${n===cur?'on':''}" data-page="${id}" data-p="${n}">${n}</button>`).join('')}
     <button data-page="${id}" data-p="${cur+1}" ${cur>=pages?'disabled':''}>${I.cv}</button></span></div>`;
