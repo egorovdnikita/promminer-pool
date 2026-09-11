@@ -1189,7 +1189,7 @@ const contactRow=k=>{const c=CONTACTS[k], on=S[k]==='yes';
   return `<div class="mrow"><span class="mi">${c.ico()}</span>
     <span class="tx"><i>${c.label}</i>${on?`<b>${c.val}<span class="okmark">${I.ok}</span></b>`:''}</span>
     ${on?`<span class="cacts spacer">
-      <button class="act danger" data-modal="${k}unlink" title="Отвязать">${I.tr}</button>
+      <button class="act danger" data-modal="${k}unlink" title="Отвязать">${I.unlink}</button>
       <button class="act" data-modal="${k}edit" title="Изменить">${I.edit}</button></span>`
     :`<button class="act spacer" data-modal="${k}add" title="Добавить">${I.pl}</button>`}</div>`;
 };
