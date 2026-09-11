@@ -1117,31 +1117,37 @@ const MODALS={
   logout:{t:'',acts:false,b:()=>`
     <div class="empty" style="padding:8px 0 0"><div class="art">${I.user}</div>
       <b style="font-size:var(--fs-b1);line-height:var(--lh-b1)">Вы действительно хотите выйти?</b></div>
-    <div class="acts" style="margin-top:24px"><button class="btn out" style="flex:1;justify-content:center" data-close>Отменить</button>
-      <button class="btn danger" style="flex:1;justify-content:center" data-go="auth" data-close>Выйти</button></div>`},
+`,
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn danger" data-go="auth" data-close>Выйти</button>`},
 
-  /* Карточка суб-аккаунта (макеты 477:8024, 1489:79674, 1489:79826).
+  /* Информация об аккаунте (макеты 1490:80238, 2219:31849): шапка с аватаром 64,
+     значения — карточками Assets Items 16/r24 по две в ряд, футер прижат.
      У текущего аккаунта кнопки «Выбрать этот аккаунт» нет. */
-  subinfo:{t:'Информация об аккаунте',acts:false,b:m=>{
-    const a=subByName(U.sub), cur=(S.acct==='main'?'natarusso':'alfred')===a.name;
-    const HU=['TH/s','GH/s','KSol/s'], IC=['BTC','LTC','DOGE','ZEC'];
-    const cell=(k,v)=>`<div class="field"><div class="k">${k}</div><div class="v mono">${v}</div></div>`;
-    return `<div class="empty" style="padding:4px 0 20px"><span class="avat lg">${a.name[0].toUpperCase()}</span>
-        <b style="font-size:var(--fs-b1);line-height:var(--lh-b1);margin-top:12px">${a.name}</b>
-        <span class="tag sm ${a.main?'sel':''}" style="margin-top:6px">${a.main?'Основной':'Суб-аккаунт'}</span></div>
-      <div class="hr"></div>
-      <div style="margin-top:16px">${cell('Общий баланс',nf(a.bal)+' $')}</div>
-      <div class="grid g2" style="margin:8px 0 0;gap:8px">
-        ${a.h.map((v,i)=>cell('Хэшрейт, '+['BTC','LTC','ZEC'][i],ni(v)+' '+HU[i])).join('')}
-        ${a.inc.map((v,i)=>cell('Доход, '+IC[i],dec(v)+' '+IC[i])).join('')}</div>
-      <div class="field" style="margin-top:8px"><div class="k">Воркера</div>
-        <div class="row" style="gap:16px;margin-top:6px;justify-content:space-between">
-          ${[['Активные','var(--pos)'],['Низкий хэш.','var(--warn)'],['Отключены','var(--neg)'],['Оффлайн','var(--neu)']]
-            .map(([t,c],i)=>`<span style="text-align:center"><span class="row" style="gap:6px;justify-content:center">
-              <i class="dot" style="background:${c}"></i><b class="mono" style="font-weight:600">${ni(a.w[i])}</b></span>
-              <div class="cap dim" style="margin-top:2px">${t}</div></span>`).join('')}</div></div>
-      ${cur?'':`<div class="acts" style="margin-top:24px"><button class="btn" style="flex:1;justify-content:center"
-        data-acct="${a.main?'main':'sub'}" data-close data-toast="Переключились на ${a.name}">Выбрать этот аккаунт</button></div>`}`;
+  subinfo:{t:'Информация об аккаунте',acts:false,
+    foot:m=>{const a=subByName(U.sub); const cur=(S.acct==='main'?'natarusso':'alfred')===a.name;
+      return cur?'':`<button class="btn" data-acct="${a.main?'main':'sub'}" data-close
+        data-toast="Переключились на ${a.name}">Выбрать этот аккаунт</button>`},
+    b:m=>{
+    const a=subByName(U.sub);
+    const cell=(k,v)=>`<div class="acell"><div class="k">${k}</div><div class="v mono">${v}</div></div>`;
+    const pair=(x,y)=>`<div class="arow">${x}${y}</div>`;
+    const W=[['Активные','var(--pos)'],['Низкий хэш.','var(--warn)'],['Отключены','var(--neg)'],['Оффлайн','var(--neu)']];
+    return `<div class="ainfo">
+      <span class="avat" style="width:64px;height:64px;font-size:var(--fs-h3);line-height:40px">${a.name[0].toUpperCase()}</span>
+      <span class="atx"><b>${a.name}</b>
+        <span class="tag sm ${a.main?'sel':''}">${a.main?'Основной':'Суб-аккаунт'}</span></span></div>
+    <div class="acells">
+      ${cell('Общий баланс',nf(a.bal)+' $')}
+      ${pair(cell('Хэшрейт, BTC',ni(a.h[0])+' TH/s'),cell('Хэшрейт, LTC',ni(a.h[1])+' GH/s'))}
+      ${pair(cell('Хэшрейт, ZEC',ni(a.h[2])+' KSol/s'),cell('Создан',a.created))}
+      ${pair(cell('Доход, BTC',dec(a.inc[0])+' BTC'),cell('Доход, LTC',dec(a.inc[1])+' LTC'))}
+      ${pair(cell('Доход, DOGE',dec(a.inc[2])+' DOGE'),cell('Доход, ZEC',dec(a.inc[3])+' ZEC'))}
+      <div class="acell"><div class="k">Воркера</div>
+        <div class="wgrid">${W.map(([t,c],i)=>`<span><span class="row" style="gap:4px">
+          <i class="dot" style="background:${c}"></i><b class="mono">${ni(a.w[i])}</b></span>
+          <div class="cap dim">${t}</div></span>`).join('')}</div></div>
+    </div>`;
   }},
 
   connect:{ok:'Воркер добавлен — данные появятся через 5–10 минут',t:'Подключить воркера',s:'Укажите адрес пула и имя воркера в прошивке устройства',b:m=>`

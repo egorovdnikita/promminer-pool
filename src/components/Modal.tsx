@@ -10,6 +10,7 @@ export function Modal({ m }: { m: Model }) {
 
   const step = U.step || 0
   const steps = typeof d.steps === 'function' ? d.steps(m) : d.steps
+  const foot = d.foot?.(m, step)
 
   return (
     <div className="mask" data-close>
@@ -18,15 +19,18 @@ export function Modal({ m }: { m: Model }) {
           <h2>{d.t}</h2>
           <button className="mx" data-close><Ico html={I.x} /></button>
         </div>
-        {!!steps && (
-          <div className="msteps">
-            {Array.from({ length: steps }, (_, i) => <i className={i <= step ? 'on' : ''} key={i} />)}
-          </div>
-        )}
-        {d.s && <p className="s">{d.s}</p>}
-        <Raw html={d.b(m, step)} />
+        <div className="mbody">
+          {!!steps && (
+            <div className="msteps">
+              {Array.from({ length: steps }, (_, i) => <i className={i <= step ? 'on' : ''} key={i} />)}
+            </div>
+          )}
+          {d.s && <p className="s">{d.s}</p>}
+          <Raw html={d.b(m, step)} />
+        </div>
+        {foot && <div className="mfoot"><Raw html={foot} /></div>}
         {d.acts !== false && (
-          <div className="acts">
+          <div className="mfoot">
             {steps && step < steps - 1
               ? <button className="btn" data-step={step + 1}>{d.cta || 'Подтвердить'}</button>
               : <button className="btn" data-close data-toast={d.ok || 'Готово'}>{d.cta || 'Подтвердить'}</button>}
