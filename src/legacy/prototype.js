@@ -931,7 +931,10 @@ function obsForm(desc){
       return `<div class="marea ${msg?'err':''}"><div class="box ${val?'':'dim'}">${val||'Описание'}</div>
         <div class="crow">${msg?`<span class="errmsg">${msg}</span>`:'<span></span>'}
           <span class="cnt2">${(val||'').length}/100</span></div></div>`})()}
-    ${obsList('Аккаунт',accs,true,'acc')}
+    ${S.acct==='sub'
+      ? `<div class="inp fl" style="margin:0"><span class="tx"><div class="k">Суб-аккаунт</div>
+          <input value="alfred" readonly></span></div>`
+      : obsList('Аккаунт',accs,true,'acc')}
     <div class="mlists">${obsList('Разрешения',OBS_PERMS,0,'perm')}${obsList('Монеты',OBS_COINS,0,'coin')}</div>
     <div class="msel"><div class="lb">Срок действия</div>
       <div class="selbox">Бессрочно<span class="spacer">${I.cd}</span></div></div>
@@ -1261,17 +1264,20 @@ const noteRow=([t,d,dt,read])=>`<tr class="${read?'read':''}">
 
 V.notifsettings=m=>{
   const n=NOTIF_N[S.notif];
-  const rows=n?NOTES_ALL.slice(0,Math.max(n,2)):[];
+  const f=segi('nfilter');
+  /* фильтр реально отбирает строки: все / непрочитанные / прочитанные */
+  const rows=(n?NOTES_ALL.slice(0,Math.max(n,2)):[]).filter(r=>f===0||(f===1?!r[3]:r[3]));
   return card(`<div class="ch subhead"><h2>Уведомления</h2><div class="spacer"></div>
-  ${rows.length?`<button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button>
+  ${n?`<button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button>
   <span class="pop-wrap"><button class="selbox nsel" data-pop="nfilter">${segv('nfilter',['Все уведомления','Непрочитанные','Прочитанные'])}<span class="spacer">${I.cd}</span></button>
     ${pop==='nfilter'?`<div class="pop" style="min-width:230px">${['Все уведомления','Непрочитанные','Прочитанные'].map((o,i)=>
       `<button class="${segi('nfilter')===i?'on':''}" data-seg="nfilter" data-i="${i}">${o}${segi('nfilter')===i?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`:''}
   <button class="btn g" data-go="notifconfig">${I.tune} Настройка</button></div>
   ${rows.length?`<div class="tw"><table class="tbl notbl"><tbody>${rows.map(noteRow).join('')}</tbody></table></div>`
     :`<div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
-        <b>Уведомлений пока не было</b>
-        <p>Как только у вас появятся уведомления,<br>вы увидите их здесь</p></div>`}
+        <b>${n?'Ничего не найдено':'Уведомлений пока не было'}</b>
+        <p>${n?'В этом фильтре уведомлений нет — попробуйте другой'
+             :'Как только у вас появятся уведомления,<br>вы увидите их здесь'}</p></div>`}
   ${pager('notif',rows.length,20)}`,'tblcard');
 };
 

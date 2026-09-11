@@ -194,9 +194,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (pg && !(pg as HTMLButtonElement).disabled) { u.page[pg.dataset.page!] = +pg.dataset.p!; return bump() }
     /* «Подтвердить» в форме наблюдателя: либо ошибки, либо экран успеха */
     if (at('[data-osubmit]')) {
-      const empty = ['acc', 'perm', 'coin'].some(
-        (k) => !Array.from(u.ochk).some((x) => x.startsWith(k + ':')),
-      )
+      /* под суб-аккаунтом аккаунт не выбирают — группы там нет */
+      const groups = S.current.acct === 'sub' ? ['perm', 'coin'] : ['acc', 'perm', 'coin']
+      const empty = groups.some((k) => !Array.from(u.ochk).some((x) => x.startsWith(k + ':')))
       if (empty || S.current.oerr !== 'no') { u.oval = true; return bump() }
       u.oval = false; u.step = 1; return bump()
     }
