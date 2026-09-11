@@ -162,6 +162,15 @@ body.mini .ni .spacer.lbl{display:none!important}
 .pop-wrap{position:relative}
 .pop{position:absolute;right:0;top:calc(100% + 8px);z-index:40;background:var(--surface);border-radius:var(--r-l);box-shadow:var(--shadow);padding:16px;min-width:250px;max-height:70vh;overflow:auto}
 .pop.left{right:auto;left:0}
+/* Dropdown-Menu: пункты 18/22 с иконкой 24, удаление красным */
+.pop.menu{width:188px;min-width:0;border-radius:var(--r-m);padding:8px 0;display:flex;flex-direction:column;gap:8px}
+.pop.menu>button{padding:8px 12px!important;min-height:40px;gap:8px!important;
+  font-size:var(--fs-b1)!important;line-height:var(--lh-b1)!important;font-weight:600}
+.pop.menu>button:hover{background:var(--ctrl2)}
+.pop.menu>button.del,.pop.menu>button.del:hover{color:var(--neg)!important}
+.pop.menu>button.del:hover{color:var(--neg);background:#ef44441f}
+.pop.menu .hr{margin:0 12px}
+.pop.menu svg{width:24px;height:24px}
 .pop b.ph{display:block;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 0 6px}
 .pop button:not(.btn):not(.ra):not(.lnk):not(.dp-nav){display:flex;align-items:center;gap:8px;width:100%;padding:8px 0;min-height:40px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
 .pop button:not(.btn):not(.ra):not(.lnk):not(.dp-nav):hover{color:var(--accent)}
@@ -433,8 +442,7 @@ body.mini .ni .spacer.lbl{display:none!important}
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .marea .cnt2{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
 /* QR-код наблюдателя — 290×290 со скруглением 24 */
-.qrbox{width:290px;height:290px;border-radius:var(--r-l);background:var(--surface);
-  box-shadow:var(--shadow);display:grid;place-items:center;margin:0 auto}
+.qrbox{width:290px;height:290px;border-radius:var(--r-l);display:block;margin:0 auto}
 /* Прогресс шагов в модалках наблюдателя */
 .mprog{display:flex;gap:8px}
 .mprog i{flex:1;height:4px;border-radius:var(--r-f);background:var(--ctrl)}
@@ -459,7 +467,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mrow .mi{width:48px;height:48px;border-radius:var(--r-m);background:var(--ctrl2);color:var(--c2);
   display:grid;place-items:center;flex:0 0 auto}
 .mrow .tx{min-width:0;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
-.mrow .tx i{display:block;font-style:normal;font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c3);font-weight:500}
+.mrow .tx i{display:flex;align-items:center;gap:8px;font-style:normal;font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c3);font-weight:500}
 .mrow .tx b{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .mrow .act{margin-left:auto;width:48px;height:48px;border-radius:var(--r-m);background:var(--accent-sub);
   color:var(--accent);display:grid;place-items:center;flex:0 0 auto}
@@ -474,7 +482,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .phonefield .pre{color:var(--c2);font-weight:600}
 .modal p.s{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);margin-bottom:18px}
 .modal .acts{display:flex;gap:8px;margin-top:20px}
-.mstack{display:flex;flex-direction:column;gap:20px;padding:20px 0}
+.mstack{display:flex;flex-direction:column;gap:20px}
 /* Assets Items — карточка «ключ сверху, значение снизу» из модалки аккаунта */
 .acells{display:flex;flex-direction:column;gap:8px}
 .arow{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0}
@@ -607,6 +615,7 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .dashed:hover{background:var(--ctrl)}
 .linkfield{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:var(--r-m);padding:0 12px;height:48px;font-size:var(--fs-s);color:var(--c2);min-width:0}
 .linkfield span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.badge.sm{height:24px;padding:0 12px;font-size:var(--fs-c);line-height:var(--lh-c)}
 .badge{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:var(--r-xs);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;background:var(--warn);color:#fff}
 /* строка «иконка — текст — шеврон» в карточке профиля */
 .hr{height:1px;background:var(--border);margin:20px 0}

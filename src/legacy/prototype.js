@@ -206,7 +206,9 @@ const COIN_ICON={
   /* DOGE оставлен собственным: в Payments это иллюстрация на 95 КБ */
   DOGE:`<svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#C2A633"/><path fill="#fff" d="M8 5.6h4.4c3.6 0 6 2.5 6 6.4s-2.4 6.4-6 6.4H8v-5.2H6.4v-2.1H8V5.6Zm2.4 2.2v3.3h2v2.1h-2v3.3h1.8c2.2 0 3.7-1.5 3.7-4.2s-1.5-4.5-3.7-4.5h-1.8Z"/></svg>`,
 };
-const GOOGLE=`<svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285F4" d="M21.6 12.2c0-.6-.1-1.3-.2-1.9H12v3.6h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.2Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2L6.4 14Z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8C16.9 3 14.7 2 12 2a10 10 0 0 0-8.9 5.4L6.4 10c.8-2.3 3-4.1 5.6-4.1Z"/></svg>`;
+const GOOGLE=`<svg width="24" height="24" viewBox="0 0 24 24"><path fill="#4285F4" d="M21.6 12.2c0-.6-.1-1.3-.2-1.9H12v3.6h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.2Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2L6.4 14Z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.8-2.8C16.9 3 14.7 2 12 2a10 10 0 0 0-8.9 5.4L6.4 10c.8-2.3 3-4.1 5.6-4.1Z"/></svg>`;
+/* Flags / ru — флаг в строке «Выбор языка» */
+const FLAG_RU=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><g clip-path="url(#flagRU)"><path d="M23.3172 16C23.7594 14.7489 24 13.4025 24 12C24 10.5975 23.7594 9.2511 23.3172 7.99998H0.682834C0.240621 9.2511 0 10.5975 0 12C0 13.4025 0.240613 14.7489 0.682812 16H23.3172Z" fill="#0052B4"/><path d="M23.3172 16C21.6698 20.6608 17.2249 24 12 24C6.77513 24 2.33018 20.6608 0.682831 16H23.3172Z" fill="#D80027"/><path d="M23.3172 8H0.682816C2.33016 3.33923 6.77512 0 12 0C17.2249 0 21.6698 3.33923 23.3172 8Z" fill="#F3F5F9"/></g><path d="M12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5C5.64873 23.5 0.5 18.3513 0.5 12C0.5 5.64873 5.64873 0.5 12 0.5Z" stroke="#6B7280" stroke-opacity="0.16"/><defs><clipPath id="flagRU"><path d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z" fill="white"/></clipPath></defs></svg>`;
 const USD_ICON=`<svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#22c55e"/><path fill="#fff" d="M11.2 4.6h1.6v1.6h-1.6zM11.2 17.8h1.6v1.6h-1.6zM12 6.8c2.2 0 3.8 1.1 4 2.9h-2.1c-.2-.7-.9-1.1-1.9-1.1s-1.8.4-1.8 1.1c0 .6.5 1 1.7 1.2l1.2.2c2.2.4 3.2 1.3 3.2 2.9 0 1.9-1.7 3.1-4.2 3.1s-4.1-1.1-4.3-3h2.1c.2.8 1 1.2 2.2 1.2 1.2 0 2-.5 2-1.2 0-.6-.5-.9-1.7-1.2l-1.3-.2C10 12.3 9 11.4 9 9.8c0-1.8 1.6-3 3.9-3Z"/></svg>`;
 
 /* ============================================================
@@ -808,17 +810,6 @@ const NOTES=[
 const OBS_PERMS=['Воркеры','Мои активы','Начисления','Выплаты','Продажи',
   'Список рефералов','Реферальный доход','Реферальные выплаты'];
 const OBS_COINS=['BTC','LTC','DOGE','ZEC'];
-/* Плейсхолдер QR-кода: детерминированный узор с тремя «глазами» */
-const QR=(()=>{const N=25,S=10;let seed=7;const rnd=()=>(seed=(seed*1103515245+12345)&0x7fffffff)/0x7fffffff;
-  const eye=(x,y)=>`<rect x="${x*S}" y="${y*S}" width="${7*S}" height="${7*S}" rx="${1.5*S}"/>`
-    +`<rect x="${(x+1)*S}" y="${(y+1)*S}" width="${5*S}" height="${5*S}" rx="${S}" fill="var(--surface)"/>`
-    +`<rect x="${(x+2)*S}" y="${(y+2)*S}" width="${3*S}" height="${3*S}" rx="${S/2}"/>`;
-  const inEye=(c,r)=>(c<8&&r<8)||(c>N-9&&r<8)||(c<8&&r>N-9);
-  let m='';
-  for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(inEye(c,r))continue;if(rnd()>0.55)m+=`<rect x="${c*S}" y="${r*S}" width="${S}" height="${S}" rx="2"/>`;}
-  return `<svg width="230" height="230" viewBox="0 0 ${N*S} ${N*S}" fill="currentColor">${m}${eye(0,0)}${eye(N-7,0)}${eye(0,N-7)}</svg>`;
-})();
-
 const SESSIONS=[
   {dev:'Apple Macintosh, Chrome (macOS)',ip:'89.23.14.201',loc:'Москва',when:'сейчас',cur:1},
   {dev:'iPhone 15, Safari (iOS)',        ip:'212.90.4.18', loc:'Санкт-Петербург',when:'2 часа назад',cur:0},
@@ -871,13 +862,17 @@ function obsForm(desc){
       <div class="selbox">Бессрочно<span class="spacer">${I.cd}</span></div></div>
   </div>`;
 }
-function obsTile(o){
+function obsTile(o,i){
   const url=LINKS.watcher(o.token);
   const tags=o.access.slice(0,2), rest=o.access.length-tags.length;
   return `<div class="tile2">
     <div class="row" style="margin-bottom:8px"><b style="font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600">${o.name}</b>
       ${o.extra?`<span class="tag sm n">+${o.extra}</span>`:''}
-      <button class="ibr spacer dim" data-modal="obsedit">${I.dots}</button></div>
+      <span class="pop-wrap spacer"><button class="ibr dim" data-pop="obs${i}">${I.dots}</button>
+      ${pop==='obs'+i?`<div class="pop menu">
+        <button data-modal="obsedit">${I.edit}Редактировать</button>
+        <div class="hr" style="margin:0"></div>
+        <button class="del" data-modal="obsdel">${I.tr}Удалить</button></div>`:''}</span></div>
     <div class="row" style="gap:4px;margin-bottom:20px"><span class="coins">${o.coins.map(c=>COIN_ICON[c]).join('')}</span>
       <span class="bs semi ${o.off?'dim':''}">${o.off?'⦸ ':''}${o.label}</span></div>
     <div class="row" style="gap:4px;margin-bottom:20px;flex-wrap:wrap">
@@ -1137,7 +1132,7 @@ V.auth=()=>{
 /* ============================================================
    7. МОДАЛКИ
    ============================================================ */
-const TZ=['UTC +3:00','UTC +4:00','UTC +5:00','UTC +6:00'];
+const TZ=['(UTC +3:00)','(UTC +4:00)','(UTC +5:00)','(UTC +6:00)'];
 const THEMES=[['light','Всегда светлая'],['dark','Всегда тёмная'],['system','Как в системе']];
 /* Данные для модалки суб-аккаунта: активный аккаунт берём из U.sub */
 const subByName=n=>SUBS.find(x=>x.name===n)||SUBS[0];
@@ -1149,7 +1144,9 @@ const MODALS={
     <div class="mstack">
       <div>
         <div class="mrow"><span class="mi">${I.doc}</span>
-          <span class="tx"><i>Выбор языка <span class="tag sm n">Скоро</span></i><b>Русский</b></span></div>
+          <span class="tx"><i>Выбор языка <span class="badge sm">Скоро</span></i>
+            <b>${FLAG_RU}RU</b></span>
+          <button class="ibr spacer dim">${I.cd}</button></div>
         <div class="mrow"><span class="mi">${I.cal}</span>
           <span class="tx"><i>Таймзона</i><b>${segv('tz',TZ)}</b></span>
           <span class="pop-wrap spacer"><button class="ibr dim" data-pop="tz">${I.cd}</button>
@@ -1190,10 +1187,10 @@ const MODALS={
 
   /* QR-код ссылки наблюдателя (макет 1445:172568) */
   qr:{t:'Отсканируйте QR-код или скачайте',acts:false,
-    b:()=>`<div class="mstack"><div class="qrbox">${QR}</div></div>`,
+    b:()=>`<div class="mstack" style="align-items:center"><img class="qrbox" src="/qr-watcher.png" alt="QR-код ссылки наблюдателя" width="290" height="290"></div>`,
     foot:()=>{const url=LINKS.watcher(OBSERVERS[0].token);
-      return `<button class="btn out" data-copy="${url}">Ссылка на наблюдателя</button>
-        <button class="btn" data-toast="QR-код скачан">Скачать QR-код</button>`}},
+      return `<button class="btn out" data-copy="${url}">${I.cp} Ссылка на наблюдателя</button>
+        <button class="btn" data-toast="QR-код скачан">${I.dl} Скачать QR-код</button>`}},
 
   /* Информация об аккаунте (макеты 1490:80238, 2219:31849): шапка с аватаром 64,
      значения — карточками Assets Items 16/r24 по две в ряд, футер прижат.
