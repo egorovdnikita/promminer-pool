@@ -27,6 +27,8 @@ const AXES={
   mail:{g:'Контакты',label:'Почта',opts:[['yes','Привязана'],['no','Не привязана']]},
   tg:{g:'Контакты',label:'Telegram',opts:[['no','Не привязан'],['yes','Привязан']]},
   fa:{g:'Аккаунт',label:'Двухфакторная защита',opts:[['no','Выключена'],['yes','Включена']]},
+  sess:{g:'Аккаунт',label:'Сессии',opts:[['many','Три устройства'],['one','Только это устройство']]},
+  del:{g:'Аккаунт',label:'Удаление аккаунта',opts:[['no','Не запрошено'],['yes','Запрошено']]},
   cerr:{g:'Контакты',label:'Ошибка в поле контакта',opts:[['no','Нет'],['req','Не заполнено'],['busy','Занято / нет бота'],['fmt','Неверный формат']]},
 };
 /* Готовые связки состояний — один клик вместо десяти переключателей */
@@ -41,7 +43,7 @@ const PRESETS=[
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
 const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
-  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no'};
+  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
 let U={seg:{},sort:{},page:{},sel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
@@ -839,7 +841,7 @@ const subsOf=m=>{
   return all.slice(0,Math.max(1,CNT[S.subs]??3));
 };
 const obsOf=m=>m.empty?[]:OBSERVERS.slice(0,CNT[S.obs]??3);
-const sessOf=m=>m.empty?SESSIONS.slice(0,1):SESSIONS;
+const sessOf=m=>(m.empty||S.sess==='one')?SESSIONS.slice(0,1):SESSIONS;
 /* Вкладки — Segment Control из макета: общий контейнер, белый активный сегмент.
    Счётчики показываются и при нуле (в макете «Наблюдатели 0»). */
 const profTabs=(cur,m)=>{const n={subaccounts:subsOf(m).length,observers:obsOf(m).length};
@@ -1051,13 +1053,17 @@ V.security=m=>{
       ${secRow(GOOGLE,'Google Authentication','2FA через код из приложения Google',
         `<span class="tog ${fa?'on':''} spacer" data-modal="${fa?'fa2off':'fa2on'}"></span>`)}`)}
     ${card(`<h2>Безопасность данных</h2>
-      ${secRow(I.lock,'Ваш пароль','Этот пароль используется для входа в ваш аккаунт',
+      ${secRow(I.key,'Ваш пароль','Этот пароль используется для входа в ваш аккаунт',
         '<button class="btn g sm spacer" data-modal="pwd">Изменить</button>')}
-      ${secRow(I.tr,'Удаление данных и аккаунта','Безвозратное удаление данных и всего, что связано с аккаунтом',
-        '<button class="btn soft-danger sm spacer" data-modal="acctdel">Удалить аккаунт</button>')}`)}
+      ${S.del==='yes'
+        ? `${secRow(I.tr2,'Аккаунт будет удален','Заявка принята, данные сотрут через 30 дней — до этого удаление можно отменить',
+            `<button class="btn g sm spacer" data-axis="del" data-val="no" data-toast="Удаление аккаунта отменено">Отменить удаление</button>`)}
+           <div class="alert warn" style="margin-top:20px">${I.inf}<div>Пока заявка активна вывод средств и создание суб-аккаунтов недоступны</div></div>`
+        : secRow(I.tr2,'Удаление данных и аккаунта','Безвозратное удаление данных и всего, что связано с аккаунтом',
+            '<button class="btn soft-danger sm spacer" data-modal="acctdel">Удалить аккаунт</button>')}`)}
   </div>
   <div>
-    ${card(`<div class="ch"><h2>Сессии</h2><button class="btn link spacer" data-modal="sessions">Все сессии</button></div>
+    ${card(`<div class="ch"><h2>Сессии</h2>${rows.length>1?'<button class="btn link spacer" data-modal="sessions">Все сессии</button>':''}</div>
       <div class="scur">Это устройство</div>
       ${secRow(I.pc,`${cur.dev}<i class="pulse"></i>`,
         `<span class="sdots">${cur.ip}</span><span class="sdots">${cur.when}</span><br>${cur.loc}`,'')}`)}
@@ -1446,7 +1452,7 @@ Object.assign(MODALS,{
           <b class="ctitle">Отсканируйте QR-код</b>
           <img class="qrbox" src="/qr-watcher.png" alt="QR-код для Google Authenticator" width="290" height="290">
           <div class="gacode">
-            <div class="gakey"><span>Код для ручного ввода</span><b class="mono">MAU4958DJOS9SW8JX</b>
+            <div class="gakey"><span class="tx"><i>Код для ручного ввода</i><b class="mono">MAU4958DJOS9SW8JX</b></span>
               <button class="lnk spacer" style="color:var(--accent)" data-copy="MAU4958DJOS9SW8JX">${I.cp}</button></div>
             <div class="alert info">${I.inf}<div>Сохраните код в надёжном месте: он понадобится при смене устройства</div></div>
           </div>
@@ -1464,12 +1470,17 @@ Object.assign(MODALS,{
       ? `<button class="btn out" data-close>Отменить</button><button class="btn danger" data-step="1">Выключить</button>`
       : `<button class="btn" data-close data-axis="fa" data-val="no" data-toast="2FA-защита выключена">Отлично</button>`},
   /* Изменение пароля (972:36256): подтверждение по почте, новый пароль, успех */
-  pwd:{t:'Изменение пароля',acts:false,tall:1,
+  pwd:{t:'Изменение пароля',acts:false,tall:3,
     b:(m,step)=>step===0?`<div class="cstep g32">${prog(0,3)}${codeBlock('Подтвердите действие',MAIL_CH)}</div>`
-      :step===1?`<div class="cstep g20">${prog(1,3)}
-        <div class="inp" style="margin:0"><input type="password" placeholder="Придумайте новый пароль"></div>
-        <div class="inp" style="margin:0"><input type="password" placeholder="Подтвердите новый пароль"></div>
-        <ul class="mhints">${PWD_RULES.map(r=>`<li>${r}</li>`).join('')}</ul></div>`
+      :step===1?`<div class="cstep g32">${prog(1,3)}
+        <div class="pwdform">
+          <b class="ctitle">Придумайте новый пароль</b>
+          <div class="inp" style="margin:0"><div class="k">Новый пароль</div>
+            <input type="password" value="Kate1234!"></div>
+          <div class="inp" style="margin:0"><div class="k">Подтвердить новый пароль</div>
+            <input type="password" value="Kate1234!"></div>
+          <ul class="mhints">${PWD_RULES.map(r=>`<li>${I.ok}${r}</li>`).join('')}</ul>
+        </div></div>`
       :`<div class="cstep mid">${prog(2,3)}${doneBlock('Пароль успешно изменен')}</div>`,
     foot:(m,step)=>step<2
       ? `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="${step+1}">${step?'Изменить':'Далее'}</button>`
@@ -1495,13 +1506,20 @@ Object.assign(MODALS,{
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Все сессии завершены">Завершить</button>`},
   /* Удаление аккаунта (1008:52491) */
-  acctdel:{t:'Это приведет к безвозвратному удалению аккаунта',img:'/modal-delete.png',acts:false,
-    b:()=>`<div class="mstack">
-      <p class="mtext">Перед удалением необходимо:</p>
-      <ul class="mhints dark">${['Отключить все воркеры','Вывести все деньги со счета','Отвязать все суб-аккаунты']
-        .map(t=>`<li>${t}</li>`).join('')}</ul></div>`,
+  acctdel:{t:'',img:'/modal-delete.png',acts:false,
+    b:()=>`<div class="mstack" style="padding-top:16px">
+      <div class="alert info">${I.inf}<div>Это приведет к безвозвратному удалению данных и всего, что связано с аккаунтом</div></div>
+      <div class="row" style="gap:16px"><span class="dico">${I.tr2}</span>
+        <h3 class="mh3">Перед удалением необходимо:</h3></div>
+      <div class="dlist">
+        <span>Отключить все воркеры</span>
+        <span>Вывести все деньги со счетов</span>
+      </div>
+      <p class="mtext mut">Если сумма на счетах меньше порогов вывода, то оставьте заявку в Telegram-поддержку</p>
+    </div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
-      <button class="btn danger" data-close data-toast="Заявка на удаление аккаунта создана">Удалить аккаунт</button>`},
+      <button class="btn danger" data-close data-axis="del" data-val="yes"
+        data-toast="Заявка на удаление аккаунта создана">Удалить аккаунт</button>`},
 });
 
 Object.assign(MODALS, contactModals());

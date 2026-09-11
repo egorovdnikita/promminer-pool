@@ -435,6 +435,15 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Шаговые экраны контактов: в макете Modal Content фиксированные 348 */
 .mbody.tall{height:348px;flex:0 0 auto}
 .mbody.tall2{height:506px;flex:0 0 auto}
+.mbody.tall3{height:356px;flex:0 0 auto}
+.pwdform{display:flex;flex-direction:column;gap:24px}
+.pwdform .mhints{gap:4px}
+.pwdform .mhints li{display:flex;align-items:center;gap:8px}
+.pwdform .mhints svg{width:16px;height:16px;color:var(--pos);flex:0 0 auto}
+/* Модалка удаления: иконка 32 у заголовка и список требований */
+.dico{width:32px;height:32px;display:grid;place-items:center;color:var(--neg);flex:0 0 auto}
+.dico svg{width:32px;height:32px}
+.dlist{display:flex;flex-direction:column;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .cstep{display:flex;flex-direction:column;height:100%}
 .cstep.g32{gap:32px}
 .cstep.g20{gap:20px}
@@ -464,7 +473,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Точки-разделители в подписи сессии */
 .sdots+.sdots::before{content:'\2022';margin:0 8px;color:var(--c3)}
 /* «Это устройство» — акцентная подпись над сессией */
-.scur{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--accent);margin-bottom:20px}
+.scur{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:700;text-transform:uppercase;
+  letter-spacing:0;color:var(--accent);margin-bottom:20px}
 /* Мягкая красная кнопка «Удалить аккаунт» */
 .btn.soft-danger{background:#ef44441f;color:var(--neg);box-shadow:none}
 .btn.soft-danger:hover{background:#ef44442e}
@@ -472,8 +482,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .gacont{display:flex;flex-direction:column;align-items:center;gap:16px}
 .gacode{display:flex;flex-direction:column;gap:12px;width:100%}
 .gakey{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:var(--r-m);background:#7086fc1f}
-.gakey span{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
-.gakey b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.gakey .tx{display:flex;flex-direction:column;min-width:0}
+.gakey i{font-style:normal;font-size:var(--fs-c2);line-height:var(--lh-c2);font-weight:500;color:var(--c2)}
+.gakey b{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .mhints.dark{color:var(--c1)}
 .mhints li{list-style:none}
 /* Ссылка на бота внутри абзаца — Button 28, из-за неё строка выше обычной */
@@ -521,7 +532,8 @@ body.mini .ni .spacer.lbl{display:none!important}
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .marea .cnt2{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
 /* QR-код наблюдателя — 290×290 со скруглением 24 */
-.qrbox{width:290px;height:290px;border-radius:var(--r-l);display:block;margin:0 auto}
+.qrbox{width:290px;height:290px;border-radius:var(--r-l);display:block;margin:0 auto;
+  border:1px solid var(--border);background:#fff}
 /* Прогресс шагов в модалках наблюдателя */
 .mprog{display:flex;gap:8px}
 .mprog i{flex:1;height:4px;border-radius:var(--r-f);background:var(--ctrl)}

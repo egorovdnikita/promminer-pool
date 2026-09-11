@@ -17,6 +17,8 @@ export interface Scenario {
   tg: string
   cerr: string
   fa: string
+  sess: string
+  del: string
 }
 
 /** Эфемерное состояние интерфейса — в ссылку не попадает. */
