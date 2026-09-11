@@ -1001,14 +1001,16 @@ const VHELP=[['mail','Почта','poolsupport@promminer.ru','mailto:poolsupport
 const helpRow=([ic,k,v,u])=>`<a class="vhelp" href="${u}" target="_blank" rel="noopener">
   <span class="vhi">${I[ic]}</span><span class="k">${k}</span>
   <span class="spacer v">${v}${I.ext}</span></a>`;
-/* Поле анкеты: пустое — плейсхолдер, заполненное — подпись 12 сверху */
+/* Поле дизайн-системы: пока пусто — подпись служит плейсхолдером,
+   при вводе и в заполненном виде она уезжает наверх (макет 2263:11095) */
+const inpField=(label,val='',cls='')=>`<div class="inp fl ${cls}" style="margin:0">
+  <span class="tx"><div class="k">${label}</div>
+    <input placeholder="${label}" value="${val}"></span>
+  <button class="vclear" data-clear>${I.x}</button></div>`;
+/* Поле анкеты — то же поле плюс подпись ошибки */
 const vField=([label,val,key])=>{
   const err=key&&S.verr===key, v=err?'12':(S.verif==='yes'?val:'');
-  return `<div class="vfield">
-    <div class="inp ${err?'err':''}" style="margin:0">
-      <span class="tx">${v?`<div class="k">${label}</div>`:''}
-        <input placeholder="${v?'':label}" value="${v}"></span>
-      <button class="vclear" data-clear>${I.x}</button></div>
+  return `<div class="vfield">${inpField(label,v,err?'err':'')}
     ${err?`<div class="errmsg">${VERR[key]}</div>`:''}</div>`;
 };
 const bankLogo=(k,size=24)=>`<span class="blogo" style="width:${size}px;height:${size}px">${BANKS[k].svg}</span>`;
@@ -1264,13 +1266,13 @@ const CONTACTS={
     hint2:'Вы сможете получать уведомления на ваш Email.',
     askText:'Вы больше не сможете авторизовываться по Email и паролю, и больше не будет приходить код 2FA',
     okAdd:'Email успешно добавлен',okEdit:'Email успешно изменен',okDel:'Email успешно отвязан',
-    field:(v,e)=>`<div class="inp ${e?'err':''}" style="margin:0"><input placeholder="Email" ${v?`value="${v}"`:''}></div>`},
+    field:(v,e)=>inpField('Email',v||'',e?'err':'')},
   tg:{label:'Telegram',ico:()=>I.tg,val:'@ivanivanov2003',
     add:'Привязка Telegram',edit:'Изменение Telegram',
     ask:'Отвязать Telegram?',
     askText:'При отвязке Telegram-аккаунта вы не сможете получать уведомления от нашего TG-бота.',
     okAdd:'Telegram привязан',okEdit:'Telegram изменён',okDel:'Telegram отвязан',
-    field:(v,e)=>`<div class="inp ${e?'err':''}" style="margin:0"><input placeholder="Telegram" ${v?`value="${v}"`:''}></div>`}
+    field:(v,e)=>inpField('Telegram',v||'',e?'err':'')}
 };
 /* Строка контакта в «Личных данных»: пусто — плюс, привязано — меню */
 const contactRow=k=>{const c=CONTACTS[k], on=S[k]==='yes';
@@ -1301,7 +1303,7 @@ const codeBlock=(title,c)=>`<div class="ccode">
       <p class="mtext">${c.val}</p>
     </div>
     ${c.cells?`<div class="codecells">${[0,1,2,3,4,5].map(i=>`<span>${'901234'[i]}</span>`).join('')}</div>`
-      :`<div class="inp" style="margin:0"><input placeholder="Код подтверждения"></div>`}
+      :inpField('Код подтверждения')}
   </div>
   <div class="cbtns">
     ${c.paste?`<button class="btn link" data-toast="Код вставлен из буфера">Вставить код</button>`:''}
@@ -1480,7 +1482,7 @@ const MODALS={
   subacct:{t:'Добавить суб-аккаунт',acts:false,b:()=>`
     <div class="mstack">
       <p class="mtext">После создания изменить имя суб-аккаунта будет нельзя</p>
-      <div class="inp" style="margin:0"><input placeholder="Имя суб-аккаунта"></div>
+      ${inpField('Имя суб-аккаунта')}
       <ul class="mhints"><li>От 4 до 15 символов</li><li>Только строчные буквы (a−z) и цифры</li></ul>
     </div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
@@ -1635,9 +1637,13 @@ Object.assign(MODALS,{
           ${err?'<div class="errmsg" style="margin-top:8px">Поле обязательно для заполнения</div>':''}
         </div>
         <div style="display:flex;flex-direction:column;gap:12px">
-          <div class="inp" style="margin:0"><div class="k">Расчетный счет</div>
-            <input value="12345678901234567890"></div>
-          <button class="btn link" style="width:100%;justify-content:center" data-toast="Номер вставлен из буфера">Вставить</button>
+          ${inpField('БИК')}
+          <p class="vhint">Введите 9 цифр кода своего банка</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          ${inpField('Расчетный счет')}
+          <button class="btn link" style="width:100%;justify-content:center"
+            data-paste="12345678901234567890">Вставить</button>
         </div>
         <div class="hr" style="margin:0"></div>
         <div style="display:flex;flex-direction:column;gap:12px">

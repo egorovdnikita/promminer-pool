@@ -437,7 +437,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mbody.tall{height:348px;flex:0 0 auto}
 .mbody.tall2{height:506px;flex:0 0 auto}
 .mbody.tall3{height:356px;flex:0 0 auto}
-.mbody.tall4{height:412px;flex:0 0 auto}
+.mbody.tall4{height:544px;flex:0 0 auto}
 .pwdform{display:flex;flex-direction:column;gap:24px}
 /* Поле пароля: подпись со значением слева, глаз справа */
 .inp.pwd{flex-direction:row;align-items:center;gap:12px}
@@ -957,14 +957,18 @@ html{scrollbar-gutter:stable}
 .vrows{display:flex;flex-direction:column;gap:16px}
 .vrow{display:grid;gap:16px}
 .vfield{min-width:0;display:flex;flex-direction:column;gap:8px}
-.vfield .inp{flex-direction:row;align-items:center;gap:4px;padding:0 12px}
-.vfield .inp .tx{flex:1;min-width:0;display:flex;flex-direction:column}
-.vfield .inp input{width:100%}
+/* Input дизайн-системы: подпись уезжает наверх, как только в поле появился текст */
+.inp.fl{flex-direction:row;align-items:center;gap:4px;padding:0 12px}
+.inp.fl .tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.inp.fl input{width:100%}
+.inp.fl:has(input:placeholder-shown) .k{display:none}
+.inp.fl input::placeholder{color:var(--c2);font-weight:600;opacity:1}
 .vfield .errmsg{font-size:var(--fs-s);line-height:var(--lh-s);margin-left:12px}
 .vclear{display:none;color:var(--c3);flex:0 0 auto}
 .vclear svg{width:24px;height:24px}
 .vclear:hover{color:var(--c1)}
-.inp:focus-within .vclear,.inp.err .vclear{display:flex}
+.inp.fl:focus-within .vclear,.inp.fl.err .vclear{display:flex}
+.inp.fl:has(input:placeholder-shown) .vclear{display:none}
 /* секции «Выписка» и «Расчетный счет» */
 .vsec{gap:24px}
 .vstate{display:flex;align-items:center;gap:4px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;margin-top:-8px}
@@ -978,6 +982,7 @@ html{scrollbar-gutter:stable}
 .vpay .tx i{font-style:normal;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
 .vpay .tx b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .vbanks{display:flex;flex-direction:column;gap:8px}
+.vhint{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
 .vbanks p{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c3)}
 .vbank{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .blogo{display:inline-flex;flex:0 0 auto}

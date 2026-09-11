@@ -230,6 +230,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (cl && (!cl.classList.contains('mask') || t === cl)) {
       modal.current = null; bump(); if (tst) toast(tst.dataset.toast!); return
     }
+    /* «Вставить» — подставляет номер в поле рядом */
+    const ps = at('[data-paste]')
+    if (ps) {
+      const inp = ps.parentElement?.querySelector('input') as HTMLInputElement | null
+      if (inp) { inp.value = ps.dataset.paste!; inp.dispatchEvent(new Event('input', { bubbles: true })) }
+      if (tst) toast(tst.dataset.toast!)
+      return
+    }
     if (tst) return toast(tst.dataset.toast!)
     const gt = at('[data-go]')
     if (gt) { go(gt.dataset.go!); return bump() }
