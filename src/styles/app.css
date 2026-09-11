@@ -643,7 +643,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .schead{display:flex;align-items:center;gap:8px;margin-bottom:4px}
 .schead h3{flex:1}
 /* Поиск по состояниям и экранам — осей уже полтора десятка */
-.scsearch{height:36px;padding:0 12px;border-radius:var(--r-s);background:var(--ctrl);margin-bottom:16px;
+.scsearch{height:36px;padding:0 12px;border-radius:var(--r-s);background:var(--ctrl);margin-bottom:0;
   font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500}
 .scsearch:focus{box-shadow:0 0 0 3px var(--focus)}
 .scsec{border-top:1px solid var(--border);padding-top:12px;margin-bottom:4px}
@@ -1113,3 +1113,40 @@ html{scrollbar-gutter:stable}
   font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600}
 .subempty b{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600;color:var(--c1)}
 .subempty b+p{margin-top:-16px}
+
+/* ===== Панель сценариев: свои наборы, фильтры и быстрые действия ===== */
+.sc{width:420px;max-width:100vw}
+.scbar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.scbar .scsearch{flex:1 1 100%}
+.scchip{padding:7px 11px;border-radius:var(--r-2xs);background:var(--bg);font-size:var(--fs-c);
+  line-height:var(--lh-c);font-weight:600;color:var(--c2)}
+.scchip:hover{background:var(--ctrl)}
+.scchip.on{background:var(--accent);color:#fff}
+/* сохранение своего набора и импорт ссылки */
+.scsave{display:flex;gap:6px;margin-bottom:8px}
+.scsave input{flex:1;min-width:0;height:32px;padding:0 10px;border-radius:var(--r-2xs);background:var(--ctrl);
+  font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--c1)}
+.scsave input:focus{box-shadow:0 0 0 3px var(--focus)}
+.scsave button{padding:0 12px;border-radius:var(--r-2xs);background:var(--bg);font-size:var(--fs-c);
+  line-height:var(--lh-c);font-weight:600;flex:0 0 auto}
+.scsave button:hover{background:var(--ctrl)}
+.scsave button:disabled{opacity:.45;cursor:default}
+.scnote{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
+.scrow{display:flex;align-items:stretch;gap:4px}
+.scrow>button:first-child{flex:1;min-width:0;text-align:left;padding:8px 10px;border-radius:var(--r-s);background:var(--bg)}
+.scrow>button:first-child:hover{background:var(--ctrl)}
+.scrow b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.scrow i{display:block;font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
+.scdel{width:28px;border-radius:var(--r-s);background:var(--bg);color:var(--c3);font-size:18px;flex:0 0 auto}
+.scdel:hover{background:#ef444429;color:var(--neg)}
+/* сворачиваемые группы */
+button.scsect{display:flex;align-items:center;gap:6px;width:100%;text-align:left}
+button.scsect:hover{color:var(--accent)}
+.scsect .scnum{min-width:18px;height:18px;padding:0 5px;border-radius:var(--r-f);background:var(--accent);
+  color:#fff;font-size:10px;line-height:18px;text-align:center;font-weight:700}
+.scsect .scarr{margin-left:auto;color:var(--c3);font-size:14px}
+/* возврат оси к значению по умолчанию */
+.scg>label{display:flex;align-items:center;gap:6px}
+.scundo{width:18px;height:18px;border-radius:var(--r-f);background:var(--ctrl);color:var(--c2);
+  font-size:11px;line-height:18px;flex:0 0 auto}
+.scundo:hover{background:var(--accent);color:#fff}

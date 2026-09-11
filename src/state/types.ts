@@ -36,6 +36,12 @@ export interface Ui {
   vfile?: boolean
   /** Выбранный банк в модалке «Добавить счет». */
   vbank?: string
+  /** Показывать в панели только изменённые оси. */
+  scdirty?: boolean
+  /** Свёрнутые группы осей в панели. */
+  scgrp?: string[]
+  /** Свои сохранённые сценарии (живут в localStorage). */
+  saved?: { name: string; axes: Record<string, string> }[]
   /** Фильтр в панели сценариев. */
   scq?: string
   page: Record<string, number>

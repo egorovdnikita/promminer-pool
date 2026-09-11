@@ -3,7 +3,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { DEF, PRESETS, GROUP_OF, M, applyState, workersList, workersRows, obsOf } from '@/legacy/prototype'
+import { AXES, DEF, PRESETS, GROUP_OF, M, applyState, workersList, workersRows, obsOf } from '@/legacy/prototype'
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
@@ -12,9 +12,19 @@ export const routeOf = (pathname: string) => pathname.replace(/^\/+|\/+$/g, '') 
 
 const freshUi = (): Ui => ({
   seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {}, oval: false, obs: 0, sess: '',
+  scgrp: [], saved: loadSaved(),
   q: '', wfilter: 'all', geo: '',
   wk: null, qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
+
+/** Свои сценарии живут в localStorage отдельно от текущего состояния. */
+const SAVED_KEY = 'pm.saved'
+function loadSaved(): Ui['saved'] {
+  try { return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]') } catch { return [] }
+}
+function storeSaved(list: Ui['saved']) {
+  try { localStorage.setItem(SAVED_KEY, JSON.stringify(list)) } catch { /* приватный режим */ }
+}
 
 /** Сценарий из хэша ссылки, иначе из localStorage, иначе дефолт. */
 function loadScenario(): Scenario {
@@ -347,6 +357,66 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return bump()
     }
     if (at('[data-reset]')) { S.current = { ...DEF }; modal.current = null; go(HOME); return bump() }
+    /* ==== Панель сценариев ==== */
+    if (at('[data-onlydirty]')) { u.scdirty = !u.scdirty; return bump() }
+    const grp = at('[data-scgrp]')
+    if (grp) {
+      const g = grp.dataset.scgrp!
+      const list = u.scgrp || []
+      u.scgrp = list.includes(g) ? list.filter((x) => x !== g) : [...list, g]
+      return bump()
+    }
+    const axr = at('[data-axreset]')
+    if (axr) { const k = axr.dataset.axreset! as keyof typeof DEF; S.current[k] = DEF[k]; return bump() }
+    if (at('[data-rand]')) {
+      const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]
+      for (const k of Object.keys(AXES) as (keyof typeof DEF)[])
+        S.current[k] = pick(AXES[k].opts.map(([v]: [string, string]) => v))
+      toast('Случайный сценарий')
+      return bump()
+    }
+    if (at('[data-save]')) {
+      const inp = document.getElementById('scname') as HTMLInputElement | null
+      const name = (inp?.value || '').trim() || `Сценарий ${(u.saved?.length || 0) + 1}`
+      const axes: Record<string, string> = {}
+      for (const k of Object.keys(DEF) as (keyof typeof DEF)[])
+        if (S.current[k] !== DEF[k]) axes[k] = S.current[k]
+      u.saved = [...(u.saved || []).filter((x) => x.name !== name), { name, axes }]
+      storeSaved(u.saved)
+      if (inp) inp.value = ''
+      toast(`Сценарий «${name}» сохранён`)
+      return bump()
+    }
+    const ap = at('[data-apply]')
+    if (ap) {
+      const found = (u.saved || []).find((x) => x.name === ap.dataset.apply)
+      if (found) { S.current = { ...DEF, ...found.axes }; modal.current = null; toast(`Сценарий «${found.name}»`) }
+      return bump()
+    }
+    const dls = at('[data-delsave]')
+    if (dls) {
+      u.saved = (u.saved || []).filter((x) => x.name !== dls.dataset.delsave)
+      storeSaved(u.saved)
+      return bump()
+    }
+    if (at('[data-scimport]')) {
+      const inp = document.getElementById('scimp') as HTMLInputElement | null
+      const raw = (inp?.value || '').trim()
+      const hash = raw.includes('#') ? raw.slice(raw.indexOf('#') + 1) : raw
+      if (!hash) return toast('Вставьте ссылку со сценарием')
+      const p = new URLSearchParams(hash)
+      const next = { ...DEF }
+      let n = 0
+      for (const k of Object.keys(DEF) as (keyof typeof DEF)[]) {
+        const v = p.get(k)
+        if (v) { next[k] = v; n++ }
+      }
+      if (!n) return toast('В ссылке нет сценария')
+      S.current = next; modal.current = null
+      if (inp) inp.value = ''
+      toast('Сценарий из ссылки применён')
+      return bump()
+    }
     if (at('[data-copylink]')) { navigator.clipboard?.writeText(location.href); return toast('Ссылка скопирована') }
     if (pop.current && !at('.pop-wrap')) { pop.current = null; bump() }
   }, [go, toast, snapshot])
