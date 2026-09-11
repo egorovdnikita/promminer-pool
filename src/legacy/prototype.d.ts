@@ -73,6 +73,8 @@ export declare const MODALS: Record<string, {
   center?: boolean
   /** Узкое окно 500 — подтверждения. */
   size?: 'sm'
+  /** Тело фиксированной высоты 348 — шаговые экраны контактов. */
+  tall?: number
 }>
 /** Вкладки профиля — рисуются в шапке. */
 export declare function profTabs(cur: string, m: Model): string

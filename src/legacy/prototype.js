@@ -1205,16 +1205,24 @@ const cerrText=k=>{const e=S.cerr; if(!e||e==='no')return '';
 const CH={phone:{word:'номер',val:'+7 999 999-99-99',paste:0},
           mail:{word:'email',val:'ivanivanov2003@gmail.com',paste:1}};
 const OTHER={phone:'mail',mail:'phone'};
-/* Экран ввода кода: заголовок, куда отправили, ячейки и таймер */
+/* Экран кода (макет 577:24890): шапка по центру, поле 502×56 и две ссылки.
+   Все шаговые экраны живут в теле фиксированной высоты 348 — как Modal Content. */
 const codeBlock=(title,c)=>`<div class="ccode">
-  <b class="msec">${title}</b>
-  <p class="mtext mut">Мы отправили код подтверждения<br>на указанный вами ${c.word}</p>
-  <p class="mtext">${c.val}</p>
-  <div class="otp">${[0,1,2,3].map(i=>`<span class="otpc ${i===0?'cur':''}" tabindex="0">${i===0?'':'·'}</span>`).join('')}</div>
-  ${c.paste?`<button class="btn link" data-toast="Код вставлен из буфера">Вставить код</button>`:''}
-  <button class="btn link">Запросить новый код через 00:59</button>
+  <div class="ccont">
+    <div class="chead">
+      <b class="ctitle">${title}</b>
+      <p class="mtext mut">Мы отправили код подтверждения<br>на указанный вами ${c.word}</p>
+      <p class="mtext">${c.val}</p>
+    </div>
+    <div class="inp" style="margin:0"><input placeholder="Код подтверждения"></div>
+  </div>
+  <div class="cbtns">
+    ${c.paste?`<button class="btn link" data-toast="Код вставлен из буфера">Вставить код</button>`:''}
+    <button class="btn link">Запросить новый код через 00:59</button>
+  </div>
 </div>`;
-const doneBlock=t=>`<div class="ccode" style="padding-top:40px"><b class="msec">${t}</b></div>`;
+/* Экран успеха: круг 64 с галочкой и подпись, блок по центру свободного места */
+const doneBlock=t=>`<div class="cdone"><span class="cok">${CHECK}</span><b class="ctitle">${t}</b></div>`;
 const prog=(cur,n)=>`<div class="mprog">${Array.from({length:n},(_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('')}</div>`;
 /* Модалки контактов. Телефон и почта: 4 шага на добавление и изменение
    (подтверждение по второму каналу → значение → код → успех) и 3 на отвязку.
@@ -1227,14 +1235,14 @@ function contactModals(){
     const c=CONTACTS[k];
     const err=()=>{const t=cerrText(k); return t?`<div class="errmsg">${t}</div>`:''};
     const hints=()=>c.hint?`<div class="mhints"><span>${c.hint}</span>${c.hint2?`<span>${c.hint2}</span>`:''}</div>`:'';
-    const value=v=>`<div class="mstack">${c.field(v,!!cerrText(k))}${err()}${hints()}</div>`;
+    const value=v=>`<div class="cfield">${c.field(v,!!cerrText(k))}${err()}</div>${hints()}`;
 
     if(k==='tg'){
       const body=v=>`<div class="mstack">
         <p class="mtext">${v?'Для изменения Telegram':'Для получения уведомлений в Telegram'}
           <button class="lnk" style="color:var(--accent)" data-toast="Открываем @PromminerAlertbot">${v?'перейдите в бота':'подключите бота'}</button>
           ${v?'и измените свой аккаунт ниже':'и добавьте свой аккаунт ниже'}</p>
-        ${c.field(v,!!cerrText(k))}${err()}</div>`;
+        <div class="cfield">${c.field(v,!!cerrText(k))}${err()}</div></div>`;
       out.tgadd={t:c.add,img:'/modal-tg.png',acts:false,b:()=>body(''),
         foot:()=>foot('Отменить','Сохранить',`data-close data-axis="tg" data-val="yes" data-toast="${c.okAdd}"`)};
       out.tgedit={t:c.edit,img:'/modal-tg.png',acts:false,b:()=>body(c.val),
@@ -1248,10 +1256,11 @@ function contactModals(){
     const o=CH[OTHER[k]], self=CH[k];
     /* Добавление и изменение: 4 шага */
     const four=(title,ok,cta)=>({t:title,acts:false,
-      b:(m,step)=>step===0?`${prog(0,4)}${codeBlock('Подтвердите действие',o)}`
-        :step===1?`${prog(1,4)}${value(title===c.edit?c.val:'')}`
-        :step===2?`${prog(2,4)}${codeBlock('Введите код',self)}`
-        :`${prog(3,4)}${doneBlock(ok)}`,
+      tall:1,
+      b:(m,step)=>step===0?`<div class="cstep g32">${prog(0,4)}${codeBlock('Подтвердите действие',o)}</div>`
+        :step===1?`<div class="cstep g20">${prog(1,4)}${value(title===c.edit?c.val:'')}</div>`
+        :step===2?`<div class="cstep g32">${prog(2,4)}${codeBlock('Введите код',self)}</div>`
+        :`<div class="cstep mid">${prog(3,4)}${doneBlock(ok)}</div>`,
       foot:(m,step)=>step===0?foot('Отменить','Далее','data-step="1"')
         :step===1?foot('Отменить','Подтвердить','data-step="2"')
         :step===2?foot('Отменить',cta,'data-step="3"')
@@ -1264,9 +1273,10 @@ function contactModals(){
       foot:()=>`<button class="btn out" data-close>Отменить</button>
         <button class="btn danger" data-modal="${k}code">Отвязать</button>`};
     out[k+'code']={t:c.unlink,acts:false,
-      b:(m,step)=>step===0?`${prog(0,3)}${codeBlock('Подтвердите действие',o)}`
-        :step===1?`${prog(1,3)}${codeBlock('Введите код',self)}`
-        :`${prog(2,3)}${doneBlock(c.okDel)}`,
+      tall:1,
+      b:(m,step)=>step===0?`<div class="cstep g32">${prog(0,3)}${codeBlock('Подтвердите действие',o)}</div>`
+        :step===1?`<div class="cstep g32">${prog(1,3)}${codeBlock('Введите код',self)}</div>`
+        :`<div class="cstep mid">${prog(2,3)}${doneBlock(c.okDel)}</div>`,
       foot:(m,step)=>step<2?foot('Отменить','Далее',`data-step="${step+1}"`)
         :`<button class="btn" data-close data-axis="${k}" data-val="no" data-toast="${c.okDel}">Отлично</button>`};
   }

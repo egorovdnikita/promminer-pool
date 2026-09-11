@@ -426,9 +426,30 @@ body.mini .ni .spacer.lbl{display:none!important}
 .inpphone:focus-within{box-shadow:0 0 0 3px var(--focus)}
 .inpphone.err,.inp.err{box-shadow:0 0 0 1px var(--neg) inset}
 /* Экран ввода кода и успеха — по центру */
-.ccode{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;padding:8px 0}
-.ccode .otp{margin:8px 0}
-.ccode .btn.link{height:auto}
+/* Шаговые экраны контактов: в макете Modal Content фиксированные 348 */
+.mbody.tall{height:348px;flex:0 0 auto}
+.cstep{display:flex;flex-direction:column;height:100%}
+.cstep.g32{gap:32px}
+.cstep.g20{gap:20px}
+/* Экран кода: шапка 12, поле через 24, ссылки через 32 и между собой 16 */
+.ccode{display:flex;flex-direction:column;gap:32px}
+.ccont{display:flex;flex-direction:column;gap:24px}
+/* Заголовок шагового экрана — Body/L, а не H5 */
+.ctitle{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+/* Ссылка на бота внутри абзаца — Button 28, из-за неё строка выше обычной */
+.mtext .lnk{display:inline-flex;align-items:center;height:28px;vertical-align:middle;font-weight:600}
+.chead{display:flex;flex-direction:column;gap:10px;text-align:center;align-items:center}
+/* Ошибка — часть блока поля: в макете шаг до неё 8, а не 20 */
+.cfield{display:flex;flex-direction:column;gap:8px}
+/* Успех центрируется по всей высоте тела, прогресс прижат к верху */
+.cstep.mid{position:relative;justify-content:center}
+.cstep.mid .mprog{position:absolute;top:0;left:0;right:0}
+.cbtns{display:flex;flex-direction:column;gap:16px;align-items:center}
+.cbtns .btn.link{height:28px}
+/* Экран успеха: круг 64 и подпись по центру свободного места */
+.cdone{margin:auto 0;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.cok{width:64px;height:64px;border-radius:var(--r-f);background:var(--accent);color:#fff;display:grid;place-items:center}
+.cok svg{width:32px;height:32px}
 .mfoot .btn{flex:1;justify-content:center;height:56px;border-radius:var(--r-m);
   font-size:var(--fs-m);line-height:var(--lh-m)}
 /* Шапка-иллюстрация: баннер 542×144 с отступом 4 и крестиком поверх */
@@ -440,7 +461,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Типовые куски содержимого модалок */
 .mtext{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .mh3{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
-.mhints{list-style:none;display:flex;flex-direction:column;gap:4px;
+.mhints{list-style:none;display:flex;flex-direction:column;gap:8px;
   font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
 .datechip{display:inline-flex;align-self:flex-start;align-items:center;gap:4px;padding:8px;border-radius:var(--r-s);
   background:var(--ctrl2);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
