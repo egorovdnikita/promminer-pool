@@ -448,7 +448,7 @@ const sortTh=(k,label,gs)=>{const s=U.sort.workers, on=s&&s.k===k;
 
 V.workers=m=>{
   const st=[['Активные',m.h.a,'var(--pos)',I.ok],['Низкий хэшрейт',m.h.l,'var(--warn)',I.excl],
-            ['Отключены',m.h.o,'var(--neg)',I.x],['Оффлайн',m.h.f,'var(--neu)',I.pause]];
+            ['Отключены',m.h.o,'var(--neg)',I.xc],['Оффлайн',m.h.f,'var(--neu)',I.pause]];
   const all=workersList(m), shown=workersRows(m);
   /* Счётчики в фильтре — по всему парку, как в макете (таблица показывает выборку) */
   const PC={all:m.total,ok:m.h.a,low:m.h.l,off:m.h.o,fail:m.h.f};
