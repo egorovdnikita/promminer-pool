@@ -241,7 +241,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (pp) { pop.current = pop.current === pp.dataset.pop ? null : pp.dataset.pop!; return bump() }
     const eye = at('[data-eye]')
     if (eye) {
-      const inp = eye.closest('.inp')?.querySelector('input') as HTMLInputElement | null
+      const inp = eye.closest('.inp, .afield')?.querySelector('input') as HTMLInputElement | null
       if (inp) inp.type = inp.type === 'password' ? 'text' : 'password'
       eye.classList.toggle('on')
       return

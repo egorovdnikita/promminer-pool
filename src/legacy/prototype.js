@@ -1044,10 +1044,13 @@ V.observers=m=>{
         <button class="ibr dim" data-modal="obsdel" title="Удалить">${I.tr}</button></span></td></tr>`}).join('')}
   </tbody></table></div>`:emptyBox('Наблюдателей пока нет','Создайте ссылку, чтобы дать бухгалтеру или партнеру доступ к статистике только для чтения')}`)}`};
 
-/* Строка сессии: плашка 56, устройство с пульсом, IP • дата и город */
-const sessRow=(s,act='')=>secRow(I.monitor,
+/* Строка сессии: плашка 56, устройство с пульсом, IP • дата и город.
+   У всех сессий, кроме текущей, справа кнопка завершения. */
+const sessOut=s=>s.cur?'':`<button class="ibr dim spacer" data-modal="sessend"
+  title="Завершить сессию">${I.out}</button>`;
+const sessRow=(s,act)=>secRow(I.monitor,
   `${s.dev}${s.act?'<i class="pulse"></i>':''}`,
-  `<span class="sdots"><em>IP</em> ${s.ip}</span><span class="sdots">${s.when}</span><br>${s.loc}`,act);
+  `<span class="sdots"><em>IP</em> ${s.ip}</span><span class="sdots">${s.when}</span><br>${s.loc}`,act??sessOut(s));
 /* Группа сессий с капсовой подписью */
 const sessGroup=(label,list,gray)=>list.length?`<div class="sgroup">
   <div class="scur ${gray?'off':''}">${label}</div>${list.map(x=>sessRow(x)).join('')}</div>`:'';
@@ -1140,7 +1143,7 @@ V.notifconfig=m=>`${card(`<div class="ch"><button class="ib sm" data-go="notifse
    Экраны собраны по проду: белый лист, колонка 358, поля h56 r16,
    кнопка xl h56, три чекбокса согласий с настоящими PDF-ссылками. */
 const AUTH_TABS={login:'Вход',register:'Регистрация',restore:'Восстановление',otp:'Код'};
-const authField=(ph,type,eye)=>`<div class="afield"><input placeholder="${ph}" ${type?`type="${type}"`:''}>${eye?`<button class="aeye">${I.eye}</button>`:''}</div>`;
+const authField=(ph,type,eye)=>`<div class="afield"><input placeholder="${ph}" ${type?`type="${type}"`:''}>${eye?`<button class="aeye" data-eye>${I.eyeoff}<span class="off">${I.eye}</span></button>`:''}</div>`;
 const consent=(i,html)=>`<label class="acheck" data-acheck="${i}">${cb(U.consent.has(i))}<span>${html}</span></label>`;
 V.auth=()=>{
   const step=U.auth||'login';
@@ -1491,7 +1494,7 @@ Object.assign(MODALS,{
           ${['Новый пароль','Подтвердить новый пароль'].map(k=>`
             <div class="inp pwd" style="margin:0"><span class="tx"><div class="k">${k}</div>
               <input type="password" value="Kate1234!"></span>
-              <button class="aeye spacer" data-eye>${I.eye}<span class="off">${I.eyeoff}</span></button></div>`).join('')}
+              <button class="aeye spacer" data-eye>${I.eyeoff}<span class="off">${I.eye}</span></button></div>`).join('')}
           <ul class="mhints">${PWD_RULES.map(r=>`<li>${I.ok}${r}</li>`).join('')}</ul>
         </div></div>`
       :`<div class="cstep mid">${prog(2,3)}${doneBlock('Пароль успешно изменен')}</div>`,
@@ -1523,8 +1526,7 @@ Object.assign(MODALS,{
   acctdel:{t:'',img:'/modal-delete.png',acts:false,
     b:()=>`<div class="mstack" style="padding-top:16px">
       <div class="alert info">${I.inf}<div>Это приведет к безвозвратному удалению данных и всего, что связано с аккаунтом</div></div>
-      <div class="row" style="gap:16px"><span class="dico">${I.tr2}</span>
-        <h3 class="mh3">Перед удалением необходимо:</h3></div>
+      <h3 class="mh3">Перед удалением необходимо:</h3>
       <div class="dlist">
         <span>Отключить все воркеры</span>
         <span>Вывести все деньги со счетов</span>

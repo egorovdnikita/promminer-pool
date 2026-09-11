@@ -450,8 +450,6 @@ body.mini .ni .spacer.lbl{display:none!important}
 .pwdform .mhints li{display:flex;align-items:center;gap:8px}
 .pwdform .mhints svg{width:16px;height:16px;color:var(--pos);flex:0 0 auto}
 /* Модалка удаления: иконка 32 у заголовка и список требований */
-.dico{width:32px;height:32px;display:grid;place-items:center;color:var(--neg);flex:0 0 auto}
-.dico svg{width:32px;height:32px}
 .dlist{display:flex;flex-direction:column;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .cstep{display:flex;flex-direction:column;height:100%}
 .cstep.g32{gap:32px}
@@ -479,6 +477,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .srow .tx i{font-style:normal;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
 .srow+.srow{margin-top:20px}
 .srow .act{flex:0 0 auto}
+.srow .ibr:hover{color:var(--neg);background:var(--ctrl)}
 /* Точки-разделители в подписи сессии */
 .sdots+.sdots::before{content:'\2022';margin:0 8px;color:var(--c3)}
 /* «Это устройство» — акцентная подпись над сессией */
