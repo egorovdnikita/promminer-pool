@@ -27,7 +27,7 @@ const AXES={
   mail:{g:'Контакты',label:'Почта',opts:[['yes','Привязана'],['no','Не привязана']]},
   tg:{g:'Контакты',label:'Telegram',opts:[['no','Не привязан'],['yes','Привязан']]},
   fa:{g:'Аккаунт',label:'Двухфакторная защита',opts:[['no','Выключена'],['yes','Включена']]},
-  sess:{g:'Аккаунт',label:'Сессии',opts:[['many','Три устройства'],['one','Только это устройство']]},
+  sess:{g:'Аккаунт',label:'Сессии',opts:[['many','Шесть устройств'],['few','Два устройства'],['one','Только это устройство']]},
   del:{g:'Аккаунт',label:'Удаление аккаунта',opts:[['no','Не запрошено'],['yes','Запрошено']]},
   cerr:{g:'Контакты',label:'Ошибка в поле контакта',opts:[['no','Нет'],['req','Не заполнено'],['busy','Занято / нет бота'],['fmt','Неверный формат']]},
 };
@@ -844,7 +844,8 @@ const subsOf=m=>{
   return all.slice(0,Math.max(1,CNT[S.subs]??3));
 };
 const obsOf=m=>m.empty?[]:OBSERVERS.slice(0,CNT[S.obs]??3);
-const sessOf=m=>(m.empty||S.sess==='one')?SESSIONS.slice(0,1):SESSIONS;
+const SESS_N={one:1,few:2,many:6};
+const sessOf=m=>SESSIONS.slice(0,m.empty?1:(SESS_N[S.sess]??6));
 /* Вкладки — Segment Control из макета: общий контейнер, белый активный сегмент.
    Счётчики показываются и при нуле (в макете «Наблюдатели 0»). */
 const profTabs=(cur,m)=>{const n={subaccounts:subsOf(m).length,observers:obsOf(m).length};
@@ -1044,9 +1045,12 @@ V.observers=m=>{
   </tbody></table></div>`:emptyBox('Наблюдателей пока нет','Создайте ссылку, чтобы дать бухгалтеру или партнеру доступ к статистике только для чтения')}`)}`};
 
 /* Строка сессии: плашка 56, устройство с пульсом, IP • дата и город */
-const sessRow=s=>secRow(I.monitor,
+const sessRow=(s,act='')=>secRow(I.monitor,
   `${s.dev}${s.act?'<i class="pulse"></i>':''}`,
-  `<span class="sdots">${s.ip}</span><span class="sdots">${s.when}</span><br>${s.loc}`,'');
+  `<span class="sdots"><em>IP</em> ${s.ip}</span><span class="sdots">${s.when}</span><br>${s.loc}`,act);
+/* Группа сессий с капсовой подписью */
+const sessGroup=(label,list,gray)=>list.length?`<div class="sgroup">
+  <div class="scur ${gray?'off':''}">${label}</div>${list.map(x=>sessRow(x)).join('')}</div>`:'';
 /* Безопасность (макет 971:102888): две карточки слева и «Сессии» справа.
    Строка секции — плашка 56, заголовок 16/20, подпись 14/18 и действие справа. */
 const secRow=(ic,t,d,right)=>`<div class="srow"><span class="sico">${ic}</span>
@@ -1070,9 +1074,12 @@ V.security=m=>{
             '<button class="btn soft-danger sm spacer" data-modal="acctdel">Удалить аккаунт</button>')}`)}
   </div>
   <div>
-    ${card(`<div class="ch"><h2>Сессии</h2>${rows.length>1?'<button class="btn link spacer" data-modal="sessions">Все сессии</button>':''}</div>
-      <div class="scur">Это устройство</div>
-      ${sessRow(cur)}`)}
+    ${(()=>{const act=rows.filter(s=>!s.cur&&s.act).slice(0,4), more=rows.length>5;
+      return card(`<div class="ch"><h2>Сессии</h2>${rows.length>1?'<button class="btn link spacer" data-modal="sessions">Все сессии</button>':''}</div>
+      <div class="sgroup"><div class="scur">Это устройство</div>${sessRow(cur)}
+        ${rows.length>1?`<button class="slink" data-modal="sessall">Завершить все сессии, кроме текущей</button>`:''}</div>
+      ${act.length?`<div class="hr" style="margin:20px 0"></div>${sessGroup('Активные',act)}`:''}
+      ${more?`<button class="btn g" style="width:100%;justify-content:center;margin-top:20px" data-modal="sessions">Показать все</button>`:''}`)})()}
   </div></div>`;
 };
 
@@ -1484,7 +1491,7 @@ Object.assign(MODALS,{
           ${['Новый пароль','Подтвердить новый пароль'].map(k=>`
             <div class="inp pwd" style="margin:0"><span class="tx"><div class="k">${k}</div>
               <input type="password" value="Kate1234!"></span>
-              <button class="aeye spacer" data-eye>${I.eye}</button></div>`).join('')}
+              <button class="aeye spacer" data-eye>${I.eye}<span class="off">${I.eyeoff}</span></button></div>`).join('')}
           <ul class="mhints">${PWD_RULES.map(r=>`<li>${I.ok}${r}</li>`).join('')}</ul>
         </div></div>`
       :`<div class="cstep mid">${prog(2,3)}${doneBlock('Пароль успешно изменен')}</div>`,
@@ -1496,15 +1503,13 @@ Object.assign(MODALS,{
   sessions:{t:'Все сессии',acts:false,
     b:m=>{const rows=sessOf(m);
       const act=rows.filter(s=>!s.cur&&s.act), off=rows.filter(s=>!s.cur&&!s.act);
-      const group=(label,list,gray)=>list.length?`<div class="sgroup">
-        <div class="scur ${gray?'off':''}">${label}</div>${list.map(sessRow).join('')}</div>`:'';
       return `<div class="mstack" style="gap:20px">
         <div class="sgroup"><div class="scur">Это устройство</div>${sessRow(rows[0])}
           ${rows.length>1?`<button class="slink" data-modal="sessall">Завершить все сессии, кроме текущей</button>`:''}</div>
         ${act.length?'<div class="hr" style="margin:0"></div>':''}
-        ${group('Активные',act)}
+        ${sessGroup('Активные',act)}
         ${off.length?'<div class="hr" style="margin:0"></div>':''}
-        ${group('НЕ Активные',off,1)}
+        ${sessGroup('НЕ Активные',off,1)}
       </div>`},
     foot:()=>`<button class="btn out" data-close>Закрыть</button>`},
   sessend:{t:'Завершить эту сессию?',img:'/modal-delete.png',center:true,acts:false,b:()=>'',
