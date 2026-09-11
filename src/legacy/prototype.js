@@ -295,15 +295,18 @@ const CHECK='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke=
 const cb=(on,attr='',cls='')=>`<span class="cb ${on?'on':''} ${cls}" ${attr}>${on?CHECK:''}</span>`;
 /* Date Picker дизайн-системы: месяц сеткой, выбранный диапазон подсвечен.
    Данные статичные — прототипу хватает января 2026 с диапазоном 29–30. */
-function datePicker(sel=[29,30]){
+const MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+/* Календарь на любой месяц. min — первый доступный день: раньше него
+   даты гасятся (в сроке действия ссылки выбор только вперёд). */
+function datePicker(sel=[29,30],mi=0,yr=2026,min=0){
   const dows=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-  const lead=4, days=31; /* 1 января 2026 — четверг, неделя с воскресенья */
+  const lead=new Date(yr,mi,1).getDay(), days=new Date(yr,mi+1,0).getDate(), prev=new Date(yr,mi,0).getDate();
   const cells=[];
-  for(let i=0;i<lead;i++)cells.push(`<span class="dp-d mut">${29+i}</span>`); /* хвост декабря */
-  for(let d=1;d<=days;d++)cells.push(`<span class="dp-d ${sel.includes(d)?'sel':''}">${d}</span>`);
-  for(let d=1;cells.length%7;d++)cells.push(`<span class="dp-d mut">${d}</span>`); /* начало февраля */
+  for(let i=lead;i>0;i--)cells.push(`<span class="dp-d mut">${prev-i+1}</span>`);
+  for(let d=1;d<=days;d++)cells.push(`<span class="dp-d ${sel.includes(d)?'sel':''} ${d<min?'off':''}">${d}</span>`);
+  for(let d=1;cells.length%7;d++)cells.push(`<span class="dp-d mut">${d}</span>`);
   return `<div class="pop dp">
-    <div class="dp-top"><button class="dp-nav">${I.cl}</button><b>Январь 2026</b><button class="dp-nav">${I.cv}</button></div>
+    <div class="dp-top"><button class="dp-nav">${I.cl}</button><b>${MONTHS[mi]} ${yr}</b><button class="dp-nav">${I.cv}</button></div>
     <div class="dp-div"></div>
     <div class="dp-grid">${dows.map(d=>`<span class="dp-dow">${d}</span>`).join('')}${cells.join('')}</div>
   </div>`;
@@ -960,7 +963,7 @@ function obsForm(desc){
         <button class="selbox full" data-pop="oterm">${OTERM[i][1]}<span class="spacer">${I.cd}</span></button>
         ${pop==='oterm'?`<div class="pop menu row up oterm">
           ${seg('oterm',OTERM.map(t=>t[0]),0)}
-          ${datePicker([]).replace('class="pop dp"','class="dp"')}</div>`:''}
+          ${datePicker([],3,2026,1).replace('class="pop dp"','class="dp"')}</div>`:''}
       </span></div>`})()}
   </div>`;
 }

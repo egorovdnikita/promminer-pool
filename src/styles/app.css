@@ -843,6 +843,7 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .dp-d{height:34px;display:grid;place-items:center;border-radius:var(--r-s);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
 .dp-d:hover{background:var(--ctrl)}
 .dp-d.sel{background:#7086fc1f;color:var(--accent)}
+.dp-d.off{opacity:.35;pointer-events:none}
 .dp-d.mut{color:var(--c3);pointer-events:none}
 
 /* Список уведомлений (макет «Уведомления» профиля) */
