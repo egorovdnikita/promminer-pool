@@ -1230,23 +1230,25 @@ const NOTES_ALL=[
   ['Средства выведены успешно','Вывод 0.0005 BTC на ваш аккаунт natarusso','07.02.2026 12:20',1],
   ['Изменения в политике выплат','Внимание! Обратите внимание на изменения в политике платежей. Вывод средств на ваш аккаунт account20101 может занять больше времени, чем ожидало…','03.02.2026 09:14',1],
 ];
-const noteRow=([t,d,dt,read])=>`<div class="nrow ${read?'read':''}"><i class="dot"></i>
-  <b>${t}</b><p>${d}</p><span class="dt mono">${dt}</span></div>`;
+/* Строка уведомления — таблица 48 с точкой непрочитанного (макет 1022:57336) */
+const noteRow=([t,d,dt,read])=>`<tr class="${read?'read':''}">
+  <td class="ndot">${read?'':'<i class="dot"></i>'}</td>
+  <td class="nt">${t}</td><td class="nd">${d}</td><td class="ndt">${dt}</td></tr>`;
 
 V.notifsettings=m=>{
   const n=NOTIF_N[S.notif];
   const rows=n?NOTES_ALL.slice(0,Math.max(n,2)):[];
-  return `${card(`<div class="ch"><h2>Уведомления</h2><div class="spacer"></div>
+  return card(`<div class="ch subhead"><h2>Уведомления</h2><div class="spacer"></div>
   ${rows.length?`<button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button>
-  <span class="pop-wrap"><button class="pill flat sq" data-pop="nfilter">${segv('nfilter',['Все уведомления','Непрочитанные','Прочитанные'])} ${I.cd}</button>
+  <span class="pop-wrap"><button class="selbox nsel" data-pop="nfilter">${segv('nfilter',['Все уведомления','Непрочитанные','Прочитанные'])}<span class="spacer">${I.cd}</span></button>
     ${pop==='nfilter'?`<div class="pop" style="min-width:230px">${['Все уведомления','Непрочитанные','Прочитанные'].map((o,i)=>
       `<button class="${segi('nfilter')===i?'on':''}" data-seg="nfilter" data-i="${i}">${o}${segi('nfilter')===i?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`:''}
-  <button class="btn w sm" data-go="notifconfig">${I.tune} Настройка</button></div>
-  ${rows.length?`<div class="nlist">${rows.map(noteRow).join('')}</div>`
-    :`<div class="empty" style="padding:64px 0"><div class="art">${I.bell}</div>
+  <button class="btn g" data-go="notifconfig">${I.tune} Настройка</button></div>
+  ${rows.length?`<div class="tw"><table class="tbl notbl"><tbody>${rows.map(noteRow).join('')}</tbody></table></div>`
+    :`<div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
         <b>Уведомлений пока не было</b>
-        <p style="max-width:260px">Как только у вас появятся уведомления, вы увидите их здесь</p></div>`}
-  ${pager('notif',rows.length,20)}`)}`;
+        <p>Как только у вас появятся уведомления,<br>вы увидите их здесь</p></div>`}
+  ${pager('notif',rows.length,20)}`,'tblcard');
 };
 
 /* Настройка уведомлений (макет 2219:246155): события по группам, пять каналов. */

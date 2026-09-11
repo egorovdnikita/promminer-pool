@@ -834,15 +834,19 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .dp-d.mut{color:var(--c3);pointer-events:none}
 
 /* Список уведомлений (макет «Уведомления» профиля) */
-.nlist{display:flex;flex-direction:column}
-.nrow{display:grid;grid-template-columns:8px minmax(180px,240px) 1fr auto;gap:16px;align-items:start;padding:14px 0}
-.nrow+.nrow{border-top:1px solid var(--border)}
-.nrow>.dot{width:8px;height:8px;margin-top:6px;background:var(--accent)}
-.nrow.read>.dot{background:transparent}
-.nrow b{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
-.nrow p{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c1)}
-.nrow .dt{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);white-space:nowrap}
-.nrow.read b,.nrow.read p,.nrow.read .dt{color:var(--c2)}
+/* Список уведомлений — таблица со строками 48 (макет 1022:57336) */
+.notbl td{height:48px;padding:12px;font-size:var(--fs-s);line-height:var(--lh-s);
+  font-weight:500;color:var(--c1);border-bottom:1px solid var(--border);vertical-align:middle}
+.notbl tbody tr:last-child td{border-bottom:1px solid var(--border)}
+.notbl .ndot{width:24px;padding:12px 0 12px 12px}
+.notbl .ndot .dot{display:block;width:12px;height:12px;border-radius:var(--r-f);background:var(--accent)}
+.notbl .nt{width:400px;font-weight:600}
+.notbl .nd{white-space:normal}
+.notbl .ndt{width:130px;white-space:nowrap}
+.notbl tr.read .nt{font-weight:500}
+.notbl tr.read .nd,.notbl tr.read .ndt{color:var(--c2)}
+.pager .selbox.nsel,.card.tblcard .ch .selbox.nsel{height:48px;gap:4px;white-space:nowrap;
+  font-size:var(--fs-s);line-height:var(--lh-s)}
 /* Настройка уведомлений: шапка с каналами и группы событий */
 .ntbl th{vertical-align:top}
 .ntbl th .nch{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1);margin-bottom:2px}
@@ -1029,6 +1033,8 @@ html{scrollbar-gutter:stable}
 .card.tblcard{padding:8px}
 .card.tblcard>.ch.subhead{padding:16px;margin:0;min-height:80px;gap:16px}
 .card.tblcard .tw{padding-bottom:8px}
+/* Pagination внутри карточки: 4 сверху и 16 по бокам и снизу (макет 1026:104278) */
+.card.tblcard .pager{padding:4px 16px 16px}
 .subtbl{table-layout:auto}
 /* полосы групп: светлая и чуть темнее — так в макете отделены «Воркеры» и «Доход» */
 .subtbl th.ba{background:var(--ctrl2)}
@@ -1077,6 +1083,8 @@ html{scrollbar-gutter:stable}
 .obulk .btn.link{height:40px}
 .obulk .btn.danger.sm{height:40px}
 .obstbl .ibr{width:36px;height:36px;border-radius:var(--r-f);border:1px solid var(--border)}
+/* в ячейках таблицы у svg есть margin-left:4px — внутри кнопки он ломает центровку */
+.tbl td .ibr svg,.tbl th .ibr svg{margin:0}
 .obstbl .ibr svg{width:16px;height:16px}
 .obstbl .ibr.acc{color:var(--accent)}
 .obstbl .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
