@@ -1070,9 +1070,9 @@ V.security=m=>{
       ${secRow(I.key,'Ваш пароль','Этот пароль используется для входа в ваш аккаунт',
         '<button class="btn g sm spacer" data-modal="pwd">Изменить</button>')}
       ${S.del==='yes'
-        ? `${secRow(I.tr2,'Аккаунт будет удален','Заявка принята, данные сотрут через 30 дней — до этого удаление можно отменить',
-            `<button class="btn g sm spacer" data-axis="del" data-val="no" data-toast="Удаление аккаунта отменено">Отменить удаление</button>`)}
-           <div class="alert warn" style="margin-top:20px">${I.inf}<div>Пока заявка активна вывод средств и создание суб-аккаунтов недоступны</div></div>`
+        ? secRow(I.tr2,'Удаление аккаунта',
+            `Если передумали - напишите в <a class="acc" href="https://t.me/PoolSupport" target="_blank" rel="noopener">поддержку</a>`,
+            '<span class="badge acc spacer">В процессе</span>')
         : secRow(I.tr2,'Удаление данных и аккаунта','Безвозратное удаление данных и всего, что связано с аккаунтом',
             '<button class="btn soft-danger sm spacer" data-modal="acctdel">Удалить аккаунт</button>')}`)}
   </div>
