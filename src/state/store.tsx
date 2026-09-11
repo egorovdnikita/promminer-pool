@@ -179,8 +179,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (wf) { u.wfilter = wf.dataset.wf!; u.page.workers = 1; return bump() }
     const sk = at('[data-sortk]')
     if (sk) {
-      const k = sk.dataset.sortk!, s = u.sort.workers
-      u.sort.workers = s && s.k === k ? (s.d > 0 ? { k, d: -1 } : null) : { k, d: 1 }
+      const k = sk.dataset.sortk!, tb = sk.dataset.sorttbl || 'workers', s = u.sort[tb]
+      u.sort[tb] = s && s.k === k ? (s.d > 0 ? { k, d: -1 } : null) : { k, d: 1 }
       return bump()
     }
     /* Размер страницы в пагинации */

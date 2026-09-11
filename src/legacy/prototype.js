@@ -489,8 +489,13 @@ function workersRows(m){
     return (typeof x==='string'?String(x).localeCompare(String(y)):x-y)*s.d});
   return rows;
 }
-const sortTh=(k,label,gs,cls='')=>{const s=U.sort.workers, on=s&&s.k===k;
-  return `<th class="srt ${on?'on':''} ${gs?'gs':''} ${cls}" data-sortk="${k}">${label}${on?(s.d>0?I.sortUp:I.sortDn):I.sortv}</th>`};
+/* Заголовок с сортировкой. tbl — своя пара ключ/направление на каждую таблицу */
+const sortTh=(k,label,gs,cls='',tbl='workers')=>{const s=U.sort[tbl], on=s&&s.k===k;
+  return `<th class="srt ${on?'on':''} ${gs?'gs':''} ${cls}" data-sortk="${k}" data-sorttbl="${tbl}">${label}${on?(s.d>0?I.sortUp:I.sortDn):I.sortv}</th>`};
+/* Сортировка строк по вычисленному ключу */
+const sortBy=(rows,tbl,val)=>{const s=U.sort[tbl]; if(!s) return rows;
+  return [...rows].sort((a,b)=>{const x=val(a,s.k),y=val(b,s.k);
+    return (typeof x==='number'&&typeof y==='number'?x-y:String(x).localeCompare(String(y),'ru'))*s.d})};
 
 V.workers=m=>{
   const st=[['Активные',m.h.a,'var(--pos)',I.ok],['Низкий хэшрейт',m.h.l,'var(--warn)',I.excl],
@@ -1119,7 +1124,9 @@ V.subaccounts=m=>{
     <div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
       <p>Чтобы начать добывать цифровую валюту<br>необходимо добавить имя аккаунта</p>
       <button class="btn" data-modal="subacct">Добавить имя аккаунта</button></div>`,'tblcard');
-  const rows=subsOf(m);
+  /* колонки: 0 имя, 1 баланс, 2–5 воркеры, 6–8 хэшрейт, 9–12 доход */
+  const rows=sortBy(subsOf(m),'subs',(r,k)=>{const i=+k.slice(1);
+    return i===0?r.name:i===1?r.bal:i<6?r.w[i-2]:i<9?r.h[i-6]:r.inc[i-9]});
   const sum=i=>rows.reduce((a,r)=>a+r.w[i],0);
   const sumH=i=>rows.reduce((a,r)=>a+r.h[i],0);
   const sumI=i=>rows.reduce((a,r)=>a+r.inc[i],0);
@@ -1137,7 +1144,7 @@ V.subaccounts=m=>{
     <tr class="grp">${SUB_GROUPS.map(([t,n,b])=>`<th class="b${b}" colspan="${n}">${t}</th>`).join('')}<th class="ba"></th></tr>
     <tr>${SUB_COLS.map(([t,b],i)=>{
       const ico=i>=9?`<span class="thico">${COIN_ICON[t]||''}</span>`:'';
-      return sortTh('c'+i,ico+t,false,'b'+b)}).join('')}<th class="ba"></th></tr>
+      return sortTh('c'+i,ico+t,false,'b'+b,'subs')}).join('')}<th class="ba"></th></tr>
   </thead><tbody>
   ${rows.map(r=>`<tr><td><span class="subname"><b>${r.name}</b>
       <span class="badge acc ${r.main?'on':''}">${r.main?'Основной':'Суб-аккаунт'}</span></span></td>
@@ -1161,6 +1168,10 @@ V.observers=m=>{
     <button class="btn" data-modal="observer" ${S.role==='observer'?'disabled':''}>${I.pl} Создать ссылку</button></div>`;
   const cols=['Аккаунт','Изменен','URL-адрес','Описание','Монеты','Разрешения','Срок действия'];
   const sel=U.osel, allSel=rows.length&&rows.every((_,i)=>sel.has(i));
+  /* «Изменен» сортируется по дате, «Срок действия» — бессрочные в конец */
+  const sorted=sortBy(rows,'obs',(o,k)=>k==='chg'
+    ? o.changed.slice(6,10)+o.changed.slice(3,5)+o.changed.slice(0,2)+o.changed.slice(11)
+    : (o.term==='Бессрочно'?'9999':o.term.replace(/\D/g,'')));
   if(S.name==='no') return card(`<div class="ch subhead"><h2>Мои наблюдатели</h2></div>
     <div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
       <p>Чтобы начать добывать цифровую валюту<br>необходимо добавить имя аккаунта</p>
@@ -1178,9 +1189,9 @@ V.observers=m=>{
     <button class="btn danger sm" data-modal="obsdel">Удалить</button></div>`:''}
   <div class="tw"><table class="tbl obstbl">
   <thead><tr><th class="cbc">${cb(allSel,'data-oselall')}</th>
-    <th>Аккаунт</th>${sortTh('obs-chg','Изменен')}<th>URL-адрес</th><th>Описание</th>
-    <th>Монеты</th><th>Разрешения</th>${sortTh('obs-term','Срок действия')}<th></th></tr></thead>
-  <tbody>${rows.map((o,i)=>{const url=LINKS.watcher(o.token);
+    <th>Аккаунт</th>${sortTh('chg','Изменен',0,'','obs')}<th>URL-адрес</th><th>Описание</th>
+    <th>Монеты</th><th>Разрешения</th>${sortTh('term','Срок действия',0,'','obs')}<th></th></tr></thead>
+  <tbody>${sorted.map((o,i)=>{const url=LINKS.watcher(o.token);
     const rest=o.access.length-1;
     return `<tr><td class="cbc">${cb(sel.has(i),'data-osel="'+i+'"')}</td>
     <td><span class="row" style="gap:8px"><span class="ell">${o.name}</span>
