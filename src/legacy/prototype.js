@@ -1670,12 +1670,12 @@ const MODALS={
       <button class="btn" data-close data-toast="Данные успешно изменены">Сохранить</button>`},
   /* Создать и изменить наблюдателя — один макет с разными заголовками
      (2219:32420 и 2219:32311): описание со счётчиком, списки чекбоксов, срок действия */
-  observer:{t:'Создать ссылку наблюдателя',acts:false,
+  observer:{t:'Создать ссылку наблюдателя',acts:false,tall:6,
     b:(m,step)=>step?`<div class="cstep mid">${prog(2,3)}${doneBlock('Наблюдатель успешно создан')}</div>`:obsForm(''),
     foot:(m,step)=>step
       ? `<button class="btn" style="flex:1" data-close data-toast="Ссылка наблюдателя создана">Отлично</button>`
       : `<button class="btn out" data-close>Отменить</button><button class="btn" data-osubmit>Подтвердить</button>`},
-  obsedit:{t:'Изменить наблюдателя',acts:false,
+  obsedit:{t:'Изменить наблюдателя',acts:false,tall:6,
     b:(m,step)=>step?`<div class="cstep mid">${prog(2,3)}${doneBlock('Изменения сохранены')}</div>`:obsForm(obsCur(m).label),
     foot:(m,step)=>step
       ? `<button class="btn" style="flex:1" data-close data-toast="Изменения сохранены">Отлично</button>`

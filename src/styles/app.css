@@ -435,11 +435,16 @@ body.mini .ni .spacer.lbl{display:none!important}
 .inpphone.err,.inp.err{box-shadow:0 0 0 1px var(--neg) inset}
 /* Экран ввода кода и успеха — по центру */
 /* Шаговые экраны контактов: в макете Modal Content фиксированные 348 */
-.mbody.tall{height:348px;flex:0 0 auto}
-.mbody.tall2{height:506px;flex:0 0 auto}
-.mbody.tall3{height:356px;flex:0 0 auto}
-.mbody.tall4{height:544px;flex:0 0 auto}
-.mbody.tall5{height:326px;flex:0 0 auto}
+/* Шаговые модалки одной высоты: Modal Content в макете не меняется между
+   шагами. flex:0 1 auto — на низком экране тело ужимается и скроллится,
+   иначе футер вылезет за max-height окна. */
+.mbody.tall,.mbody.tall2,.mbody.tall3,.mbody.tall4,.mbody.tall5,.mbody.tall6{flex:0 1 auto}
+.mbody.tall{height:348px}
+.mbody.tall2{height:530px}
+.mbody.tall3{height:356px}
+.mbody.tall4{height:544px}
+.mbody.tall5{height:326px}
+.mbody.tall6{height:772px}
 .pwdform{display:flex;flex-direction:column;gap:24px}
 /* Поле пароля: подпись со значением слева, глаз справа */
 .inp.pwd{flex-direction:row;align-items:center;gap:12px}
