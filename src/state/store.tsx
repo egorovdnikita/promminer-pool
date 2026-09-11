@@ -11,7 +11,8 @@ export const pathOf = (route: string) => (route === HOME ? '/' : '/' + route)
 export const routeOf = (pathname: string) => pathname.replace(/^\/+|\/+$/g, '') || HOME
 
 const freshUi = (): Ui => ({
-  seg: {}, sort: {}, page: {}, sel: new Set(), osel: new Set(), q: '', wfilter: 'all', geo: '',
+  seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {},
+  q: '', wfilter: 'all', geo: '',
   wk: null, qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
 
@@ -182,8 +183,41 @@ export function AppProvider({ children }: { children: ReactNode }) {
       u.sort.workers = s && s.k === k ? (s.d > 0 ? { k, d: -1 } : null) : { k, d: 1 }
       return bump()
     }
+    /* Размер страницы в пагинации */
+    const pper = at('[data-per]')
+    if (pper) {
+      const [id, n] = pper.dataset.per!.split(':')
+      u.per[id] = +n; u.page[id] = 1; pop.current = null
+      return bump()
+    }
     const pg = at('[data-page]')
     if (pg && !(pg as HTMLButtonElement).disabled) { u.page[pg.dataset.page!] = +pg.dataset.p!; return bump() }
+    /* Чекбоксы в форме наблюдателя и «Выбрать все» по группе */
+    const ock = at('[data-ochk]')
+    if (ock) { const k = ock.dataset.ochk!; u.ochk.has(k) ? u.ochk.delete(k) : u.ochk.add(k); return bump() }
+    const oca = at('[data-ochkall]')
+    if (oca) {
+      const [key, n] = oca.dataset.ochkall!.split(':')
+      const all = Array.from({ length: +n }, (_, i) => `${key}:${i}`)
+      const on = all.every((k) => u.ochk.has(k))
+      all.forEach((k) => (on ? u.ochk.delete(k) : u.ochk.add(k)))
+      return bump()
+    }
+    /* Баннеры сводки закрываются по крестику */
+    const ph = at('[data-phide]')
+    if (ph) { u.phide.add(+ph.dataset.phide!); toast('Баннер скрыт'); return bump() }
+    /* Тумблер канала у события и «Включить все / Выключить все» по колонке */
+    const nch = at('[data-nch]')
+    if (nch) { const k = nch.dataset.nch!; u.nch[k] = !nch.classList.contains('on'); return bump() }
+    const nc = at('[data-ncol]')
+    if (nc) {
+      const i = nc.dataset.ncol!
+      const togs = Array.from(document.querySelectorAll<HTMLElement>(`.ntbl .tog[data-nch$="-${i}"]`))
+      const on = togs.every((t) => t.classList.contains('on'))
+      togs.forEach((t) => { u.nch[t.dataset.nch!] = !on })
+      toast(on ? 'Канал выключен для всех событий' : 'Канал включен для всех событий')
+      return bump()
+    }
     /* Выбор строк наблюдателей — своя коллекция, не пересекается с воркерами */
     const osl = at('[data-osel]')
     if (osl) { const i = +osl.dataset.osel!; u.osel.has(i) ? u.osel.delete(i) : u.osel.add(i); return bump() }
@@ -200,7 +234,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (sl) { const id = +sl.dataset.sel!; u.sel.has(id) ? u.sel.delete(id) : u.sel.add(id); return bump() }
     if (at('[data-selall]')) {
       applyState(snapshot())
-      const rows = workersRows(M()), per = 10
+      const rows = workersRows(M()), per = u.per.workers ?? 10
       const pages = Math.max(1, Math.ceil(rows.length / per))
       const cur = Math.min(u.page.workers || 1, pages)
       const page = rows.slice((cur - 1) * per, cur * per)
@@ -226,7 +260,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const st = at('[data-step]')
     if (st) { u.step = +st.dataset.step!; return bump() }
     const md = at('[data-modal]')
-    if (md) { modal.current = md.dataset.modal!; u.step = 0; u.vfile = false; u.vbank = undefined; pop.current = null; return bump() }
+    if (md) {
+      modal.current = md.dataset.modal!; u.step = 0; u.vfile = false; u.vbank = undefined; pop.current = null
+      /* формы наблюдателя открываются с отмеченными первыми двумя пунктами */
+      if (md.dataset.modal === 'observer' || md.dataset.modal === 'obsedit')
+        u.ochk = new Set(['acc:0', 'acc:1', 'perm:0', 'perm:1', 'coin:0', 'coin:1'])
+      return bump()
+    }
     const tst = at('[data-toast]')
     /* Ось сценария применяем до закрытия: кнопки модалок несут и data-axis,
        и data-close, а ветка закрытия выходит из обработчика. */

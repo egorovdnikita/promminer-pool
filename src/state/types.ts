@@ -38,9 +38,17 @@ export interface Ui {
   /** Фильтр в панели сценариев. */
   scq?: string
   page: Record<string, number>
+  /** Выбранный размер страницы в пагинации. */
+  per: Record<string, number>
   sel: Set<number>
   /** Выбранные строки наблюдателей. */
   osel: Set<number>
+  /** Отмеченные пункты в форме наблюдателя, ключ «группа:индекс». */
+  ochk: Set<string>
+  /** Скрытые промо-баннеры сводки. */
+  phide: Set<number>
+  /** Отличия от умолчания в таблице каналов уведомлений. */
+  nch: Record<string, boolean>
   q: string
   wfilter: string
   geo: string

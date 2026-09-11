@@ -52,7 +52,7 @@ const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',veri
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},sel:new Set(),osel:new Set(),q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -282,7 +282,10 @@ const segv=(id,opts,def=0)=>opts[U.seg[id]??def];
 const segLine=(id,opts,def=0,cls='')=>{const c=U.seg[id]??def;
   return `<div class="segl ${cls}">${opts.map((o,i)=>`<button class="${i===c?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</div>`};
 const segi=(id,def=0)=>U.seg[id]??def;
-const pageSlice=(pid,total,per=10)=>{const pages=Math.max(1,Math.ceil(total/per)),cur=Math.min(U.page[pid]||1,pages),f=(cur-1)*per;return[f,Math.min(f+per,total)]};
+/* Размер страницы выбирается в пагинации и живёт в U.per */
+const PER_OPTS=[10,20,50,100];
+const perOf=(pid,def)=>U.per[pid]??def;
+const pageSlice=(pid,total,def=10)=>{const per=perOf(pid,def),pages=Math.max(1,Math.ceil(total/per)),cur=Math.min(U.page[pid]||1,pages),f=(cur-1)*per;return[f,Math.min(f+per,total)]};
 /* Чекбокс */
 /* Checkbox и Radio дизайн-системы. cls: on|ind|err|dis. */
 const CHECK='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
@@ -306,13 +309,16 @@ function datePicker(sel=[29,30]){
 const status=(t,label)=>`<span class="status ${t}"><i class="dot"></i>${label}</span>`;
 const rd=(on,attr='',cls='')=>`<span class="rd ${on?'on':''} ${cls}" ${attr}></span>`;
 /* Пагинация — кликабельная */
-function pager(id,total,per=10){
+function pager(id,total,def=10){
+  const per=perOf(id,def);
   const pages=Math.max(1,Math.ceil(total/per)), cur=Math.min(U.page[id]||1,pages);
   const from=total?(cur-1)*per+1:0, to=Math.min(cur*per,total);
   const nums=[];for(let i=1;i<=pages;i++){if(i===1||i===pages||Math.abs(i-cur)<=1)nums.push(i);else if(nums[nums.length-1]!=='…')nums.push('…')}
   /* Pagination дизайн-системы: подпись «Показать» стоит над селектом */
   return `<div class="pager"><span class="perpage"><span class="lb">Показать</span>
-    <button class="selbox sm" data-toast="Количество строк на странице">${per} строк<span class="spacer">${I.cd}</span></button></span>
+    <span class="pop-wrap"><button class="selbox sm" data-pop="per-${id}">${per} строк<span class="spacer">${I.cd}</span></button>
+      ${pop==='per-'+id?`<div class="pop menu up" style="width:110px">${PER_OPTS.map(o=>
+        `<button data-per="${id}:${o}">${o} строк${o===per?`<span class="ck spacer">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></span>
     <span class="pshown">Показано ${from}–${to} из ${ni(total)}</span>
     <span class="pg"><button data-page="${id}" data-p="${cur-1}" ${cur<=1?'disabled':''}>${I.cl}</button>
     ${nums.map(n=>n==='…'?'<button disabled>…</button>':`<button class="${n===cur?'on':''}" data-page="${id}" data-p="${n}">${n}</button>`).join('')}
@@ -402,7 +408,7 @@ function incomeTable(m,n,pid){
   const hs=['510','288','320','286','256','244','200','278','298','288'];
   if(!n) return emptyBox('Дохода пока нет','Как только будет доход вы увидите здесь информацию');
   let from=0,to=n;
-  if(pid){const per=10,pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
+  if(pid){const per=perOf(pid,10),pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
   return `<div class="tw"><table class="tbl"><thead><tr>
     <th>Дата и время</th><th>Хэшрейт ${I.inf}</th>
     <th class="num"><span class="thico">${COIN_ICON[u]} Доход, ${u}</span></th><th class="num">Доход с 1 ${m.c.short}, ${u}</th>
@@ -490,7 +496,7 @@ V.workers=m=>{
   /* Счётчики в фильтре — по всему парку, как в макете (таблица показывает выборку) */
   const PC={all:m.total,ok:m.h.a,low:m.h.l,off:m.h.o,fail:m.h.f};
   const cnt=k=>PC[k];
-  const per=10, pages=Math.max(1,Math.ceil(shown.length/per));
+  const per=perOf('workers',10), pages=Math.max(1,Math.ceil(shown.length/per));
   const cur=Math.min(U.page.workers||1,pages);
   const page=shown.slice((cur-1)*per,cur*per);
   const allSel=page.length&&page.every(w=>U.sel.has(w.id));
@@ -897,11 +903,13 @@ function subTile(m,s){
   </div>`;
 }
 /* Форма наблюдателя — общая для «Создать» и «Изменить» (макет 2219:32420) */
-function obsList(label,items,two){
+function obsList(label,items,two,key){
+  const on=i=>U.ochk.has(key+':'+i);
+  const all=items.every((_,i)=>on(i));
   return `<div class="mlist"><div class="ch"><span class="lb">${label}</span>
-    <button class="btn link bs" data-toast="Выбрано всё">Выбрать все</button></div>
+    <button class="btn link bs" data-ochkall="${key}:${items.length}">${all?'Снять все':'Выбрать все'}</button></div>
     <div class="opts ${two?'c2':''}">${items.map((t,i)=>
-      `<label>${cb(i<2)}${t.ico?`<span class="coins">${t.ico.map(c=>COIN_ICON[c]).join('')}</span>`:''}
+      `<label data-ochk="${key}:${i}">${cb(on(i))}${t.ico?`<span class="coins">${t.ico.map(c=>COIN_ICON[c]).join('')}</span>`:''}
         <span class="ell">${t.label??t}</span>${t.badge?`<span class="badge acc on">${t.badge}</span>`:''}</label>`).join('')}</div></div>`;
 }
 function obsForm(desc){
@@ -911,8 +919,8 @@ function obsForm(desc){
     ${prog(0,3)}
     <div class="marea"><div class="box ${desc?'':'dim'}">${desc||'Описание'}</div>
       <div class="cnt2">${(desc||'').length}/100</div></div>
-    ${obsList('Аккаунт',accs,true)}
-    <div class="mlists">${obsList('Разрешения',OBS_PERMS)}${obsList('Монеты',OBS_COINS)}</div>
+    ${obsList('Аккаунт',accs,true,'acc')}
+    <div class="mlists">${obsList('Разрешения',OBS_PERMS,0,'perm')}${obsList('Монеты',OBS_COINS,0,'coin')}</div>
     <div class="msel"><div class="lb">Срок действия</div>
       <div class="selbox">Бессрочно<span class="spacer">${I.cd}</span></div></div>
   </div>`;
@@ -940,8 +948,8 @@ function obsTile(o,i){
   </div>`;
 }
 /* Промо-баннеры внизу сводки — оба есть в макете */
-const PROMOS=[['Снизили порог для<br>продажи ЦВ до 10 000 ₽','Продать','/banner-sell.png'],
-              ['Начните формировать свой<br>пассивный доход, став<br>партнером Promminer','Узнать больше','/banner-referral.png']];
+const PROMOS=[['Снизили порог для<br>продажи ЦВ до 10 000 ₽','Продать','/banner-sell.png','assets'],
+              ['Начните формировать свой<br>пассивный доход, став<br>партнером Promminer','Узнать больше','/banner-referral.png','ref']];
 V.profile=m=>{
   const acct=S.acct==='main'?'natarusso':'alfred';
   const n=NOTIF_N[S.notif];
@@ -965,9 +973,9 @@ V.profile=m=>{
           ${S.role==='owner'&&!noname?`<button class="btn out sm" style="margin-top:16px" data-modal="observer">${I.pl} Создать</button>`:''}</div>`}`)}
     <div style="height:12px"></div>
     <div class="grid promos ${noname?'':'g2'}" style="margin:0">
-      ${(noname?PROMOS.slice(1):PROMOS).map(([t,b,img])=>`<section class="promo"><img class="art" src="${img}" alt="">
-        <button class="pclose" data-toast="Баннер скрыт">${I.x}</button>
-        <h2>${t}</h2><button class="btn">${b}</button></section>`).join('')}
+      ${(noname?PROMOS.slice(1):PROMOS).map(([t,b,img,go],i)=>U.phide.has(noname?i+1:i)?'':`<section class="promo"><img class="art" src="${img}" alt="">
+        <button class="pclose" data-phide="${noname?i+1:i}">${I.x}</button>
+        <h2>${t}</h2><button class="btn" data-go="${go}">${b}</button></section>`).join('')}
     </div>
   </div>
   <div>
@@ -1260,18 +1268,21 @@ const NEVENTS=[
     ['Изменен лимит на вывод средств']]],
   ['Реферальная программа',[['Зарегистрировался реферал'],['Получен реферальный доход'],['Произведена реферальная выплата']]],
 ];
+/* Каналы уведомлений: по умолчанию включены первые два, U.nch хранит отличия */
+const nchOn=(g,r,c)=>U.nch[`${g}-${r}-${c}`]??(c<2);
+const nchAll=c=>NEVENTS.every(([,rows],g)=>rows.every((_,r)=>nchOn(g,r,c)));
 V.notifconfig=m=>`${card(`<div class="ch"><button class="ib sm" data-go="notifsettings">${I.cl}</button>
   <h2 style="margin-left:4px">Настройка уведомлений</h2></div>
   <div class="tw"><table class="tbl ntbl"><thead><tr>
     <th>События для отправки уведомлений</th>
     ${NCHAN.map((c,i)=>`<th><span class="nch">${c}</span>
-      <button class="lnk" style="color:var(--accent)" data-toast="${i<2?'Канал выключен для всех событий':'Канал включен для всех событий'}">${i<2?'Выключить все':'Включить все'}</button></th>`).join('')}
+      <button class="lnk" style="color:var(--accent)" data-ncol="${i}">${nchAll(i)?'Выключить все':'Включить все'}</button></th>`).join('')}
   </tr></thead><tbody>
-  ${NEVENTS.map(([g,rows])=>`<tr class="ngrp"><td colspan="${NCHAN.length+1}">${g}</td></tr>
-    ${rows.map(([t,inf,val])=>`<tr><td><span class="row" style="gap:8px">${t}
+  ${NEVENTS.map(([g,rows],gi)=>`<tr class="ngrp"><td colspan="${NCHAN.length+1}">${g}</td></tr>
+    ${rows.map(([t,inf,val],ri)=>`<tr><td><span class="row" style="gap:8px">${t}
       ${val?`<span class="pill flat sq" style="height:28px;padding:0 10px;font-size:var(--fs-c)">${val}</span>`:''}
       ${inf?`<span class="tipi" data-tip="Порог, при котором придёт уведомление">${I.inf}</span>`:''}</span></td>
-      ${NCHAN.map((c,i)=>`<td class="num"><span class="tog ${i<2?'on':''}" data-tog></span></td>`).join('')}</tr>`).join('')}`).join('')}
+      ${NCHAN.map((c,i)=>`<td class="num"><span class="tog ${nchOn(gi,ri,i)?'on':''}" data-nch="${gi}-${ri}-${i}"></span></td>`).join('')}</tr>`).join('')}`).join('')}
   </tbody></table></div>
   <p class="cap dim" style="margin-top:16px">Promminer Pool вправе присылать системные уведомления пользователю, без возможности отписаться от них.</p>`)}`;
 
@@ -1381,8 +1392,8 @@ const codeBlock=(title,c)=>`<div class="ccode">
       :inpField('Код подтверждения')}
   </div>
   <div class="cbtns">
-    ${c.paste?`<button class="btn link" data-toast="Код вставлен из буфера">Вставить код</button>`:''}
-    <button class="btn link">Запросить новый код через 00:59</button>
+    ${c.paste?`<button class="btn link" data-paste="901234">Вставить код</button>`:''}
+    <button class="btn link" disabled>Запросить новый код через 00:59</button>
   </div>
 </div>`;
 /* Экран успеха: круг 64 с галочкой и подпись, блок по центру свободного места */
@@ -1404,7 +1415,7 @@ function contactModals(){
     if(k==='tg'){
       const body=v=>`<div class="mstack">
         <p class="mtext">${v?'Для изменения Telegram':'Для получения уведомлений в Telegram'}
-          <button class="lnk" style="color:var(--accent)" data-toast="Открываем @PromminerAlertbot">${v?'перейдите в бота':'подключите бота'}</button>
+          <a class="lnk" style="color:var(--accent)" href="${LINKS.tgBot}" target="_blank" rel="noopener">${v?'перейдите в бота':'подключите бота'}</a>
           ${v?'и измените свой аккаунт ниже':'и добавьте свой аккаунт ниже'}</p>
         <div class="cfield">${c.field(v,!!cerrText(k))}${err()}</div></div>`;
       out.tgadd={t:c.add,img:'/modal-tg.png',acts:false,b:()=>body(''),
@@ -1456,7 +1467,7 @@ const MODALS={
         <div class="mrow"><span class="mi">${I.doc}</span>
           <span class="tx"><i>Выбор языка <span class="badge sm">Скоро</span></i>
             <b>${FLAG_RU}RU</b></span>
-          <button class="ibr spacer dim">${I.cd}</button></div>
+          <button class="ibr spacer dim" disabled>${I.cd}</button></div>
         <div class="mrow"><span class="mi">${I.cal}</span>
           <span class="tx"><i>Таймзона</i><b>${segv('tz',TZ)}</b></span>
           <span class="pop-wrap full spacer"><button class="ibr dim" data-pop="tz">${I.cd}</button>
