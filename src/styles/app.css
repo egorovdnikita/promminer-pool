@@ -166,11 +166,17 @@ body.mini .ni .spacer.lbl{display:none!important}
 .pop.menu{width:188px;min-width:0;border-radius:var(--r-m);padding:8px 0;display:flex;flex-direction:column;gap:8px}
 /* В модалке меню открывается вверх: снизу футер и край окна */
 .pop.menu.up{top:auto;bottom:calc(100% + 8px);z-index:60}
+.mrow{position:relative}
+.mrow .pop-wrap.full{position:static}
+.pop.menu.row{width:auto;left:0;right:0}
+.pop.menu>button .ck{display:flex;color:var(--c1)}
 .pop.menu>button{padding:8px 12px!important;min-height:40px;gap:8px!important;
   font-size:var(--fs-b1)!important;line-height:var(--lh-b1)!important;font-weight:600}
-.pop.menu>button:hover{background:var(--ctrl2)}
-.pop.menu>button.del,.pop.menu>button.del:hover{color:var(--neg)!important}
-.pop.menu>button.del:hover{color:var(--neg);background:#ef44441f}
+/* Состояния пунктов по макету 483:17894: ховер красит текст, подложки нет */
+.pop.menu>button:hover{color:var(--accent)!important}
+.pop.menu>button:active{color:var(--c1)!important}
+.pop.menu>button.del,.pop.menu>button.del:active{color:var(--neg)!important}
+.pop.menu>button.del:hover{color:var(--neg)!important;opacity:.75}
 .pop.menu .hr{margin:0 12px}
 .pop.menu svg{width:24px;height:24px}
 .pop b.ph{display:block;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 0 6px}
@@ -434,6 +440,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Экран кода: шапка 12, поле через 24, ссылки через 32 и между собой 16 */
 .ccode{display:flex;flex-direction:column;gap:32px}
 .ccont{display:flex;flex-direction:column;gap:24px}
+.codecells{display:flex;gap:8px;justify-content:center}
+.codecells span{width:51px;height:57px;padding-bottom:16px;border-bottom:2px solid var(--ctrl-line);
+  display:grid;place-items:center;font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
 /* Заголовок шагового экрана — Body/L, а не H5 */
 .ctitle{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
 /* Ссылка на бота внутри абзаца — Button 28, из-за неё строка выше обычной */
@@ -508,8 +517,16 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mrow .tx{min-width:0;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .mrow .tx i{display:flex;align-items:center;gap:8px;font-style:normal;font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c3);font-weight:500}
 .mrow .tx b{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
-.mrow .act{margin-left:auto;width:48px;height:48px;border-radius:var(--r-m);background:var(--accent-sub);
+.mrow .act{width:48px;height:48px;border-radius:var(--r-m);background:#7086fc1f;
   color:var(--accent);display:grid;place-items:center;flex:0 0 auto}
+.mrow .act:hover{background:#7086fc29}
+.mrow .act.danger{background:#ef44441f;color:var(--neg)}
+.mrow .act.danger:hover{background:#ef44442e}
+/* Пара действий справа: отвязать и изменить */
+.cacts{display:flex;gap:8px;flex:0 0 auto}
+/* Зелёная галочка подтверждённого контакта */
+.okmark{display:inline-flex;width:16px;height:16px;color:var(--pos);margin-left:8px}
+.okmark svg{width:16px;height:16px}
 /* Заголовок секции внутри модалки — Headline/H5 */
 .msec{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
 .mcode{text-align:center}

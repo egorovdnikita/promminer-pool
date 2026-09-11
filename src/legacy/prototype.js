@@ -1187,13 +1187,11 @@ const CONTACTS={
 /* Строка контакта в «Личных данных»: пусто — плюс, привязано — меню */
 const contactRow=k=>{const c=CONTACTS[k], on=S[k]==='yes';
   return `<div class="mrow"><span class="mi">${c.ico()}</span>
-    <span class="tx"><i>${c.label}</i>${on?`<b>${c.val}<i class="dot" style="background:var(--pos);margin-left:8px"></i></b>`:''}</span>
-    ${on?`<span class="pop-wrap spacer"><button class="act" data-pop="c${k}">${I.edit}</button>
-      ${pop==='c'+k?`<div class="pop menu up">
-        <button data-modal="${k}edit">${I.edit}Изменить</button>
-        <div class="hr" style="margin:0"></div>
-        <button class="del" data-modal="${k}unlink">${I.tr}Отвязать</button></div>`:''}</span>`
-    :`<button class="act spacer" data-modal="${k}add">${I.pl}</button>`}</div>`;
+    <span class="tx"><i>${c.label}</i>${on?`<b>${c.val}<span class="okmark">${I.ok}</span></b>`:''}</span>
+    ${on?`<span class="cacts spacer">
+      <button class="act danger" data-modal="${k}unlink" title="Отвязать">${I.tr}</button>
+      <button class="act" data-modal="${k}edit" title="Изменить">${I.edit}</button></span>`
+    :`<button class="act spacer" data-modal="${k}add" title="Добавить">${I.pl}</button>`}</div>`;
 };
 /* Ошибки полей — переключаются осью cerr */
 const CERR={req:'Поле обязательно для заполнения',
@@ -1214,7 +1212,8 @@ const codeBlock=(title,c)=>`<div class="ccode">
       <p class="mtext mut">Мы отправили код подтверждения<br>на указанный вами ${c.word}</p>
       <p class="mtext">${c.val}</p>
     </div>
-    <div class="inp" style="margin:0"><input placeholder="Код подтверждения"></div>
+    ${c.cells?`<div class="codecells">${[0,1,2,3,4,5].map(i=>`<span>${'901234'[i]}</span>`).join('')}</div>`
+      :`<div class="inp" style="margin:0"><input placeholder="Код подтверждения"></div>`}
   </div>
   <div class="cbtns">
     ${c.paste?`<button class="btn link" data-toast="Код вставлен из буфера">Вставить код</button>`:''}
@@ -1259,7 +1258,7 @@ function contactModals(){
       tall:1,
       b:(m,step)=>step===0?`<div class="cstep g32">${prog(0,4)}${codeBlock('Подтвердите действие',o)}</div>`
         :step===1?`<div class="cstep g20">${prog(1,4)}${value(title===c.edit?c.val:'')}</div>`
-        :step===2?`<div class="cstep g32">${prog(2,4)}${codeBlock('Введите код',self)}</div>`
+        :step===2?`<div class="cstep g32">${prog(2,4)}${codeBlock('Введите код',{...self,cells:1})}</div>`
         :`<div class="cstep mid">${prog(3,4)}${doneBlock(ok)}</div>`,
       foot:(m,step)=>step===0?foot('Отменить','Далее','data-step="1"')
         :step===1?foot('Отменить','Подтвердить','data-step="2"')
@@ -1275,7 +1274,7 @@ function contactModals(){
     out[k+'code']={t:c.unlink,acts:false,
       tall:1,
       b:(m,step)=>step===0?`<div class="cstep g32">${prog(0,3)}${codeBlock('Подтвердите действие',o)}</div>`
-        :step===1?`<div class="cstep g32">${prog(1,3)}${codeBlock('Введите код',self)}</div>`
+        :step===1?`<div class="cstep g32">${prog(1,3)}${codeBlock('Введите код',{...self,cells:1})}</div>`
         :`<div class="cstep mid">${prog(2,3)}${doneBlock(c.okDel)}</div>`,
       foot:(m,step)=>step<2?foot('Отменить','Далее',`data-step="${step+1}"`)
         :`<button class="btn" data-close data-axis="${k}" data-val="no" data-toast="${c.okDel}">Отлично</button>`};
@@ -1295,9 +1294,11 @@ const MODALS={
           <button class="ibr spacer dim">${I.cd}</button></div>
         <div class="mrow"><span class="mi">${I.cal}</span>
           <span class="tx"><i>Таймзона</i><b>${segv('tz',TZ)}</b></span>
-          <span class="pop-wrap spacer"><button class="ibr dim" data-pop="tz">${I.cd}</button>
-          ${pop==='tz'?`<div class="pop" style="min-width:200px">${TZ.map((t,i)=>
-            `<button class="${segi('tz')===i?'on':''}" data-seg="tz" data-i="${i}">${t}${segi('tz')===i?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></div>
+          <span class="pop-wrap full spacer"><button class="ibr dim" data-pop="tz">${I.cd}</button>
+          ${pop==='tz'?`<div class="pop menu row">${TZ.map((t,i)=>
+            `<button data-seg="tz" data-i="${i}">${t.replace(/[()]/g,'')}
+              ${segi('tz')===i?`<span class="ck spacer">${CHECK}</span>`:''}</button>`)
+            .join('<div class="hr" style="margin:0 12px"></div>')}</div>`:''}</span></div>
       </div>
       <div class="alert info" style="margin:0">${I.inf}<div>Укажите таймзону для удобной связи с поддержкой. На баланс и выплаты это не влияет</div></div>
       <div class="hr" style="margin:0"></div>
