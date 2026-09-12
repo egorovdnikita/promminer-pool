@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
   CHECK, I, NOTIF_N, PROF, TITLES, acctSummary, nf, notifications, profTabs, type Model,
 } from '@/legacy/prototype'
@@ -13,6 +14,10 @@ export function Header({ m }: { m: Model }) {
   const { S, route, pop } = useApp()
   const n = NOTIF_N[S.notif]
   const acct = S.acct === 'main' ? 'natarusso' : 'alfred'
+  /* На проде заголовок вкладки — «<Раздел> - Promminer» */
+  useEffect(() => {
+    document.title = TITLES[route] ? `${TITLES[route]} - Promminer` : 'Promminer Pool'
+  }, [route])
 
   return (
     <header className="top">

@@ -266,6 +266,9 @@ const LINKS={
   kbIp:'https://pmpool.ru/blog/asic-kak-nayti-ip-adres-maynera/',
   kbSerial:'https://pmpool.ru/blog/gde-nayti-zavodskoy-nomer-mayneraa/',
   tgBot:'https://t.me/PromminerAlertbot',
+  /* боты поддержки — как на проде, в виджете внизу страницы входа */
+  tgSupport:'https://telegram.me/PoolSupportPromminerbot',
+  maxSupport:'https://max.ru/id7720861599_2_bot',
   support:'poolsupport@promminer.ru',
   deleteAccount:'https://promminer.ru/delete-account/',
   ref:c=>`https://pool.promminer.ru/r/${c}`,
@@ -308,8 +311,8 @@ const MAX_LOGO='<img src="/max.png" alt="" width="24" height="24">';
 /* Блок «Связаться с нами» на главной (макет 185:105625).
    Ключ иконки, а не сама иконка: icons.js перекрывает I уже после этого модуля */
 const HOME_CONTACTS=[
-  ['tg','Telegram','@PoolSupport','https://t.me/PoolSupport'],
-  ['max','Max','@PoolSupport','https://max.ru/PoolSupport'],
+  ['tg','Telegram','@PoolSupport',LINKS.tgSupport],
+  ['max','Max','@PoolSupport',LINKS.maxSupport],
   ['mail','Почта',LINKS.support,'mailto:'+LINKS.support],
   ['phone','Телефон','+7 (996) 666-59-52','tel:+79966665952']];
 const FLAG_RU=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><g clip-path="url(#flagRU)"><path d="M23.3172 16C23.7594 14.7489 24 13.4025 24 12C24 10.5975 23.7594 9.2511 23.3172 7.99998H0.682834C0.240621 9.2511 0 10.5975 0 12C0 13.4025 0.240613 14.7489 0.682812 16H23.3172Z" fill="#0052B4"/><path d="M23.3172 16C21.6698 20.6608 17.2249 24 12 24C6.77513 24 2.33018 20.6608 0.682831 16H23.3172Z" fill="#D80027"/><path d="M23.3172 8H0.682816C2.33016 3.33923 6.77512 0 12 0C17.2249 0 21.6698 3.33923 23.3172 8Z" fill="#F3F5F9"/></g><path d="M12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5C5.64873 23.5 0.5 18.3513 0.5 12C0.5 5.64873 5.64873 0.5 12 0.5Z" stroke="#6B7280" stroke-opacity="0.16"/><defs><clipPath id="flagRU"><path d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z" fill="white"/></clipPath></defs></svg>`;

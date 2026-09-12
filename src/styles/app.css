@@ -376,7 +376,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .urlrow:last-of-type{margin-bottom:16px}
 .urlrow .k{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
 .urlrow .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
-.linkrow{display:flex;align-items:center;gap:8px;color:var(--c1);background:var(--accent-sub);border-radius:var(--r-m);padding:12px;min-height:var(--h-field);margin-bottom:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
+/* Строки контактов в макете серые (#6b7280 12 %), в отличие от адресов
+   майнинга на акцентной подложке (185:105627) */
+.linkrow{display:flex;align-items:center;gap:8px;color:var(--c1);background:var(--ctrl);border-radius:var(--r-m);padding:16px 12px;min-height:var(--h-field);margin-bottom:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .linkrow:last-of-type{margin-bottom:0}
 /* Баннер из макета 1981:32563: градиент, угловая фигура и иллюстрация с выносом за край */
 .promo{background:#eef0fd url('/banner-bg.png') center/cover;border-radius:var(--r-l);padding:24px;position:relative;overflow:hidden;box-shadow:none;display:flex;flex-direction:column;min-height:188px}
@@ -780,7 +782,7 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .linkrow svg{display:inline-block;vertical-align:-4px}
 .lico{width:24px;height:24px;flex:0 0 auto;display:grid;place-items:center;color:var(--accent)}
 .lico img{width:24px;height:24px;display:block;border-radius:50%}
-.linkrow:hover{background:#6366f129}
+.linkrow:hover{background:var(--ctrl-hover)}
 .promo .btn{align-self:flex-start;margin-top:auto;position:relative}
 .pager .pg button:not(:disabled):not(.on):hover{background:var(--ctrl-hover)}
 .pager .pg button:disabled{opacity:.4;pointer-events:none}
