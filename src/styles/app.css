@@ -124,7 +124,10 @@ body.mini .ni .spacer.lbl{display:none!important}
 
 /* header */
 /* Хедер по DS: белая панель со скруглением 24 снизу */
-.top{background:var(--surface);border-radius:0 0 var(--r-l) var(--r-l);padding:20px 8px 8px;position:sticky;top:0;z-index:50}
+/* Два хедера ДС: без вкладок 88 с паддингом 20/8/20/8,
+   со вкладками — 140 и снизу 8, потому что сегмент-контрол несёт свои 2 */
+.top{background:var(--surface);border-radius:0 0 var(--r-l) var(--r-l);padding:20px 8px;position:sticky;top:0;z-index:50}
+.top:has(.tabseg){padding-bottom:8px}
 .toprow{display:flex;align-items:center;gap:16px;padding:0 16px}
 .top .h3{flex:1;min-width:0}
 .hgroup{display:flex;align-items:center;gap:16px}
