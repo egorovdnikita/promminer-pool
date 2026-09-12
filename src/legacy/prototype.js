@@ -1001,28 +1001,26 @@ V.profile=m=>{
   const subs=subsOf(m).filter(x=>!x.arch), obs=obsOf(m).slice(0,3);
   const noname=S.name==='no';
   const notes=NOTES;
-  return `<div class="grid cols2" style="grid-template-columns:1.9fr 1fr;align-items:start">
-  <div>
+  return `<div class="grid cols2" style="grid-template-columns:1176fr 460fr;gap:16px;align-items:start">
+  <div class="pcol">
     ${card(`<div class="ch"><h2>Мои суб-аккаунты</h2><button class="btn link spacer" data-go="subaccounts">Смотреть все</button></div>
       ${noname?`<div class="empty" style="padding:28px 0"><p style="max-width:372px">Чтобы начать добывать цифровую валюту необходимо добавить имя аккаунта</p>
         <button class="btn" style="margin-top:16px" data-modal="subacct">${I.pl} Добавить имя аккаунта</button></div>`
       :`<div class="grid g3" style="margin:0">${subs.map(s=>subTile(m,s)).join('')}
         ${S.role==='owner'&&subs.length<3?`<button class="dashed" style="grid-column:span ${3-subs.length}" data-modal="subacct">${I.pl}Создать суб-аккаунт</button>`:''}</div>`}`)}
-    <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Мои наблюдатели</h2>${obs.length?'<button class="btn link spacer" data-go="observers">Смотреть все</button>':''}</div>
       ${obs.length?`<div class="grid g3" style="margin:0">${obs.map(obsTile).join('')}
         ${S.role==='owner'&&obs.length<3?`<button class="dashed" style="grid-column:span ${3-obs.length}" data-modal="observer">${I.pl}Создать ссылку наблюдателя</button>`:''}</div>`
       :`<div class="empty" style="padding:48px 0 40px"><div class="art">${I.eye}</div>
           <b>У вас еще нет созданных ссылок наблюдателей</b>
           ${S.role==='owner'&&!noname?`<button class="btn out sm" style="margin-top:16px" data-modal="observer">${I.pl} Создать</button>`:''}</div>`}`)}
-    <div style="height:12px"></div>
     <div class="grid promos ${noname?'':'g2'}" style="margin:0">
       ${(noname?PROMOS.slice(1):PROMOS).map(([t,b,img,go],i)=>U.phide.has(noname?i+1:i)?'':`<section class="promo"><img class="art" src="${img}" alt="">
         <button class="pclose" data-phide="${noname?i+1:i}">${I.x}</button>
         <h2>${t}</h2><button class="btn" data-go="${go}">${b}</button></section>`).join('')}
     </div>
   </div>
-  <div>
+  <div class="pcol">
     ${card(`<div class="ch"><h2>Мой профиль</h2></div>
       ${noname?`<div class="row" style="gap:16px;margin-bottom:20px"><span class="avat lg" style="width:64px;height:64px;font-size:var(--fs-h3);line-height:var(--lh-h3)">?</span>
         <button class="btn out sm" data-modal="subacct">${I.pl} Добавить имя аккаунта</button></div>`
@@ -1038,7 +1036,6 @@ V.profile=m=>{
       ${noname?'':`<button class="rowline" data-go="security"><span class="iconbox">${GOOGLE}</span>
         <span class="tx"><b>Google Authentication</b><span class="badge">Не подключено</span></span>
         <span class="ch2 ibr">${I.cv}</span></button>`}`)}
-    <div style="height:12px"></div>
     ${card(`<div class="ch"><h2>Последние уведомления</h2>${n?`<span class="cnt">${n>99?'99+':n}</span>`:''}
       <button class="btn link spacer dim" data-go="notifsettings">${I.cv}</button></div>
       ${n?`<div class="nplist">${notes.slice(0,Math.min(n,4)).map(([t,d,dt],i)=>`<div class="nitem" data-note="${i}"><i class="dot"></i>

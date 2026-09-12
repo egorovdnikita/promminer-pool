@@ -957,6 +957,8 @@ html{scrollbar-gutter:stable}
 .tile2 .kv.big span{font-size:var(--fs-b1);line-height:var(--lh-b1)}
 
 /* ===== Верификация и реквизиты (макеты 759:68419) ===== */
+/* Колонка сводки профиля: 1176/460 с шагом 16, как в макете 880:42990 */
+.pcol{display:flex;flex-direction:column;gap:16px;min-width:0}
 .vcol{display:flex;flex-direction:column;gap:16px;min-width:0}
 .vcol>.card{padding:24px;display:flex;flex-direction:column;gap:24px}
 .vform{display:flex;flex-direction:column;gap:16px}
