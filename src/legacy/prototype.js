@@ -12,6 +12,7 @@ import { ICONS } from './icons.js';
    ============================================================ */
 const AXES={
   coin:{g:'Данные',label:'Монета',opts:[['btc','BTC'],['ltc','LTC + DOGE'],['zec','ZEC']]},
+  wf:{g:'Данные',label:'Теги и модели',opts:[['yes','Заведены'],['none','Ничего не заведено']]},
   data:{g:'Данные',label:'Наполнение данными',opts:[['normal','Норма'],['empty','Пусто'],['few','Мало записей'],['huge','Большие значения']]},
   health:{g:'Данные',label:'Здоровье парка',opts:[['ok','Всё живо'],['degraded','Деградация'],['critical','Авария']]},
   load:{g:'Данные',label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон']]},
@@ -52,11 +53,11 @@ const PRESETS=[
   ['Крупный клиент','Большие значения и много записей',{data:'huge',subs:'many',obs:'many',tier:'4',verif:'yes',vdoc:'yes',vacc:'yes'}],
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
-const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',perm:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
+const DEF={coin:'btc',wf:'yes',data:'normal',health:'degraded',role:'owner',perm:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -352,8 +353,8 @@ const skeleton=()=>`<div class="grid cols2" style="grid-template-columns:1.9fr 1
 const RO=()=>S.role==='observer'?'disabled':'';
 const card=(inner,cls='')=>`<section class="card ${cls}">${inner}</section>`;
 /* Пустая таблица — иллюстрация «not found» из макета (1018:112400) */
-const emptyBox=(t,p)=>`<div class="empty"><img src="/empty-state.svg" alt="" width="221" height="175">
-  <b>${t}</b><p>${p}</p></div>`;
+const emptyBox=(t,p,act='')=>`<div class="empty"><img src="/empty-state.svg" alt="" width="221" height="175">
+  <b>${t}</b><p>${p}</p>${act}</div>`;
 /* Сегментированный контрол — кликабельный, состояние в U.seg[id] */
 const seg=(id,opts,def=0)=>{const c=U.seg[id]??def;
   return `<div class="seg">${opts.map((o,i)=>`<button class="${i===c?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</div>`};
@@ -611,13 +612,21 @@ const TAGS=[
   ['Подготовлен','Готов к установке'],
   ['Готов','В работе']];
 /* Производители моделей — для фильтра и логотипов в таблице */
-const VENDORS={'S19':'Bitmain','S21':'Bitmain','Q':'Canaan Avalon'};
-const vendorOf=model=>VENDORS[String(model).split(/[\s+]/)[0]]||'Bitmain';
+/* Производители из дизайн-системы (Brands 148:49846) — логотипы выгружены
+   в public/logo-*.svg. По ним же группирует фильтр моделей в шторке. */
+const MODELS=[['bitmain','Bitmain'],['canaan','Canaan Avalon'],['whatsminer','Whatsminer'],
+  ['iceriver','IceRiver'],['bitdeer','Bitdeer']];
+const VENDORS={'S19':'bitmain','S21':'bitmain','Q':'canaan'};
+const vendorOf=model=>VENDORS[String(model).split(/[\s+]/)[0]]||'bitmain';
+const vlogo=k=>`<span class="vlogo"><img src="/logo-${k}.svg" alt="" width="24" height="24"></span>`;
+/* Сколько фильтров применено — счётчик на кнопке «Фильтры» (612:100188) */
+const fcount=()=>U.fapp?U.fapp.t.length+U.fapp.m.length:0;
 const WST={ok:['Активен','var(--pos)'],low:['Низкий хэшрейт','var(--warn)'],off:['Отключен','var(--neg)'],fail:['Оффлайн','var(--neu)']};
 function workersList(m){
   if(m.empty) return [];
   const models=['S19 XP Hydro 2…','S21+ 235 TH/s','Q 90 TH/s','S21+ 225 TH/s'];
-  const tags=['Разогнан','Готов','Без прошивки'];
+  /* У воркера один видимый тег и, если есть второй, чип «+1» с подсказкой */
+  const tags=[['Разогнан','Собран'],['Готов','Завершен'],['Без прошивки','Подготовлен']];
   const N=S.data==='few'?3:36, r=rng(S.coin==='btc'?11:23);
   const share=[['ok',m.h.a],['low',m.h.l],['off',m.h.o],['fail',m.h.f]];
   const tot=share.reduce((s,x)=>s+x[1],0)||1, out=[];
@@ -625,14 +634,20 @@ function workersList(m){
     const p=(i+.5)/N*tot; let acc=0, st='ok';
     for(const [k,v] of share){acc+=v; if(p<=acc){st=k;break}}
     const base=225+r()*15;
+    const tg=tags[i%3], extra=i%2;
     out.push({id:i+1,name:'Ant'+String(i+1).padStart(2,'0'),model:models[i%4],st,
-      h5:base+5,h1:base+12,h24:base+8,rej:((i%8)+1)/100,up:99+(i%2),tag:tags[i%3],extra:i%2});
+      h5:base+5,h1:base+12,h24:base+8,rej:((i%8)+1)/100,up:99+(i%2),
+      tag:tg[0],tags:extra?tg:[tg[0]],extra});
   }
   return out;
 }
 function workersRows(m){
   let rows=workersList(m);
   if(U.wfilter!=='all') rows=rows.filter(w=>w.st===U.wfilter);
+  /* Выборка из шторки фильтров: теги по названию, модели по производителю */
+  const f=U.fapp;
+  if(f&&f.t.length) rows=rows.filter(w=>w.tags.some(t=>f.t.includes(t)));
+  if(f&&f.m.length) rows=rows.filter(w=>f.m.includes(vendorOf(w.model)));
   const q=U.q.trim().toLowerCase();
   if(q) rows=rows.filter(w=>(w.name+' '+w.model).toLowerCase().includes(q));
   const s=U.sort.workers;
@@ -674,11 +689,11 @@ V.workers=m=>{
   const rows=page.map(w=>{const[lbl,col]=WST[w.st];
     return `<tr data-wk="${w.id}" class="${U.sel.has(w.id)?'sel':''}">
       <td>${cb(U.sel.has(w.id),'data-sel="'+w.id+'"')}</td><td><b>${w.name}</b></td>
-      <td class="mut">${w.model}</td>
+      <td class="mut"><span class="vcell">${vlogo(vendorOf(w.model))}<span>${w.model}</span></span></td>
       <td><i class="dot" style="display:inline-block;background:${col};margin-right:8px"></i>${lbl}</td>
       <td class="mono">${nf(w.h5,2)} ${m.c.unit}</td><td class="mono">${nf(w.h1,2)} ${m.c.unit}</td><td class="mono">${nf(w.h24,2)} ${m.c.unit}</td>
       <td class="mono">${nf(w.rej,2)}%</td><td class="mono">${w.up}%</td><td class="mono mut">9 Апреля, 07:32</td>
-      <td class="tags"><span class="tag ${w.tag==='Без прошивки'?'y':''}">${w.tag}</span>${w.extra?' <span class="tag n">+1</span>':''}</td>
+      <td class="tags"><span class="tag ${w.tag==='Без прошивки'?'y':''}">${w.tag}</span>${w.extra?` <span class="tag n" data-tip="${w.tags.slice(1).join(', ')}">+1</span>`:''}</td>
       <td class="num wact">${wkMenu(w)}</td></tr>`}).join('');
   /* Сводка хэшрейта — одна карточка: акцентная плашка и сетка 2×2 (макет 173:59403) */
   const wst=(l,v,d='')=>`<div class="wst"><div class="l">${l}</div><div class="v mono">${v}${d}</div></div>`;
@@ -707,7 +722,7 @@ V.workers=m=>{
       ${[['all','Все',''],['ok','Активные','var(--pos)'],['low','Низкий хэшрейт','var(--warn)'],['off','Отключены','var(--neg)'],['fail','Оффлайн','var(--neu)']]
         .map(([k,l,c])=>`<button class="${U.wfilter===k?'on':''}" data-wf="${k}">${c?`<i class="dot" style="background:${c}"></i>`:''}${l} <u>${ni(cnt(k))}</u></button>`).join('')}
     </div>
-    <button class="btn g wfilt" data-modal="filters">${I.flt}<span class="lb">Фильтры</span></button>
+    <button class="btn g wfilt" data-modal="filters">${I.flt}<span class="lb">Фильтры</span>${fcount()?`<i class="fbadge">${fcount()}</i>`:''}</button>
     <div class="spacer"></div>
     <label class="search wsearch">${I.srch}<input id="q" placeholder="Найти воркер" value="${U.q.replace(/"/g,'&quot;')}"></label>
     <button class="btn g wexport" data-toast="Экспорт CSV поставлен в очередь">${I.dl}<span class="lb">Экспорт</span></button></div>
@@ -720,7 +735,9 @@ V.workers=m=>{
       ${sortTh('h5','Хэшрейт, 5 мин')}${sortTh('h1','Хэшрейт, 1 ч')}${sortTh('h24','Хэшрейт, 24 ч')}${sortTh('rej','Реджект, 24 ч')}
       <th>Uptime <span class="tipi" data-tip="Доля времени за 24 часа, когда воркер присылал шары">${I.inf}</span></th><th>Отпр. шары</th><th>Мои теги</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
       ${pager('workers',shown.length,20)}`
-    :emptyBox('Ничего не найдено','Измените фильтр или поисковый запрос'))
+    :(fcount()?emptyBox('Ничего не найдено','Попробуйте изменить выбор или очистить фильтры',
+        '<button class="btn link" data-fclear>Очистить фильтры</button>')
+      :emptyBox('Ничего не найдено','Измените фильтр или поисковый запрос')))
     :emptyBox('Воркеров пока нет','Подключите первый воркер, чтобы увидеть статистику по парку')}`,'tblcard')}</div>`;
 };
 
@@ -1769,9 +1786,36 @@ const MODALS={
     <div class="inp"><div class="k">Название группы</div><input value="Псков"></div>
     <div class="inp"><div class="k">Комментарий</div><input placeholder="Необязательно"></div>
     <p class="cap dim">Воркеров можно добавить после создания через действие «Привязать группу»</p>`},
-  filters:{ok:'Фильтры применены',t:'Фильтры',s:'Настройте выборку воркеров',b:m=>`
-    <div class="grid g2" style="margin:0;gap:10px">
-      ${[['Статус','Любой'],['Модель','Любая'],['Группа','Любая'],['Тег','Любой'],['Хэшрейт от',''],['Хэшрейт до','']].map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v">${v||'—'}</div></div>`).join('')}</div>`},
+  /* Шторка фильтров (макет 173:65425): панель 430 у правого края.
+     «Сбросить» в секции появляется, только когда в ней есть выбор;
+     подвал переключается с «Закрыть» на «Применить» + «Сбросить все». */
+  filters:{t:'Фильтры',sheet:true,acts:false,b:m=>{
+    const none=S.wf==='none';
+    const q=U.fq.trim().toLowerCase();
+    const mods=MODELS.filter(([,n])=>!q||n.toLowerCase().includes(q));
+    return `
+    <section class="fcard">
+      <div class="fh"><h3>Теги</h3><div class="spacer"></div>
+        ${U.ftag.size?'<button class="btn link" data-freset="t">Сбросить</button>':''}</div>
+      ${none?'<p class="fempty">У вас нет тегов</p>'
+        :`<div class="chips">${TAGS.map(([t])=>
+          `<button class="chip ${U.ftag.has(t)?'on':''}" data-ftag="${t}">${t}</button>`).join('')}</div>`}
+      <button class="btn out fbtn" data-modal="tagnew">${I.pl}Создать тег</button>
+    </section>
+    <section class="fcard">
+      <div class="fh"><h3>Модели</h3><div class="spacer"></div>
+        ${U.fmod.size?'<button class="btn link" data-freset="m">Сбросить</button>':''}</div>
+      ${none||m.empty?'<p class="fempty">Вы еще не добавили модели устройств</p>':`
+      <div class="frow">${cb(U.fmod.size===MODELS.length,'data-fall')}
+        <label class="search fsearch">${I.srch}<input id="fq" placeholder="Модель" value="${U.fq.replace(/"/g,'&quot;')}"></label></div>
+      ${mods.length?`<div class="flist">${mods.map(([k,n],i)=>
+        `${i?'<div class="fdiv"></div>':''}<label class="fitem" data-fmod="${k}">${cb(U.fmod.has(k))}${vlogo(k)}<span>${n}</span></label>`).join('')}</div>`
+        :'<p class="fempty">Результатов не найдено</p>'}`}
+    </section>`},
+    foot:()=>U.ftag.size+U.fmod.size
+      ?`<button class="btn" data-fapply>Применить</button>
+        <button class="btn link" data-freset="all">Сбросить все</button>`
+      :'<button class="btn out" data-close>Закрыть</button>'},
   /* Изменить теги воркера (макет 173:62936): список с чекбоксами и переход
      в создание тега; если выбор не менялся — алерт при подтверждении */
   wtags:{ok:'Теги обновлены',t:'Изменить теги',s:'Отметьте теги, которые нужно привязать к воркеру',
@@ -1788,15 +1832,16 @@ const MODALS={
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn" data-close data-toast="Группы обновлены">Привязать</button>`},
   /* Создать тег (макет 173:62151): лимиты 10 и 100 символов */
-  tagnew:{ok:'Тег создан',t:'Создать тег',s:'Тег поможет отметить состояние воркера',sm:true,
+  tagnew:{ok:'Тег создан',t:'Создать тег',s:'Тег поможет отметить состояние воркера',size:'sm',
     b:()=>`<div class="inp" style="margin:0"><div class="k">Наименование</div>
         <input maxlength="10" placeholder="До 10 символов"></div>
       <div class="inp"><div class="k">Описание</div>
         <input maxlength="100" placeholder="Необязательно, до 100 символов"></div>`,
-    foot:()=>`<button class="btn out" data-close>Отменить</button>
-      <button class="btn" data-close data-toast="Тег создан">Создать</button>`},
+    foot:()=>{const back=U.fback?'data-modal="filters"':'data-close';
+      return `<button class="btn out" ${back}>Отменить</button>
+      <button class="btn" ${back} data-toast="Тег создан">Создать</button>`}},
   /* Удаление воркера (макет 173:65944): только неактивные */
-  wkdel:{t:'Удалить воркер?',s:'Воркер пропадёт из списка, статистика по нему сохранится',sm:true,danger:true,
+  wkdel:{t:'Удалить воркер?',s:'Воркер пропадёт из списка, статистика по нему сохранится',size:'sm',danger:true,
     b:()=>'',
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Воркер удален">Удалить</button>`},
@@ -2067,7 +2112,7 @@ export function applyState(next){
 export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
-  NAV, TITLES, GROUP_OF, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
+  NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf,
   S, U, route, pop, modal, openGroups, mini,
 };

@@ -69,6 +69,15 @@ export interface Ui {
   wk: any
   wtag: Set<number>
   wgrp: Set<number>
+  /** Черновик шторки фильтров: выбранные теги и производители. */
+  ftag: Set<string>
+  fmod: Set<string>
+  /** Поиск по моделям внутри шторки. */
+  fq: string
+  /** Применённая выборка: null, пока фильтры не нажимали. */
+  fapp: { t: string[]; m: string[] } | null
+  /** «Создать тег» открыли из шторки — вернуться в неё после. */
+  fback: boolean
   qfocus: boolean
   auth: string
   consent: Set<number>

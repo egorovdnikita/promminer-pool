@@ -76,6 +76,8 @@ export declare const MODALS: Record<string, {
   center?: boolean
   /** Узкое окно 500 — подтверждения. */
   size?: 'sm'
+  /** Шторка: панель 430 у правого края вместо центральной модалки. */
+  sheet?: true
   /** Тело фиксированной высоты 348 — шаговые экраны контактов. */
   tall?: number
 }>
@@ -105,3 +107,6 @@ export declare const mini: boolean
 /** Отдаёт движку текущее состояние React перед рендером экрана. */
 export declare function applyState(next: AppSnapshot): void
 export declare function obsOf(m: any): any[]
+export declare const MODELS: [string, string][]
+export declare const TAGS: [string, string][]
+export declare function vendorOf(model: string): string

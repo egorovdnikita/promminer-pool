@@ -15,8 +15,8 @@ export function Modal({ m }: { m: Model }) {
   const close = <button className="mx" data-close><Ico html={I.x} /></button>
 
   return (
-    <div className="mask" data-close>
-      <div className={d.size === 'sm' ? 'modal sm' : 'modal'}>
+    <div className={d.sheet ? 'mask sheet' : 'mask'} data-close>
+      <div className={d.sheet ? 'modal sheet' : d.size === 'sm' ? 'modal sm' : 'modal'}>
         {d.img ? (
           // Modal HeaderA с иллюстрацией: баннер, крестик поверх, заголовок под ним
           <div className="mhead img">

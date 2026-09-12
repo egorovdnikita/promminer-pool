@@ -3,7 +3,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { AXES, DEF, PRESETS, GROUP_OF, M, allowed, applyState, workersList, workersRows, obsOf } from '@/legacy/prototype'
+import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, applyState, workersList, workersRows, obsOf } from '@/legacy/prototype'
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
@@ -14,7 +14,9 @@ const freshUi = (): Ui => ({
   seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {}, oval: false, obs: 0, sess: '',
   scgrp: [], saved: loadSaved(),
   q: '', wfilter: 'all', geo: '',
-  wk: null, wtag: new Set(), wgrp: new Set(), qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
+  wk: null, wtag: new Set(), wgrp: new Set(),
+  ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false,
+  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
 
 /** Свои сценарии живут в localStorage отдельно от текущего состояния. */
@@ -187,6 +189,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (q) { U.current.q = q.value; U.current.page.workers = 1; U.current.qfocus = true; bump() }
     const sq = (e.target as HTMLElement).closest('#scq') as HTMLInputElement | null
     if (sq) { U.current.scq = sq.value; bump() }
+    const fq = (e.target as HTMLElement).closest('#fq') as HTMLInputElement | null
+    if (fq) { U.current.fq = fq.value; bump() }
   }, [])
 
   const snapshot = useCallback((): AppSnapshot => ({
@@ -326,6 +330,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (md) {
       if (md.dataset.obs) u.obs = +md.dataset.obs
       if (md.dataset.sess) u.sess = md.dataset.sess
+      /* «Создать тег» из шторки — после создания вернуться в шторку */
+      u.fback = md.dataset.modal === 'tagnew' && modal.current === 'filters'
       modal.current = md.dataset.modal!; u.step = 0; u.vfile = false; u.vbank = undefined; pop.current = null
       /* формы наблюдателя открываются с отмеченными первыми двумя пунктами */
       if (md.dataset.modal === 'observer' || md.dataset.modal === 'obsedit') {
@@ -371,6 +377,35 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     /* стрелки прокрутки ленты групп на «Воркерах» */
     /* чекбоксы в модалках «Изменить теги» и «Изменить группы» */
+    /* шторка фильтров: теги чипами, модели чекбоксами, поиск по моделям */
+    const ft = at('[data-ftag]')
+    if (ft) { const t = ft.dataset.ftag!; u.ftag.has(t) ? u.ftag.delete(t) : u.ftag.add(t); return bump() }
+    const fm = at('[data-fmod]')
+    if (fm) { const k = fm.dataset.fmod!; u.fmod.has(k) ? u.fmod.delete(k) : u.fmod.add(k); return bump() }
+    if (at('[data-fall]')) {
+      const all = MODELS.map(([k]) => k)
+      u.fmod = new Set(u.fmod.size === all.length ? [] : all)
+      return bump()
+    }
+    const fr = at('[data-freset]')
+    if (fr) {
+      const k = fr.dataset.freset!
+      if (k !== 'm') u.ftag.clear()
+      if (k !== 't') { u.fmod.clear(); u.fq = '' }
+      if (k === 'all') { u.fapp = null; u.page.workers = 1 }
+      return bump()
+    }
+    if (at('[data-fapply]')) {
+      u.fapp = { t: [...u.ftag], m: [...u.fmod] }
+      u.page.workers = 1
+      modal.current = null
+      toast('Фильтры применены')
+      return bump()
+    }
+    if (at('[data-fclear]')) {
+      u.ftag.clear(); u.fmod.clear(); u.fq = ''; u.fapp = null; u.page.workers = 1
+      return bump()
+    }
     const wp = at('[data-wpick]')
     if (wp) {
       const [kind, i] = wp.dataset.wpick!.split(':')

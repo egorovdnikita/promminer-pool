@@ -1324,3 +1324,37 @@ button.scsect:hover{color:var(--accent)}
 .scundo{width:18px;height:18px;border-radius:var(--r-f);background:var(--ctrl);color:var(--c2);
   font-size:11px;line-height:18px;flex:0 0 auto}
 .scundo:hover{background:var(--accent);color:#fff}
+
+/* --- Шторка фильтров воркеров (макет 173:65425) --- */
+/* Панель 430 у правого края: фон страницы, белые карточки секций внутри */
+.mask.sheet{place-items:stretch;justify-items:end;padding:0}
+.modal.sheet{max-width:430px;width:430px;height:100%;border-radius:0;background:var(--bg)}
+.modal.sheet .mhead{height:88px;padding:24px;flex:0 0 auto}
+.modal.sheet .mhead h2{font-size:var(--fs-h5);line-height:var(--lh-h5)}
+.modal.sheet .mbody{display:flex;flex-direction:column;gap:16px}
+.modal.sheet .mfoot{flex-direction:column;gap:8px}
+.modal.sheet .mfoot .btn{flex:0 0 auto;width:100%}
+.modal.sheet .mfoot .btn.link{height:38px}
+.fcard{background:var(--surface);border-radius:var(--r-l);padding:16px;
+  display:flex;flex-direction:column;gap:16px;flex:0 0 auto}
+.fh{display:flex;align-items:center;gap:6px;min-height:28px}
+.fh h3{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600;color:var(--c1)}
+.fbtn{height:56px;justify-content:center;gap:8px}
+.fempty{font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c2)}
+.frow{display:flex;align-items:center;gap:12px}
+.frow .search{flex:1;min-width:0}
+.flist{display:flex;flex-direction:column}
+.fdiv{height:1px;background:var(--border);margin:3.5px 0}
+.fitem{display:flex;align-items:center;gap:12px;height:48px;
+  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1);cursor:pointer}
+/* Логотип производителя: 24×24 с сохранением пропорций */
+.vlogo{width:24px;height:24px;display:grid;place-items:center;flex:0 0 auto}
+.vlogo img{width:auto;height:auto;max-width:24px;max-height:24px}
+.vcell{display:inline-flex;align-items:center;gap:8px;min-width:0;max-width:100%;vertical-align:middle}
+.vlogo img{vertical-align:top}
+.vcell>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Счётчик применённых фильтров на кнопке «Фильтры» */
+.wfilt{position:relative;overflow:visible}
+.fbadge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;
+  border-radius:var(--r-f);background:var(--accent);color:#fff;
+  font-size:var(--fs-c);line-height:20px;font-weight:600;text-align:center}
