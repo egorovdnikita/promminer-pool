@@ -56,7 +56,7 @@ const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',perm:'all',ti
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -601,6 +601,18 @@ const tierTrack=m=>`<div class="track">
 /* Группы площадок — лента Segment Control Line из макета «Воркеры» */
 const GEO=[['Все','5 979'],['Москва','2 398'],['Псков','789'],['Ростов','15'],['Питер','16'],
   ['Пермь','16'],['Воронеж','16'],['Калининград','16'],['Нижний','16'],['Хабаровск','16'],['Казань','16']];
+/* Теги воркеров (шторка фильтров 173:65425): пользовательские, с описанием.
+   Привязка живёт в U.wtag — ключ «id воркера», значение — набор тегов. */
+const TAGS=[
+  ['Без прошивки','Прошивка не установлена'],
+  ['Разогнан','Разгон по частоте'],
+  ['Собран','Собран на площадке'],
+  ['Завершен','Работы завершены'],
+  ['Подготовлен','Готов к установке'],
+  ['Готов','В работе']];
+/* Производители моделей — для фильтра и логотипов в таблице */
+const VENDORS={'S19':'Bitmain','S21':'Bitmain','Q':'Canaan Avalon'};
+const vendorOf=model=>VENDORS[String(model).split(/[\s+]/)[0]]||'Bitmain';
 const WST={ok:['Активен','var(--pos)'],low:['Низкий хэшрейт','var(--warn)'],off:['Отключен','var(--neg)'],fail:['Оффлайн','var(--neu)']};
 function workersList(m){
   if(m.empty) return [];
@@ -636,6 +648,17 @@ const sortBy=(rows,tbl,val)=>{const s=U.sort[tbl]; if(!s) return rows;
   return [...rows].sort((a,b)=>{const x=val(a,s.k),y=val(b,s.k);
     return (typeof x==='number'&&typeof y==='number'?x-y:String(x).localeCompare(String(y),'ru'))*s.d})};
 
+/* Меню действий воркера (макеты 173:59614 и 173:59712): три пункта,
+   удаление недоступно у «Активен» и «Низкий хэшрейт» — с подсказкой. */
+const wkMenu=w=>{const busy=w.st==='ok'||w.st==='low';
+  return `<span class="pop-wrap"><button class="ibr act" data-pop="wk${w.id}">${I.dots}</button>
+  ${pop==='wk'+w.id?`<div class="pop menu wkmenu">
+    <button data-modal="wgroups" data-wk2="${w.id}">Изменить группы</button>
+    <button data-modal="wtags" data-wk2="${w.id}">Изменить теги</button>
+    ${busy?`<span class="mi off" data-tip="Вы не сможете удалить воркер в статусе «Активен» или «Низкий хэшрейт»">Удалить</span>`
+      :`<button class="del" data-modal="wkdel" data-wk2="${w.id}">Удалить</button>`}
+  </div>`:''}</span>`};
+
 V.workers=m=>{
   /* Плитка статуса: подложка — цвет статуса на 16 %, значок — тот же цвет (360:110008) */
   const st=[['Активные',m.h.a,'#22c55e',I.warr],['Низкий хэшрейт',m.h.l,'#f59e0b',I.wdng],
@@ -655,8 +678,8 @@ V.workers=m=>{
       <td><i class="dot" style="display:inline-block;background:${col};margin-right:8px"></i>${lbl}</td>
       <td class="mono">${nf(w.h5,2)} ${m.c.unit}</td><td class="mono">${nf(w.h1,2)} ${m.c.unit}</td><td class="mono">${nf(w.h24,2)} ${m.c.unit}</td>
       <td class="mono">${nf(w.rej,2)}%</td><td class="mono">${w.up}%</td><td class="mono mut">9 Апреля, 07:32</td>
-      <td><span class="tag ${w.tag==='Без прошивки'?'y':''}">${w.tag}</span>${w.extra?' <span class="tag n">+1</span>':''}</td>
-      <td class="dim">${I.dots}</td></tr>`}).join('');
+      <td class="tags"><span class="tag ${w.tag==='Без прошивки'?'y':''}">${w.tag}</span>${w.extra?' <span class="tag n">+1</span>':''}</td>
+      <td class="num wact">${wkMenu(w)}</td></tr>`}).join('');
   /* Сводка хэшрейта — одна карточка: акцентная плашка и сетка 2×2 (макет 173:59403) */
   const wst=(l,v,d='')=>`<div class="wst"><div class="l">${l}</div><div class="v mono">${v}${d}</div></div>`;
   return `
@@ -692,7 +715,7 @@ V.workers=m=>{
     <button class="btn g sm" data-toast="Команда перезагрузки отправлена">Перезагрузить</button>
     <button class="btn g sm" data-modal="group">Привязать группу</button>
     <div class="spacer"></div><button class="btn link" data-selclear>Снять выбор</button></div>`:''}
-  ${all.length?(shown.length?`<div class="tw"><table class="tbl"><thead><tr>
+  ${all.length?(shown.length?`<div class="tw"><table class="tbl wtbl"><thead><tr>
       <th>${cb(allSel,'data-selall')}</th>${sortTh('name','Наименование')}${sortTh('model','Модель')}${sortTh('st','Статус')}
       ${sortTh('h5','Хэшрейт, 5 мин')}${sortTh('h1','Хэшрейт, 1 ч')}${sortTh('h24','Хэшрейт, 24 ч')}${sortTh('rej','Реджект, 24 ч')}
       <th>Uptime <span class="tipi" data-tip="Доля времени за 24 часа, когда воркер присылал шары">${I.inf}</span></th><th>Отпр. шары</th><th>Мои теги</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
@@ -1749,6 +1772,34 @@ const MODALS={
   filters:{ok:'Фильтры применены',t:'Фильтры',s:'Настройте выборку воркеров',b:m=>`
     <div class="grid g2" style="margin:0;gap:10px">
       ${[['Статус','Любой'],['Модель','Любая'],['Группа','Любая'],['Тег','Любой'],['Хэшрейт от',''],['Хэшрейт до','']].map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v">${v||'—'}</div></div>`).join('')}</div>`},
+  /* Изменить теги воркера (макет 173:62936): список с чекбоксами и переход
+     в создание тега; если выбор не менялся — алерт при подтверждении */
+  wtags:{ok:'Теги обновлены',t:'Изменить теги',s:'Отметьте теги, которые нужно привязать к воркеру',
+    b:()=>`<div class="picklist">${TAGS.map(([t,d],i)=>`<label data-wpick="tag:${i}">
+        ${cb(U.wtag.has(i))}<span class="tx"><b>${t}</b><i>${d}</i></span></label>`).join('')}</div>
+      <button class="btn link" data-modal="tagnew">${I.pl} Создать тег</button>`,
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-toast="Теги обновлены">Привязать</button>`},
+  /* Изменить группы воркера (макет 173:64798) */
+  wgroups:{ok:'Группы обновлены',t:'Изменить группы',s:'Отметьте группы, в которые входит воркер',
+    b:()=>`<div class="picklist">${GEO.slice(1).map(([g,n],i)=>`<label data-wpick="grp:${i}">
+        ${cb(U.wgrp.has(i))}<span class="tx"><b>${g}</b><i>${n} воркеров</i></span></label>`).join('')}</div>
+      <button class="btn link" data-modal="group">${I.pl} Создать группу</button>`,
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-toast="Группы обновлены">Привязать</button>`},
+  /* Создать тег (макет 173:62151): лимиты 10 и 100 символов */
+  tagnew:{ok:'Тег создан',t:'Создать тег',s:'Тег поможет отметить состояние воркера',sm:true,
+    b:()=>`<div class="inp" style="margin:0"><div class="k">Наименование</div>
+        <input maxlength="10" placeholder="До 10 символов"></div>
+      <div class="inp"><div class="k">Описание</div>
+        <input maxlength="100" placeholder="Необязательно, до 100 символов"></div>`,
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-toast="Тег создан">Создать</button>`},
+  /* Удаление воркера (макет 173:65944): только неактивные */
+  wkdel:{t:'Удалить воркер?',s:'Воркер пропадёт из списка, статистика по нему сохранится',sm:true,danger:true,
+    b:()=>'',
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn danger" data-close data-toast="Воркер удален">Удалить</button>`},
   wallet:{ok:'Кошелёк добавлен',t:'Добавить кошелек',s:'Адрес будет использоваться для выводов по этой монете',b:()=>`
     <div class="inp"><div class="k">Сеть</div><input value="Bitcoin (BTC)"></div>
     <div class="inp"><div class="k">Адрес кошелька</div><input placeholder="bc1q…"></div>

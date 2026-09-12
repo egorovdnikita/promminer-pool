@@ -67,6 +67,8 @@ export interface Ui {
   wfilter: string
   geo: string
   wk: any
+  wtag: Set<number>
+  wgrp: Set<number>
   qfocus: boolean
   auth: string
   consent: Set<number>

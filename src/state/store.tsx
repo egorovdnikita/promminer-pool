@@ -14,7 +14,7 @@ const freshUi = (): Ui => ({
   seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {}, oval: false, obs: 0, sess: '',
   scgrp: [], saved: loadSaved(),
   q: '', wfilter: 'all', geo: '',
-  wk: null, qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
+  wk: null, wtag: new Set(), wgrp: new Set(), qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
 
 /** Свои сценарии живут в localStorage отдельно от текущего состояния. */
@@ -311,7 +311,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const cp = at('[data-copy]')
     if (cp) { navigator.clipboard?.writeText(cp.dataset.copy!); return toast('Скопировано') }
     const wk = at('[data-wk]')
-    if (wk) {
+    /* по клику на строку — в деталку, но не когда жмут меню действий
+       или чекбокс выбора (комментарий дизайнера в макете 177:122812) */
+    if (wk && !at('[data-pop]') && !at('[data-sel]') && !at('.wact') && !at('.pop')) {
       applyState(snapshot())
       u.wk = workersList(M()).find((w: any) => w.id === +wk.dataset.wk!) || null
       go('worker')
@@ -368,6 +370,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (next && next !== route) go(next)
     }
     /* стрелки прокрутки ленты групп на «Воркерах» */
+    /* чекбоксы в модалках «Изменить теги» и «Изменить группы» */
+    const wp = at('[data-wpick]')
+    if (wp) {
+      const [kind, i] = wp.dataset.wpick!.split(':')
+      const set = kind === 'tag' ? u.wtag : u.wgrp
+      const n = +i
+      set.has(n) ? set.delete(n) : set.add(n)
+      return bump()
+    }
     const gs = at('[data-gscroll]')
     if (gs) {
       const strip = gs.parentElement?.querySelector('.segl') as HTMLElement | null

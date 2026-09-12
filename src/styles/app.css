@@ -261,6 +261,30 @@ body.mini .ni .spacer.lbl{display:none!important}
   .ch .wsearch{flex:0 0 48px;width:48px;min-width:48px;padding:0;justify-content:center}
   .ch .wsearch input{display:none}
 }
+/* Таблица воркеров: строка 48, ячейки 12, чипы 32, кнопка действий 36 */
+/* Колонки поровну, как в макете: 36 под чекбокс, 68 под действия,
+   остальные делят ширину; длинные модели обрезаются многоточием */
+.tbl.wtbl{table-layout:fixed}
+.tbl.wtbl th,.tbl.wtbl td{overflow:hidden;text-overflow:ellipsis}
+.tbl.wtbl td{padding:12px;height:48px}
+.tbl.wtbl td.tags{padding:8px 12px}
+.tbl.wtbl td.wact{padding:6px 16px}
+.tbl.wtbl .tag{height:32px;padding:0 12px}
+.tbl.wtbl .ibr.act{width:36px;height:36px;border-radius:var(--r-s);color:var(--c1)}
+.tbl.wtbl .ibr.act:hover{background:var(--ctrl2)}
+.tbl.wtbl th:first-child,.tbl.wtbl td:first-child{width:36px;padding-right:0}
+.tbl.wtbl th:last-child,.tbl.wtbl td:last-child{width:68px}
+/* Меню действий и его заблокированный пункт */
+.wkmenu{width:226px}
+.wkmenu .mi.off{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:40px;
+  color:var(--c3);cursor:not-allowed;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
+/* Список выбора в модалках тегов и групп */
+.picklist{display:flex;flex-direction:column;gap:4px;max-height:320px;overflow:auto}
+.picklist label{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:var(--r-s);cursor:pointer}
+.picklist label:hover{background:var(--ctrl2)}
+.picklist .tx{display:flex;flex-direction:column}
+.picklist b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.picklist i{font-style:normal;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500}
 .wlist{display:flex;flex-direction:column;gap:12px}
 .gtabs{gap:16px;min-width:0;min-height:48px}
 .gtabs .segl{flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;scroll-behavior:smooth}
