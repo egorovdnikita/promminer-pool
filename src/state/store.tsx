@@ -367,6 +367,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const next = ['home', 'workers', 'assets', 'income', 'payouts', 'ref'].find((r) => ok.has(r))
       if (next && next !== route) go(next)
     }
+    /* стрелки прокрутки ленты групп на «Воркерах» */
+    const gs = at('[data-gscroll]')
+    if (gs) {
+      const strip = gs.parentElement?.querySelector('.segl') as HTMLElement | null
+      if (strip) strip.scrollLeft += +gs.dataset.gscroll! * 320
+      return
+    }
     const gp = at('[data-grp]')
     if (gp) { const g = gp.dataset.grp!; openGroups.current[g] = !openGroups.current[g]; return bump() }
     const ac = at('[data-acct]')

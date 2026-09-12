@@ -243,9 +243,37 @@ body.mini .ni .spacer.lbl{display:none!important}
 .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
 .tile .t span{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
 .tile .n{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
-.statcard{background:var(--surface);border-radius:var(--r-m);padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
-.statcard .n{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
-.statcard .ic{margin-left:auto;width:var(--h-ctrl);height:var(--h-ctrl);border-radius:var(--r-f);background:var(--ctrl2);display:grid;place-items:center;color:#fff;flex:0 0 auto}
+/* Плитки статусов воркеров (макет 173:59403): 96 высотой, паддинг 20/24,
+   радиус 24, подпись 14 SemiBold, число 24 SemiBold, значок 48 с радиусом 16 */
+.statcard{background:var(--surface);border-radius:var(--r-l);padding:20px 24px;box-shadow:none;display:flex;align-items:center;gap:8px;min-height:96px}
+.statcard .cap{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c3);margin-bottom:8px}
+.statcard .n{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
+.statcard .ic{margin-left:auto;width:48px;height:48px;border-radius:var(--r-m);display:grid;place-items:center;color:#fff;flex:0 0 auto}
+/* Сводка хэшрейта: акцентная плашка и сетка 2×2 в одной карточке */
+/* Лента групп и таблица — один блок с шагом 12 (макет 173:59403) */
+.wlist{display:flex;flex-direction:column;gap:12px}
+.gtabs{gap:16px;min-width:0;min-height:48px}
+.gtabs .segl{flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;scroll-behavior:smooth}
+.gtabs .segl::-webkit-scrollbar{display:none}
+.gsc{width:28px;height:28px;flex:0 0 auto;color:var(--c3)}
+.gsc:hover{color:var(--c1)}
+.gtabs .btn.link{flex:0 0 auto}
+.card.wcard{padding:24px;display:flex;gap:40px;align-items:stretch}
+.whero{flex:1 1 0;min-width:0;background:var(--accent);border-radius:var(--r-m);padding:16px;color:#fff;
+  display:flex;flex-direction:column;justify-content:space-between;gap:16px}
+.whero .l{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+.whero .vrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.whero .v{font-size:48px;line-height:56px;font-weight:600}
+.wstats{flex:1 1 0;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:24px 32px;align-content:space-between}
+.wst .l{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c3);margin-bottom:8px}
+.wst .v{display:flex;align-items:center;gap:8px;font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
+/* Badge Dynamic */
+.dyn{display:inline-flex;align-items:center;gap:2px;height:22px;padding:2px 4px;border-radius:100px;
+  color:#fff;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;flex:0 0 auto}
+.dyn svg{width:16px;height:16px}
+.dyn.teal{background:#42bc9c}
+.dyn.ok{background:var(--pos)}
+.dyn.neg{background:var(--neg)}
 .delta{display:inline-flex;align-items:center;gap:3px;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;padding:2px 6px;border-radius:var(--r-f)}
 .delta.up{background:#ef444429;color:var(--neg)}
 .delta.dn{background:#22c55e29;color:var(--pos)}

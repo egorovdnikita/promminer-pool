@@ -389,6 +389,8 @@ function datePicker(sel=[29,30],mi=0,yr=2026,min=0){
   </div>`;
 }
 /* Status дизайн-системы: точка 8 + подпись 12 Bold. t: ok|err|warn|off. */
+/* Badge Dynamic из макета воркеров: 22 в высоту, r100, стрелка 16 и 14 SemiBold */
+const dyn=(kind,val)=>`<span class="dyn ${kind}">${I.sortUp}${val}</span>`;
 const status=(t,label,cls='')=>`<span class="status ${t} ${cls}"><i class="dot"></i>${label}</span>`;
 const rd=(on,attr='',cls='')=>`<span class="rd ${on?'on':''} ${cls}" ${attr}></span>`;
 /* Пагинация — кликабельная */
@@ -635,13 +637,13 @@ const sortBy=(rows,tbl,val)=>{const s=U.sort[tbl]; if(!s) return rows;
     return (typeof x==='number'&&typeof y==='number'?x-y:String(x).localeCompare(String(y),'ru'))*s.d})};
 
 V.workers=m=>{
-  const st=[['Активные',m.h.a,'var(--pos)',I.ok],['Низкий хэшрейт',m.h.l,'var(--warn)',I.excl],
-            ['Отключены',m.h.o,'var(--neg)',I.xc],['Оффлайн',m.h.f,'var(--neu)',I.pause]];
+  const st=[['Активные',m.h.a,'var(--pos)',I.warr],['Низкий хэшрейт',m.h.l,'var(--warn)',I.wdng],
+            ['Отключены',m.h.o,'var(--neg)',I.wrec],['Оффлайн',m.h.f,'var(--neu)',I.woff]];
   const all=workersList(m), shown=workersRows(m);
   /* Счётчики в фильтре — по всему парку, как в макете (таблица показывает выборку) */
   const PC={all:m.total,ok:m.h.a,low:m.h.l,off:m.h.o,fail:m.h.f};
   const cnt=k=>PC[k];
-  const per=perOf('workers',10), pages=Math.max(1,Math.ceil(shown.length/per));
+  const per=perOf('workers',20), pages=Math.max(1,Math.ceil(shown.length/per));
   const cur=Math.min(U.page.workers||1,pages);
   const page=shown.slice((cur-1)*per,cur*per);
   const allSel=page.length&&page.every(w=>U.sel.has(w.id));
@@ -654,31 +656,33 @@ V.workers=m=>{
       <td class="mono">${nf(w.rej,2)}%</td><td class="mono">${w.up}%</td><td class="mono mut">9 Апреля, 07:32</td>
       <td><span class="tag ${w.tag==='Без прошивки'?'y':''}">${w.tag}</span>${w.extra?' <span class="tag n">+1</span>':''}</td>
       <td class="dim">${I.dots}</td></tr>`}).join('');
+  /* Сводка хэшрейта — одна карточка: акцентная плашка и сетка 2×2 (макет 173:59403) */
+  const wst=(l,v,d='')=>`<div class="wst"><div class="l">${l}</div><div class="v mono">${v}${d}</div></div>`;
   return `
-  <div class="grid" style="grid-template-columns:1.15fr 1fr;gap:12px">
-    ${card(`<div class="hero" style="min-height:104px;align-items:center"><div><div class="l">Средний хэшрейт за 24 ч</div>
-      <div class="v" style="font-size:var(--fs-h3);line-height:var(--lh-h3)">${m.avg} ${m.c.unit} <span class="delta w">▲ 10%</span></div></div></div>`,'')}
-    ${card(`<div class="grid g2" style="gap:14px;margin:0">
-      <div><div class="cap dim">Средний хэшрейт за 5 мин</div><div class="mono" style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${m.h5} ${m.c.unit}</div></div>
-      <div><div class="cap dim">Реджект за 24 ч</div><div class="mono" style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${m.empty?'0%':m.c.rej} <span class="delta up">▲ 10%</span></div></div>
-      <div><div class="cap dim">Средний хэшрейт за 1 ч</div><div class="mono" style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${m.h1} ${m.c.unit}</div></div>
-      <div><div class="cap dim">Uptime за 24 ч</div><div class="mono" style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${m.empty?'0%':m.c.up} <span class="delta dn">▲ 10%</span></div></div>
-    </div>`)}
-  </div>
-  <div class="grid g4">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap dim">${l}</div><div class="n mono">${ni(n)}</div></div>
+  ${card(`<div class="whero"><span class="l">Средний хэшрейт за 24 ч</span>
+      <span class="vrow"><b class="v mono">${m.avg} ${m.c.unit}</b>${dyn('teal','10%')}</span></div>
+    <div class="wstats">
+      ${wst('Средний хэшрейт за 5 мин',`${m.h5} ${m.c.unit}`)}
+      ${wst('Реджект за 24 ч',m.empty?'0%':m.c.rej,dyn('neg','10%'))}
+      ${wst('Средний хэшрейт за 1 ч',`${m.h1} ${m.c.unit}`)}
+      ${wst('Uptime за 24 ч',m.empty?'0%':m.c.up,dyn('ok','10%'))}
+    </div>`,'wcard')}
+  <div class="grid g4" style="gap:16px;margin:0">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap">${l}</div><div class="n mono">${ni(n)}</div></div>
     <div class="ic" style="background:${c}">${g}</div></div>`).join('')}</div>
   <!-- Лента групп — Segment Control Line из макета: текстовые вкладки со счётчиками -->
-  <div class="row" style="gap:16px;margin-bottom:12px;min-width:0">
-    <div class="segl" style="flex:1;min-width:0">
+  <div class="wlist">
+  <div class="row gtabs">
+    <button class="ibr gsc" data-gscroll="-1">${I.cl}</button>
+    <div class="segl" id="gtabs">
       ${GEO.map(([g,n])=>`<button class="${(U.geo||'Все')===g?'on':''}" data-geo="${g}">${g} <u>${n}</u></button>`).join('')}</div>
-    ${S.role==='owner'?`<button class="btn link" data-modal="group" style="flex:0 0 auto">${I.pl} Создать группу</button>`:''}
+    <button class="ibr gsc" data-gscroll="1">${I.cv}</button>
+    ${S.role==='owner'?`<button class="btn link" data-modal="group">${I.pl} Создать группу</button>`:''}
   </div>
-  ${card(`<div class="ch">
+  ${card(`<div class="ch subhead">
     <div class="seg">
       ${[['all','Все',''],['ok','Активные','var(--pos)'],['low','Низкий хэшрейт','var(--warn)'],['off','Отключены','var(--neg)'],['fail','Оффлайн','var(--neu)']]
         .map(([k,l,c])=>`<button class="${U.wfilter===k?'on':''}" data-wf="${k}">${c?`<i class="dot" style="background:${c}"></i>`:''}${l} <u>${ni(cnt(k))}</u></button>`).join('')}
-    </div></div>
-  <div class="ch">
+    </div>
     <button class="chip" data-modal="filters">${I.flt} Фильтры</button>
     <div class="spacer"></div>
     <label class="search">${I.srch}<input id="q" placeholder="Найти воркер" value="${U.q.replace(/"/g,'&quot;')}"></label>
@@ -691,9 +695,9 @@ V.workers=m=>{
       <th>${cb(allSel,'data-selall')}</th>${sortTh('name','Наименование')}${sortTh('model','Модель')}${sortTh('st','Статус')}
       ${sortTh('h5','Хэшрейт, 5 мин')}${sortTh('h1','Хэшрейт, 1 ч')}${sortTh('h24','Хэшрейт, 24 ч')}${sortTh('rej','Реджект, 24 ч')}
       <th>Uptime <span class="tipi" data-tip="Доля времени за 24 часа, когда воркер присылал шары">${I.inf}</span></th><th>Отпр. шары</th><th>Мои теги</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
-      ${pager('workers',shown.length,per)}`
+      ${pager('workers',shown.length,20)}`
     :emptyBox('Ничего не найдено','Измените фильтр или поисковый запрос'))
-    :emptyBox('Воркеров пока нет','Подключите первый воркер, чтобы увидеть статистику по парку')}`)}`;
+    :emptyBox('Воркеров пока нет','Подключите первый воркер, чтобы увидеть статистику по парку')}`,'tblcard')}</div>`;
 };
 
 V.worker=m=>{
