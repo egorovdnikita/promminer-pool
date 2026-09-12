@@ -390,8 +390,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 img.hex{object-fit:contain}
 .hex.none{background:url('/tier-0.svg') center/130px 146px no-repeat;
   font-size:40px;line-height:22px;font-weight:500;color:var(--c3)}
-/* дорожка 590 из 642: по 12 внутри блока info, отсюда просвет до панели справа */
-.track{margin-top:0;padding:0 12px}
+/* дорожка 590 из 642: справа ещё 24, отсюда просвет до панели */
+.track{margin-top:0;padding:0 24px 0 0}
 .tbar{height:20px;border-radius:var(--r-f);background:#6b728014;overflow:hidden}
 .tfill{height:100%;background:var(--accent);border-radius:var(--r-f);transition:width .25s}
 .tpts{display:flex;justify-content:space-between;margin-top:-30px;position:relative}
@@ -844,6 +844,9 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .thico svg{display:inline-block;margin:0;width:20px;height:20px}
 .tbl th .thico{max-height:20px}
 .tbl th svg{width:16px;height:16px}
+/* значки монеты и валют в шапке — 24, в отличие от 16 у Info Circle */
+.tbl th .paico{margin-right:4px;max-height:none;line-height:0}
+.tbl th .paico svg{width:24px;height:24px}
 /* тёмная тема: точечные доводки блоков с собственной заливкой */
 :root[data-theme="dark"] .promo{background:linear-gradient(135deg,#312e81,#1e1b4b)}
 :root[data-theme="dark"] .tag.g{color:#4ade80}
@@ -1100,22 +1103,29 @@ html{scrollbar-gutter:stable}
 .card.tblcard>.ch.thead{padding:16px;margin:0;gap:16px;min-height:0}
 /* Нижняя полоса табличной карточки: 60 с паддингом 16 */
 .tfoot{padding:16px 0;text-align:center}
-/* График в макете выше: тело 409 и легенда через 24 (макет 185:105315) */
+/* График (макет 1447:159993): подписи осей строкой 20 над телом через 20,
+   тело 409, легенда 14 Medium через 24 */
 .card.chartcard{display:flex;flex-direction:column;gap:24px}
 .card.chartcard>.ch{margin:0}
-.card.chartcard .clegend{margin-top:0!important}
+.cbody{display:flex;flex-direction:column;gap:20px}
+.caxis{display:flex;justify-content:space-between;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;color:var(--c1)}
+.clegend{display:flex;justify-content:center;gap:12px;margin-top:0!important}
+.clegend span{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c1)}
+.clegend i{width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto}
 /* Реферальная карточка: две колонки по 794, зазор 16 (макет 185:105548) */
 .refrow{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 16px 8px;align-items:start}
 .refmain{display:flex;gap:16px;min-width:0;align-items:center}
-.refinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding:0 14px}
-.refstats{display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap}
+/* info в макете: паддинг слева 4, справа 24, а у дорожки ещё 24 справа */
+.refinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding:0 24px 0 4px}
+.refstats{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.rstrow{display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap}
 .rst .l{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
 .rst .v{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
 .refcoin{display:flex;align-items:center;gap:8px}
 .refcoin svg{width:32px;height:32px}
 .refcoin b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .refcoin i{display:block;font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:500;color:var(--c3)}
-.reftot{background:#7086fc1f;border-radius:var(--r-m);padding:12px 24px;min-width:0}
+.reftot{background:#7086fc1f;border-radius:var(--r-m);padding:24px;min-width:0}
 .reftot h3{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;margin-bottom:24px}
 .rtgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .card.tblcard{padding:8px}

@@ -313,6 +313,9 @@ const HOME_CONTACTS=[
   ['mail','Почта',LINKS.support,'mailto:'+LINKS.support],
   ['phone','Телефон','+7 (996) 666-59-52','tel:+79966665952']];
 const FLAG_RU=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><g clip-path="url(#flagRU)"><path d="M23.3172 16C23.7594 14.7489 24 13.4025 24 12C24 10.5975 23.7594 9.2511 23.3172 7.99998H0.682834C0.240621 9.2511 0 10.5975 0 12C0 13.4025 0.240613 14.7489 0.682812 16H23.3172Z" fill="#0052B4"/><path d="M23.3172 16C21.6698 20.6608 17.2249 24 12 24C6.77513 24 2.33018 20.6608 0.682831 16H23.3172Z" fill="#D80027"/><path d="M23.3172 8H0.682816C2.33016 3.33923 6.77512 0 12 0C17.2249 0 21.6698 3.33923 23.3172 8Z" fill="#F3F5F9"/></g><path d="M12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5C5.64873 23.5 0.5 18.3513 0.5 12C0.5 5.64873 5.64873 0.5 12 0.5Z" stroke="#6B7280" stroke-opacity="0.16"/><defs><clipPath id="flagRU"><path d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z" fill="white"/></clipPath></defs></svg>`;
+/* Значки валют из Payments для шапок таблиц: синие, в отличие от зелёных
+   в шапке страницы (макет 1447:160163) */
+const PAY_ICON={'$':`<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 24C18.6274 24 24 18.6274 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 18.6274 5.37258 24 12 24Z" fill="#7086FC"/><path d="M10.0354 19.2056C9.75196 19.1297 9.58884 18.8716 9.66925 18.5715L9.95737 17.4962C8.29715 16.8906 7.0624 15.6306 7.06596 14.0503C7.06612 13.9163 7.08295 13.7868 7.11645 13.6618C7.22366 13.2617 7.58076 13.0625 7.98086 13.1697C8.32261 13.2613 8.53411 13.5056 8.56414 13.9603C8.60916 14.8926 9.06844 15.7125 10.3058 16.1959L11.3711 12.2199L11.1928 12.1185C9.25133 11.0623 8.3823 9.83777 8.82229 8.19569C9.30249 6.40358 11.0283 5.59741 13.0507 5.9517L13.3388 4.87643C13.4192 4.57636 13.6896 4.43438 13.973 4.51032C14.2564 4.58625 14.4195 4.84437 14.3391 5.14445L14.0532 6.21138C15.6717 6.80588 16.7575 8.08846 16.7612 9.60822C16.7611 9.74218 16.7442 9.87168 16.7107 9.99671C16.6035 10.3968 16.2464 10.5959 15.8463 10.4887C15.4546 10.3838 15.2837 10.0878 15.263 9.69814C15.1554 8.63296 14.6587 7.91919 13.7025 7.52004L12.6863 11.3126L12.9291 11.4402C14.9328 12.531 15.8964 13.7362 15.4273 15.4866C14.8891 17.4955 12.9627 18.1496 10.9554 17.7726L10.6695 18.8395C10.5891 19.1396 10.3188 19.2816 10.0354 19.2056ZM10.2995 8.48429C10.0806 9.30116 10.411 10.0687 11.7508 10.8029L12.7001 7.26036C11.3884 7.08758 10.5161 7.67576 10.2995 8.48429ZM12.3544 12.7514L12.3066 12.7297L11.3038 16.4723C12.8855 16.771 13.6888 16.1733 13.9457 15.2147C14.1914 14.2978 13.8976 13.5937 12.3544 12.7514Z" fill="white" stroke="white" stroke-width="0.5"/></svg>`,'₽':`<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 24C18.6274 24 24 18.6274 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 18.6274 5.37258 24 12 24Z" fill="#7086FC"/><path d="M7.09338 14.7758C6.81086 14.7001 6.68144 14.4405 6.75498 14.1661C6.82852 13.8916 7.0704 13.7315 7.35292 13.8072L8.62019 14.1468L9.03545 12.597L7.76818 12.2574C7.48567 12.1817 7.35625 11.9221 7.42979 11.6477C7.50332 11.3732 7.74521 11.2131 8.02772 11.2888L9.29499 11.6284L10.7463 6.21219C10.8695 5.7521 11.2299 5.53721 11.6739 5.65617L14.6362 6.44993C16.8237 7.03606 17.8172 8.94603 17.27 10.9882C16.7207 13.0384 14.8956 14.1672 12.7081 13.5811L10.4884 12.9863L10.0731 14.5361L13.0758 15.3407C13.3583 15.4164 13.4878 15.676 13.4142 15.9504C13.3407 16.2249 13.0988 16.385 12.8163 16.3093L9.81357 15.5047L9.49347 16.6993C9.37884 17.1271 8.99584 17.3619 8.56803 17.2473C8.14023 17.1327 7.92592 16.7378 8.04055 16.31L8.36065 15.1154L7.09338 14.7758ZM10.8258 11.7271L12.6823 12.2246C14.3451 12.6701 15.4004 11.9926 15.7767 10.5881C16.1509 9.19165 15.5816 8.08747 13.9108 7.63977L12.0543 7.14231L10.8258 11.7271Z" fill="white" stroke="white" stroke-width="0.5"/></svg>`};
 const USD_ICON=`<svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#22c55e"/><path fill="#fff" d="M11.2 4.6h1.6v1.6h-1.6zM11.2 17.8h1.6v1.6h-1.6zM12 6.8c2.2 0 3.8 1.1 4 2.9h-2.1c-.2-.7-.9-1.1-1.9-1.1s-1.8.4-1.8 1.1c0 .6.5 1 1.7 1.2l1.2.2c2.2.4 3.2 1.3 3.2 2.9 0 1.9-1.7 3.1-4.2 3.1s-4.1-1.1-4.3-3h2.1c.2.8 1 1.2 2.2 1.2 1.2 0 2-.5 2-1.2 0-.6-.5-.9-1.7-1.2l-1.3-.2C10 12.3 9 11.4 9 9.8c0-1.8 1.6-3 3.9-3Z"/></svg>`;
 
 /* ============================================================
@@ -415,22 +418,30 @@ function chart(m,opts={}){
   const x=i=>PL+(i/(N-1))*iw, y=v=>PT+ih-(v/100)*ih;
   const ln=p.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   const ar=`${ln} L${x(N-1).toFixed(1)},${PT+ih} L${PL},${PT+ih} Z`;
+  /* svg тянется по ширине (1400 → ~1593 на 1920), поэтому кегль делений
+     задаём с поправкой, чтобы на экране получилось 12 */
+  const TS=(opts.ts||12)/1.138;
   const ticks=opts.ticks||[0,150,300,450,600,750,900,1050,1200,1350,1500];
   const hrs=opts.xs||['14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00','01:00','02:00','03:00','04:00','05:00','06:00'];
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${opts.hpx?opts.hpx+'px':'auto'}" preserveAspectRatio="none">
-    <text x="${PL}" y="9" font-size="12" fill="var(--c3)" font-weight="600">${opts.yl??('Хэшрейт, '+m.c.unit)}</text>
-    ${opts.right===false?'':`<text x="${W-PR}" y="9" font-size="12" fill="var(--c3)" text-anchor="end" font-weight="600">Реджект, %</text>`}
+  /* Подписи осей в макете живут вне графика строкой 20 (16 Medium), иначе их
+     растягивает вместе с svg; цифры делений — 12 SemiBold, время — Tertiary */
+  const outer=opts.axisHtml;
+  const yl=opts.yl??('Хэшрейт, '+m.c.unit);
+  const caps=outer?`<div class="caxis"><span>${yl}</span>${opts.right===false?'':'<span>Реджект, %</span>'}</div>`:'';
+  return `${outer?'<div class="cbody">':''}${caps}<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${opts.hpx?opts.hpx+'px':'auto'}" preserveAspectRatio="none">
+    ${outer?'':`<text x="${PL}" y="9" font-size="12" fill="var(--c3)" font-weight="600">${yl}</text>`}
+    ${outer||opts.right===false?'':`<text x="${W-PR}" y="9" font-size="12" fill="var(--c3)" text-anchor="end" font-weight="600">Реджект, %</text>`}
     ${ticks.map((t,i)=>{const yy=PT+ih-(i/(ticks.length-1))*ih;return`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="var(--border)"/>
-      <text x="${PL-8}" y="${yy+3}" font-size="10" fill="var(--c3)" text-anchor="end">${m.empty?0:t}</text>
-      ${opts.right===false?'':`<text x="${W-PR+8}" y="${yy+3}" font-size="10" fill="var(--c3)">${i*10}</text>`}`}).join('')}
+      <text x="${PL-8}" y="${yy+4}" font-size="${TS}" font-weight="600" fill="var(--c1)" text-anchor="end">${m.empty?0:t}</text>
+      ${opts.right===false?'':`<text x="${W-PR+8}" y="${yy+4}" font-size="${TS}" font-weight="600" fill="var(--c1)">${i*10}</text>`}`}).join('')}
     ${m.empty?'':`<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".22"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
       <path d="${ar}" fill="url(#ag)"/><path d="${ln}" fill="none" stroke="var(--accent)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
       ${opts.right===false?'':`<path d="M${PL},${PT+ih-2} L${W-PR},${PT+ih-3}" fill="none" stroke="var(--warn)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>`}`}
-    ${hrs.map((h,i)=>`<text x="${PL+(i/(hrs.length-1))*iw}" y="${H-6}" font-size="10" fill="var(--c3)" text-anchor="middle">${h}</text>`).join('')}
-  </svg>
-  ${opts.right===false?'':`<div class="clegend" style="display:flex;justify-content:center;gap:20px;margin-top:8px">
-    <span class="cap mut"><i style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:5px"></i>Хэшрейт</span>
-    <span class="cap mut"><i style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--warn);margin-right:5px"></i>Реджект</span></div>`}`;
+    ${hrs.map((h,i)=>`<text x="${PL+(i/(hrs.length-1))*iw}" y="${H-5}" font-size="${TS}" font-weight="600" fill="var(--c3)" text-anchor="middle">${h}</text>`).join('')}
+  </svg>${outer?'</div>':''}
+  ${opts.right===false?'':`<div class="clegend">
+    <span><i style="background:var(--accent)"></i>Хэшрейт</span>
+    <span><i style="background:var(--warn)"></i>Реджект</span></div>`}`;
 }
 
 /* ============================================================
@@ -463,7 +474,7 @@ ${cards.length?`<div class="grid g3" style="gap:16px;margin:0">${cards.join('')}
 ${p.workers?card(`<div class="ch"><h2>График изменения хэшрейта (${m.bal[0].s})</h2>
   <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],2)}
   <span class="pop-wrap"><button class="pill ctl sq mono lg" data-pop="date">29.01.2026 – 30.01.2026 ${I.cal}</button>${pop==='date'?datePicker():''}</span>
-  <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{h:395})}`,'chartcard'):''}
+  <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{h:359,axisHtml:true})}`,'chartcard'):''}
 ${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,0):`<h2>${tabs[0]}</h2>`}
   <div class="spacer"></div>${m.bal.length>1?`<span class="pill flat sq">${COIN_ICON.LTC} LTC ${I.cd}</span>`:''}
   <button class="ib ctl" data-toast="Отчет скачан">${I.dl}</button></div>
@@ -507,9 +518,9 @@ function incomeTable(m,n,pid){
   if(pid){const per=perOf(pid,10),pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
   return `<div class="tw"><table class="tbl"><thead><tr>
     <th>Дата и время</th><th>Хэшрейт ${I.inf}</th>
-    <th class="num">Доход, ${u}</th><th class="num">Доход с 1 ${m.c.short}, ${u}</th>
-    <th class="num">Доход, $ ${I.inf}</th>
-    <th class="num">Доход, ₽ ${I.inf}</th>
+    <th class="num"><span class="thico paico">${COIN_ICON[u]}</span> Доход, ${u}</th><th class="num">Доход с 1 ${m.c.short}, ${u}</th>
+    <th class="num"><span class="thico paico">${PAY_ICON['$']}</span> Доход, $ ${I.inf}</th>
+    <th class="num"><span class="thico paico">${PAY_ICON['₽']}</span> Доход, ₽ ${I.inf}</th>
     <th class="num">Баланс, ${u}</th><th class="num">Цена ${u}, ₽</th></tr></thead><tbody>
     ${Array.from({length:to-from},(_,j)=>{const i=from+j;return `<tr><td class="mono">${d[i%10]}</td><td class="mono">${hs[i%10]} ${m.c.unit}</td>
       <td class="num mono">${R.amount}</td><td class="num mono">${R.per}</td><td class="num mono">35,00 $</td>
@@ -539,8 +550,8 @@ function refBlock(m){
         :`<img class="hex" src="/tier-${t.k}.png" alt="${t.p}" width="152" height="152">`}
       <div class="refinfo">
         <div class="refstats">
-          ${st('Ваша комиссия',e?'0%':`${t.p} (${t.n})`)}
-          ${st('Хэшрейт рефералов',e?`0 ${m.c.unit}`:m.c.refHash)}
+          <div class="rstrow">${st('Ваша комиссия',e?'0%':`${t.p} (${t.n})`)}
+          ${st('Хэшрейт рефералов',e?`0 ${m.c.unit}`:m.c.refHash)}</div>
           <div class="refcoin">${COIN_ICON[m.bal[0].s]}
             <span><b>${m.c.refCoin[0]}</b><i>${m.c.refCoin[1]}</i></span></div>
         </div>
@@ -1976,7 +1987,7 @@ export function applyState(next){
 }
 export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
-  nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON,
+  nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf,
   S, U, route, pop, modal, openGroups, mini,

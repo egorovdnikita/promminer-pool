@@ -20,6 +20,11 @@
 - Баннеры профиля — `public/banner-sell.png`, `banner-referral.png` и подложка
   `banner-bg.png`: выгрузки из Figma, присланные вручную. В них уже вшита
   геометрическая фигура фона, поэтому CSS рисует только подложку и картинку.
+- `inf` — `Essentional, UI / Info Circle` **стиль Bold**, а не Bold Duotone:
+  в шапках таблиц это сплошной кружок с белой «i» (макет 1447:160163).
+- `cal` — `Time / Calendar Minimalistic`, без точек-дней внутри.
+- `PAY_ICON` в `prototype.js` — синие `us-dollar-USD` и `rouble-RUB` из Payments
+  для шапок таблиц; зелёные `USD_ICON` и `rub` остаются для шапки страницы.
 - `unlink` — `Text Formatting / Link Broken`, кнопка «Отвязать» у контакта.
 - `up` (`Arrows Action / Upload`) и `uid` (`Users / User Id`) — зона загрузки выписки
   и карточка «Правовая форма» на «Верификации».
