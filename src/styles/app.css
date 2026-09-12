@@ -119,7 +119,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mini-btn:hover{background:var(--ctrl2)}
 
 .main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 8px;min-height:100vh}
-.page{padding:16px 0 0;width:100%;flex:1;display:flex;flex-direction:column;min-height:0}
+.page{padding:16px 0 0;width:100%;flex:1;display:flex;flex-direction:column;gap:16px;min-height:0}
 .page>*{flex:0 0 auto}
 
 /* header */
@@ -159,8 +159,11 @@ body.mini .ni .spacer.lbl{display:none!important}
 .cnt.pri{background:var(--accent)}.cnt.neu{background:#6b7280}
 .cnt.ok{background:var(--pos)}.cnt.info{background:#3b82f6}
 .cnt.warn{background:var(--warn)}.cnt.neg{background:var(--neg)}
-.subbar{display:flex;align-items:center;gap:10px;padding-bottom:12px;flex-wrap:wrap}
-.subbar .rate{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:600}
+/* Строка монеты в макете ровно 48 без паддингов — зазор даёт .page */
+.subbar{display:flex;align-items:center;gap:10px;min-height:48px;flex-wrap:wrap}
+.subbar .rate{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
+/* Выбор монеты — 16 SemiBold (макет 185:109932) */
+.subbar .pill{font-size:var(--fs-m);line-height:var(--lh-m)}
 
 /* popovers */
 .pop-wrap{position:relative}
@@ -213,23 +216,28 @@ body.mini .ni .spacer.lbl{display:none!important}
 .card{background:var(--surface);border-radius:var(--r-l);padding:24px;box-shadow:none;min-width:0}
 .ch{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 /* Карточки в макете — вертикальный автолэйаут с шагом 20 */
-.card>.ch{margin-bottom:20px}
+.card>.ch{margin-bottom:16px}
 .ch h2{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
-.hero{background:var(--accent);border-radius:var(--r-s);padding:12px 14px;color:#fff;display:flex;gap:12px;align-items:flex-start;min-height:76px}
-.hero .l{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;opacity:.78;margin-bottom:4px}
-.hero .v{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;letter-spacing:0}
-.hero .s{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;opacity:.85;margin-top:3px}
-.hero .cv{margin-left:auto;opacity:.9;align-self:center}
-.stats{display:flex;gap:26px;margin-top:12px}
-.stats .l{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:600;margin-bottom:3px}
-.stats .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
-.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.tile{background:var(--bg);border-radius:var(--r-s);padding:10px 12px}
-.tile .t{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+/* Акцентная плашка: паддинг 16, радиус 16, шаг 8; подпись 14 SemiBold,
+   значение 32 SemiBold, курс 18 SemiBold (макет 185:105223) */
+.hero{background:var(--accent);border-radius:var(--r-m);padding:16px;color:#fff;display:flex;flex-direction:column;gap:8px}
+.hero .hrow{display:flex;align-items:center;gap:4px}
+.hero .l{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.hero .v{font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600;letter-spacing:0}
+.hero .hval{display:flex;flex-direction:column;gap:4px}
+.hero .s{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+.hero .cv{margin-left:auto;display:flex;color:#fff}
+/* Ряд под плашкой: две колонки, подпись 14 Medium, значение 18 SemiBold */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px;margin-top:16px}
+.stats .l{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500;margin-bottom:8px}
+.stats .v{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+/* Плитки воркеров: 92 высотой, паддинг 16, радиус 16, число 24 SemiBold */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{background:var(--bg);border-radius:var(--r-m);padding:16px}
+.tile .t{display:flex;align-items:center;gap:4px;margin-bottom:6px}
 .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
-.tile .t span{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--c2)}
-.tile .n{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
-.tile.alert{background:#ef444414}.tile.alert .n{color:var(--neg)}
+.tile .t span{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
+.tile .n{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
 .statcard{background:var(--surface);border-radius:var(--r-m);padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
 .statcard .n{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
 .statcard .ic{margin-left:auto;width:var(--h-ctrl);height:var(--h-ctrl);border-radius:var(--r-f);background:var(--ctrl2);display:grid;place-items:center;color:#fff;flex:0 0 auto}
@@ -294,10 +302,11 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* tables */
 .tw{overflow-x:auto}
 .tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-.tbl th{background:var(--ctrl2);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:500;color:var(--c2);text-align:left;padding:16px 12px;white-space:nowrap}
+/* Шапка и ячейки таблиц в макетах — 14 SemiBold, строка 48 */
+.tbl th{background:var(--ctrl2);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c3);text-align:left;padding:12px;white-space:nowrap}
 .tbl th:first-child{border-radius:var(--r-s) 0 0 var(--r-s)}
 .tbl th:last-child{border-radius:0 var(--r-s) var(--r-s) 0}
-.tbl td{padding:15px 12px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:15px 12px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;border-bottom:1px solid var(--border);white-space:nowrap}
 .tbl tr:last-child td{border-bottom:0}
 .tbl tr.hl td{background:var(--accent-ghost)}
 .tbl .num{text-align:right}
@@ -352,10 +361,13 @@ body.mini .ni .spacer.lbl{display:none!important}
 .field{background:var(--ctrl);border-radius:var(--r-m);padding:12px;min-height:var(--h-field);display:flex;flex-direction:column;justify-content:center}
 .field .k{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
 .field .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
-.urlrow{display:flex;align-items:center;gap:8px;background:var(--accent-sub);border-radius:var(--r-m);padding:12px;min-height:var(--h-field);margin-bottom:8px}
+/* Список адресов: строки 56 с шагом 8, до кнопки 16 (макет 185:105616) */
+.urlrow{display:flex;align-items:center;gap:8px;background:var(--accent-sub);border-radius:var(--r-m);padding:10px 12px;min-height:var(--h-field);margin-bottom:8px}
+.urlrow:last-of-type{margin-bottom:16px}
 .urlrow .k{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
 .urlrow .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .linkrow{display:flex;align-items:center;gap:8px;color:var(--c1);background:var(--accent-sub);border-radius:var(--r-m);padding:12px;min-height:var(--h-field);margin-bottom:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
+.linkrow:last-of-type{margin-bottom:0}
 /* Баннер из макета 1981:32563: градиент, угловая фигура и иллюстрация с выносом за край */
 .promo{background:#eef0fd url('/banner-bg.png') center/cover;border-radius:var(--r-l);padding:24px;position:relative;overflow:hidden;box-shadow:none;display:flex;flex-direction:column;min-height:188px}
 
@@ -373,11 +385,12 @@ body.mini .ni .spacer.lbl{display:none!important}
 img.hex{object-fit:contain}
 .hex.none{background:url('/tier-0.svg') center/130px 146px no-repeat;
   font-size:40px;line-height:22px;font-weight:500;color:var(--c3)}
-.track{margin-top:16px}
+.track{margin-top:0}
 .tbar{height:20px;border-radius:var(--r-f);background:#6b728014;overflow:hidden}
 .tfill{height:100%;background:var(--accent);border-radius:var(--r-f);transition:width .25s}
 .tpts{display:flex;justify-content:space-between;margin-top:-30px;position:relative}
-.pt{display:flex;flex-direction:column;align-items:center;gap:12px;width:40px}
+/* подпись идёт через 12 от полосы, а медаль свисает на 10 — отсюда зазор 2 */
+.pt{display:flex;flex-direction:column;align-items:center;gap:2px;width:40px}
 .pt img{width:40px;height:40px;display:block}
 .pt span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
 /* медали выгружены на белой подложке; на светлой карточке её не видно,
@@ -385,7 +398,7 @@ img.hex{object-fit:contain}
 :root[data-theme="dark"] img.hex,:root[data-theme="dark"] .pt img{
   clip-path:polygon(50% 2%,92.8% 29.6%,92.8% 69.7%,50% 98%,7.2% 69.7%,7.2% 29.6%)}
 .alert.mb{margin-bottom:12px}
-.foot{margin-top:auto;display:flex;gap:24px;padding:20px 0 24px;font-size:var(--fs-s);line-height:var(--lh-s);color:#9ca3af;font-weight:600;flex-wrap:wrap}
+.foot{margin-top:auto;display:flex;gap:24px;padding:4px 0 24px;font-size:var(--fs-s);line-height:var(--lh-s);color:#9ca3af;font-weight:600;flex-wrap:wrap}
 .foot .l{margin-left:auto;display:flex;gap:24px;flex-wrap:wrap}
 
 /* auth — по проду: белый лист, колонка 358, поля h56, кнопка xl h56 */
@@ -817,8 +830,10 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .addbtn:hover{background:var(--accent-sub)}
 .coin{display:inline-flex;align-items:center;gap:8px;font-weight:600}
 .coin svg{display:inline-block}
-.thico{display:inline-flex;align-items:center;gap:6px}
-.thico svg{display:inline-block;margin:0}
+/* Значок монеты в шапке не должен распирать строку: она 48 по макету */
+.thico{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;line-height:var(--lh-s)}
+.thico svg{display:inline-block;margin:0;width:20px;height:20px}
+.tbl th .thico{max-height:20px}
 /* тёмная тема: точечные доводки блоков с собственной заливкой */
 :root[data-theme="dark"] .promo{background:linear-gradient(135deg,#312e81,#1e1b4b)}
 :root[data-theme="dark"] .tag.g{color:#4ade80}
@@ -1065,6 +1080,38 @@ html{scrollbar-gutter:stable}
 .pop.menu>button .blogo{width:24px;height:24px}
 
 /* ===== Центр суб-аккаунтов (макеты 1482:83256) ===== */
+/* ===== Главная: вертикальный ритм и реферальный блок ===== */
+.hcol{display:flex;flex-direction:column;gap:16px}
+/* «Продать» в шапке карточки — Button Ghost 16 SemiBold акцентом */
+.hlink{color:var(--accent);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+/* Выбор диапазона дат на графике — 16 SemiBold, как в макете 185:105307 */
+.pill.lg{font-size:var(--fs-m);line-height:var(--lh-m)}
+/* Шапка табличной карточки без сегмент-контрола — просто паддинг 16 */
+.card.tblcard>.ch.thead{padding:16px;margin:0;gap:16px;min-height:0}
+/* Нижняя полоса табличной карточки: 60 с паддингом 16 */
+.tfoot{padding:16px 0;text-align:center}
+/* График в макете выше: тело 409 и легенда через 24 (макет 185:105315) */
+.card.chartcard{display:flex;flex-direction:column;gap:24px}
+.card.chartcard>.ch{margin:0}
+.card.chartcard .clegend{margin-top:0!important}
+/* Реферальная карточка: две колонки по 794, зазор 16 (макет 185:105548) */
+.refrow{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 16px 8px}
+.refmain{display:flex;gap:16px;min-width:0;align-items:center}
+.refinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
+.refstats{display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap}
+.rst .l{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
+.rst .v{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
+.refcoin{display:flex;align-items:center;gap:8px}
+.refcoin svg{width:32px;height:32px}
+.refcoin b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.refcoin i{display:block;font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:500;color:var(--c3)}
+.reftot{background:#7086fc1f;border-radius:var(--r-m);padding:12px 24px;min-width:0}
+.reftot h3{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;margin-bottom:16px}
+.rtgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+/* «До следующего уровня» над дорожкой */
+.tnext{display:flex;gap:4px;font-size:var(--fs-c);line-height:var(--lh-c);margin-bottom:16px}
+.tnext span{color:var(--c3);font-weight:500}
+.tnext b{font-weight:600}
 .card.tblcard{padding:8px}
 .card.tblcard>.ch.subhead{padding:16px;margin:0;min-height:80px;gap:16px}
 .card.tblcard .tw{padding-bottom:8px}

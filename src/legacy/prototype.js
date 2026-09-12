@@ -73,29 +73,36 @@ const COINS={
     bal:[{s:'BTC',v:0.39006783,usd:31553.37,rub:2331897.65}],
     d24:[{s:'BTC',v:0.08096645}],all:[{s:'BTC',v:3.67891025}],
     avg:'499 320',h5:'502 500',h1:'499 200',rej:'0,02%',up:'98.9%',
-    refHash:'40 000 TH/s',refCoin:['Bitcoin','BTC'],
+    refHash:'40 000 TH/s',refCoin:['Bitcoin','BTC'],next:'59 800 TH/s',
     row:{amount:'0,0000185087',per:'0,0000185087',bal:'0,00012591',price:'5 000 000,33'}},
   ltc:{label:'LTC + DOGE',icon:'Ł',tint:'#345D9D',unit:'GH/s',short:'GH',
     rate:'LTC: 58,31 $ • 4 311,98 ₽    DOGE: 0,11 $ • 8,13 ₽',
     bal:[{s:'LTC',v:5.4098,usd:315.45,rub:23326.95},{s:'DOGE',v:1950.55,usd:214.56,rub:15857.97}],
     d24:[{s:'LTC',v:0.2145},{s:'DOGE',v:20.72}],all:[{s:'LTC',v:12.6351},{s:'DOGE',v:2087.08}],
     avg:'74 243',h5:'74 587',h1:'74 500',rej:'0,04%',up:'97.2%',
-    refHash:'1 200 GH/s',refCoin:['Litecoin','LTC, DOGE'],
+    refHash:'1 200 GH/s',refCoin:['Litecoin','LTC, DOGE'],next:'1 800 GH/s',
     row:{amount:'0,1234',per:'0,1234',bal:'23,4254',price:'4 082,82'}},
 };
 const HEALTH={ok:{a:5800,l:70,o:40,f:69},degraded:{a:1398,l:1230,o:851,f:2500},critical:{a:300,l:500,o:1200,f:3979}};
+/* У каждой монеты свой парк воркеров: в макете LTC + DOGE это 212 штук
+   с раскладкой 23/68/21/100 (кадр 185:108306), а не те же 5 979, что у BTC */
+const HEALTH_LTC={ok:{a:200,l:6,o:2,f:4},degraded:{a:23,l:68,o:21,f:100},critical:{a:10,l:20,o:40,f:142}};
+const HEALTH_OF={btc:HEALTH,ltc:HEALTH_LTC};
+/* Знаков после запятой по монетам — по макету: BTC 8, LTC 4, DOGE 2 */
+const DEC={BTC:8,LTC:4,DOGE:2,ZEC:8};
+const amt=b=>`${nf(b.v,DEC[b.s]??8)} ${b.s}`;
 /* Уровни рефералки. k — медаль (public/tier-<k>.png, выгрузка pic_star),
    f — ширина заполнения дорожки в процентах (макет 1283:59582: 114/222/352/484/583 из 590) */
 const TIERS=[{k:5,p:'5%',n:'Бронза',c:'#B87333',f:19.3},{k:10,p:'10%',n:'Серебро',c:'#9AA3B2',f:37.6},
   {k:15,p:'15%',n:'Золото',c:'#D8A32B',f:59.7},{k:20,p:'20%',n:'Платина',c:'#7FA8C9',f:82},
-  {k:25,p:'25%',n:'Алмаз',c:'#4B5563',f:98.8}];
+  {k:25,p:'25%',n:'VIP',c:'#4B5563',f:98.8}];
 const NOTIF_N={many:12,few:2,none:0};
 const ACCOUNTS=['natarusso','alfred','ivanivanov','loricarson'];
 const FULLNAME='Иванов Иван';
 
 function M(){
   const c=COINS[S.coin], empty=S.data==='empty', huge=S.data==='huge', k=huge?1e6:1;
-  const h=empty?{a:0,l:0,o:0,f:0}:HEALTH[S.health];
+  const h=empty?{a:0,l:0,o:0,f:0}:(HEALTH_OF[S.coin]||HEALTH)[S.health];
   const rows=empty?0:S.data==='few'?3:20;
   return {c,empty,huge,h,rows,
     total:empty?0:h.a+h.l+h.o+h.f,
@@ -362,7 +369,7 @@ function chart(m,opts={}){
   const ar=`${ln} L${x(N-1).toFixed(1)},${PT+ih} L${PL},${PT+ih} Z`;
   const ticks=opts.ticks||[0,150,300,450,600,750,900,1050,1200,1350,1500];
   const hrs=opts.xs||['14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00','01:00','02:00','03:00','04:00','05:00','06:00'];
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" preserveAspectRatio="none">
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${opts.hpx?opts.hpx+'px':'auto'}" preserveAspectRatio="none">
     <text x="${PL}" y="9" font-size="12" fill="var(--c3)" font-weight="600">${opts.yl??('Хэшрейт, '+m.c.unit)}</text>
     ${opts.right===false?'':`<text x="${W-PR}" y="9" font-size="12" fill="var(--c3)" text-anchor="end" font-weight="600">Реджект, %</text>`}
     ${ticks.map((t,i)=>{const yy=PT+ih-(i/(ticks.length-1))*ih;return`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="var(--border)"/>
@@ -373,7 +380,7 @@ function chart(m,opts={}){
       ${opts.right===false?'':`<path d="M${PL},${PT+ih-2} L${W-PR},${PT+ih-3}" fill="none" stroke="var(--warn)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>`}`}
     ${hrs.map((h,i)=>`<text x="${PL+(i/(hrs.length-1))*iw}" y="${H-6}" font-size="10" fill="var(--c3)" text-anchor="middle">${h}</text>`).join('')}
   </svg>
-  ${opts.right===false?'':`<div style="display:flex;justify-content:center;gap:20px;margin-top:8px">
+  ${opts.right===false?'':`<div class="clegend" style="display:flex;justify-content:center;gap:20px;margin-top:8px">
     <span class="cap mut"><i style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:5px"></i>Хэшрейт</span>
     <span class="cap mut"><i style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--warn);margin-right:5px"></i>Реджект</span></div>`}`;
 }
@@ -383,48 +390,56 @@ function chart(m,opts={}){
    ============================================================ */
 const V={};
 
-V.home=m=>`
-${S.role==='observer'?'<div class="alert warn mb">👁 Режим наблюдателя — действия с балансом и настройками скрыты</div>':''}
-<div class="grid g3">
-  ${card(`<div class="ch"><h2>Доход</h2>${S.role==='owner'?'<a class="spacer" href="#" style="font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600">Продать</a>':''}</div>
-    <div class="hero"><div style="display:flex;gap:20px;flex:1;min-width:0">
-      ${m.bal.map(b=>`<div><div class="l">Текущий баланс</div><div class="v mono">${nf(b.v,b.s==='DOGE'?2:8)} ${b.s}</div><div class="s mono">≈ ${nf(b.usd)} $ • ${nf(b.rub)} ₽</div></div>`).join('')}
-    </div><span class="cv">${I.cv}</span></div>
-    <div class="stats"><div><div class="l">За 24 ч</div>${m.d24.map(b=>`<div class="v mono">${nf(b.v,b.s==='DOGE'?2:8)} ${b.s}</div>`).join('')}</div>
-      <div><div class="l">За все время</div>${m.all.map(b=>`<div class="v mono">${nf(b.v,b.s==='DOGE'?2:8)} ${b.s}</div>`).join('')}</div></div>`)}
+/* Главная (макет 185:105205). Шаг 16 по вертикали и в рядах — как в Top/Content
+   макета; карточки таблиц собраны оболочкой tblcard (паддинг 8, шапка 16). */
+V.home=m=>`<div class="hcol">
+${S.role==='observer'?'<div class="alert warn">\u{1F441} Режим наблюдателя — действия с балансом и настройками скрыты</div>':''}
+<div class="grid g3" style="gap:16px;margin:0">
+  ${card(`<div class="ch"><h2>Доход</h2>${S.role==='owner'?'<button class="hlink spacer" data-go="assets">Продать</button>':''}</div>
+    ${heroBox('Текущий баланс',m.bal.map(b=>heroVal(amt(b),`≈ ${nf(b.usd)} $ • ${nf(b.rub)} ₽`)).join(''),'income')}
+    <div class="stats"><div><div class="l">За 24 ч</div>${m.d24.map(b=>`<div class="v mono">${amt(b)}</div>`).join('')}</div>
+      <div><div class="l">За все время</div>${m.all.map(b=>`<div class="v mono">${amt(b)}</div>`).join('')}</div></div>`)}
   ${card(`<div class="ch"><h2>Средний хэшрейт</h2></div>
-    <div class="hero"><div><div class="l">За 24 ч</div><div class="v mono">${m.avg} ${m.c.unit}</div></div><span class="cv">${I.cv}</span></div>
+    ${heroBox(m.bal.length>1?'Средний хэшрейт за 24 ч':'За 24 ч',heroVal(`${m.avg} ${m.c.unit}`),'workers')}
     <div class="stats"><div><div class="l">За 5 мин</div><div class="v mono">${m.h5} ${m.c.unit}</div></div>
       <div><div class="l">За 1 ч</div><div class="v mono">${m.h1} ${m.c.unit}</div></div></div>`)}
   ${card(`<div class="ch"><h2>Воркеры (${ni(m.total)})</h2></div>${workerTiles(m)}`)}
 </div>
 ${card(`<div class="ch"><h2>График изменения хэшрейта (${S.coin==='btc'?'BTC':'LTC'})</h2>
   <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],2)}
-  <span class="pop-wrap"><button class="pill flat sq mono" data-pop="date">29.01.2026 – 30.01.2026 ${I.cal}</button>${pop==='date'?datePicker():''}</span>
-  <button class="ib sm" data-tip="Приблизить">${I.zi}</button><button class="ib sm" data-tip="Отдалить">${I.zo}</button></div>${chart(m)}`)}
-<div style="height:12px"></div>
-${card(`<div class="ch">${seg('home-tab',['Доход','Выплаты'],0)}
-  <div class="spacer"></div>${S.coin==='ltc'?`<span class="pill flat sq">${COIN_ICON.LTC} LTC ${I.cd}</span>`:''}<button class="ib sm">${I.dl}</button></div>
+  <span class="pop-wrap"><button class="pill flat sq mono lg" data-pop="date">29.01.2026 – 30.01.2026 ${I.cal}</button>${pop==='date'?datePicker():''}</span>
+  <button class="ib" data-tip="Приблизить">${I.zi}</button><button class="ib" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{hpx:449})}`,'chartcard')}
+${card(`<div class="ch subhead">${seg('home-tab',['Доход','Выплаты'],0)}
+  <div class="spacer"></div>${S.coin==='ltc'?`<span class="pill flat sq">${COIN_ICON.LTC} LTC ${I.cd}</span>`:''}
+  <button class="ib" data-toast="Отчет скачан">${I.dl}</button></div>
   ${(U.seg['home-tab']||0)===0?incomeTable(m,Math.min(m.rows,5)):payoutsTable(m,Math.min(m.rows,5))}
-  ${m.rows?`<div style="text-align:center;padding-top:12px"><button class="btn link" data-go="${(U.seg['home-tab']||0)===0?'income':'payouts'}">${(U.seg['home-tab']||0)===0?'Весь доход':'Все выплаты'}</button></div>`:''}`)}
-<div style="height:12px"></div>
-${card(refBlock(m))}
-<div style="height:12px"></div>
-<div class="grid g3">
+  ${m.rows?`<div class="tfoot"><button class="btn link" data-go="${(U.seg['home-tab']||0)===0?'income':'payouts'}">${(U.seg['home-tab']||0)===0?'Весь доход':'Все выплаты'}</button></div>`:''}`,'tblcard')}
+${card(refBlock(m),'tblcard')}
+<div class="grid g3" style="gap:16px;margin:0">
   ${card(`<div class="ch"><h2>Адреса майнинга</h2></div>
     ${[3333,4444,5555].map((p,i)=>`<div class="urlrow"><div><div class="k">URL ${i+1}</div><div class="v mono">stratum+tcp://ss.promminer.ru:${p}</div></div><button class="spacer lnk" style="color:var(--accent)" data-copy="stratum+tcp://ss.promminer.ru:${p}">${I.cp}</button></div>`).join('')}
-    ${S.role==='owner'?`<button class="btn" data-modal="connect">${I.pl} Подключить воркера</button>`:''}`)}
+    ${S.role==='owner'?`<button class="btn" data-modal="connect">${I.pl} Подключить воркер</button>`:''}`)}
   ${card(`<div class="ch"><h2>Связаться с нами</h2></div>
     ${HOME_CONTACTS.map(([ic,k,v,u])=>`<a class="linkrow" href="${u}" target="_blank" rel="noopener">
       <span class="lico">${ic==='max'?MAX_LOGO:I[ic]}</span>${k}<span class="spacer mut">${v} ${I.ext}</span></a>`).join('')}`)}
   <section class="promo plain"><img class="art" src="/promo-sell.png" alt="">
     <h2>Снизили порог<br>для продажи ЦВ<br>до 10 000 ₽</h2>
     <button class="btn" data-go="assets">Продать</button></section>
-</div>`;
+</div></div>`;
 
+/* Акцентная плашка карточки: подпись со стрелкой сверху, под ней значения.
+   Подпись одна на все монеты — в макете «Текущий баланс» не повторяется. */
+const heroBox=(label,vals,go)=>`<div class="hero">
+  <div class="hrow"><span class="l">${label}</span><button class="cv" data-go="${go}">${I.cv}</button></div>
+  ${vals}</div>`;
+/* значение с курсом — одна группа: в макете между ними 4, а не общий шаг плашки */
+const heroVal=(v,s='')=>`<div class="hval"><div class="v mono">${v}</div>${s?`<div class="s mono">${s}</div>`:''}</div>`;
+
+/* Плитки воркеров. В макете все четыре одинаковые (#f3f4f6, число Primary) —
+   красной подсветки проблемных состояний там нет (185:105269). */
 function workerTiles(m){
-  const t=(c,l,n,k,al)=>`<div class="tile ${al?'alert':''}" data-tilef="${k}"><div class="t"><i class="dot" style="background:${c}"></i><span>${l}</span><span class="spacer dim">${I.cv}</span></div><div class="n mono">${ni(n)}</div></div>`;
-  return `<div class="tiles">${t('var(--pos)','Активные',m.h.a,'ok')}${t('var(--warn)','Низкий хэшрейт',m.h.l,'low',m.alert)}${t('var(--neg)','Отключены',m.h.o,'off',m.alert)}${t('var(--neu)','Оффлайн',m.h.f,'fail',m.alert)}</div>`;
+  const t=(c,l,n,k)=>`<div class="tile" data-tilef="${k}"><div class="t"><i class="dot" style="background:${c}"></i><span>${l}</span><span class="spacer dim">${I.cv}</span></div><div class="n mono">${ni(n)}</div></div>`;
+  return `<div class="tiles">${t('var(--pos)','Активные',m.h.a,'ok')}${t('var(--warn)','Низкий хэшрейт',m.h.l,'low')}${t('var(--neg)','Отключены',m.h.o,'off')}${t('var(--neu)','Оффлайн',m.h.f,'fail')}</div>`;
 }
 
 function incomeTable(m,n,pid){
@@ -456,29 +471,39 @@ function payoutsTable(m,n){
       <td><span class="tag ${i%7===3?'y':'g'}">${i%7===3?'В обработке':'Выплачено'}</span></td></tr>`).join('')}
   </tbody></table></div>`;
 }
+/* Реферальная программа (макет 185:105544): табличная карточка, внутри две
+   колонки по 794 — слева медаль с дорожкой, справа панель «Общие данные». */
 function refBlock(m){
-  const t=m.tier;
-  return `<div class="ch"><h2>Реферальная программа</h2></div>
-  <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
-    ${m.empty?'<div class="hex none">0%</div>'
-      :`<img class="hex" src="/tier-${t.k}.png" alt="${t.p}" width="152" height="152">`}
-    <div style="display:flex;gap:26px;padding-top:6px;flex-wrap:wrap">
-      <div><div class="cap dim">Ваша комиссия</div><div style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?'0%':t.p+' ('+t.n+')'}</div></div>
-      <div><div class="cap dim">Хэшрейт рефералов</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?'0 '+m.c.unit:m.c.refHash}</div></div>
-      <div><div class="cap dim">Монета</div><div style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.c.refCoin[0]}<div class="cap dim">${m.c.refCoin[1]}</div></div></div>
+  const t=m.tier, e=m.empty;
+  const st=(l,v)=>`<div class="rst"><div class="l">${l}</div><div class="v">${v}</div></div>`;
+  return `<div class="ch thead"><h2>Реферальная программа</h2></div>
+  <div class="refrow">
+    <div class="refmain">
+      ${e?'<div class="hex none">0%</div>'
+        :`<img class="hex" src="/tier-${t.k}.png" alt="${t.p}" width="152" height="152">`}
+      <div class="refinfo">
+        <div class="refstats">
+          ${st('Ваша комиссия',e?'0%':`${t.p} (${t.n})`)}
+          ${st('Хэшрейт рефералов',e?`0 ${m.c.unit}`:m.c.refHash)}
+          <div class="refcoin">${COIN_ICON[m.bal[0].s]}
+            <span><b>${m.c.refCoin[0]}</b><i>${m.c.refCoin[1]}</i></span></div>
+        </div>
+        ${tierTrack(m)}
+      </div>
     </div>
-    <div style="flex:1;min-width:290px;background:var(--accent-ghost);border-radius:var(--r-s);padding:14px 16px">
-      <h3 style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;margin-bottom:10px">Общие данные по всем монетам</h3>
-      <div style="display:flex;gap:26px;flex-wrap:wrap">
-        <div><div class="cap dim">Активные рефералы</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?0:20}</div></div>
-        <div><div class="cap dim">Все рефералы</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?0:50}</div></div>
-        <div><div class="cap dim">Текущий баланс</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?'0 ₽':'7 500,56 ₽'}</div></div>
-        <div><div class="cap dim">Доход за все время</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?'0 ₽':'90 000,99 ₽'}</div></div>
-      </div></div>
-  </div>${tierTrack(m)}
-  <div style="text-align:center;margin-top:14px"><a href="#" data-go="ref" style="font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600">Подробно о программе</a></div>`;
+    <div class="reftot">
+      <h3>Общие данные по всем монетам</h3>
+      <div class="rtgrid">
+        ${st('Активные рефералы',e?0:20)}${st('Все рефералы',e?0:50)}
+        ${st('Текущий баланс',e?'0 ₽':'7 500,56 ₽')}${st('Доход за все время',e?'0 ₽':'90 000,99 ₽')}
+      </div>
+    </div>
+  </div>
+  <div class="tfoot"><button class="btn link" data-go="ref">Подробно о программе</button></div>`;
 }
-const tierTrack=m=>`<div class="track"><div class="tbar"><div class="tfill" style="width:${m.empty?0:TIERS[+S.tier].f}%"></div></div>
+const tierTrack=m=>`<div class="track">
+  <div class="tnext"><span>До следующего уровня:</span><b class="mono">${m.empty?'0 '+m.c.unit:m.c.next}</b></div>
+  <div class="tbar"><div class="tfill" style="width:${m.empty?0:TIERS[+S.tier].f}%"></div></div>
   <div class="tpts">${TIERS.map(x=>`<div class="pt"><img src="/tier-${x.k}-s.png" alt="" width="40" height="40"><span>${x.p}</span></div>`).join('')}</div></div>`;
 
 /* --- Воркеры --- */
