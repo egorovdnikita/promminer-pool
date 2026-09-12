@@ -139,6 +139,49 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => removeEventListener('keydown', onKey)
   }, [])
 
+  /* Наведение на график: линия, точки на сериях и подсказка. Двигаем живой DOM,
+     а не состояние, иначе каждый пиксель мыши перерисовывал бы экран. */
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      const wrap = (e.target as HTMLElement)?.closest?.('.chartwrap[data-chart]') as HTMLElement | null
+      if (!wrap) return
+      const cfg = JSON.parse(wrap.dataset.chart!)
+      const svg = wrap.querySelector('svg')!
+      const box = svg.getBoundingClientRect()
+      const kx = box.width / cfg.W, ky = box.height / cfg.H
+      const iw = cfg.W - cfg.PL - cfg.PR, ih = cfg.H - cfg.PT - cfg.PB
+      const rel = (e.clientX - box.left) / kx
+      const i = Math.round(((rel - cfg.PL) / iw) * (cfg.N - 1))
+      if (i < 0 || i > cfg.N - 1) { wrap.classList.remove('on'); return }
+      const v = cfg.p[i]
+      const px = (cfg.PL + (i / (cfg.N - 1)) * iw) * kx
+      const py = (cfg.PT + ih - (v / 100) * ih) * ky
+      const pr = (cfg.PT + ih - 2) * ky
+      const line = wrap.querySelector('.chline') as HTMLElement
+      const dh = wrap.querySelector('.cdot.ch') as HTMLElement
+      const dr = wrap.querySelector('.cdot.cr') as HTMLElement
+      const tip = wrap.querySelector('.ctip') as HTMLElement
+      line.style.left = px + 'px'
+      dh.style.left = px + 'px'; dh.style.top = py + 'px'
+      dr.style.left = px + 'px'; dr.style.top = pr + 'px'
+      const t = cfg.hrs[Math.round((i / (cfg.N - 1)) * (cfg.hrs.length - 1))]
+      const hash = Math.round((v / 100) * cfg.max)
+      tip.innerHTML =
+        `<b>${t}</b><span><i class="h"></i>Хэшрейт<em>${hash.toLocaleString('ru')} ${cfg.unit}</em></span>` +
+        `<span><i class="r"></i>Реджект<em>${(v / 50).toFixed(2).replace('.', ',')} %</em></span>`
+      tip.style.left = px + 'px'
+      tip.classList.toggle('flip', px > box.width - 200)
+      wrap.classList.add('on')
+    }
+    const onLeave = (e: MouseEvent) => {
+      const wrap = (e.target as HTMLElement)?.closest?.('.chartwrap') as HTMLElement | null
+      if (wrap) wrap.classList.remove('on')
+    }
+    addEventListener('mousemove', onMove)
+    addEventListener('mouseout', onLeave)
+    return () => { removeEventListener('mousemove', onMove); removeEventListener('mouseout', onLeave) }
+  }, [])
+
   const onInput = useCallback((e: React.FormEvent) => {
     const q = (e.target as HTMLElement).closest('#q') as HTMLInputElement | null
     if (q) { U.current.q = q.value; U.current.page.workers = 1; U.current.qfocus = true; bump() }

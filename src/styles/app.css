@@ -399,7 +399,9 @@ img.hex{object-fit:contain}
   font-size:40px;line-height:22px;font-weight:500;color:var(--c3)}
 /* дорожка 590 из 642: справа ещё 24, отсюда просвет до панели */
 .track{margin-top:0;padding:0 24px 0 0}
-.tbar{height:20px;border-radius:var(--r-f);background:#6b728014;overflow:hidden}
+/* полоса заходит под крайние медали: их шестиугольник начинается на 8 % от
+   края картинки, поэтому без отступа 3 она торчит слева от первой звезды */
+.tbar{height:20px;margin:0 3px;border-radius:var(--r-f);background:#6b728014;overflow:hidden}
 .tfill{height:100%;background:var(--accent);border-radius:var(--r-f);transition:width .25s}
 .tpts{display:flex;justify-content:space-between;margin-top:-30px;position:relative}
 /* подпись идёт через 12 от полосы, а медаль свисает на 10 — отсюда зазор 2 */
@@ -1121,6 +1123,23 @@ html{scrollbar-gutter:stable}
 .card.chartcard{display:flex;flex-direction:column;gap:24px}
 .card.chartcard>.ch{margin:0}
 .cbody{display:flex;flex-direction:column;gap:20px}
+/* Наведение на график: вертикальная линия, точки на сериях и подсказка */
+.chartwrap{position:relative}
+.chartwrap .chline,.chartwrap .cdot,.chartwrap .ctip{position:absolute;opacity:0;transition:opacity .12s;pointer-events:none}
+.chartwrap.on .chline,.chartwrap.on .cdot,.chartwrap.on .ctip{opacity:1}
+.chline{top:0;bottom:26px;width:1px;background:var(--ctrl-line-h)}
+.cdot{width:10px;height:10px;border-radius:50%;margin:-5px 0 0 -5px;border:2px solid var(--surface)}
+.cdot.ch{background:var(--accent)}
+.cdot.cr{background:var(--warn)}
+.ctip{top:8px;transform:translateX(12px);background:var(--surface);border-radius:var(--r-s);
+  box-shadow:var(--shadow);padding:12px;display:flex;flex-direction:column;gap:8px;min-width:180px;z-index:2}
+.ctip.flip{transform:translateX(calc(-100% - 12px))}
+.ctip b{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.ctip span{display:flex;align-items:center;gap:8px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
+.ctip i{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+.ctip i.h{background:var(--accent)}
+.ctip i.r{background:var(--warn)}
+.ctip em{margin-left:auto;font-style:normal;font-weight:600;color:var(--c1);font-variant-numeric:tabular-nums}
 .caxis{display:flex;justify-content:space-between;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;color:var(--c1)}
 .clegend{display:flex;justify-content:center;gap:12px;margin-top:0!important}
 .clegend span{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c1)}

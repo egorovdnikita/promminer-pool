@@ -431,7 +431,12 @@ function chart(m,opts={}){
   const outer=opts.axisHtml;
   const yl=opts.yl??('Хэшрейт, '+m.c.unit);
   const caps=outer?`<div class="caxis"><span>${yl}</span>${opts.right===false?'':'<span>Реджект, %</span>'}</div>`:'';
-  return `${outer?'<div class="cbody">':''}${caps}<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${opts.hpx?opts.hpx+'px':'auto'}" preserveAspectRatio="none">
+  /* Наведение: геометрию и значения кладём в data-атрибут, чтобы обработчик
+     двигал линию и подсказку по живому DOM, не перерисовывая экран */
+  const hov=opts.hover?` data-chart='${JSON.stringify({W,H,PL,PR,PT,PB,N,
+    p:p.map(v=>+v.toFixed(1)),hrs,max:ticks[ticks.length-1],unit:m.c.unit})}'`:'';
+  const hovDom=opts.hover?`<i class="chline"></i><i class="cdot ch"></i><i class="cdot cr"></i><div class="ctip"></div>`:'';
+  return `${outer?'<div class="cbody">':''}${caps}<div class="chartwrap"${hov}><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${opts.hpx?opts.hpx+'px':'auto'}" preserveAspectRatio="none">
     ${outer?'':`<text x="${PL}" y="9" font-size="12" fill="var(--c3)" font-weight="600">${yl}</text>`}
     ${outer||opts.right===false?'':`<text x="${W-PR}" y="9" font-size="12" fill="var(--c3)" text-anchor="end" font-weight="600">Реджект, %</text>`}
     ${ticks.map((t,i)=>{const yy=PT+ih-(i/(ticks.length-1))*ih;return`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="var(--border)"/>
@@ -441,7 +446,7 @@ function chart(m,opts={}){
       <path d="${ar}" fill="url(#ag)"/><path d="${ln}" fill="none" stroke="var(--accent)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
       ${opts.right===false?'':`<path d="M${PL},${PT+ih-2} L${W-PR},${PT+ih-3}" fill="none" stroke="var(--warn)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>`}`}
     ${hrs.map((h,i)=>`<text x="${PL+(i/(hrs.length-1))*iw}" y="${H-5}" font-size="${TS}" font-weight="600" fill="var(--c3)" text-anchor="middle">${h}</text>`).join('')}
-  </svg>${outer?'</div>':''}
+  </svg>${hovDom}</div>${outer?'</div>':''}
   ${opts.right===false?'':`<div class="clegend">
     <span><i style="background:var(--accent)"></i>Хэшрейт</span>
     <span><i style="background:var(--warn)"></i>Реджект</span></div>`}`;
@@ -477,7 +482,7 @@ ${cards.length?`<div class="grid g3" style="gap:16px;margin:0">${cards.join('')}
 ${p.workers?card(`<div class="ch"><h2>График изменения хэшрейта (${m.bal[0].s})</h2>
   <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],2)}
   <span class="pop-wrap"><button class="pill ctl sq mono lg" data-pop="date">29.01.2026 – 30.01.2026 ${I.cal}</button>${pop==='date'?datePicker():''}</span>
-  <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{h:359,axisHtml:true})}`,'chartcard'):''}
+  <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{h:359,axisHtml:true,hover:true})}`,'chartcard'):''}
 ${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,0):`<h2>${tabs[0]}</h2>`}
   <div class="spacer"></div>${m.bal.length>1?`<span class="pill flat sq">${COIN_ICON.LTC} LTC ${I.cd}</span>`:''}
   <button class="ib ctl" data-toast="Отчет скачан">${I.dl}</button></div>

@@ -23,6 +23,8 @@
 - `inf` — `Essentional, UI / Info Circle` **стиль Bold**, а не Bold Duotone:
   в шапках таблиц это сплошной кружок с белой «i» (макет 1447:160163).
 - `cal` — `Time / Calendar Minimalistic`, без точек-дней внутри.
+- `zi` и `zo` — `Search / Magnifer Zoom In` и `Zoom Out`, **Linear**:
+  в макете графика лупы контурные, поэтому каждому пути нужен `fill="none"`.
 - `PAY_ICON` в `prototype.js` — синие `us-dollar-USD` и `rouble-RUB` из Payments
   для шапок таблиц; зелёные `USD_ICON` и `rub` остаются для шапки страницы.
 - `unlink` — `Text Formatting / Link Broken`, кнопка «Отвязать» у контакта.
