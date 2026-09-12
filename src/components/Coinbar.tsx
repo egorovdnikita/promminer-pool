@@ -20,7 +20,7 @@ export function Coinbar({ m }: { m: Model }) {
           <div className="pop left" style={{ minWidth: 190 }}>
             {AXES.coin.opts.map(([v, t]) => (
               <button className={S.coin === v ? 'on' : ''} data-axis="coin" data-val={v} key={v}>
-                <Ico html={COIN_ICON[v === 'btc' ? 'BTC' : 'LTC']} />
+                <Ico html={COIN_ICON[v === 'btc' ? 'BTC' : v === 'zec' ? 'ZEC' : 'LTC']} />
                 {t}
                 {S.coin === v && <Ico className="ck" html={CHECK} />}
               </button>

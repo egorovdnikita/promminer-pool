@@ -11,11 +11,14 @@ import { ICONS } from './icons.js';
    1. СЦЕНАРИИ — правится только здесь
    ============================================================ */
 const AXES={
-  coin:{g:'Данные',label:'Монета',opts:[['btc','BTC'],['ltc','LTC + DOGE']]},
+  coin:{g:'Данные',label:'Монета',opts:[['btc','BTC'],['ltc','LTC + DOGE'],['zec','ZEC']]},
   data:{g:'Данные',label:'Наполнение данными',opts:[['normal','Норма'],['empty','Пусто'],['few','Мало записей'],['huge','Большие значения']]},
   health:{g:'Данные',label:'Здоровье парка',opts:[['ok','Всё живо'],['degraded','Деградация'],['critical','Авария']]},
   load:{g:'Данные',label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон']]},
   role:{g:'Аккаунт',label:'Роль',opts:[['owner','Владелец'],['observer','Наблюдатель']]},
+  perm:{g:'Аккаунт',label:'Разрешения вотчера',opts:[['all','Все разделы'],['wi','Воркеры и доход'],
+    ['wo','Только воркеры'],['fin','Только финансы'],['assets','Только мои активы'],
+    ['pay','Только выплаты'],['none','Только рефералы — Главной нет']]},
   acct:{g:'Аккаунт',label:'Аккаунт',opts:[['main','Основной'],['sub','Суб-аккаунт']]},
   name:{g:'Аккаунт',label:'Имя аккаунта',opts:[['yes','Задано'],['no','Не задано']]},
   verif:{g:'Верификация',label:'Данные',opts:[['no','Не заполнены'],['yes','Заполнены']]},
@@ -49,7 +52,7 @@ const PRESETS=[
   ['Крупный клиент','Большие значения и много записей',{data:'huge',subs:'many',obs:'many',tier:'4',verif:'yes',vdoc:'yes',vacc:'yes'}],
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
-const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
+const DEF={coin:'btc',data:'normal',health:'degraded',role:'owner',perm:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
@@ -82,15 +85,58 @@ const COINS={
     avg:'74 243',h5:'74 587',h1:'74 500',rej:'0,04%',up:'97.2%',
     refHash:'1 200 GH/s',refCoin:['Litecoin','LTC, DOGE'],next:'1 800 GH/s',
     row:{amount:'0,1234',per:'0,1234',bal:'23,4254',price:'4 082,82'}},
+  /* ZEC: в макете кадр-заглушка с цифрами от BTC (1954:74747), поэтому числа
+     придуманы под майнинг Equihash — хэшрейт в KSol/s, знаков после запятой 4 */
+  zec:{label:'ZEC',icon:'ⓩ',tint:'#F4B823',unit:'KSol/s',short:'KSol',
+    rate:'ZEC: 42,18 $ • 3 118,52 ₽',
+    bal:[{s:'ZEC',v:12.4085,usd:523.36,rub:38700.12}],
+    d24:[{s:'ZEC',v:0.3142}],all:[{s:'ZEC',v:48.9127}],
+    avg:'3 240',h5:'3 310',h1:'3 268',rej:'0,03%',up:'98.1%',
+    refHash:'9 500 KSol/s',refCoin:['Zcash','ZEC'],next:'12 000 KSol/s',
+    row:{amount:'0,0004182',per:'0,0004182',bal:'0,0125400',price:'3 118,52'}},
 };
+/* Разрешения вотчера (секция «Наблюдатель» 1099:95409). Главная собирается
+   из них: карточка «Доход» — от «Мои активы»; «Средний хэшрейт», «Воркеры»
+   и график — от «Воркеры»; таблица — от «Доход» и «Выплаты». Правило из макета:
+   «В вотчере есть Главная страница, если настроены на просмотр все или хотя бы
+   одна из страниц: Воркеры, Доход, Выплаты, Мои активы. Во всех остальных
+   случаях — Главной страницы нет». */
+const PERM_SETS={
+  all:{workers:1,assets:1,income:1,payouts:1},
+  wi:{workers:1,assets:1,income:1},
+  wo:{workers:1},
+  fin:{assets:1,income:1,payouts:1},
+  assets:{assets:1},
+  pay:{payouts:1},
+  /* «во всех остальных случаях Главной страницы нет»: вотчер только по рефералам */
+  none:{refs:1}};
+const OWNER_PERMS={workers:1,assets:1,income:1,payouts:1};
+const permsOf=()=>S.role==='observer'?(PERM_SETS[S.perm]||PERM_SETS.all):OWNER_PERMS;
+/* Разделы, доступные роли: у владельца null (все), у вотчера — набор */
+function allowed(){
+  if(S.role!=='observer')return null;
+  const p=permsOf(), out=new Set();
+  if(p.workers)out.add('workers');
+  if(p.assets)out.add('assets');
+  if(p.income)out.add('income');
+  if(p.payouts)out.add('payouts');
+  /* Главная есть, только если открыт хотя бы один из четырёх разделов выше */
+  if(out.size)out.add('home');
+  if(p.refs)['ref','reflist','refincome','refpayouts'].forEach(r=>out.add(r));
+  return out;
+}
 const HEALTH={ok:{a:5800,l:70,o:40,f:69},degraded:{a:1398,l:1230,o:851,f:2500},critical:{a:300,l:500,o:1200,f:3979}};
 /* У каждой монеты свой парк воркеров: в макете LTC + DOGE это 212 штук
    с раскладкой 23/68/21/100 (кадр 185:108306), а не те же 5 979, что у BTC */
 const HEALTH_LTC={ok:{a:200,l:6,o:2,f:4},degraded:{a:23,l:68,o:21,f:100},critical:{a:10,l:20,o:40,f:142}};
-const HEALTH_OF={btc:HEALTH,ltc:HEALTH_LTC};
+/* ZEC — парк поменьше BTC, но крупнее LTC: 980 воркеров */
+const HEALTH_ZEC={ok:{a:950,l:12,o:8,f:10},degraded:{a:210,l:180,o:140,f:450},critical:{a:40,l:90,o:200,f:650}};
+const HEALTH_OF={btc:HEALTH,ltc:HEALTH_LTC,zec:HEALTH_ZEC};
 /* Знаков после запятой по монетам — по макету: BTC 8, LTC 4, DOGE 2 */
-const DEC={BTC:8,LTC:4,DOGE:2,ZEC:8};
-const amt=b=>`${nf(b.v,DEC[b.s]??8)} ${b.s}`;
+const DEC={BTC:8,LTC:4,DOGE:2,ZEC:4};
+/* В пустом состоянии макет печатает ровный ноль, а не 0,00000000 */
+const amt=b=>`${b.v?nf(b.v,DEC[b.s]??8):'0'} ${b.s}`;
+const cur=(v,sym)=>`${v?nf(v):'0'} ${sym}`;
 /* Уровни рефералки. k — медаль (public/tier-<k>.png, выгрузка pic_star),
    f — ширина заполнения дорожки в процентах (макет 1283:59582: 114/222/352/484/583 из 590) */
 const TIERS=[{k:5,p:'5%',n:'Бронза',c:'#B87333',f:19.3},{k:10,p:'10%',n:'Серебро',c:'#9AA3B2',f:37.6},
@@ -240,6 +286,8 @@ const COIN_ICON={
   BTC:`<svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="url(#pmBTC)"/><path fill-rule="evenodd" clip-rule="evenodd" d="M17.1414 14.7504C17.2256 14.0741 17.0355 13.4796 16.5614 13.0032C16.4119 12.855 16.2314 12.7174 16.0491 12.5784C15.9696 12.5178 15.8898 12.4569 15.8121 12.3948C15.8326 12.3906 15.8498 12.3806 15.8642 12.3723C15.8785 12.3641 15.89 12.3574 15.8991 12.3599C17.5288 12.0007 17.9941 9.75715 17.1656 8.71987C16.8315 8.30036 16.414 7.97497 15.936 7.73042C15.744 7.63546 15.5561 7.54771 15.3645 7.45824C15.2141 7.388 15.0614 7.3167 14.9027 7.24003C14.9853 6.93168 15.0895 6.5602 15.1964 6.17868C15.3093 5.77592 15.4254 5.3618 15.5226 4.9991L14.1642 4.63514C14.0695 4.9888 13.9558 5.3938 13.8454 5.78753C13.7408 6.15998 13.6391 6.5224 13.5589 6.82173L12.4904 6.53541C12.6602 5.90152 12.8932 5.03219 13.0957 4.34882L11.7555 3.98971C11.6552 4.36401 11.5397 4.7757 11.428 5.17364C11.3236 5.5459 11.2225 5.90615 11.1405 6.21252C10.6763 6.08816 10.2226 5.96168 9.77109 5.83582C9.32404 5.71121 8.87917 5.5872 8.42864 5.46648C8.29762 5.95548 8.17144 6.42637 8.02716 6.89241L8.57049 7.03799C8.73349 7.08167 8.9146 7.1302 9.07275 7.19198C9.53393 7.35438 9.70144 7.67102 9.57526 8.14191L7.97287 13.9048C7.86125 14.3214 7.63161 14.4539 7.21506 14.3423L6.3095 14.0997C6.07336 14.6187 5.84207 15.1197 5.58782 15.6339C6.03817 15.7643 6.48973 15.8901 6.9413 16.016C7.39286 16.1418 7.84443 16.2677 8.29478 16.3981C8.11037 17.0863 7.87258 17.9737 7.66036 18.6933L9.00058 19.0524C9.09888 18.6856 9.21054 18.2874 9.32076 17.8944C9.42819 17.5114 9.53428 17.1331 9.6253 16.7934C9.8081 16.8518 9.98347 16.9037 10.1545 16.9542C10.3347 17.0075 10.5101 17.0593 10.6841 17.1159C10.5925 17.4578 10.4869 17.8343 10.3805 18.2131C10.2728 18.5969 10.1644 18.9833 10.0691 19.3388L11.4094 19.6979C11.5083 19.3286 11.6208 18.9276 11.7311 18.5345C11.8371 18.1564 11.9412 17.7855 12.0292 17.4569C12.0637 17.4662 12.0928 17.4662 12.1141 17.4662C12.1264 17.4662 12.1361 17.4662 12.1427 17.468C12.3927 17.491 12.6457 17.5232 12.899 17.5554C13.3176 17.6086 13.7372 17.6619 14.145 17.6745C15.0134 17.6936 15.7916 17.3974 16.3359 16.6698C16.8185 16.1003 17.0476 15.4628 17.1414 14.7504ZM12.4346 8.22524C13.1413 8.40482 13.8329 8.58055 14.4174 9.05114C14.8663 9.40435 15.0082 9.88885 14.8361 10.3863C14.6592 10.9018 14.2494 11.1996 13.6756 11.24C12.87 11.2765 12.1093 11.0726 11.3221 10.8229C11.4429 10.3724 11.5656 9.93209 11.689 9.4896C11.8137 9.04264 11.939 8.59331 12.0633 8.12919C12.1872 8.16238 12.3111 8.19387 12.4346 8.22524ZM10.9125 15.3883C11.6556 15.57 12.4115 15.7548 13.1969 15.6346C13.7623 15.5531 14.1491 15.2685 14.2995 14.7071C14.45 14.1457 14.2621 13.6877 13.8313 13.3393C13.0926 12.7526 12.2133 12.5256 11.3287 12.2973C11.1975 12.2635 11.0662 12.2296 10.9352 12.1945C10.7927 12.6901 10.6559 13.1824 10.5192 13.6747C10.3824 14.167 10.2456 14.6594 10.1031 15.155C10.2348 15.1903 10.3554 15.2278 10.4713 15.2639C10.5787 15.2973 10.682 15.3295 10.7865 15.3575C10.8285 15.3677 10.8704 15.378 10.9125 15.3883Z" fill="white"/><defs><linearGradient id="pmBTC" x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#FFAB45"/><stop offset="1" stop-color="#FFA02E"/></linearGradient></defs></svg>`,
   /* Payments / litecoin-LTC */
   LTC:`<svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="url(#pmLTC)"/><path d="M16.6496 17.8427H7.27814L8.0658 14.0824L6.53424 15.1326L6.90629 13.0748L8.50816 11.9721L10.0795 4.47193H13.005L11.9232 9.62189L15.7322 7.0005L15.2858 9.13269L11.4775 11.7434L10.7241 15.3307H17.17L16.6496 17.8427Z" fill="white"/><defs><linearGradient id="pmLTC" x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#345D9D"/><stop offset="1" stop-color="#6A9BE8"/></linearGradient></defs></svg>`,
+  /* Payments / zcash-ZEC */
+  ZEC:`<svg width="20" height="20" viewBox="0 0 24 24"><g clip-path="url(#pmZEC)"><circle cx="12" cy="12" r="12" fill="#F4B823"/><path d="M10.6125 6.075C10.6125 5.30625 10.6125 4.63125 10.6125 3.91875C11.5125 3.91875 12.375 3.91875 13.3125 3.91875C13.3125 4.6125 13.3125 5.30625 13.3125 6.05625C14.4188 6.05625 15.45 6.05625 16.5938 6.05625C16.4813 7.0875 16.8563 8.08125 16.0688 9.0375C14.5125 10.9312 13.0875 12.9375 11.625 14.8875C11.6063 14.9062 11.6063 14.9437 11.5875 15.0562C13.3125 15.0562 15.0188 15.0562 16.7438 15.0562C16.7438 16.0687 16.7438 16.9875 16.7438 17.9812C15.6188 17.9812 14.4938 17.9812 13.3125 17.9812C13.3125 18.7125 13.3125 19.3687 13.3125 20.0812C12.3938 20.0812 11.55 20.0812 10.6313 20.0812C10.6313 19.4062 10.6313 18.75 10.6313 18.0187C9.4875 18.0187 8.4 18.0187 7.2375 18.0187C7.29375 16.9687 7.05 15.975 7.81875 15.0375C9.39375 13.1437 10.8375 11.1375 12.3188 9.16875C12.3375 9.13125 12.3563 9.075 12.3938 8.98125C10.8 8.98125 9.24375 8.98125 7.65 8.98125C7.65 7.9875 7.65 7.06875 7.65 6.075C8.64375 6.075 9.6 6.075 10.6125 6.075Z" fill="white"/></g><defs><clipPath id="pmZEC"><rect width="24" height="24" fill="white"/></clipPath></defs></svg>`,
   /* DOGE оставлен собственным: в Payments это иллюстрация на 95 КБ */
   DOGE:`<svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#C2A633"/><path fill="#fff" d="M8 5.6h4.4c3.6 0 6 2.5 6 6.4s-2.4 6.4-6 6.4H8v-5.2H6.4v-2.1H8V5.6Zm2.4 2.2v3.3h2v2.1h-2v3.3h1.8c2.2 0 3.7-1.5 3.7-4.2s-1.5-4.5-3.7-4.5h-1.8Z"/></svg>`,
 };
@@ -392,40 +440,48 @@ const V={};
 
 /* Главная (макет 185:105205). Шаг 16 по вертикали и в рядах — как в Top/Content
    макета; карточки таблиц собраны оболочкой tblcard (паддинг 8, шапка 16). */
-V.home=m=>`<div class="hcol">
-${S.role==='observer'?'<div class="alert warn">\u{1F441} Режим наблюдателя — действия с балансом и настройками скрыты</div>':''}
-<div class="grid g3" style="gap:16px;margin:0">
-  ${card(`<div class="ch"><h2>Доход</h2>${S.role==='owner'?'<button class="hlink spacer" data-go="assets">Продать</button>':''}</div>
-    ${heroBox('Текущий баланс',m.bal.map(b=>heroVal(amt(b),`≈ ${nf(b.usd)} $ • ${nf(b.rub)} ₽`)).join(''),'income')}
+V.home=m=>{
+  const p=permsOf(), obs=S.role==='observer';
+  const tabs=[]; if(p.income)tabs.push('Доход'); if(p.payouts)tabs.push('Выплаты');
+  const ti=Math.min(U.seg['home-tab']??0,Math.max(0,tabs.length-1)), inc=tabs[ti]==='Доход';
+  const cards=[];
+  if(p.assets)cards.push(card(`<div class="ch"><h2>Доход</h2>${S.role==='owner'?'<button class="hlink spacer" data-go="assets">Продать</button>':''}</div>
+    ${heroBox('Текущий баланс',m.bal.map(b=>heroVal(amt(b),`≈ ${cur(b.usd,'$')} • ${cur(b.rub,'₽')}`)).join(''),'income')}
     <div class="stats"><div><div class="l">За 24 ч</div>${m.d24.map(b=>`<div class="v mono">${amt(b)}</div>`).join('')}</div>
-      <div><div class="l">За все время</div>${m.all.map(b=>`<div class="v mono">${amt(b)}</div>`).join('')}</div></div>`)}
-  ${card(`<div class="ch"><h2>Средний хэшрейт</h2></div>
-    ${heroBox(m.bal.length>1?'Средний хэшрейт за 24 ч':'За 24 ч',heroVal(`${m.avg} ${m.c.unit}`),'workers')}
-    <div class="stats"><div><div class="l">За 5 мин</div><div class="v mono">${m.h5} ${m.c.unit}</div></div>
-      <div><div class="l">За 1 ч</div><div class="v mono">${m.h1} ${m.c.unit}</div></div></div>`)}
-  ${card(`<div class="ch"><h2>Воркеры (${ni(m.total)})</h2></div>${workerTiles(m)}`)}
-</div>
-${card(`<div class="ch"><h2>График изменения хэшрейта (${S.coin==='btc'?'BTC':'LTC'})</h2>
+      <div><div class="l">За все время</div>${m.all.map(b=>`<div class="v mono">${amt(b)}</div>`).join('')}</div></div>`));
+  if(p.workers){
+    cards.push(card(`<div class="ch"><h2>Средний хэшрейт</h2></div>
+      ${heroBox(m.bal.length>1?'Средний хэшрейт за 24 ч':'За 24 ч',heroVal(`${m.avg} ${m.c.unit}`),'workers')}
+      <div class="stats"><div><div class="l">За 5 мин</div><div class="v mono">${m.h5} ${m.c.unit}</div></div>
+        <div><div class="l">За 1 ч</div><div class="v mono">${m.h1} ${m.c.unit}</div></div></div>`));
+    cards.push(card(`<div class="ch"><h2>Воркеры (${ni(m.total)})</h2></div>${workerTiles(m)}`));
+  }
+  if(obs&&!cards.length&&!tabs.length) return card(emptyBox('Главная недоступна',
+    'У этой ссылки наблюдателя не открыт ни один из разделов: воркеры, доход, выплаты или мои активы'));
+  return `<div class="hcol">
+${cards.length?`<div class="grid g3" style="gap:16px;margin:0">${cards.join('')}</div>`:''}
+${p.workers?card(`<div class="ch"><h2>График изменения хэшрейта (${m.bal[0].s})</h2>
   <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],2)}
   <span class="pop-wrap"><button class="pill flat sq mono lg" data-pop="date">29.01.2026 – 30.01.2026 ${I.cal}</button>${pop==='date'?datePicker():''}</span>
-  <button class="ib" data-tip="Приблизить">${I.zi}</button><button class="ib" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{hpx:449})}`,'chartcard')}
-${card(`<div class="ch subhead">${seg('home-tab',['Доход','Выплаты'],0)}
-  <div class="spacer"></div>${S.coin==='ltc'?`<span class="pill flat sq">${COIN_ICON.LTC} LTC ${I.cd}</span>`:''}
+  <button class="ib" data-tip="Приблизить">${I.zi}</button><button class="ib" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{hpx:449})}`,'chartcard'):''}
+${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,0):`<h2>${tabs[0]}</h2>`}
+  <div class="spacer"></div>${m.bal.length>1?`<span class="pill flat sq">${COIN_ICON.LTC} LTC ${I.cd}</span>`:''}
   <button class="ib" data-toast="Отчет скачан">${I.dl}</button></div>
-  ${(U.seg['home-tab']||0)===0?incomeTable(m,Math.min(m.rows,5)):payoutsTable(m,Math.min(m.rows,5))}
-  ${m.rows?`<div class="tfoot"><button class="btn link" data-go="${(U.seg['home-tab']||0)===0?'income':'payouts'}">${(U.seg['home-tab']||0)===0?'Весь доход':'Все выплаты'}</button></div>`:''}`,'tblcard')}
-${card(refBlock(m),'tblcard')}
+  ${inc?incomeTable(m,Math.min(m.rows,5)):payoutsTable(m,Math.min(m.rows,5))}
+  ${m.rows?`<div class="tfoot"><button class="btn link" data-go="${inc?'income':'payouts'}">${inc?'Весь доход':'Все выплаты'}</button></div>`:''}`,'tblcard'):''}
+${obs?'':`${card(refBlock(m),'tblcard')}
 <div class="grid g3" style="gap:16px;margin:0">
   ${card(`<div class="ch"><h2>Адреса майнинга</h2></div>
-    ${[3333,4444,5555].map((p,i)=>`<div class="urlrow"><div><div class="k">URL ${i+1}</div><div class="v mono">stratum+tcp://ss.promminer.ru:${p}</div></div><button class="spacer lnk" style="color:var(--accent)" data-copy="stratum+tcp://ss.promminer.ru:${p}">${I.cp}</button></div>`).join('')}
-    ${S.role==='owner'?`<button class="btn" data-modal="connect">${I.pl} Подключить воркер</button>`:''}`)}
+    ${[3333,4444,5555].map((port,i)=>`<div class="urlrow"><div><div class="k">URL ${i+1}</div><div class="v mono">stratum+tcp://ss.promminer.ru:${port}</div></div><button class="spacer lnk" style="color:var(--accent)" data-copy="stratum+tcp://ss.promminer.ru:${port}">${I.cp}</button></div>`).join('')}
+    <button class="btn" data-modal="connect">${I.pl} Подключить воркер</button>`)}
   ${card(`<div class="ch"><h2>Связаться с нами</h2></div>
     ${HOME_CONTACTS.map(([ic,k,v,u])=>`<a class="linkrow" href="${u}" target="_blank" rel="noopener">
       <span class="lico">${ic==='max'?MAX_LOGO:I[ic]}</span>${k}<span class="spacer mut">${v} ${I.ext}</span></a>`).join('')}`)}
   <section class="promo plain"><img class="art" src="/promo-sell.png" alt="">
     <h2>Снизили порог<br>для продажи ЦВ<br>до 10 000 ₽</h2>
     <button class="btn" data-go="assets">Продать</button></section>
-</div></div>`;
+</div>`}</div>`;
+};
 
 /* Акцентная плашка карточки: подпись со стрелкой сверху, под ней значения.
    Подпись одна на все монеты — в макете «Текущий баланс» не повторяется. */
@@ -735,7 +791,7 @@ ${card(`<div class="callout" style="margin-bottom:14px"><button class="x">${I.x}
 V.calc=m=>card(`
   <div style="display:flex;gap:0;border-radius:var(--r-s);overflow:hidden;background:var(--accent)">
     <div style="flex:1;background:var(--surface);padding:16px;border-radius:var(--r-s) 0 0 var(--r-s)">
-      <div class="ch"><span class="pill flat sq">${COIN_ICON[m.bal[0].s]} ${S.coin==='btc'?'BTC':'LTC'} ${I.cd}</span>
+      <div class="ch"><span class="pill flat sq">${COIN_ICON[m.bal[0].s]} ${m.bal[0].s} ${I.cd}</span>
         <div class="spacer"></div><a href="#">Сбросить</a></div>
       <div class="grid g3" style="margin:0;gap:10px">
         <div class="field" style="display:flex;align-items:center"><div style="flex:1"><div class="k">Курс ${S.coin==='btc'?'BTC':'LTC'}</div><div class="v mono">3 071 428,57</div></div>
@@ -1922,7 +1978,7 @@ export function applyState(next){
 export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON,
-  NAV, TITLES, GROUP_OF, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
+  NAV, TITLES, GROUP_OF, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf,
   S, U, route, pop, modal, openGroups, mini,
 };

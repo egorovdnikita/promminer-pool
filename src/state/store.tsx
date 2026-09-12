@@ -3,7 +3,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { AXES, DEF, PRESETS, GROUP_OF, M, applyState, workersList, workersRows, obsOf } from '@/legacy/prototype'
+import { AXES, DEF, PRESETS, GROUP_OF, M, allowed, applyState, workersList, workersRows, obsOf } from '@/legacy/prototype'
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
@@ -296,6 +296,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (ax) {
       (S.current as any)[ax.dataset.axis!] = ax.dataset.val
       pop.current = null
+      guardRoute()
       if (!ax.hasAttribute('data-close')) return bump()
     }
     const cl = at('[data-close]')
@@ -315,6 +316,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (tst) return toast(tst.dataset.toast!)
     const gt = at('[data-go]')
     if (gt) { go(gt.dataset.go!); return bump() }
+    /* Вотчер без разрешения на раздел не должен на нём стоять: уводим
+       на первый доступный, а если Главной нет — на ближайший из разрешённых */
+    function guardRoute() {
+      const ok = allowed()
+      if (!ok || ok.has(route)) return
+      const next = ['home', 'workers', 'assets', 'income', 'payouts', 'ref'].find((r) => ok.has(r))
+      if (next && next !== route) go(next)
+    }
     const gp = at('[data-grp]')
     if (gp) { const g = gp.dataset.grp!; openGroups.current[g] = !openGroups.current[g]; return bump() }
     const ac = at('[data-acct]')

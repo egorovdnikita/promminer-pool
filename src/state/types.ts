@@ -4,6 +4,7 @@ export interface Scenario {
   data: string
   health: string
   role: string
+  perm: string
   tier: string
   verif: string
   notif: string

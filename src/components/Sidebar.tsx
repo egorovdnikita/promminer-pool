@@ -1,15 +1,22 @@
-import { GROUP_OF, I, LINKS, LOGO, NAV } from '@/legacy/prototype'
+import { allowed, GROUP_OF, I, LINKS, LOGO, NAV } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico } from './Raw'
 
 export function Sidebar() {
   const { route, openGroups, mini } = useApp()
+  /* У наблюдателя в сайдбаре только разрешённые разделы (макеты 189:154154…) */
+  const ok = allowed()
+  const nav = ok
+    ? NAV.map((o) =>
+        o.kids ? { ...o, kids: o.kids.filter(([id]) => ok.has(id)) } : o,
+      ).filter((o) => (o.kids ? o.kids.length > 0 : ok.has(o.id!)))
+    : NAV
 
   return (
     <aside className="sb">
       <div className="logo" dangerouslySetInnerHTML={{ __html: LOGO }} />
       <nav className="nav">
-        {NAV.map((o) => {
+        {nav.map((o) => {
           if (o.kids) {
             const active = GROUP_OF[route] === o.g
             const open = openGroups[o.g!] || active

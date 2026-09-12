@@ -37,6 +37,9 @@ export declare const USD_ICON: string
 export declare const NAV: NavItem[]
 export declare const TITLES: Record<string, string>
 export declare const GROUP_OF: Record<string, string>
+/** Разделы, доступные роли: null у владельца, набор идентификаторов у наблюдателя */
+export declare function allowed(): Set<string> | null
+export declare function permsOf(): Record<string, number>
 
 export declare function card(inner: string, cls?: string): string
 export declare function emptyBox(title: string, text: string): string
