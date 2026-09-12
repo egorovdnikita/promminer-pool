@@ -1388,3 +1388,29 @@ button.scsect:hover{color:var(--accent)}
 .qst{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;margin-bottom:12px}
 .qlinks{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:8px}
 .qlinks .btn{height:40px;gap:8px;font-size:var(--fs-s);line-height:var(--lh-s)}
+
+/* --- Группы и теги: создание, правка, удаление (173:61615, 173:62151) --- */
+.modal.tx{max-height:min(86vh,1010px)}
+.tmake{width:100%;height:56px;justify-content:center;margin-top:16px}
+.tmake.dis{background:var(--ctrl2);color:var(--c3);box-shadow:none;cursor:default}
+.tcolor{margin-top:16px}
+.tcolor .k{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500;margin-bottom:12px}
+.swatches{display:flex;gap:12px;flex-wrap:wrap}
+.sw{width:32px;height:32px;border-radius:var(--r-s);display:grid;place-items:center;color:#fff;flex:0 0 auto}
+.sw.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--focus)}
+.sw svg{width:16px;height:16px}
+.tyour{display:block;font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;margin-bottom:20px}
+.trow{display:flex;align-items:center;gap:12px;min-height:44px;
+  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.tlist{display:flex;flex-direction:column;gap:4px;padding-bottom:8px}
+.tcard{display:flex;align-items:center;gap:12px;height:64px;padding:8px;border-radius:var(--r-m);
+  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
+.tcard:hover,.tcard.on{background:var(--ctrl2)}
+.tcard .tdesc{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.tcard .ibr{width:48px;height:48px;border-radius:var(--r-m);color:var(--c3);flex:0 0 auto}
+.tcard .ibr:hover{background:var(--ctrl);color:var(--c1)}
+.tcard .ibr.del:hover{color:var(--neg)}
+.tempty{text-align:center;padding:40px 0 24px}
+.tempty b{display:block;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;margin-bottom:8px}
+.tempty p{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)}

@@ -12,6 +12,7 @@ export function Modal({ m }: { m: Model }) {
   const steps = typeof d.steps === 'function' ? d.steps(m) : d.steps
   const foot = d.foot?.(m, step)
   const sub = typeof d.s === 'function' ? d.s(m) : d.s
+  const title = typeof d.t === 'function' ? d.t(m) : d.t
   const hasFoot = !!foot || d.acts !== false
   const close = <button className="mx" data-close><Ico html={I.x} /></button>
 
@@ -23,10 +24,10 @@ export function Modal({ m }: { m: Model }) {
           <div className="mhead img">
             <img src={d.img} alt="" />
             {close}
-            {d.t && <h2 className={d.center ? 'c' : ''}>{d.t}</h2>}
+            {title && <h2 className={d.center ? 'c' : ''}>{title}</h2>}
           </div>
         ) : (
-          <div className="mhead"><h2>{d.t}</h2>{close}</div>
+          <div className="mhead"><h2>{title}</h2>{close}</div>
         )}
         {/* Пока открыто меню контакта, тело не прокручивается: иначе
             выпадающий список обрезается краем прокручиваемой области. */}

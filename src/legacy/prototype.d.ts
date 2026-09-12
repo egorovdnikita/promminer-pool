@@ -65,7 +65,7 @@ export declare function datePicker(sel?: number[]): string
 
 export declare const V: Record<string, (m: Model) => string>
 export declare const MODALS: Record<string, {
-  t: string; s?: string | ((m: Model) => string); ok?: string; cta?: string; cancel?: string; acts?: false
+  t: string | ((m: Model) => string); s?: string | ((m: Model) => string); ok?: string; cta?: string; cancel?: string; acts?: false
   steps?: number | ((m: Model) => number)
   b: (m: Model, step: number) => string
   /** Прижатый футер модалки — рисуется вне прокручиваемого тела. */
@@ -75,7 +75,7 @@ export declare const MODALS: Record<string, {
   /** Заголовок по центру — как в модалке выхода. */
   center?: boolean
   /** Узкое окно 500 — подтверждения. */
-  size?: 'sm' | 'xs'
+  size?: 'sm' | 'xs' | 'tx'
   /** Шторка: панель 430 у правого края вместо центральной модалки. */
   sheet?: true
   /** Тело фиксированной высоты 348 — шаговые экраны контактов. */
@@ -110,3 +110,5 @@ export declare function obsOf(m: any): any[]
 export declare const MODELS: [string, string][]
 export declare const TAGS: [string, string][]
 export declare function vendorOf(model: string): string
+export declare function groups(): { n: string; c?: string }[]
+export declare function tagsOf(): { n: string; d?: string; c?: string }[]

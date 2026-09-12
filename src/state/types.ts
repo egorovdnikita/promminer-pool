@@ -80,6 +80,19 @@ export interface Ui {
   fback: boolean
   /** Что выгружаем: 'hours' — часы работы, 'stat' — статистика воркеров. */
   exk: string
+  /** Свои группы и теги: null — ещё не собраны из сценария. */
+  grp: { n: string; c?: string }[] | null
+  tg: { n: string; d?: string; c?: string }[] | null
+  /** Выбор в списке групп и тегов — под массовое удаление. */
+  gsel: Set<number>
+  tsel: Set<number>
+  /** Правим запись с этим индексом, иначе создаём новую. */
+  ted: number | null
+  tname: string
+  tdesc: string
+  tcol: string
+  /** Снимок привязки на открытии — чтобы поймать «выбор не изменился». */
+  tbase: string
   qfocus: boolean
   auth: string
   consent: Set<number>

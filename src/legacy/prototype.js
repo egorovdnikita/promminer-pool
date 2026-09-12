@@ -626,6 +626,55 @@ const TAGS=[
   ['Подготовлен','Готов к установке'],
   ['Готов','В работе']];
 /* Производители моделей — для фильтра и логотипов в таблице */
+/* Палитра тега из макета 173:62152 */
+const TAG_COLORS=['#ef4444','#f97316','#d65384','#2dba46','#a855f7','#7086fc'];
+/* Группы и теги — изменяемые списки: их создают, правят и удаляют прямо
+   в модалке (макеты 173:61615 и 173:62151). Сценарий «Ничего не заведено»
+   отдаёт пустой список, поэтому сид зависит от оси wf. */
+const seedG=()=>S.wf==='none'?[]:GEO.slice(1).map(([n,c])=>({n,c}));
+const seedT=()=>S.wf==='none'?[]:TAGS.map(([n,d],i)=>({n,d,c:TAG_COLORS[i%6]}));
+const groups=()=>U.grp||(U.grp=seedG());
+const tagsOf=()=>U.tg||(U.tg=seedT());
+const taxon=k=>k==='g'?groups():tagsOf();
+const TX={g:{one:'группу',your:'Ваши группы',make:'Создать группу',none:'У вас пока нет групп',
+    hint:'Создайте группы для того, чтобы легче ориентироваться в воркерах и они появятся здесь'},
+  t:{one:'тег',your:'Ваши теги',make:'Создать тег',none:'У вас пока нет тегов',
+    hint:'Создайте теги для того, чтобы легче ориентироваться в воркерах и они появятся здесь'}};
+/* Тело модалки групп и тегов: форма создания сверху, ниже список своих
+   записей с правкой, удалением и выбором. bind — режим привязки к воркеру:
+   тогда чекбокс означает «привязан», а не «выбран для удаления». */
+function taxonBody(k,bind){
+  const list=taxon(k), t=TX[k], ed=U.ted;
+  const name=U.tname??(ed!=null&&list[ed]?list[ed].n:'');
+  const sel=k==='g'?U.gsel:U.tsel, bound=k==='g'?U.wgrp:U.wtag;
+  const mark=bind?bound:sel;
+  const allOn=list.length>0&&list.every((_,i)=>mark.has(i));
+  return `
+  <div class="inp" style="margin:0"><div class="k">Наименование</div>
+    <input id="tname" maxlength="10" placeholder="До 10 символов" value="${String(name).replace(/"/g,'&quot;')}"></div>
+  ${k==='t'?`<div class="inp"><div class="k">Описание</div>
+    <input id="tdesc" maxlength="100" placeholder="Необязательно, до 100 символов" value="${String(U.tdesc??(ed!=null&&list[ed]?list[ed].d:'')).replace(/"/g,'&quot;')}"></div>
+  <div class="tcolor"><div class="k">Выберите цвет тега</div>
+    <div class="swatches">${TAG_COLORS.map(c=>`<button class="sw ${(U.tcol||TAG_COLORS[0])===c?'on':''}" style="background:${c}" data-tcol="${c}">${(U.tcol||TAG_COLORS[0])===c?CHECK:''}</button>`).join('')}</div></div>`:''}
+  <button class="btn tmake ${name.trim()?'':'dis'}" ${name.trim()?`data-tsave="${k}" data-toast="${ed!=null?(k==='g'?'Группа изменена':'Тег изменён'):(k==='g'?'Группа создана':'Тег создан')}"`:'disabled'}>
+    ${ed!=null?'Сохранить':t.make}</button>
+  <div class="hr"></div>
+  <b class="tyour">${t.your}</b>
+  ${list.length?`
+  <div class="trow head">${cb(allOn,`data-tall="${k}"`)}<span class="tx">Выбрать все</span>
+    <div class="spacer"></div>
+    ${!bind&&sel.size?`<button class="btn link del" data-modal="${k}del">Удалить</button>`:''}</div>
+  <div class="tlist">${list.map((it,i)=>`<div class="tcard ${mark.has(i)?'on':''}">
+    ${cb(mark.has(i),`data-tpick="${k}:${i}"`)}
+    ${k==='t'?`<span class="tag" style="background:${it.c}1f;color:${it.c}">${it.n}</span>
+      <span class="tdesc">${it.d||''}</span>`:`<span class="tx">${it.n}</span>`}
+    <div class="spacer"></div>
+    <button class="ibr" data-ted="${k}:${i}" data-tip="Изменить">${I.edit}</button>
+    <button class="ibr del" data-modal="${k}del" data-ted1="${k}:${i}" data-tip="Удалить">${I.tr}</button>
+  </div>`).join('')}</div>`
+  :`<div class="tempty"><b>${t.none}</b><p>${t.hint}</p></div>`}`;
+}
+
 /* Производители из дизайн-системы (Brands 148:49846) — логотипы выгружены
    в public/logo-*.svg. По ним же группирует фильтр моделей в шторке. */
 const MODELS=[['bitmain','Bitmain'],['canaan','Canaan Avalon'],['whatsminer','Whatsminer'],
@@ -727,7 +776,8 @@ V.workers=m=>{
   <div class="row gtabs">
     <button class="ibr gsc" data-gscroll="-1">${I.cl}</button>
     <div class="segl" id="gtabs">
-      ${GEO.map(([g,n])=>`<button class="${(U.geo||'Все')===g?'on':''}" data-geo="${g}">${g} <u>${n}</u></button>`).join('')}</div>
+      ${[['Все',GEO[0][1]]].concat(groups().map(g=>[g.n,g.c])).map(([g,n])=>
+        `<button class="${(U.geo||'Все')===g?'on':''}" data-geo="${g}">${g} <u>${n}</u></button>`).join('')}</div>
     <button class="ibr gsc" data-gscroll="1">${I.cv}</button>
     ${S.role==='owner'?`<button class="btn link" data-modal="group">${I.pl} Создать группу</button>`:''}
   </div>
@@ -1818,10 +1868,21 @@ const MODALS={
       <b class="qst">Остались вопросы?</b>
       <div class="qlinks">${HOME_CONTACTS.slice(0,3).map(([ic,k,,u])=>
         `<a class="btn out" href="${u}" target="_blank" rel="noopener"><span class="lico">${ic==='max'?MAX_LOGO:I[ic]}</span>${k}</a>`).join('')}</div>`}},
-  group:{ok:'Группа создана',t:'Создать группу',s:'Группы помогают фильтровать парк по площадкам и владельцам',b:()=>`
-    <div class="inp"><div class="k">Название группы</div><input value="Псков"></div>
-    <div class="inp"><div class="k">Комментарий</div><input placeholder="Необязательно"></div>
-    <p class="cap dim">Воркеров можно добавить после создания через действие «Привязать группу»</p>`},
+  /* Группы (макеты 173:61615, 173:67159, 173:67419): одна модалка на
+     создание, правку и удаление; список рисуется из U.grp */
+  group:{t:'Создать группу',acts:false,size:'tx',b:()=>taxonBody('g',false)},
+  /* Привязка групп к воркеру (макет 173:64798): тот же список,
+     но чекбокс означает «привязан», и появляется подвал */
+  wgroups:{t:'Изменить группы',acts:false,size:'tx',b:()=>taxonBody('g',true),
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-tbind="g">Сохранить</button>`},
+  gdel:{t:()=>U.gsel.size>1?'Удалить группы?':'Удалить группу?',size:'sm',danger:true,
+    s:()=>U.gsel.size>1
+      ?'Это действие навсегда удалит все данные, связанные с этими группами. Подтвердите, если уверены.'
+      :'Это действие навсегда удалит все данные, связанные с этой группой. Подтвердите, если уверены.',
+    b:()=>'',
+    foot:()=>`<button class="btn out" data-modal="group">Отменить</button>
+      <button class="btn danger" data-tdel="g" data-modal="group">Удалить</button>`},
   /* Шторка фильтров (макет 173:65425): панель 430 у правого края.
      «Сбросить» в секции появляется, только когда в ней есть выбор;
      подвал переключается с «Закрыть» на «Применить» + «Сбросить все». */
@@ -1833,9 +1894,9 @@ const MODALS={
     <section class="fcard">
       <div class="fh"><h3>Теги</h3><div class="spacer"></div>
         ${U.ftag.size?'<button class="btn link" data-freset="t">Сбросить</button>':''}</div>
-      ${none?'<p class="fempty">У вас нет тегов</p>'
-        :`<div class="chips">${TAGS.map(([t])=>
-          `<button class="chip ${U.ftag.has(t)?'on':''}" data-ftag="${t}">${t}</button>`).join('')}</div>`}
+      ${tagsOf().length?`<div class="chips">${tagsOf().map(it=>
+          `<button class="chip ${U.ftag.has(it.n)?'on':''}" data-ftag="${it.n}">${it.n}</button>`).join('')}</div>`
+        :'<p class="fempty">У вас нет тегов</p>'}
       <button class="btn out fbtn" data-modal="tagnew">${I.pl}Создать тег</button>
     </section>
     <section class="fcard">
@@ -1852,30 +1913,20 @@ const MODALS={
       ?`<button class="btn" data-fapply>Применить</button>
         <button class="btn link" data-freset="all">Сбросить все</button>`
       :'<button class="btn out" data-close>Закрыть</button>'},
-  /* Изменить теги воркера (макет 173:62936): список с чекбоксами и переход
-     в создание тега; если выбор не менялся — алерт при подтверждении */
-  wtags:{ok:'Теги обновлены',t:'Изменить теги',s:'Отметьте теги, которые нужно привязать к воркеру',
-    b:()=>`<div class="picklist">${TAGS.map(([t,d],i)=>`<label data-wpick="tag:${i}">
-        ${cb(U.wtag.has(i))}<span class="tx"><b>${t}</b><i>${d}</i></span></label>`).join('')}</div>
-      <button class="btn link" data-modal="tagnew">${I.pl} Создать тег</button>`,
+  /* Теги (макеты 173:62151, 173:63756, 173:64237): наименование, описание,
+     палитра и список своих тегов с правкой и удалением */
+  tagnew:{t:'Создать тег',acts:false,size:'tx',b:()=>taxonBody('t',false)},
+  /* Привязка тегов к воркеру (макет 173:62936) */
+  wtags:{t:'Изменить теги',acts:false,size:'tx',b:()=>taxonBody('t',true),
     foot:()=>`<button class="btn out" data-close>Отменить</button>
-      <button class="btn" data-close data-toast="Теги обновлены">Привязать</button>`},
-  /* Изменить группы воркера (макет 173:64798) */
-  wgroups:{ok:'Группы обновлены',t:'Изменить группы',s:'Отметьте группы, в которые входит воркер',
-    b:()=>`<div class="picklist">${GEO.slice(1).map(([g,n],i)=>`<label data-wpick="grp:${i}">
-        ${cb(U.wgrp.has(i))}<span class="tx"><b>${g}</b><i>${n} воркеров</i></span></label>`).join('')}</div>
-      <button class="btn link" data-modal="group">${I.pl} Создать группу</button>`,
-    foot:()=>`<button class="btn out" data-close>Отменить</button>
-      <button class="btn" data-close data-toast="Группы обновлены">Привязать</button>`},
-  /* Создать тег (макет 173:62151): лимиты 10 и 100 символов */
-  tagnew:{ok:'Тег создан',t:'Создать тег',s:'Тег поможет отметить состояние воркера',size:'sm',
-    b:()=>`<div class="inp" style="margin:0"><div class="k">Наименование</div>
-        <input maxlength="10" placeholder="До 10 символов"></div>
-      <div class="inp"><div class="k">Описание</div>
-        <input maxlength="100" placeholder="Необязательно, до 100 символов"></div>`,
-    foot:()=>{const back=U.fback?'data-modal="filters"':'data-close';
-      return `<button class="btn out" ${back}>Отменить</button>
-      <button class="btn" ${back} data-toast="Тег создан">Создать</button>`}},
+      <button class="btn" data-tbind="t">Сохранить</button>`},
+  tdel:{t:()=>U.tsel.size>1?'Удалить теги?':'Удалить тег?',size:'sm',danger:true,
+    s:()=>U.tsel.size>1
+      ?'Это действие навсегда удалит все данные, связанные с этими тегами. Подтвердите, если уверены.'
+      :'Это действие навсегда удалит все данные, связанные с этим тегом. Подтвердите, если уверены.',
+    b:()=>'',
+    foot:()=>`<button class="btn out" data-modal="tagnew">Отменить</button>
+      <button class="btn danger" data-tdel="t" data-modal="tagnew">Удалить</button>`},
   /* Удаление воркера (макет 173:65944): только неактивные */
   wkdel:{t:'Удалить воркер?',size:'sm',danger:true,
     s:'Если воркер был активен в этом месяце, и вы хотите подать отчёт о майнинге, добавьте модель и серийный номер устройства.',
@@ -2165,7 +2216,7 @@ export function applyState(next){
 export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
-  NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
+  NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf,
   S, U, route, pop, modal, openGroups, mini,
 };

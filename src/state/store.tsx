@@ -3,7 +3,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, applyState, workersList, workersRows, obsOf } from '@/legacy/prototype'
+import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, groups, tagsOf, applyState, workersList, workersRows, obsOf } from '@/legacy/prototype'
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
@@ -16,6 +16,7 @@ const freshUi = (): Ui => ({
   q: '', wfilter: 'all', geo: '',
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
+  grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '',
   qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
 
@@ -191,6 +192,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (sq) { U.current.scq = sq.value; bump() }
     const fq = (e.target as HTMLElement).closest('#fq') as HTMLInputElement | null
     if (fq) { U.current.fq = fq.value; bump() }
+    const tn = (e.target as HTMLElement).closest('#tname') as HTMLInputElement | null
+    if (tn) { U.current.tname = tn.value; bump() }
+    const td = (e.target as HTMLElement).closest('#tdesc') as HTMLInputElement | null
+    if (td) { U.current.tdesc = td.value; bump() }
   }, [])
 
   const snapshot = useCallback((): AppSnapshot => ({
@@ -203,6 +208,71 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const t = e.target as HTMLElement
     const at = (sel: string) => t.closest(sel) as HTMLElement | null
     const u = U.current
+
+    /* Группы и теги: создание, правка, удаление и привязка в одной модалке */
+    const bindMode = () => modal.current === 'wgroups' || modal.current === 'wtags'
+    const listOf = (k: string) => (k === 'g' ? groups() : tagsOf())
+    const markOf = (k: string) =>
+      bindMode() ? (k === 'g' ? u.wgrp : u.wtag) : (k === 'g' ? u.gsel : u.tsel)
+    const tcol = at('[data-tcol]')
+    if (tcol) { u.tcol = tcol.dataset.tcol!; return bump() }
+    const tall = at('[data-tall]')
+    if (tall) {
+      const k = tall.dataset.tall!, set = markOf(k), list = listOf(k)
+      if (set.size === list.length) set.clear()
+      else list.forEach((_: unknown, i: number) => set.add(i))
+      return bump()
+    }
+    const tpick = at('[data-tpick]')
+    if (tpick) {
+      const [k, i] = tpick.dataset.tpick!.split(':')
+      const set = markOf(k), n = +i
+      set.has(n) ? set.delete(n) : set.add(n)
+      return bump()
+    }
+    /* «Изменить» в строке — имя и описание уезжают в форму сверху */
+    const ted = at('[data-ted]')
+    if (ted) {
+      const [k, i] = ted.dataset.ted!.split(':')
+      const it = listOf(k)[+i] as { n: string; d?: string; c?: string }
+      u.ted = +i; u.tname = it.n; u.tdesc = it.d || ''; u.tcol = it.c || '#ef4444'
+      return bump()
+    }
+    /* Корзина в строке — удаляем именно её, не трогая общий выбор */
+    const ted1 = at('[data-ted1]')
+    if (ted1) {
+      const [k, i] = ted1.dataset.ted1!.split(':')
+      const set = k === 'g' ? u.gsel : u.tsel
+      set.clear(); set.add(+i)
+    }
+    const tsave = at('[data-tsave]')
+    if (tsave) {
+      const k = tsave.dataset.tsave!, list = listOf(k), name = (u.tname || '').trim()
+      if (!name) return
+      if (u.ted != null && list[u.ted]) Object.assign(list[u.ted] as object, { n: name, d: u.tdesc, c: u.tcol })
+      else (list as { n: string; d?: string; c?: string }[]).push(
+        k === 'g' ? { n: name, c: '0' } : { n: name, d: u.tdesc || '', c: u.tcol || '#ef4444' })
+      u.ted = null; u.tname = ''; u.tdesc = ''
+      bump()
+      return toast(tsave.dataset.toast!)
+    }
+    const tdel = at('[data-tdel]')
+    if (tdel) {
+      const k = tdel.dataset.tdel!, set = k === 'g' ? u.gsel : u.tsel
+      const kept = listOf(k).filter((_: unknown, i: number) => !set.has(i))
+      if (k === 'g') u.grp = kept as Ui['grp']; else u.tg = kept as Ui['tg']
+      const many = set.size > 1
+      set.clear(); u.ted = null; u.tname = ''; u.tdesc = ''
+      toast(k === 'g' ? (many ? 'Группы удалены' : 'Группа удалена') : (many ? 'Теги удалены' : 'Тег удалён'))
+    }
+    const tbind = at('[data-tbind]')
+    if (tbind) {
+      const k = tbind.dataset.tbind!, set = k === 'g' ? u.wgrp : u.wtag
+      const now = [...set].sort().join()
+      if (now === (u.tbase ?? '')) return toast('Выбор не изменился')
+      modal.current = null; bump()
+      return toast(k === 'g' ? 'Группы обновлены' : 'Теги обновлены')
+    }
 
     const au = at('[data-auth]')
     if (au) { u.auth = au.dataset.auth!; u.consent.clear(); return bump() }
@@ -337,6 +407,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (md.dataset.obs) u.obs = +md.dataset.obs
       if (md.dataset.sess) u.sess = md.dataset.sess
       if (md.dataset.ex) u.exk = md.dataset.ex
+      /* форма групп и тегов открывается пустой, а привязка помнит исходный выбор */
+      if (['group', 'tagnew', 'wgroups', 'wtags'].includes(md.dataset.modal!)) {
+        u.ted = null; u.tname = ''; u.tdesc = ''
+        if (md.dataset.modal === 'wgroups') u.tbase = [...u.wgrp].sort().join()
+        if (md.dataset.modal === 'wtags') u.tbase = [...u.wtag].sort().join()
+      }
       /* «Создать тег» из шторки — после создания вернуться в шторку */
       u.fback = md.dataset.modal === 'tagnew' && modal.current === 'filters'
       modal.current = md.dataset.modal!; u.step = 0; u.vfile = false; u.vbank = undefined; pop.current = null
@@ -353,6 +429,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const ax = at('[data-axis]')
     if (ax) {
       (S.current as any)[ax.dataset.axis!] = ax.dataset.val
+      /* сценарий «Ничего не заведено» пересобирает списки групп и тегов */
+      if (ax.dataset.axis === 'wf') { u.grp = null; u.tg = null }
       pop.current = null
       guardRoute()
       if (!ax.hasAttribute('data-close')) return bump()
@@ -361,7 +439,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     /* Маска тоже помечена data-close, но закрывать по ней нужно только при клике
        мимо окна — иначе модалка схлопывается от клика по любому полю внутри. */
     if (cl && (!cl.classList.contains('mask') || t === cl)) {
-      modal.current = null; bump(); if (tst) toast(tst.dataset.toast!); return
+      const back = modal.current === 'tagnew' && u.fback
+      modal.current = back ? 'filters' : null
+      if (back) u.fback = false
+      bump(); if (tst) toast(tst.dataset.toast!); return
     }
     /* «Вставить» — подставляет номер в поле рядом */
     const ps = at('[data-paste]')
