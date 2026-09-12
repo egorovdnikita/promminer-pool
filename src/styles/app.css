@@ -148,6 +148,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .pill.flat.on{background:var(--accent-sub);color:var(--accent)}
 .ib{width:var(--h-ctrl);height:var(--h-ctrl);border-radius:var(--r-m);background:transparent;border:1px solid var(--border);display:grid;place-items:center;position:relative;color:var(--c3);flex:0 0 auto}
 .ib:hover{background:var(--ctrl2);color:var(--c1)}
+/* Control/Neutral из ДС: заливка 12 %, без обводки — кнопки графика и выгрузки */
+.ib.ctl,.pill.ctl{background:var(--ctrl);border-color:transparent;color:var(--c1)}
+.ib.ctl:hover,.pill.ctl:hover{background:var(--ctrl-hover)}
 .ib.sm{width:var(--h-btn-sm);height:var(--h-btn-sm);border-radius:var(--r-s)}
 /* Белая иконка-кнопка на серой подложке — QR ссылки наблюдателя */
 .ib.w{width:48px;height:48px;border-radius:var(--r-m);background:var(--surface);border-color:transparent;color:var(--c2)}
@@ -163,7 +166,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .subbar{display:flex;align-items:center;gap:10px;min-height:48px;flex-wrap:wrap}
 .subbar .rate{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
 /* Выбор монеты — 16 SemiBold (макет 185:109932) */
-.subbar .pill{font-size:var(--fs-m);line-height:var(--lh-m)}
+.subbar .pill{font-size:var(--fs-m);line-height:var(--lh-m);border-color:transparent}
 
 /* popovers */
 .pop-wrap{position:relative}
@@ -185,6 +188,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .pop.menu>button.del,.pop.menu>button.del:active{color:var(--neg)!important}
 .pop.menu>button.del:hover{color:var(--neg)!important;opacity:.75}
 .pop.menu .hr{margin:0 12px}
+.pop.menu.coinmenu{width:226px}
 .pop.menu svg{width:24px;height:24px}
 .pop b.ph{display:block;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 0 6px}
 .pop button:not(.btn):not(.ra):not(.lnk):not(.dp-nav){display:flex;align-items:center;gap:8px;width:100%;padding:8px 0;min-height:40px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
@@ -224,7 +228,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .hero .hrow{display:flex;align-items:center;gap:4px}
 .hero .l{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .hero .v{font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600;letter-spacing:0}
-.hero .hval{display:flex;flex-direction:column;gap:4px}
+/* Блок значения фиксирован на 64: плашка хэшрейта такой же высоты, как доход */
+.hero .hval{display:flex;flex-direction:column;gap:4px;min-height:64px}
 .hero .s{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
 .hero .cv{margin-left:auto;display:flex;color:#fff}
 /* Ряд под плашкой: две колонки, подпись 14 Medium, значение 18 SemiBold */
@@ -385,12 +390,16 @@ body.mini .ni .spacer.lbl{display:none!important}
 img.hex{object-fit:contain}
 .hex.none{background:url('/tier-0.svg') center/130px 146px no-repeat;
   font-size:40px;line-height:22px;font-weight:500;color:var(--c3)}
-.track{margin-top:0}
+/* дорожка 590 из 642: по 12 внутри блока info, отсюда просвет до панели справа */
+.track{margin-top:0;padding:0 12px}
 .tbar{height:20px;border-radius:var(--r-f);background:#6b728014;overflow:hidden}
 .tfill{height:100%;background:var(--accent);border-radius:var(--r-f);transition:width .25s}
 .tpts{display:flex;justify-content:space-between;margin-top:-30px;position:relative}
 /* подпись идёт через 12 от полосы, а медаль свисает на 10 — отсюда зазор 2 */
-.pt{display:flex;flex-direction:column;align-items:center;gap:2px;width:40px}
+.pt{display:flex;flex-direction:column;align-items:center;gap:2px;width:40px;position:relative}
+/* в макете полоса разорвана вокруг каждой медали: белый просвет по 3 с боков */
+.pt::before{content:'';position:absolute;left:-3px;top:0;width:46px;height:40px;background:var(--surface)}
+.pt img{position:relative}
 .pt img{width:40px;height:40px;display:block}
 .pt span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
 /* медали выгружены на белой подложке; на светлой карточке её не видно,
@@ -834,6 +843,7 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .thico{display:inline-flex;align-items:center;gap:6px;vertical-align:middle;line-height:var(--lh-s)}
 .thico svg{display:inline-block;margin:0;width:20px;height:20px}
 .tbl th .thico{max-height:20px}
+.tbl th svg{width:16px;height:16px}
 /* тёмная тема: точечные доводки блоков с собственной заливкой */
 :root[data-theme="dark"] .promo{background:linear-gradient(135deg,#312e81,#1e1b4b)}
 :root[data-theme="dark"] .tag.g{color:#4ade80}
@@ -1095,9 +1105,9 @@ html{scrollbar-gutter:stable}
 .card.chartcard>.ch{margin:0}
 .card.chartcard .clegend{margin-top:0!important}
 /* Реферальная карточка: две колонки по 794, зазор 16 (макет 185:105548) */
-.refrow{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 16px 8px}
+.refrow{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 16px 8px;align-items:start}
 .refmain{display:flex;gap:16px;min-width:0;align-items:center}
-.refinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px}
+.refinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding:0 14px}
 .refstats{display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap}
 .rst .l{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
 .rst .v{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
@@ -1106,12 +1116,8 @@ html{scrollbar-gutter:stable}
 .refcoin b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .refcoin i{display:block;font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:500;color:var(--c3)}
 .reftot{background:#7086fc1f;border-radius:var(--r-m);padding:12px 24px;min-width:0}
-.reftot h3{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;margin-bottom:16px}
+.reftot h3{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;margin-bottom:24px}
 .rtgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-/* «До следующего уровня» над дорожкой */
-.tnext{display:flex;gap:4px;font-size:var(--fs-c);line-height:var(--lh-c);margin-bottom:16px}
-.tnext span{color:var(--c3);font-weight:500}
-.tnext b{font-weight:600}
 .card.tblcard{padding:8px}
 .card.tblcard>.ch.subhead{padding:16px;margin:0;min-height:80px;gap:16px}
 .card.tblcard .tw{padding-bottom:8px}

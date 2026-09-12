@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import { AXES, CHECK, COIN_ICON, I, type Model } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico } from './Raw'
@@ -17,13 +18,16 @@ export function Coinbar({ m }: { m: Model }) {
           <Ico html={I.cd} />
         </button>
         {pop === 'coin' && (
-          <div className="pop left" style={{ minWidth: 190 }}>
-            {AXES.coin.opts.map(([v, t]) => (
-              <button className={S.coin === v ? 'on' : ''} data-axis="coin" data-val={v} key={v}>
-                <Ico html={COIN_ICON[v === 'btc' ? 'BTC' : v === 'zec' ? 'ZEC' : 'LTC']} />
-                {t}
-                {S.coin === v && <Ico className="ck" html={CHECK} />}
-              </button>
+          <div className="pop left menu coinmenu">
+            {AXES.coin.opts.map(([v, t], i) => (
+              <Fragment key={v}>
+                {i > 0 && <div className="hr" />}
+                <button className={S.coin === v ? 'on' : ''} data-axis="coin" data-val={v}>
+                  <Ico html={COIN_ICON[v === 'btc' ? 'BTC' : v === 'zec' ? 'ZEC' : 'LTC']} />
+                  {t}
+                  {S.coin === v && <Ico className="ck" html={CHECK} />}
+                </button>
+              </Fragment>
             ))}
           </div>
         )}

@@ -462,11 +462,11 @@ V.home=m=>{
 ${cards.length?`<div class="grid g3" style="gap:16px;margin:0">${cards.join('')}</div>`:''}
 ${p.workers?card(`<div class="ch"><h2>График изменения хэшрейта (${m.bal[0].s})</h2>
   <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],2)}
-  <span class="pop-wrap"><button class="pill flat sq mono lg" data-pop="date">29.01.2026 – 30.01.2026 ${I.cal}</button>${pop==='date'?datePicker():''}</span>
-  <button class="ib" data-tip="Приблизить">${I.zi}</button><button class="ib" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{hpx:449})}`,'chartcard'):''}
+  <span class="pop-wrap"><button class="pill ctl sq mono lg" data-pop="date">29.01.2026 – 30.01.2026 ${I.cal}</button>${pop==='date'?datePicker():''}</span>
+  <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{h:395})}`,'chartcard'):''}
 ${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,0):`<h2>${tabs[0]}</h2>`}
   <div class="spacer"></div>${m.bal.length>1?`<span class="pill flat sq">${COIN_ICON.LTC} LTC ${I.cd}</span>`:''}
-  <button class="ib" data-toast="Отчет скачан">${I.dl}</button></div>
+  <button class="ib ctl" data-toast="Отчет скачан">${I.dl}</button></div>
   ${inc?incomeTable(m,Math.min(m.rows,5)):payoutsTable(m,Math.min(m.rows,5))}
   ${m.rows?`<div class="tfoot"><button class="btn link" data-go="${inc?'income':'payouts'}">${inc?'Весь доход':'Все выплаты'}</button></div>`:''}`,'tblcard'):''}
 ${obs?'':`${card(refBlock(m),'tblcard')}
@@ -507,9 +507,9 @@ function incomeTable(m,n,pid){
   if(pid){const per=perOf(pid,10),pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
   return `<div class="tw"><table class="tbl"><thead><tr>
     <th>Дата и время</th><th>Хэшрейт ${I.inf}</th>
-    <th class="num"><span class="thico">${COIN_ICON[u]} Доход, ${u}</span></th><th class="num">Доход с 1 ${m.c.short}, ${u}</th>
-    <th class="num"><span class="thico">${USD_ICON} Доход, $ ${I.inf}</span></th>
-    <th class="num"><span class="thico">${I.rub} Доход, ₽ ${I.inf}</span></th>
+    <th class="num">Доход, ${u}</th><th class="num">Доход с 1 ${m.c.short}, ${u}</th>
+    <th class="num">Доход, $ ${I.inf}</th>
+    <th class="num">Доход, ₽ ${I.inf}</th>
     <th class="num">Баланс, ${u}</th><th class="num">Цена ${u}, ₽</th></tr></thead><tbody>
     ${Array.from({length:to-from},(_,j)=>{const i=from+j;return `<tr><td class="mono">${d[i%10]}</td><td class="mono">${hs[i%10]} ${m.c.unit}</td>
       <td class="num mono">${R.amount}</td><td class="num mono">${R.per}</td><td class="num mono">35,00 $</td>
@@ -558,7 +558,6 @@ function refBlock(m){
   <div class="tfoot"><button class="btn link" data-go="ref">Подробно о программе</button></div>`;
 }
 const tierTrack=m=>`<div class="track">
-  <div class="tnext"><span>До следующего уровня:</span><b class="mono">${m.empty?'0 '+m.c.unit:m.c.next}</b></div>
   <div class="tbar"><div class="tfill" style="width:${m.empty?0:TIERS[+S.tier].f}%"></div></div>
   <div class="tpts">${TIERS.map(x=>`<div class="pt"><img src="/tier-${x.k}-s.png" alt="" width="40" height="40"><span>${x.p}</span></div>`).join('')}</div></div>`;
 
