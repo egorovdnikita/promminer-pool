@@ -637,8 +637,9 @@ const sortBy=(rows,tbl,val)=>{const s=U.sort[tbl]; if(!s) return rows;
     return (typeof x==='number'&&typeof y==='number'?x-y:String(x).localeCompare(String(y),'ru'))*s.d})};
 
 V.workers=m=>{
-  const st=[['Активные',m.h.a,'var(--pos)',I.warr],['Низкий хэшрейт',m.h.l,'var(--warn)',I.wdng],
-            ['Отключены',m.h.o,'var(--neg)',I.wrec],['Оффлайн',m.h.f,'var(--neu)',I.woff]];
+  /* Плитка статуса: подложка — цвет статуса на 16 %, значок — тот же цвет (360:110008) */
+  const st=[['Активные',m.h.a,'#22c55e',I.warr],['Низкий хэшрейт',m.h.l,'#f59e0b',I.wdng],
+            ['Отключены',m.h.o,'#ef4444',I.wrec],['Оффлайн',m.h.f,'#6b7280',I.woff]];
   const all=workersList(m), shown=workersRows(m);
   /* Счётчики в фильтре — по всему парку, как в макете (таблица показывает выборку) */
   const PC={all:m.total,ok:m.h.a,low:m.h.l,off:m.h.o,fail:m.h.f};
@@ -668,7 +669,7 @@ V.workers=m=>{
       ${wst('Uptime за 24 ч',m.empty?'0%':m.c.up,dyn('ok','10%'))}
     </div>`,'wcard')}
   <div class="grid g4" style="gap:16px;margin:0">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap">${l}</div><div class="n mono">${ni(n)}</div></div>
-    <div class="ic" style="background:${c}">${g}</div></div>`).join('')}</div>
+    <div class="ic" style="background:${c}29;color:${c}">${g}</div></div>`).join('')}</div>
   <!-- Лента групп — Segment Control Line из макета: текстовые вкладки со счётчиками -->
   <div class="wlist">
   <div class="row gtabs">
@@ -683,10 +684,10 @@ V.workers=m=>{
       ${[['all','Все',''],['ok','Активные','var(--pos)'],['low','Низкий хэшрейт','var(--warn)'],['off','Отключены','var(--neg)'],['fail','Оффлайн','var(--neu)']]
         .map(([k,l,c])=>`<button class="${U.wfilter===k?'on':''}" data-wf="${k}">${c?`<i class="dot" style="background:${c}"></i>`:''}${l} <u>${ni(cnt(k))}</u></button>`).join('')}
     </div>
-    <button class="chip" data-modal="filters">${I.flt} Фильтры</button>
+    <button class="btn g wfilt" data-modal="filters">${I.flt}<span class="lb">Фильтры</span></button>
     <div class="spacer"></div>
-    <label class="search">${I.srch}<input id="q" placeholder="Найти воркер" value="${U.q.replace(/"/g,'&quot;')}"></label>
-    <button class="btn g sm" data-toast="Экспорт CSV поставлен в очередь">${I.dl} Экспорт</button></div>
+    <label class="search wsearch">${I.srch}<input id="q" placeholder="Найти воркер" value="${U.q.replace(/"/g,'&quot;')}"></label>
+    <button class="btn g wexport" data-toast="Экспорт CSV поставлен в очередь">${I.dl}<span class="lb">Экспорт</span></button></div>
   ${U.sel.size?`<div class="bulk">${cb(true)}<b>Выбрано: ${U.sel.size}</b>
     <button class="btn g sm" data-toast="Команда перезагрузки отправлена">Перезагрузить</button>
     <button class="btn g sm" data-modal="group">Привязать группу</button>
