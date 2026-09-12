@@ -386,7 +386,7 @@ function datePicker(sel=[29,30],mi=0,yr=2026,min=0){
   </div>`;
 }
 /* Status дизайн-системы: точка 8 + подпись 12 Bold. t: ok|err|warn|off. */
-const status=(t,label)=>`<span class="status ${t}"><i class="dot"></i>${label}</span>`;
+const status=(t,label,cls='')=>`<span class="status ${t} ${cls}"><i class="dot"></i>${label}</span>`;
 const rd=(on,attr='',cls='')=>`<span class="rd ${on?'on':''} ${cls}" ${attr}></span>`;
 /* Пагинация — кликабельная */
 function pager(id,total,def=10){
@@ -528,14 +528,29 @@ function incomeTable(m,n,pid){
   </tbody></table></div>${pid?pager(pid,n,10):''}`;
 }
 
+/* Выплаты (макет 247:91194): дата, сумма со значком монеты, тип транзакции,
+   кошелёк, статус-бейдж и кнопка «Скачать» — только у завершённых. */
+const PAYOUTS=[
+  ['09.12.2025 07:00','0,000329926','Автовыплата','1A1z****8uGT','work'],
+  ['08.12.2025 07:00','0,000235789','Ручной вывод','1A1z****8uGT','work'],
+  ['07.12.2025 17:34','0,000456789','Автовыплата','1A1z****8uGT','err'],
+  ['06.12.2025 10:45','0,000654321','Автовыплата','1A1z****8uGT','done'],
+  ['05.12.2025 07:00','0,000345678','Автовыплата','1A1z****8uGT','done']];
+const PAY_ST={work:['warn','В работе'],err:['err','Ошибка'],done:['ok','Завершен']};
 function payoutsTable(m,n){
   if(!n) return emptyBox('Выплат пока нет','Здесь появятся выплаты после первого вывода средств');
-  return `<div class="tw"><table class="tbl"><thead><tr><th>Дата и время</th><th>Кошелек</th>
-    <th class="num">Сумма, ${m.bal[0].s}</th><th class="num">Сумма, ₽</th><th>Статус</th></tr></thead><tbody>
-    ${Array.from({length:n},(_,i)=>`<tr><td class="mono">0${(i%9)+1}.04.2026 11:0${i%9}</td>
-      <td class="mono mut">bc1q…${(4000+i*37).toString(16)}</td><td class="num mono">0,0125${i%9}</td>
-      <td class="num mono">74 8${i%9}0,00 ₽</td>
-      <td><span class="tag ${i%7===3?'y':'g'}">${i%7===3?'В обработке':'Выплачено'}</span></td></tr>`).join('')}
+  const u=m.bal[0].s;
+  return `<div class="tw"><table class="tbl paytbl"><thead><tr>
+    <th>Дата и время</th>
+    <th><span class="thico paico">${COIN_ICON[u]}</span> Сумма, ${u}</th>
+    <th>Тип транзакции</th><th>Кошелек/Расчетный счет</th><th>Статус</th>
+    <th class="docs">Документы ${I.inf}</th></tr></thead><tbody>
+    ${Array.from({length:n},(_,i)=>{const [d,a,t,w,st]=PAYOUTS[i%PAYOUTS.length];
+      const [cls,lab]=PAY_ST[st];
+      return `<tr><td class="mono">${d}</td><td class="mono">${a} ${u}</td>
+      <td>${t}</td><td class="mono">${w}</td>
+      <td>${status(cls,lab,'caps')}</td>
+      <td class="docs">${st==='done'?`<button class="btn out xs" data-toast="Документ скачан">${I.dl} Скачать</button>`:''}</td></tr>`}).join('')}
   </tbody></table></div>`;
 }
 /* Реферальная программа (макет 185:105544): табличная карточка, внутри две

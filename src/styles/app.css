@@ -292,6 +292,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .btn.out{background:var(--surface);color:var(--c1);border:1px solid var(--ctrl-line);box-shadow:none}
 .btn.out:hover{background:var(--ctrl2)}
 .btn.sm{height:var(--h-btn-sm);padding:0 16px;border-radius:var(--r-s)}
+/* Button XS: 36 с радиусом 12 — «Скачать» в таблице выплат */
+.btn.xs{height:36px;padding:0 24px;border-radius:var(--r-s)}
+.btn.xs svg{width:16px;height:16px}
 /* текстовая кнопка: h28, без паддинга, Body/M accent */
 .btn.link{height:28px;padding:0;background:none;box-shadow:none;color:var(--accent);border-radius:var(--r-s);font-size:var(--fs-m);line-height:var(--lh-m)}
 .btn[disabled]{opacity:.45;pointer-events:none}
@@ -332,6 +335,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Status (💙 DS 214:4829): высота 24, radius 8, 12/16 Bold, точка 8. */
 .status{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;border-radius:var(--r-xs);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;white-space:nowrap}
 .status:hover{opacity:.8}
+/* Caption/S/Bold Caps из ДС: заглавные, начертание Bold (макет 247:91194) */
+.status.caps{text-transform:uppercase;font-weight:700}
 .status .dot{width:8px;height:8px}
 .status.ok{background:#22c55e29;color:#22c55e}.status.ok .dot{background:#22c55e}
 .status.err{background:#ef444429;color:#ef4444}.status.err .dot{background:#ef4444}
@@ -397,14 +402,14 @@ img.hex{object-fit:contain}
 .tpts{display:flex;justify-content:space-between;margin-top:-30px;position:relative}
 /* подпись идёт через 12 от полосы, а медаль свисает на 10 — отсюда зазор 2 */
 .pt{display:flex;flex-direction:column;align-items:center;gap:2px;width:40px;position:relative}
-/* в макете полоса разорвана вокруг каждой медали: белый просвет по 3 с боков */
-.pt::before{content:'';position:absolute;left:-3px;top:0;width:46px;height:40px;background:var(--surface)}
+/* полоса под медалями непрерывна (макет 185:99697), поэтому медали режем
+   по силуэту шестиугольника — иначе белые углы выгрузки рвут её */
 .pt img{position:relative}
 .pt img{width:40px;height:40px;display:block}
 .pt span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
 /* медали выгружены на белой подложке; на светлой карточке её не видно,
    на тёмной теме обрезаем по силуэту шестиугольника (ценой мягкой тени) */
-:root[data-theme="dark"] img.hex,:root[data-theme="dark"] .pt img{
+.pt img,:root[data-theme="dark"] img.hex{
   clip-path:polygon(50% 2%,92.8% 29.6%,92.8% 69.7%,50% 98%,7.2% 69.7%,7.2% 29.6%)}
 .alert.mb{margin-bottom:12px}
 .foot{margin-top:auto;display:flex;gap:24px;padding:4px 0 24px;font-size:var(--fs-s);line-height:var(--lh-s);color:#9ca3af;font-weight:600;flex-wrap:wrap}
@@ -845,6 +850,12 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .tbl th .thico{max-height:20px}
 .tbl th svg{width:16px;height:16px}
 /* значки монеты и валют в шапке — 24, в отличие от 16 у Info Circle */
+/* Выплаты: пять колонок поровну и 150 под документы (макет 247:91194) */
+.paytbl th,.paytbl td{width:18.2%}
+.paytbl .docs{width:150px;text-align:right}
+/* ячейки 12 по вертикали: строка 48 держится по бейджу статуса */
+.paytbl td{padding:12px}
+.paytbl td.docs{padding:6px 12px}
 .tbl th .paico{margin-right:4px;max-height:none;line-height:0}
 .tbl th .paico svg{width:24px;height:24px}
 /* тёмная тема: точечные доводки блоков с собственной заливкой */
@@ -1116,12 +1127,12 @@ html{scrollbar-gutter:stable}
 .refrow{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 16px 8px;align-items:start}
 .refmain{display:flex;gap:16px;min-width:0;align-items:center}
 /* info в макете: паддинг слева 4, справа 24, а у дорожки ещё 24 справа */
-.refinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding:0 24px 0 4px}
+.refinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:32px;padding:0 24px 0 4px}
 .refstats{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
 .rstrow{display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap}
 .rst .l{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
 .rst .v{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
-.refcoin{display:flex;align-items:center;gap:8px}
+.refcoin{display:flex;align-items:center;gap:8px;margin-left:auto}
 .refcoin svg{width:32px;height:32px}
 .refcoin b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .refcoin i{display:block;font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:500;color:var(--c3)}
