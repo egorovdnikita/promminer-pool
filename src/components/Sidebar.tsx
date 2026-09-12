@@ -6,6 +6,8 @@ export function Sidebar() {
   const { route, openGroups, mini } = useApp()
   /* У наблюдателя в сайдбаре только разрешённые разделы (макеты 189:154154…) */
   const ok = allowed()
+  /* «Серийные номера» и деталка живут внутри «Воркеров» — подсвечиваем их */
+  const act = route === 'serials' || route === 'worker' ? 'workers' : route
   const nav = ok
     ? NAV.map((o) =>
         o.kids ? { ...o, kids: o.kids.filter(([id]) => ok.has(id)) } : o,
@@ -30,7 +32,7 @@ export function Sidebar() {
                 {(open || mini) && (
                   <div className="kids">
                     {o.kids.map(([id, t]) => (
-                      <button className={`kid ${route === id ? 'on' : ''}`} data-go={id} key={id}>{t}</button>
+                      <button className={`kid ${act === id ? 'on' : ''}`} data-go={id} key={id}>{t}</button>
                     ))}
                   </div>
                 )}
@@ -38,7 +40,7 @@ export function Sidebar() {
             )
           }
           return (
-            <button className={`ni ${route === o.id ? 'on' : ''}`} data-go={o.id} key={o.id}>
+            <button className={`ni ${act === o.id ? 'on' : ''}`} data-go={o.id} key={o.id}>
               <Ico className="nic" html={I[o.ic]} />
               <span className="lbl">{o.t}</span>
             </button>

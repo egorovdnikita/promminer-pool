@@ -266,7 +266,8 @@ body.mini .ni .spacer.lbl{display:none!important}
    остальные делят ширину; длинные модели обрезаются многоточием */
 .tbl.wtbl{table-layout:fixed}
 .tbl.wtbl th,.tbl.wtbl td{overflow:hidden;text-overflow:ellipsis}
-.tbl.wtbl td{padding:12px;height:48px}
+/* 47 + разделитель 1 = строка 48 из макета */
+.tbl.wtbl td{padding:12px;height:47px}
 .tbl.wtbl td.tags{padding:8px 12px}
 .tbl.wtbl td.wact{padding:6px 16px}
 .tbl.wtbl .tag{height:32px;padding:0 12px}
@@ -1414,3 +1415,29 @@ button.scsect:hover{color:var(--accent)}
 .tempty{text-align:center;padding:40px 0 24px}
 .tempty b{display:block;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;margin-bottom:8px}
 .tempty p{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)}
+
+/* --- Серийные номера (макет 173:66711) --- */
+.tbl.sertbl{table-layout:fixed}
+.tbl.sertbl th,.tbl.sertbl td{width:25%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tbl.sertbl td{padding:12px;height:47px}
+.serph{color:var(--c3);font-weight:500}
+.serval{font-weight:500}
+.serval.bad{color:var(--neg)}
+/* Модалка загрузки файла */
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:24px;
+  border:1px dashed var(--ctrl-line);border-radius:var(--r-m);background:var(--ctrl2);color:var(--c3)}
+.drop.bad{border-color:var(--neg)}
+.drop b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1);margin-top:8px}
+.drop span{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)}
+.drop svg{width:24px;height:24px}
+.fileline{display:flex;align-items:center;gap:12px;margin-top:12px;padding:12px;
+  border-radius:var(--r-m);background:var(--ctrl2)}
+.fileline .fico{color:var(--accent);display:grid;place-items:center}
+.fileline .fnm{display:flex;flex-direction:column;gap:2px;min-width:0}
+.fileline .fnm b{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fileline .fnm i{font-size:var(--fs-c);line-height:var(--lh-c);font-style:normal;color:var(--c2)}
+.ferr{margin-top:8px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--neg)}
+.mbody .cap.dim{margin-top:16px}
+.mbody .cap.dim .btn.link{height:auto;font-size:var(--fs-s);line-height:var(--lh-s);vertical-align:baseline}
+.btn.dis{background:var(--ctrl2);color:var(--c3);box-shadow:none;cursor:default}

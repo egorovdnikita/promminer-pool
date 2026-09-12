@@ -13,6 +13,9 @@ import { ICONS } from './icons.js';
 const AXES={
   coin:{g:'Данные',label:'Монета',opts:[['btc','BTC'],['ltc','LTC + DOGE'],['zec','ZEC']]},
   wf:{g:'Данные',label:'Теги и модели',opts:[['yes','Заведены'],['none','Ничего не заведено']]},
+  ser:{g:'Воркеры',label:'Серийные номера',opts:[['no','Не заполнены'],['ok','Заполнены'],['err','Есть ошибки']]},
+  upl:{g:'Воркеры',label:'Файл серийников',opts:[['no','Не выбран'],['ok','Выбран'],
+    ['big','Больше 10 Мб'],['bad','Нет листа «Данные»']]},
   data:{g:'Данные',label:'Наполнение данными',opts:[['normal','Норма'],['empty','Пусто'],['few','Мало записей'],['huge','Большие значения']]},
   health:{g:'Данные',label:'Здоровье парка',opts:[['ok','Всё живо'],['degraded','Деградация'],['critical','Авария']]},
   load:{g:'Данные',label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон']]},
@@ -53,7 +56,7 @@ const PRESETS=[
   ['Крупный клиент','Большие значения и много записей',{data:'huge',subs:'many',obs:'many',tier:'4',verif:'yes',vdoc:'yes',vacc:'yes'}],
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
-const DEF={coin:'btc',wf:'yes',data:'normal',health:'degraded',role:'owner',perm:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
+const DEF={coin:'btc',wf:'yes',ser:'no',upl:'no',data:'normal',health:'degraded',role:'owner',perm:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
@@ -341,7 +344,7 @@ const NAV=[
   {id:'monitor',t:'Мониторинг',ic:'bars'},
   {g:'ref',t:'Мои рефералы',ic:'ref',kids:[['ref','Общая информация'],['reflist','Список рефералов'],['refincome','Реферальный доход'],['refpayouts','Реферальные выплаты']]},
 ];
-const TITLES={home:'Главная',workers:'Воркеры',worker:'Ant01',assets:'Мои активы',income:'Доход',payouts:'Выплаты',
+const TITLES={home:'Главная',workers:'Воркеры',worker:'Ant01',serials:'Воркеры',assets:'Мои активы',income:'Доход',payouts:'Выплаты',
   report:'Отчет о майнинге',calc:'Калькулятор доходности',tax:'Калькулятор налогов',monitor:'Главная сводки',
   ref:'Promminer: реферальная программа',reflist:'Список рефералов',refincome:'Реферальный доход',refpayouts:'Реферальные выплаты',
   profile:'Личный кабинет',security:'Личный кабинет',notifsettings:'Личный кабинет',notifconfig:'Личный кабинет',subaccounts:'Личный кабинет',
@@ -684,6 +687,9 @@ const vendorOf=model=>VENDORS[String(model).split(/[\s+]/)[0]]||'bitmain';
 const vlogo=k=>`<span class="vlogo"><img src="/logo-${k}.svg" alt="" width="24" height="24"></span>`;
 /* Сколько фильтров применено — счётчик на кнопке «Фильтры» (612:100188) */
 const fcount=()=>U.fapp?U.fapp.t.length+U.fapp.m.length:0;
+/* Время последней шары: отсчитываем назад от 9 апреля, 07:32 */
+const shareAt=off=>{const t=7*60+32-off, h=Math.floor((t+1440)%1440/60), mi=(t+1440)%1440%60;
+  return `${t<0?8:9} Апреля, ${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')}`};
 const WST={ok:['Активен','var(--pos)'],low:['Низкий хэшрейт','var(--warn)'],off:['Отключен','var(--neg)'],fail:['Оффлайн','var(--neu)']};
 function workersList(m){
   if(m.empty) return [];
@@ -700,7 +706,10 @@ function workersList(m){
     const tg=tags[i%3], extra=i%2;
     out.push({id:i+1,name:'Ant'+String(i+1).padStart(2,'0'),model:models[i%4],st,
       h5:base+5,h1:base+12,h24:base+8,rej:((i%8)+1)/100,up:99+(i%2),
-      tag:tg[0],tags:extra?tg:[tg[0]],extra});
+      tag:tg[0],tags:extra?tg:[tg[0]],extra,
+      /* время последней шары разное — по нему список сортируется по умолчанию
+         (заметка дизайнера 290:157360) */
+      sh:(i*7+i%5)%143});
   }
   return out;
 }
@@ -716,6 +725,8 @@ function workersRows(m){
   const s=U.sort.workers;
   if(s) rows=[...rows].sort((a,b)=>{const x=a[s.k],y=b[s.k];
     return (typeof x==='string'?String(x).localeCompare(String(y)):x-y)*s.d});
+  /* «По дефолту сортировка по шаре» — свежие сверху */
+  else rows=[...rows].sort((a,b)=>a.sh-b.sh);
   return rows;
 }
 /* Заголовок с сортировкой. tbl — своя пара ключ/направление на каждую таблицу */
@@ -755,7 +766,7 @@ V.workers=m=>{
       <td class="mut"><span class="vcell">${vlogo(vendorOf(w.model))}<span>${w.model}</span></span></td>
       <td><i class="dot" style="display:inline-block;background:${col};margin-right:8px"></i>${lbl}</td>
       <td class="mono">${nf(w.h5,2)} ${m.c.unit}</td><td class="mono">${nf(w.h1,2)} ${m.c.unit}</td><td class="mono">${nf(w.h24,2)} ${m.c.unit}</td>
-      <td class="mono">${nf(w.rej,2)}%</td><td class="mono">${w.up}%</td><td class="mono mut">9 Апреля, 07:32</td>
+      <td class="mono">${nf(w.rej,2)}%</td><td class="mono">${w.up}%</td><td class="mono mut">${shareAt(w.sh)}</td>
       <td class="tags"><span class="tag ${w.tag==='Без прошивки'?'y':''}">${w.tag}</span>${w.extra?` <span class="tag n" data-tip="${w.tags.slice(1).join(', ')}">+1</span>`:''}</td>
       <td class="num wact">${wkMenu(w)}</td></tr>`}).join('');
   /* Сводка хэшрейта — одна карточка: акцентная плашка и сетка 2×2 (макет 173:59403) */
@@ -810,6 +821,44 @@ V.workers=m=>{
         '<button class="btn link" data-fclear>Очистить фильтры</button>')
       :emptyBox('Ничего не найдено','Измените фильтр или поисковый запрос')))
     :emptyBox('Воркеров пока нет','Подключите первый воркер, чтобы увидеть статистику по парку')}`,'tblcard')}</div>`;
+};
+
+/* Серийные номера (макет 173:66711): отдельный экран с таблицей,
+   где заводской номер вводят, а модель выбирают из списка */
+const SER_MODELS=['Aisen A1 Pro 23 Th/s 2200 W','Antminer S19 XP Hydro 257 Th/s',
+  'Antminer S21+ 235 Th/s','Avalon Q 90 Th/s','Whatsminer M60S 186 Th/s'];
+V.serials=m=>{
+  const all=workersList(m), errs=S.ser==='err'?25:0;
+  const tab=U.seg['sertab']??0;
+  const rows=(tab?all.slice(0,Math.min(errs,all.length)):all).slice(0,12);
+  const filled=S.ser!=='no';
+  const cell=(w,i)=>{
+    const bad=S.ser==='err'&&i<3;
+    return `<tr>
+      <td class="mono">${String(7654+w.id*131).slice(0,4)}</td>
+      <td><b>${w.name}</b></td>
+      <td class="sercell">${filled
+        ? `<span class="serval ${bad?'bad':''}">OLTTG4BBEJDAJ062H</span>`
+        : '<span class="serph">Заводской номер</span>'}</td>
+      <td class="sercell">${filled
+        ? `<span class="serval ${bad?'bad':''}">${SER_MODELS[w.id%5]}</span>`
+        : '<span class="serph">Выберите модель</span>'}</td></tr>`};
+  return `
+  ${card(`<div class="ch"><button class="ib sm" data-go="workers">${I.cl}</button><h2>Серийные номера</h2></div>
+    <p class="cap dim" style="margin:0">Заводской номер и модель нужны, чтобы подать отчёт о майнинге за месяц</p>`)}
+  <div style="height:12px"></div>
+  ${card(`<div class="ch subhead">
+    <div class="seg">
+      <button class="${tab===0?'on':''}" data-seg="sertab" data-i="0">Все <u>${ni(m.total)}</u></button>
+      <button class="${tab===1?'on':''}" data-seg="sertab" data-i="1">С ошибками <u>${errs}</u></button>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn g" data-modal="export" data-ex="stat">${I.dl}Экспорт</button>
+    <button class="btn" data-modal="upload">${I.pl}Загрузить файл</button></div>
+  ${rows.length?`<div class="tw"><table class="tbl sertbl"><thead><tr>
+      <th>Идентификатор воркера</th><th>Наименование воркера</th><th>Заводской номер</th><th>Модель</th>
+    </tr></thead><tbody>${rows.map(cell).join('')}</tbody></table></div>`
+    :emptyBox('Ошибок нет','Все заводские номера и модели заполнены верно')}`,'tblcard')}`;
 };
 
 V.worker=m=>{
@@ -1876,6 +1925,24 @@ const MODALS={
   wgroups:{t:'Изменить группы',acts:false,size:'tx',b:()=>taxonBody('g',true),
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn" data-tbind="g">Сохранить</button>`},
+  /* Загрузка файла серийников (макет 173:66711): состояния «выбран»,
+     «больше 10 Мб» и «нет листа Данные» приходят из сценария */
+  upload:{t:'Загрузить файл',s:'При каждой загрузке данные будут перезаписаны',acts:false,
+    b:()=>{const st=S.upl, has=st!=='no';
+      const err=st==='big'?'Размер файла не может превышать 10 Мб'
+        :st==='bad'?'Файл не содержит листа «Данные»':'';
+      return `<div class="drop ${err?'bad':''}">${I.dl}
+        <b>Выберите файл или перетащите</b>
+        <span>Не более 10 Мб в формате .xlsx</span></div>
+      ${has&&st!=='bad'?`<div class="fileline"><span class="fico">${I.cv}</span>
+        <span class="fnm"><b>fns_devices_template_2026-05-21_0</b><i>${st==='big'?'10.2 Мб':'53.0 КБ'}</i></span>
+        <div class="spacer"></div><button class="btn link del" data-axis="upl" data-val="no">Удалить</button></div>`:''}
+      ${err?`<p class="ferr">${err}</p>`:''}
+      <p class="cap dim">Допускаются только файлы, созданные на основе актуальной таблицы
+        <button class="btn link" data-toast="Файл готовится — пришлём ссылку на почту">Экспорт таблицы</button></p>`},
+    foot:()=>{const ok=S.upl==='ok';
+      return `<button class="btn out" data-close>Отменить</button>
+        <button class="btn ${ok?'':'dis'}" ${ok?'data-close data-toast="Файл загружен — данные обновлены"':'disabled'}>Сохранить</button>`}},
   gdel:{t:()=>U.gsel.size>1?'Удалить группы?':'Удалить группу?',size:'sm',danger:true,
     s:()=>U.gsel.size>1
       ?'Это действие навсегда удалит все данные, связанные с этими группами. Подтвердите, если уверены.'
