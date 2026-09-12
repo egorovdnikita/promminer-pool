@@ -326,6 +326,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .pager .pg button.on{background:var(--surface);color:var(--c1)}
 .empty{display:flex;flex-direction:column;align-items:center;gap:6px;padding:44px 0 36px;text-align:center}
 .empty .art{width:92px;height:72px;border-radius:var(--r-s);background:var(--accent-ghost);display:grid;place-items:center;color:var(--accent);font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;margin-bottom:4px}
+.empty>img{margin-bottom:10px}
 .empty b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .empty p{font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c1);font-weight:500;max-width:340px}
 
@@ -358,18 +359,28 @@ body.mini .ni .spacer.lbl{display:none!important}
 .promo h2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;max-width:56%;position:relative;color:var(--c1);
   display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
 .promo .art{position:absolute;right:0;bottom:0;height:100%;width:auto;object-fit:contain;object-position:right bottom;pointer-events:none}
+/* Промо на главной (макет 185:105651): белая карточка — фигуры фона уже в иллюстрации */
+.promo.plain{background:var(--surface)}
 .promo .pclose{position:absolute;right:16px;top:16px;z-index:1;width:40px;height:40px;border-radius:var(--r-f);display:grid;place-items:center;background:#52525229;color:var(--c1)}
 .promo .pclose:hover{background:#5252523d}
 .promo .pclose svg{width:24px;height:24px}
-.hex{width:82px;height:82px;border-radius:22px;display:grid;place-items:center;font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;color:#fff;flex:0 0 auto}
-.track{margin-top:14px}
-.tbar{height:8px;border-radius:var(--r-f);background:var(--bg3);overflow:hidden}
+/* Уровни рефералки (макет 1283:59582): медаль 152 из выгрузки pic_star,
+   дорожка 20 с медалями 40 поверх и подписями 16/20 под ней */
+.hex{width:152px;height:152px;flex:0 0 auto;display:grid;place-items:center}
+img.hex{object-fit:contain}
+.hex.none{background:url('/tier-0.svg') center/130px 146px no-repeat;
+  font-size:40px;line-height:22px;font-weight:500;color:var(--c3)}
+.track{margin-top:16px}
+.tbar{height:20px;border-radius:var(--r-f);background:#6b728014;overflow:hidden}
 .tfill{height:100%;background:var(--accent);border-radius:var(--r-f);transition:width .25s}
-.tpts{display:flex;justify-content:space-between;margin-top:-16px}
-.pt{display:flex;flex-direction:column;align-items:center;gap:6px}
-.pt i{width:22px;height:22px;border-radius:7px;background:var(--bg3);border:3px solid var(--surface)}
-.pt span{font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--c3)}
-.pt.on span{color:var(--c1)}
+.tpts{display:flex;justify-content:space-between;margin-top:-30px;position:relative}
+.pt{display:flex;flex-direction:column;align-items:center;gap:12px;width:40px}
+.pt img{width:40px;height:40px;display:block}
+.pt span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
+/* медали выгружены на белой подложке; на светлой карточке её не видно,
+   на тёмной теме обрезаем по силуэту шестиугольника (ценой мягкой тени) */
+:root[data-theme="dark"] img.hex,:root[data-theme="dark"] .pt img{
+  clip-path:polygon(50% 2%,92.8% 29.6%,92.8% 69.7%,50% 98%,7.2% 69.7%,7.2% 29.6%)}
 .alert.mb{margin-bottom:12px}
 .foot{margin-top:auto;display:flex;gap:24px;padding:20px 0 24px;font-size:var(--fs-s);line-height:var(--lh-s);color:#9ca3af;font-weight:600;flex-wrap:wrap}
 .foot .l{margin-left:auto;display:flex;gap:24px;flex-wrap:wrap}
@@ -737,6 +748,8 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .lnk:hover{color:var(--accent)}
 .linkrow svg{display:inline-block;vertical-align:-4px}
+.lico{width:24px;height:24px;flex:0 0 auto;display:grid;place-items:center;color:var(--accent)}
+.lico img{width:24px;height:24px;display:block;border-radius:50%}
 .linkrow:hover{background:#6366f129}
 .promo .btn{align-self:flex-start;margin-top:auto;position:relative}
 .pager .pg button:not(:disabled):not(.on):hover{background:var(--ctrl-hover)}
@@ -814,7 +827,6 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 :root[data-theme="dark"] .status.ok{color:#4ade80}
 :root[data-theme="dark"] .status.err{color:#f87171}
 :root[data-theme="dark"] .status.warn{color:#fbbf24}
-:root[data-theme="dark"] .promo .orb{opacity:.5}
 :root[data-theme="dark"] .cb:not(.on):not(.ind),
 :root[data-theme="dark"] .rd:not(.on){background:var(--ctrl2)}
 :root[data-theme="dark"] .avat{background:#78350f;color:#fde68a}

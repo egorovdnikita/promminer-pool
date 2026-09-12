@@ -84,7 +84,11 @@ const COINS={
     row:{amount:'0,1234',per:'0,1234',bal:'23,4254',price:'4 082,82'}},
 };
 const HEALTH={ok:{a:5800,l:70,o:40,f:69},degraded:{a:1398,l:1230,o:851,f:2500},critical:{a:300,l:500,o:1200,f:3979}};
-const TIERS=[{p:'5%',n:'Бронза',c:'#B87333'},{p:'10%',n:'Серебро',c:'#9AA3B2'},{p:'15%',n:'Золото',c:'#D8A32B'},{p:'20%',n:'Платина',c:'#7FA8C9'},{p:'25%',n:'Алмаз',c:'#4B5563'}];
+/* Уровни рефералки. k — медаль (public/tier-<k>.png, выгрузка pic_star),
+   f — ширина заполнения дорожки в процентах (макет 1283:59582: 114/222/352/484/583 из 590) */
+const TIERS=[{k:5,p:'5%',n:'Бронза',c:'#B87333',f:19.3},{k:10,p:'10%',n:'Серебро',c:'#9AA3B2',f:37.6},
+  {k:15,p:'15%',n:'Золото',c:'#D8A32B',f:59.7},{k:20,p:'20%',n:'Платина',c:'#7FA8C9',f:82},
+  {k:25,p:'25%',n:'Алмаз',c:'#4B5563',f:98.8}];
 const NOTIF_N={many:12,few:2,none:0};
 const ACCOUNTS=['natarusso','alfred','ivanivanov','loricarson'];
 const FULLNAME='Иванов Иван';
@@ -243,6 +247,16 @@ const BANKS={
   vtb:{name:'ВТБ',short:'ВТБ',svg:`<svg viewBox="0 0 24 24" fill="none"><path d="M6 0.5H18C21.0376 0.5 23.5 2.96243 23.5 6V18C23.5 21.0376 21.0376 23.5 18 23.5H6C2.96243 23.5 0.5 21.0376 0.5 18V6C0.5 2.96243 2.96243 0.5 6 0.5Z" fill="#3262EC" stroke="white"/><path fill-rule="evenodd" clip-rule="evenodd" d="M8.53124 7.67188L7.80716 9.73854H17.8413L18.5654 7.67188H8.53124ZM7.44489 10.7714L6.72081 12.8376H16.755L17.4791 10.7714H7.44489ZM6.3608 13.8709L5.63672 15.9371H15.6709L16.3945 13.8709H6.3608Z" fill="white"/></svg>`},
   sovcom:{name:'Совкомбанк',short:'Совкомбанк',svg:`<svg viewBox="0 0 24 24" fill="none"><path d="M6 0.5H18C21.0376 0.5 23.5 2.96243 23.5 6V18C23.5 21.0376 21.0376 23.5 18 23.5H6C2.96243 23.5 0.5 21.0376 0.5 18V6C0.5 2.96243 2.96243 0.5 6 0.5Z" fill="#003790" stroke="white"/><path d="M5 12.0095C5 15.8677 8.13234 19 12.0096 19C12.1051 19 12.2006 19 12.2961 19V16.3452H12.0096C9.60301 16.3452 7.67395 14.397 7.67395 12.0095C7.67395 9.6221 9.62211 7.67394 12.0096 7.67394H12.2961V5C12.2006 5 12.1051 5 12.0096 5C8.13234 5 5 8.13233 5 12.0095Z" fill="white"/><path d="M13.4034 5.13477V8.78279H12.0091C10.2137 8.78279 8.78125 10.2153 8.78125 12.0106C8.78125 13.7869 10.2328 15.2384 12.0091 15.2384H13.4034V18.8865C16.593 18.2371 18.9995 15.4103 18.9995 12.0297C18.9995 8.61089 16.593 5.78415 13.4034 5.13477Z" fill="white"/></svg>`},
 };
+/* Логотип мессенджера Max — не иконка дизайн-системы: в макете это собственный
+   градиентный знак (185:105632), выгружен картинкой в public/max.png */
+const MAX_LOGO='<img src="/max.png" alt="" width="24" height="24">';
+/* Блок «Связаться с нами» на главной (макет 185:105625).
+   Ключ иконки, а не сама иконка: icons.js перекрывает I уже после этого модуля */
+const HOME_CONTACTS=[
+  ['tg','Telegram','@PoolSupport','https://t.me/PoolSupport'],
+  ['max','Max','@PoolSupport','https://max.ru/PoolSupport'],
+  ['mail','Почта',LINKS.support,'mailto:'+LINKS.support],
+  ['phone','Телефон','+7 (996) 666-59-52','tel:+79966665952']];
 const FLAG_RU=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><g clip-path="url(#flagRU)"><path d="M23.3172 16C23.7594 14.7489 24 13.4025 24 12C24 10.5975 23.7594 9.2511 23.3172 7.99998H0.682834C0.240621 9.2511 0 10.5975 0 12C0 13.4025 0.240613 14.7489 0.682812 16H23.3172Z" fill="#0052B4"/><path d="M23.3172 16C21.6698 20.6608 17.2249 24 12 24C6.77513 24 2.33018 20.6608 0.682831 16H23.3172Z" fill="#D80027"/><path d="M23.3172 8H0.682816C2.33016 3.33923 6.77512 0 12 0C17.2249 0 21.6698 3.33923 23.3172 8Z" fill="#F3F5F9"/></g><path d="M12 0.5C18.3513 0.5 23.5 5.64873 23.5 12C23.5 18.3513 18.3513 23.5 12 23.5C5.64873 23.5 0.5 18.3513 0.5 12C0.5 5.64873 5.64873 0.5 12 0.5Z" stroke="#6B7280" stroke-opacity="0.16"/><defs><clipPath id="flagRU"><path d="M0 12C0 5.37258 5.37258 0 12 0C18.6274 0 24 5.37258 24 12C24 18.6274 18.6274 24 12 24C5.37258 24 0 18.6274 0 12Z" fill="white"/></clipPath></defs></svg>`;
 const USD_ICON=`<svg width="18" height="18" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#22c55e"/><path fill="#fff" d="M11.2 4.6h1.6v1.6h-1.6zM11.2 17.8h1.6v1.6h-1.6zM12 6.8c2.2 0 3.8 1.1 4 2.9h-2.1c-.2-.7-.9-1.1-1.9-1.1s-1.8.4-1.8 1.1c0 .6.5 1 1.7 1.2l1.2.2c2.2.4 3.2 1.3 3.2 2.9 0 1.9-1.7 3.1-4.2 3.1s-4.1-1.1-4.3-3h2.1c.2.8 1 1.2 2.2 1.2 1.2 0 2-.5 2-1.2 0-.6-.5-.9-1.7-1.2l-1.3-.2C10 12.3 9 11.4 9 9.8c0-1.8 1.6-3 3.9-3Z"/></svg>`;
 
@@ -276,7 +290,9 @@ const skeleton=()=>`<div class="grid cols2" style="grid-template-columns:1.9fr 1
 /* Наблюдатель видит разделы, но не управляет ими */
 const RO=()=>S.role==='observer'?'disabled':'';
 const card=(inner,cls='')=>`<section class="card ${cls}">${inner}</section>`;
-const emptyBox=(t,p)=>`<div class="empty"><div class="art">${sv('<path d="M3 13.5h4.2c.5 0 .95.28 1.17.72l.26.56c.22.44.67.72 1.17.72h4.06c.5 0 .95-.28 1.17-.72l.26-.56c.22-.44.67-.72 1.17-.72H21"/><path d="M3.5 13.5 5 6.4A3 3 0 0 1 7.94 4h8.12A3 3 0 0 1 19 6.4l1.5 7.1"/><path d="M3 14v2c0 2.2 0 3.3.68 3.98S5.5 20.7 7.7 20.7h8.6c2.2 0 3.3 0 3.98-.68S21 18.2 21 16v-2"/>',36)}</div><b>${t}</b><p>${p}</p></div>`;
+/* Пустая таблица — иллюстрация «not found» из макета (1018:112400) */
+const emptyBox=(t,p)=>`<div class="empty"><img src="/empty-state.svg" alt="" width="221" height="175">
+  <b>${t}</b><p>${p}</p></div>`;
 /* Сегментированный контрол — кликабельный, состояние в U.seg[id] */
 const seg=(id,opts,def=0)=>{const c=U.seg[id]??def;
   return `<div class="seg">${opts.map((o,i)=>`<button class="${i===c?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</div>`};
@@ -399,8 +415,11 @@ ${card(refBlock(m))}
     ${[3333,4444,5555].map((p,i)=>`<div class="urlrow"><div><div class="k">URL ${i+1}</div><div class="v mono">stratum+tcp://ss.promminer.ru:${p}</div></div><button class="spacer lnk" style="color:var(--accent)" data-copy="stratum+tcp://ss.promminer.ru:${p}">${I.cp}</button></div>`).join('')}
     ${S.role==='owner'?`<button class="btn" data-modal="connect">${I.pl} Подключить воркера</button>`:''}`)}
   ${card(`<div class="ch"><h2>Связаться с нами</h2></div>
-    ${[['Telegram','@PoolSupport','https://t.me/PoolSupport'],['Бот с алертами','@PromminerAlertbot',LINKS.tgBot],['Почта',LINKS.support,'mailto:'+LINKS.support],['Телефон','+7 (996) 666-59-52','tel:+79966665952']].map(([k,v,u])=>`<a class="linkrow" href="${u}" target="_blank" rel="noopener"><span style="color:var(--accent)">◉</span>${k}<span class="spacer mut">${v} ${I.ext}</span></a>`).join('')}`)}
-  <section class="promo"><div class="orb"></div><h2>Снизили порог для продажи ЦВ до 10 000 ₽</h2><button class="btn" style="margin-top:20px">Продать</button></section>
+    ${HOME_CONTACTS.map(([ic,k,v,u])=>`<a class="linkrow" href="${u}" target="_blank" rel="noopener">
+      <span class="lico">${ic==='max'?MAX_LOGO:I[ic]}</span>${k}<span class="spacer mut">${v} ${I.ext}</span></a>`).join('')}`)}
+  <section class="promo plain"><img class="art" src="/promo-sell.png" alt="">
+    <h2>Снизили порог<br>для продажи ЦВ<br>до 10 000 ₽</h2>
+    <button class="btn" data-go="assets">Продать</button></section>
 </div>`;
 
 function workerTiles(m){
@@ -441,7 +460,8 @@ function refBlock(m){
   const t=m.tier;
   return `<div class="ch"><h2>Реферальная программа</h2></div>
   <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start">
-    <div class="hex" style="background:${t.c}">${m.empty?'0%':t.p}</div>
+    ${m.empty?'<div class="hex none">0%</div>'
+      :`<img class="hex" src="/tier-${t.k}.png" alt="${t.p}" width="152" height="152">`}
     <div style="display:flex;gap:26px;padding-top:6px;flex-wrap:wrap">
       <div><div class="cap dim">Ваша комиссия</div><div style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?'0%':t.p+' ('+t.n+')'}</div></div>
       <div><div class="cap dim">Хэшрейт рефералов</div><div class="mono" style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600">${m.empty?'0 '+m.c.unit:m.c.refHash}</div></div>
@@ -458,8 +478,8 @@ function refBlock(m){
   </div>${tierTrack(m)}
   <div style="text-align:center;margin-top:14px"><a href="#" data-go="ref" style="font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600">Подробно о программе</a></div>`;
 }
-const tierTrack=m=>`<div class="track"><div class="tbar"><div class="tfill" style="width:${m.empty?0:(+S.tier)/4*100}%"></div></div>
-  <div class="tpts">${TIERS.map((x,i)=>`<div class="pt ${!m.empty&&i<=+S.tier?'on':''}"><i style="${!m.empty&&i<=+S.tier?'background:'+x.c:''}"></i><span>${x.p}</span></div>`).join('')}</div></div>`;
+const tierTrack=m=>`<div class="track"><div class="tbar"><div class="tfill" style="width:${m.empty?0:TIERS[+S.tier].f}%"></div></div>
+  <div class="tpts">${TIERS.map(x=>`<div class="pt"><img src="/tier-${x.k}-s.png" alt="" width="40" height="40"><span>${x.p}</span></div>`).join('')}</div></div>`;
 
 /* --- Воркеры --- */
 /* Группы площадок — лента Segment Control Line из макета «Воркеры» */
