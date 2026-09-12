@@ -15,7 +15,7 @@ const freshUi = (): Ui => ({
   scgrp: [], saved: loadSaved(),
   q: '', wfilter: 'all', geo: '',
   wk: null, wtag: new Set(), wgrp: new Set(),
-  ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false,
+  ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
   qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
 
@@ -231,7 +231,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     if (at('[data-arch]')) { u.arch = !u.arch; return bump() }
     const sg = at('[data-seg]')
-    if (sg) { u.seg[sg.dataset.seg!] = +sg.dataset.i!; return bump() }
+    if (sg) {
+      u.seg[sg.dataset.seg!] = +sg.dataset.i!
+      if (sg.closest('.pop')) pop.current = null
+      return bump()
+    }
     const wf = at('[data-wf]')
     if (wf) { u.wfilter = wf.dataset.wf!; u.page.workers = 1; return bump() }
     const sk = at('[data-sortk]')
@@ -307,7 +311,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       page.forEach((w: any) => (on ? u.sel.delete(w.id) : u.sel.add(w.id)))
       return bump()
     }
-    if (at('[data-selclear]')) { u.sel.clear(); return bump() }
+    const sc = at('[data-selclear]')
+    /* «Удалить» в панели массовых действий несёт и снятие выбора, и закрытие */
+    if (sc) { u.sel.clear(); if (!sc.hasAttribute('data-close')) return bump() }
     const geo = at('[data-geo]')
     if (geo) { u.geo = geo.dataset.geo === 'Все' ? '' : geo.dataset.geo!; u.page.workers = 1; return bump() }
     const tf = at('[data-tilef]')
@@ -330,6 +336,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (md) {
       if (md.dataset.obs) u.obs = +md.dataset.obs
       if (md.dataset.sess) u.sess = md.dataset.sess
+      if (md.dataset.ex) u.exk = md.dataset.ex
       /* «Создать тег» из шторки — после создания вернуться в шторку */
       u.fback = md.dataset.modal === 'tagnew' && modal.current === 'filters'
       modal.current = md.dataset.modal!; u.step = 0; u.vfile = false; u.vbank = undefined; pop.current = null

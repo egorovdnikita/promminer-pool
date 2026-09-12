@@ -78,6 +78,8 @@ export interface Ui {
   fapp: { t: string[]; m: string[] } | null
   /** «Создать тег» открыли из шторки — вернуться в неё после. */
   fback: boolean
+  /** Что выгружаем: 'hours' — часы работы, 'stat' — статистика воркеров. */
+  exk: string
   qfocus: boolean
   auth: string
   consent: Set<number>

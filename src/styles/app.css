@@ -1358,3 +1358,33 @@ button.scsect:hover{color:var(--accent)}
 .fbadge{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;
   border-radius:var(--r-f);background:var(--accent);color:#fff;
   font-size:var(--fs-c);line-height:20px;font-weight:600;text-align:center}
+
+/* --- Массовые действия, экспорт и подключение воркера --- */
+/* Панель выбора (макет 173:66163): счётчик слева, действия ссылками справа */
+.bulk .del{color:var(--neg)}
+.bulk .del:hover{color:var(--neg);opacity:.75}
+.bulk .off{color:var(--c3);cursor:default;height:28px;
+  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;display:inline-flex;align-items:center}
+.expmenu{width:200px;min-width:200px}
+/* Модалка экспорта — 400 по макету 173:66473, кнопки друг под другом */
+.modal.xs{max-width:400px}
+.modal.xs .mfoot{flex-direction:column;gap:8px}
+.modal.xs .mfoot .btn{flex:0 0 auto;width:100%}
+/* Поле-селект: подпись сверху, значение в контроле 48 */
+.xf{margin-bottom:22px}
+.xf .k{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500;margin-bottom:10px}
+.xf .pop-wrap{display:block}
+.xs{display:flex;align-items:center;gap:8px;width:100%;height:var(--h-ctrl);padding:0 12px;
+  background:var(--ctrl);border-radius:var(--r-m);color:var(--c1);
+  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.xs:hover{background:var(--ctrl-hover)}
+.xmenu{width:100%;min-width:0}
+.xmenu button{font-size:var(--fs-b1);line-height:var(--lh-b1)}
+/* Инструкция в модалке подключения (макет 173:60724) */
+.steps{margin:16px 0 0;padding:0;list-style:none;counter-reset:st}
+.steps li{counter-increment:st;font-size:var(--fs-s);line-height:22px;color:var(--c1);margin-bottom:16px}
+.steps li::before{content:counter(st) ". "}
+.steps .cap{margin-top:8px}
+.qst{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;margin-bottom:12px}
+.qlinks{display:flex;flex-wrap:wrap;gap:8px;padding-bottom:8px}
+.qlinks .btn{height:40px;gap:8px;font-size:var(--fs-s);line-height:var(--lh-s)}

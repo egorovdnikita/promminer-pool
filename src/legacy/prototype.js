@@ -311,6 +311,13 @@ const BANKS={
 const MAX_LOGO='<img src="/max.png" alt="" width="24" height="24">';
 /* Блок «Связаться с нами» на главной (макет 185:105625).
    Ключ иконки, а не сама иконка: icons.js перекрывает I уже после этого модуля */
+/* Адреса пула по монетам (макет подключения 173:60724) — одни и те же
+   на Главной и в модалке подключения */
+const POOL_URLS={btc:['btc1.pmpool.ru:1314','btc2.pmpool.ru:1314','btc3.pmpool.ru:3333'],
+  ltc:['ltc1.pmpool.ru:8888','ltc2.pmpool.ru:8888','ltc3.pmpool.ru:3335'],
+  zec:['zec1.pmpool.ru:2222','zec2.pmpool.ru:2222','zec3.pmpool.ru:3337']};
+const urlRow=(k,v)=>`<div class="urlrow"><div><div class="k">${k}</div><div class="v mono">${v}</div></div>
+  <button class="spacer lnk" style="color:var(--accent)" data-copy="${v}">${I.cp}</button></div>`;
 const HOME_CONTACTS=[
   ['tg','Telegram','@PoolSupport',LINKS.tgSupport],
   ['max','Max','@PoolSupport',LINKS.maxSupport],
@@ -359,6 +366,13 @@ const emptyBox=(t,p,act='')=>`<div class="empty"><img src="/empty-state.svg" alt
 const seg=(id,opts,def=0)=>{const c=U.seg[id]??def;
   return `<div class="seg">${opts.map((o,i)=>`<button class="${i===c?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</div>`};
 const segv=(id,opts,def=0)=>opts[U.seg[id]??def];
+/* Поле-селект из макета экспорта (173:66473): подпись 14 над контролом 48,
+   значение 16, список раскрывается на 18 */
+const xsel=(label,id,opts)=>{const i=U.seg[id]??0;
+  return `<div class="xf"><div class="k">${label}</div>
+    <span class="pop-wrap"><button class="xs" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
+    ${pop===id?`<div class="pop menu xmenu">${opts.map((o,j)=>
+      `<button class="${i===j?'on':''}" data-seg="${id}" data-i="${j}">${o}${i===j?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></div>`};
 /* Segment Control Line — тот же контракт, что у seg(), но линейный вариант DS */
 const segLine=(id,opts,def=0,cls='')=>{const c=U.seg[id]??def;
   return `<div class="segl ${cls}">${opts.map((o,i)=>`<button class="${i===c?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</div>`};
@@ -494,7 +508,7 @@ ${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,
 ${obs?'':`${card(refBlock(m),'tblcard')}
 <div class="grid g3" style="gap:16px;margin:0">
   ${card(`<div class="ch"><h2>Адреса майнинга</h2></div>
-    ${[3333,4444,5555].map((port,i)=>`<div class="urlrow"><div><div class="k">URL ${i+1}</div><div class="v mono">stratum+tcp://ss.promminer.ru:${port}</div></div><button class="spacer lnk" style="color:var(--accent)" data-copy="stratum+tcp://ss.promminer.ru:${port}">${I.cp}</button></div>`).join('')}
+    ${(POOL_URLS[S.coin]||POOL_URLS.btc).map((u,i)=>urlRow('URL '+(i+1),'stratum+tcp://'+u)).join('')}
     <button class="btn" data-modal="connect">${I.pl} Подключить воркер</button>`)}
   ${card(`<div class="ch"><h2>Связаться с нами</h2></div>
     ${HOME_CONTACTS.map(([ic,k,v,u])=>`<a class="linkrow" href="${u}" target="_blank" rel="noopener">
@@ -725,11 +739,18 @@ V.workers=m=>{
     <button class="btn g wfilt" data-modal="filters">${I.flt}<span class="lb">Фильтры</span>${fcount()?`<i class="fbadge">${fcount()}</i>`:''}</button>
     <div class="spacer"></div>
     <label class="search wsearch">${I.srch}<input id="q" placeholder="Найти воркер" value="${U.q.replace(/"/g,'&quot;')}"></label>
-    <button class="btn g wexport" data-toast="Экспорт CSV поставлен в очередь">${I.dl}<span class="lb">Экспорт</span></button></div>
-  ${U.sel.size?`<div class="bulk">${cb(true)}<b>Выбрано: ${U.sel.size}</b>
-    <button class="btn g sm" data-toast="Команда перезагрузки отправлена">Перезагрузить</button>
-    <button class="btn g sm" data-modal="group">Привязать группу</button>
-    <div class="spacer"></div><button class="btn link" data-selclear>Снять выбор</button></div>`:''}
+    <span class="pop-wrap"><button class="btn g wexport" data-pop="exp">${I.dl}<span class="lb">Экспорт</span></button>
+    ${pop==='exp'?`<div class="pop left menu expmenu">
+      <button data-modal="export" data-ex="hours">Часы работы</button>
+      <button data-modal="export" data-ex="stat">Статистика воркеров</button></div>`:''}</span></div>
+  ${U.sel.size?(()=>{const busy=all.some(w=>U.sel.has(w.id)&&(w.st==='ok'||w.st==='low'));
+    return `<div class="bulk">${cb(true,'data-selclear')}<b>Выбрано элементов: ${U.sel.size}</b>
+    <div class="spacer"></div>
+    <button class="btn link" data-selclear>Очистить выбор</button>
+    <button class="btn link" data-modal="wtags">Изменить теги</button>
+    <button class="btn link" data-modal="wgroups">Изменить группы</button>
+    ${busy?`<span class="btn link off" data-tip="Вы не сможете удалить воркеры в статусе «Активен» или «Низкий хэшрейт»">Удалить</span>`
+      :`<button class="btn link del" data-modal="wkdels">Удалить</button>`}</div>`})():''}
   ${all.length?(shown.length?`<div class="tw"><table class="tbl wtbl"><thead><tr>
       <th>${cb(allSel,'data-selall')}</th>${sortTh('name','Наименование')}${sortTh('model','Модель')}${sortTh('st','Статус')}
       ${sortTh('h5','Хэшрейт, 5 мин')}${sortTh('h1','Хэшрейт, 1 ч')}${sortTh('h24','Хэшрейт, 24 ч')}${sortTh('rej','Реджект, 24 ч')}
@@ -1777,11 +1798,26 @@ const MODALS={
     </div>`;
   }},
 
-  connect:{ok:'Воркер добавлен — данные появятся через 5–10 минут',t:'Подключить воркера',s:'Укажите адрес пула и имя воркера в прошивке устройства',b:m=>`
-    <div class="ch">${seg('connect-coin',['BTC','LTC + DOGE'],S.coin==='btc'?0:1)}</div>
-    ${[3333,4444,5555].map((p,i)=>`<div class="urlrow"><div><div class="k">URL ${i+1}</div><div class="v mono">stratum+tcp://ss.promminer.ru:${p}</div></div><button class="spacer lnk" style="color:var(--accent)" data-copy="stratum+tcp://ss.promminer.ru:${p}">${I.cp}</button></div>`).join('')}
-    <div class="inp" style="margin-top:10px"><div class="k">Имя воркера</div><input value="natarusso.Ant01"></div>
-    <div class="inp"><div class="k">Пароль</div><input value="x"></div>`},
+  /* Подключение воркера (макет 173:60724): 550x1000, вкладки монет,
+     три адреса с копированием, инструкция и контакты поддержки */
+  connect:{t:'Подключение воркера',s:'Новый воркер появится в списке в течение 10 минут',acts:false,
+    b:()=>{const c=['btc','ltc','zec'][U.seg['conn']??0];
+      return `${seg('conn',['BTC','LTC','ZEC'])}
+      <div style="height:16px"></div>
+      ${POOL_URLS[c].map((u,i)=>urlRow('URL '+(i+1),'stratum+tcp://'+u)).join('')}
+      ${urlRow('Воркер','natarusso.001')}${urlRow('Пароль','123')}
+      <ol class="steps">
+        <li>Зайдите в веб-панель управления вашего Asic-майнера — введите в адресной строке браузера его IP-адрес.</li>
+        <li>В панели управления Asic откройте вкладку Miner configuration (Конфигурация майнера) и выберите раздел Pool Settings (Настройка пулов).</li>
+        <li>Заполните поля в соответствии с данными для подключения, которые указаны выше:
+          <p class="cap dim">Воркер = имя_аккаунта.имя_воркера. Имя_воркера является обязательным. Это произвольное наименование, которое вы должны задать самостоятельно на стороне устройства (может содержать строчные буквы, цифры и не должен превышать 64 символа).</p>
+          <p class="cap dim">Пароль: оставьте пустым или введите любое значение по желанию (на стороне устройства)</p></li>
+        <li>Новый воркер появится в списке в течение 10 минут, и вы сможете отслеживать основные показатели его работы (статус, хэшрейт и пр.)</li>
+      </ol>
+      <div class="hr"></div>
+      <b class="qst">Остались вопросы?</b>
+      <div class="qlinks">${HOME_CONTACTS.slice(0,3).map(([ic,k,,u])=>
+        `<a class="btn out" href="${u}" target="_blank" rel="noopener"><span class="lico">${ic==='max'?MAX_LOGO:I[ic]}</span>${k}</a>`).join('')}</div>`}},
   group:{ok:'Группа создана',t:'Создать группу',s:'Группы помогают фильтровать парк по площадкам и владельцам',b:()=>`
     <div class="inp"><div class="k">Название группы</div><input value="Псков"></div>
     <div class="inp"><div class="k">Комментарий</div><input placeholder="Необязательно"></div>
@@ -1841,10 +1877,27 @@ const MODALS={
       return `<button class="btn out" ${back}>Отменить</button>
       <button class="btn" ${back} data-toast="Тег создан">Создать</button>`}},
   /* Удаление воркера (макет 173:65944): только неактивные */
-  wkdel:{t:'Удалить воркер?',s:'Воркер пропадёт из списка, статистика по нему сохранится',size:'sm',danger:true,
+  wkdel:{t:'Удалить воркер?',size:'sm',danger:true,
+    s:'Если воркер был активен в этом месяце, и вы хотите подать отчёт о майнинге, добавьте модель и серийный номер устройства.',
     b:()=>'',
     foot:()=>`<button class="btn out" data-close>Отменить</button>
-      <button class="btn danger" data-close data-toast="Воркер удален">Удалить</button>`},
+      <button class="btn danger" data-close data-toast="Воркер успешно удален">Удалить</button>`},
+  /* Массовое удаление (макет 173:65944): доступно, только если среди
+     выбранных нет «Активен» и «Низкий хэшрейт» */
+  wkdels:{t:'Удалить воркеры?',size:'sm',danger:true,
+    s:'Если вы хотите подать отчёт о майнинге за месяц с активными воркерами, добавьте модели и серийные номера устройств.',
+    b:()=>'',
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn danger" data-close data-selclear data-toast="Воркеры успешно удалены">Удалить</button>`},
+  /* Экспорт истории (макет 173:66473): 400 в ширину, поля-селекты,
+     у «часов работы» добавляется период */
+  export:{t:'Экспорт истории',size:'xs',acts:false,
+    s:()=>U.exk==='hours'?'часов работы воркеров':'статистики воркеров',
+    b:()=>`${xsel('Монета','exc',['BTC','LTC','ZEC'])}
+      ${U.exk==='hours'?xsel('Период','exp',['Май','Апрель','Март']):''}
+      ${xsel('Формат выгрузки','exf',['XLS','CSV'])}`,
+    foot:()=>`<button class="btn" data-close data-toast="Файл готовится — пришлём ссылку на почту">Скачать</button>
+      <button class="btn out" data-close>Отменить</button>`},
   wallet:{ok:'Кошелёк добавлен',t:'Добавить кошелек',s:'Адрес будет использоваться для выводов по этой монете',b:()=>`
     <div class="inp"><div class="k">Сеть</div><input value="Bitcoin (BTC)"></div>
     <div class="inp"><div class="k">Адрес кошелька</div><input placeholder="bc1q…"></div>

@@ -65,7 +65,7 @@ export declare function datePicker(sel?: number[]): string
 
 export declare const V: Record<string, (m: Model) => string>
 export declare const MODALS: Record<string, {
-  t: string; s?: string; ok?: string; cta?: string; cancel?: string; acts?: false
+  t: string; s?: string | ((m: Model) => string); ok?: string; cta?: string; cancel?: string; acts?: false
   steps?: number | ((m: Model) => number)
   b: (m: Model, step: number) => string
   /** Прижатый футер модалки — рисуется вне прокручиваемого тела. */
@@ -75,7 +75,7 @@ export declare const MODALS: Record<string, {
   /** Заголовок по центру — как в модалке выхода. */
   center?: boolean
   /** Узкое окно 500 — подтверждения. */
-  size?: 'sm'
+  size?: 'sm' | 'xs'
   /** Шторка: панель 430 у правого края вместо центральной модалки. */
   sheet?: true
   /** Тело фиксированной высоты 348 — шаговые экраны контактов. */

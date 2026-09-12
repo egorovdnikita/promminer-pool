@@ -11,12 +11,13 @@ export function Modal({ m }: { m: Model }) {
   const step = U.step || 0
   const steps = typeof d.steps === 'function' ? d.steps(m) : d.steps
   const foot = d.foot?.(m, step)
+  const sub = typeof d.s === 'function' ? d.s(m) : d.s
   const hasFoot = !!foot || d.acts !== false
   const close = <button className="mx" data-close><Ico html={I.x} /></button>
 
   return (
     <div className={d.sheet ? 'mask sheet' : 'mask'} data-close>
-      <div className={d.sheet ? 'modal sheet' : d.size === 'sm' ? 'modal sm' : 'modal'}>
+      <div className={d.sheet ? 'modal sheet' : d.size ? 'modal ' + d.size : 'modal'}>
         {d.img ? (
           // Modal HeaderA с иллюстрацией: баннер, крестик поверх, заголовок под ним
           <div className="mhead img">
@@ -35,7 +36,7 @@ export function Modal({ m }: { m: Model }) {
               {Array.from({ length: steps }, (_, i) => <i className={i <= step ? 'on' : ''} key={i} />)}
             </div>
           )}
-          {d.s && <p className="s">{d.s}</p>}
+          {sub && <p className="s">{sub}</p>}
           <Raw html={d.b(m, step)} />
         </div>
         {foot && <div className="mfoot"><Raw html={foot} /></div>}
