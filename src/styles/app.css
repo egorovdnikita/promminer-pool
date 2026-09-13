@@ -1690,7 +1690,8 @@ button.scsect:hover{color:var(--accent)}
 .serpick .sarr{width:24px;height:24px;margin-left:auto;color:var(--c3);flex:0 0 auto}
 .serpick .sarr:hover{color:var(--c1)}
 .serpick .sarr svg{width:24px;height:24px}
-.pop.menu.smenu{width:320px;min-width:320px;padding:12px!important;gap:0;right:0;left:auto;scrollbar-gutter:auto}
+.pop.menu.smenu{width:320px;min-width:320px;max-height:386px;overflow-y:auto;
+  padding:12px!important;gap:0;right:0;left:auto;scrollbar-gutter:auto}
 .pop.menu.smenu>button{padding:0!important;height:40px;gap:8px;font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
 .pop.menu.smenu .mdiv{margin:3.5px 0}
 .pop.menu.smenu .ck{margin-left:auto}

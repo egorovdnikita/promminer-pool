@@ -685,7 +685,7 @@ function taxonBody(k,bind){
   return `
   <div class="inp" style="margin:0"><div class="k">Наименование</div>
     <input id="tname" maxlength="10" placeholder="Наименование" value="${String(name).replace(/"/g,'&quot;')}"></div>
-  ${k==='t'?`<div class="inp ta"><div class="k">Описание</div>
+  ${k==='t'?`<div class="inp ta" style="margin-top:8px"><div class="k">Описание</div>
     <input id="tdesc" maxlength="100" placeholder="Описание" value="${String(U.tdesc||'').replace(/"/g,'&quot;')}"></div>
   <div class="tcolor"><div class="k">Выберите цвет тега</div>
     <div class="swatches">${TAG_COLORS.map(c=>`<button class="sw ${(U.tcol||TAG_COLORS[0])===c?'on':''}" style="background:${c}" data-tcol="${c}">${(U.tcol||TAG_COLORS[0])===c?CHECK:''}</button>`).join('')}</div></div>`:''}
@@ -893,8 +893,13 @@ V.serials=m=>{
       <td class="sercell sermodel ${bad?'bad':''}">
         <span class="pop-wrap serpick">${filled?`<span class="sname">${SER_MODELS[w.id%5]}</span>`:'<i class="serph">Выберите модель</i>'}
           <button class="ibr sarr" data-pop="sm${w.id}">${I.cd}</button>
-          ${pop==='sm'+w.id?`<div class="pop menu smenu">${SER_MODELS.map((mo,j)=>
-            `${j?'<div class="mdiv"></div>':''}<button data-toast="Модель: ${mo}">${mo}${filled&&SER_MODELS[w.id%5]===mo?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}
+          ${pop==='sm'+w.id?(()=>{const q=(U.selq||'').trim().toLowerCase();
+            const shown=SER_MODELS.filter(mo=>!q||mo.toLowerCase().includes(q));
+            return `<div class="pop menu smenu">
+              <label class="search xfind">${I.srch}<input id="selq" placeholder="Поиск" value="${String(U.selq||'').replace(/"/g,'&quot;')}"></label>
+              ${shown.length?shown.map((mo,j)=>
+                `${j?'<div class="mdiv"></div>':''}<button data-toast="Модель: ${mo}">${mo}${filled&&SER_MODELS[w.id%5]===mo?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')
+                :'<p class="fempty">Результатов не найдено</p>'}</div>`})():''}
         </span></td></tr>`};
   return `
   <div class="wdtop">
