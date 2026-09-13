@@ -12,6 +12,8 @@ export function Modal({ m }: { m: Model }) {
   const steps = typeof d.steps === 'function' ? d.steps(m) : d.steps
   const foot = d.foot?.(m, step)
   const sub = typeof d.s === 'function' ? d.s(m) : d.s
+  /* высота тела может зависеть от состояния: с ошибкой окно выше (238:140186) */
+  const tall = typeof d.tall === 'function' ? d.tall(m) : d.tall
   const title = typeof d.t === 'function' ? d.t(m) : d.t
   const hasFoot = !!foot || d.acts !== false
   const close = <button className="mx" data-close><Ico html={I.x} /></button>
@@ -38,7 +40,7 @@ export function Modal({ m }: { m: Model }) {
         )}
         {/* Пока открыто меню контакта, тело не прокручивается: иначе
             выпадающий список обрезается краем прокручиваемой области. */}
-        <div className={`mbody ${hasFoot ? '' : 'nofoot'} ${pop ? 'over' : ''} ${d.tall ? 'tall' + (d.tall > 1 ? d.tall : '') : ''}`}>
+        <div className={`mbody ${hasFoot ? '' : 'nofoot'} ${pop ? 'over' : ''} ${tall ? 'tall' + (tall > 1 ? tall : '') : ''}`}>
           {!!steps && (
             <div className="msteps">
               {Array.from({ length: steps }, (_, i) => <i className={i <= step ? 'on' : ''} key={i} />)}

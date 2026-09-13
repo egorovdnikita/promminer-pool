@@ -60,6 +60,7 @@ export declare function pager(id: string, total: number, per?: number): string
 export declare function chart(m: Model, opts?: any): string
 /** Скелетон загрузки страницы. */
 export declare function skeleton(): string
+export declare function loadFail(): string
 /** Календарь дизайн-системы; sel — подсвеченные числа. */
 export declare function datePicker(sel?: number[]): string
 
@@ -79,7 +80,7 @@ export declare const MODALS: Record<string, {
   /** Шторка: панель 430 у правого края вместо центральной модалки. */
   sheet?: true
   /** Тело фиксированной высоты 348 — шаговые экраны контактов. */
-  tall?: number
+  tall?: number | ((m: Model) => number)
 }>
 /** Вкладки профиля — рисуются в шапке. */
 export declare function profTabs(cur: string, m: Model): string

@@ -17,7 +17,7 @@ const freshUi = (): Ui => ({
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
   grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null, selq: '',
-  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
+  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null,
 })
 
 /** Свои сценарии живут в localStorage отдельно от текущего состояния. */
@@ -466,6 +466,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (md.dataset.obs) u.obs = +md.dataset.obs
       if (md.dataset.sess) u.sess = md.dataset.sess
       if (md.dataset.ex) u.exk = md.dataset.ex
+      /* модалки активов открываются на монете той строки, из которой нажали */
+      if (md.dataset.coin) { u.coin2 = md.dataset.coin; u.thr = null }
       if (md.dataset.wk2) {
         const w2 = workersList(M()).find((w: any) => w.id === +md.dataset.wk2!)
         if (w2) { u.wk = w2; seedBind(w2) }
@@ -602,6 +604,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (vf) { U.current.vfile = vf.dataset.vfile !== 'off'; return bump() }
     const vb = at('[data-vbank]')
     if (vb) { U.current.vbank = vb.dataset.vbank!; pop.current = null; return bump() }
+    const c2 = at('[data-coin2]')
+    if (c2) { u.coin2 = c2.dataset.coin2!; u.thr = null; pop.current = null; return bump() }
+    const tr = at('[data-thr]')
+    if (tr) { u.thr = tr.dataset.thr!; return bump() }
     const tg = at('[data-tog]')
     if (tg) { tg.classList.toggle('on'); return }
     if (at('[data-mini]')) { mini.current = !mini.current; document.body.classList.toggle('mini', mini.current); return bump() }

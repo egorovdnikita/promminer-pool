@@ -106,6 +106,10 @@ export interface Ui {
   sub: string
   theme: 'light' | 'dark' | 'system'
   step: number
+  /** монета, на которой открыта модалка активов */
+  coin2: string
+  /** выбранный порог автовыплат в модалке */
+  thr: string | null
 }
 
 export interface AppSnapshot {

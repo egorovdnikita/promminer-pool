@@ -46,7 +46,7 @@
   --fs-m:16px; --lh-m:20px; --fs-s:14px; --lh-s:18px; --fs-c:12px; --lh-c:16px;
   --fs-b1:18px; --lh-b1:22px; --fs-c2:10px; --lh-c2:12px;
   --fs-h5:20px; --lh-h5:24px; --fs-h4:24px; --lh-h4:30px; --fs-h3:32px; --lh-h3:38px;
-  --fs-h2:40px; --lh-h2:48px;
+  --fs-h2:40px; --lh-h2:48px; --fs-h1:48px; --lh-h1:56px; --fs-ds:56px; --lh-ds:64px;
   /* ширина кастомной полосы прокрутки: жёлоб резервируется всегда, */
   /* поэтому правый отступ прокручиваемых блоков уменьшаем на неё */
   --sbw:11px;
@@ -594,13 +594,24 @@ img.hex{object-fit:contain}
 /* Шаговые модалки одной высоты: Modal Content в макете не меняется между
    шагами. flex:0 1 auto — на низком экране тело ужимается и скроллится,
    иначе футер вылезет за max-height окна. */
-.mbody.tall,.mbody.tall2,.mbody.tall3,.mbody.tall4,.mbody.tall5,.mbody.tall6{flex:0 1 auto}
+.mbody.tall,.mbody.tall2,.mbody.tall3,.mbody.tall4,.mbody.tall5,.mbody.tall6,
+.mbody.tall7,.mbody.tall8,.mbody.tall9,.mbody.tall10,.mbody.tall11,
+.mbody.tall12,.mbody.tall13{flex:0 1 auto}
 .mbody.tall{height:348px}
 .mbody.tall2{height:530px}
 .mbody.tall3{height:356px}
 .mbody.tall4{height:544px}
 .mbody.tall5{height:326px}
 .mbody.tall6{height:772px}
+/* Мои активы: вывод 520, продажа 746, порог 444, адрес 510 и 660 */
+.mbody.tall7{height:336px}
+.mbody.tall8{height:562px}
+.mbody.tall9{height:260px}
+.mbody.tall10{height:326px}
+.mbody.tall11{height:476px}
+/* с ошибкой суммы окно вырастает: вывод 580, продажа 810 */
+.mbody.tall12{height:396px}
+.mbody.tall13{height:626px}
 .pwdform{display:flex;flex-direction:column;gap:24px}
 /* Поле пароля: подпись со значением слева, глаз справа */
 .inp.pwd{flex-direction:row;align-items:center;gap:12px}
@@ -951,11 +962,6 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .rowline .tx b{display:flex;align-items:center;width:100%;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .rowline .ch2{margin-left:auto;color:var(--c3)}
 /* герой «Мои активы» с двумя плитками-действиями */
-.heroact{display:flex;gap:12px;margin-left:auto;align-self:stretch}
-.heroact button{background:#ffffff26;border-radius:var(--r-m);padding:14px 16px;color:#fff;min-width:150px;display:flex;flex-direction:column;gap:14px}
-.heroact button:hover{background:#ffffff3d}
-.heroact .ic2{width:36px;height:36px;border-radius:var(--r-s);background:#ffffff29;display:grid;place-items:center}
-.heroact .lb{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);font-weight:600}
 /* кнопка-ссылка «+ Добавить» в таблице */
 .addbtn{display:inline-flex;align-items:center;gap:4px;height:32px;padding:0 12px;border-radius:var(--r-s);background:var(--accent-ghost);color:var(--accent);font-size:var(--fs-s);font-weight:600}
 .addbtn:hover{background:var(--accent-sub)}
@@ -1716,3 +1722,88 @@ button.scsect:hover{color:var(--accent)}
 .xfind{width:100%;height:40px;border-radius:var(--r-s);margin-bottom:8px;flex:0 0 auto}
 .xfind input{min-width:0}
 .xmenu .fempty{padding:8px 0}
+
+/* ============ Мои активы (макеты 95:19946, 212:107049) ============ */
+/* Плашка баланса — отдельный блок над карточкой: 154, паддинг 24, радиус 24 */
+.abal{position:relative;overflow:hidden;background:var(--accent);color:#fff;border-radius:var(--r-l);
+  padding:24px;margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-height:154px}
+.abal::before,.abal::after{content:"";position:absolute;border-radius:50%;background:#ffffff0f;pointer-events:none}
+.abal::before{width:318px;height:318px;right:18%;top:-120px}
+.abal::after{width:866px;height:238px;right:-180px;top:-40px}
+.abal>*{position:relative}
+.abv{display:flex;flex-direction:column;gap:12px}
+.abv .l{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
+.abv .ar{display:flex;align-items:flex-end;gap:16px}
+.abv .ar b{font-size:var(--fs-ds);line-height:var(--lh-ds);font-weight:600}
+.abv .ar>span{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;padding-bottom:6px}
+.atiles{display:flex;gap:16px;align-self:center}
+.atiles button{width:173px;min-height:106px;background:#ffffff26;border-radius:var(--r-l);padding:16px 24px;
+  color:#fff;display:flex;flex-direction:column;justify-content:space-between;gap:12px;text-align:left}
+.atiles button:hover{background:#ffffff3d}
+.atiles i{display:block;width:32px;height:32px}
+.atiles i svg{width:32px;height:32px}
+.atiles span{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
+.atiles span svg{width:24px;height:24px;flex:0 0 auto}
+/* Чипы адреса и порога в ячейках: 26 в высоту, паддинг 4/8 */
+.acell{display:inline-flex;align-items:center;gap:8px;height:26px;padding:0 8px;border-radius:var(--r-s);
+  background:var(--ctrl);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1);white-space:nowrap}
+.acell:hover{background:var(--ctrl-hover)}
+.acell i{display:inline-flex;color:var(--accent)}
+.acell i svg{width:16px;height:16px}
+.acell.add{color:var(--accent);gap:4px}
+.acell.add svg{width:16px;height:16px}
+.athr{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;padding-left:8px}
+.tipi{display:inline-flex;color:var(--c3)}
+.tipi svg{width:16px;height:16px}
+.aver{margin-bottom:12px;align-items:flex-start}
+.aver b{color:#3b82f6}
+.aver span{display:block;color:var(--c2);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500}
+.aver .lnk{color:var(--accent);font-weight:600}
+.empty.fail b{font-size:var(--fs-h4);line-height:var(--lh-h4)}
+.empty.fail .btn{margin-top:12px}
+/* Поле суммы в модалках вывода и продажи (226:124696) */
+.amtw{display:flex;flex-direction:column;gap:2px}
+.acont{display:flex;flex-direction:column;gap:16px}
+.amt{background:var(--surface);border:1px solid var(--ctrl-line);border-radius:var(--r-l);padding:15px 16px;
+  display:flex;flex-direction:column;gap:16px}
+.amt.bad{border-color:var(--neg)}
+.ahead{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
+.arow{display:flex;align-items:center;gap:12px;min-height:40px}
+.ain{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:var(--fs-h5);line-height:var(--lh-h5);
+  font-weight:600;color:var(--c1);outline:none}
+.acur{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c2)}
+.csel{display:inline-flex;align-items:center;gap:4px;width:110px;height:40px;padding:0 12px;border-radius:var(--r-s);
+  background:var(--ctrl);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
+.csel:hover{background:var(--ctrl-hover)}
+.csel svg{width:24px;height:24px;flex:0 0 auto}
+.csmenu{min-width:110px}
+.csmenu button[disabled]{opacity:.4;pointer-events:none}
+.amore{display:flex;gap:16px;padding:0 16px}
+.amore span{min-width:235px;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:600}
+.mhints.anote{gap:4px}
+.ahint{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500}
+/* Плашка ошибки суммы — ровно 40, как в макете (238:140186) */
+.mstack>.alert.err{height:40px;min-height:40px;padding:0 16px;font-size:var(--fs-s);line-height:var(--lh-s);align-items:center}
+.mstack>.alert.err>svg{width:16px;height:16px;margin:0;flex:0 0 auto}
+.mhints.anote li{font-size:var(--fs-s);line-height:var(--lh-s)}
+.amore b{font-weight:600}
+.apay{background:var(--ctrl);border-radius:var(--r-m);padding:16px;display:flex;flex-direction:column;gap:8px}
+.apay .aval{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;color:var(--c3)}
+.btn.wide{width:100%;justify-content:center}
+.acont>.btn.g{height:40px;min-height:40px;border-radius:var(--r-s)}
+.mtext.mc{text-align:center}
+.thrpick{display:flex;flex-direction:column;gap:12px}
+/* Добавление и изменение адреса (106:68854, 211:131764) */
+.wadr,.wfmt,.whist{display:flex;flex-direction:column;gap:12px}
+.tbl.mini th,.tbl.mini td{padding:8px 12px;font-size:var(--fs-c);line-height:var(--lh-c)}
+/* Строки активов — 48, как в макете: ячейка фиксированной высоты, паддинг 12 */
+.atbl th,.atbl td{height:48px;padding:0 12px}
+.atbl td{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.atbl td.num{text-align:right}
+.atbl .btn.sm{height:36px;min-width:104px;padding:0 24px}
+/* Карточка активов: паддинг 8, шапка со своим 16, таблица во всю ширину */
+.card:has(.atbl){padding:8px}
+.card:has(.atbl)>.ch{padding:16px;margin:0;min-height:80px}
+.card:has(.atbl) .aver{margin:0 16px 12px}
+.atbl{table-layout:fixed}

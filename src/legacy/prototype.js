@@ -19,7 +19,11 @@ const AXES={
     ['big','Больше 10 Мб'],['bad','Нет листа «Данные»']]},
   data:{g:'Данные',label:'Наполнение данными',opts:[['normal','Норма'],['empty','Пусто'],['few','Мало записей'],['huge','Большие значения']]},
   health:{g:'Данные',label:'Здоровье парка',opts:[['ok','Всё живо'],['degraded','Деградация'],['critical','Авария']]},
-  load:{g:'Данные',label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон']]},
+  load:{g:'Данные',label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон'],['err','Ошибка загрузки']]},
+  awal:{g:'Мои активы',label:'Кошельки',opts:[['some','Как в макете'],['all','У всех монет'],['none','Не добавлены']]},
+  apay:{g:'Мои активы',label:'Автовыплаты',opts:[['btc','Только BTC'],['all','У всех монет'],['none','Выключены']]},
+  aerr:{g:'Мои активы',label:'Ошибка в поле',opts:[['no','Нет'],['req','Не заполнено'],
+    ['low','Сумма меньше порога'],['bad','Некорректный адрес'],['code','Неверный код'],['old','Код недействителен']]},
   role:{g:'Аккаунт',label:'Роль',opts:[['owner','Владелец'],['observer','Наблюдатель']]},
   perm:{g:'Аккаунт',label:'Разрешения вотчера',opts:[['all','Все разделы'],['wi','Воркеры и доход'],
     ['wo','Только воркеры'],['fin','Только финансы'],['assets','Только мои активы'],
@@ -58,10 +62,10 @@ const PRESETS=[
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
 const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',health:'degraded',role:'owner',perm:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
-  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no'};
+  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -366,6 +370,10 @@ const card=(inner,cls='')=>`<section class="card ${cls}">${inner}</section>`;
 /* Пустая таблица — иллюстрация «not found» из макета (1018:112400) */
 const emptyBox=(t,p,act='')=>`<div class="empty"><img src="/empty-state.svg" alt="" width="221" height="175">
   <b>${t}</b><p>${p}</p>${act}</div>`;
+/* Экран не загрузился (223:33637): заголовок 24, подпись 16 и «Обновить» */
+const loadFail=()=>`<div class="empty fail"><img src="/empty-state.svg" alt="" width="221" height="175">
+  <b>Не загрузилось</b><p>Попробуйте обновить</p>
+  <button class="btn" data-axis="load" data-val="no">Обновить</button></div>`;
 /* Сегментированный контрол — кликабельный, состояние в U.seg[id] */
 const seg=(id,opts,def=0)=>{const c=U.seg[id]??def;
   return `<div class="seg">${opts.map((o,i)=>`<button class="${i===c?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</div>`};
@@ -1006,35 +1014,121 @@ V.worker=m=>{
 };
 
 /* --- Финансы --- */
-/* Мои активы — по проду: герой с двумя плитками-действиями, вкладки
-   «Выплаты / Продажи», логотипы монет, порог автовыплат пилюлей. */
-const ASSETS=[['BTC',0.39006783,31553.37,2331897.65,'0.001 BTC'],
-              ['LTC',5.4098,315.45,23326.95,'0.001 LTC'],
-              ['DOGE',1950.55,214.56,15857.97,'1 DOGE']];
+/* Мои активы (макеты 95:19946 и 212:107049). Вкладка меняет не подпись кнопки,
+   а три колонки из восьми: кошелёк → расчётный счёт, порог автовыплат в монете
+   → порог продажи в рублях, автовыплаты → условия. */
+const ASSETS=[
+  {s:'BTC', v:0.39006783,u:31553.37,r:2331897.65,th:'0,001 BTC',min:'0,001',   max:'0,0411118179',dp:10,w:'1A1z****8uGT'},
+  {s:'LTC', v:5.4098,    u:315.45,  r:23326.95,  th:'0,001 LTC',min:'0,001',   max:'50,07',       dp:4, w:null},
+  {s:'DOGE',v:1950.55,   u:214.56,  r:15857.97,  th:'5 DOGE',   min:'5',       max:'1 950,55',    dp:4, w:'DA1z****7uTT'},
+  {s:'ZEC', v:345.56,    u:184.45,  r:8567.38,   th:'5 ZEC',    min:'5',       max:'345,56',      dp:4, w:'FB2g****4iBB'},
+];
+const SELL_THR='10 000 ₽';
+const ACC_NUM='1469****5009';
+/* Подсказки ⓘ в шапке таблицы (231:129971, 231:130644, 231:131328, 231:131978) */
+const ATIP={th:'Выплаты возможны при достижении минимального порога автовыплат',
+  auto:'Переводы выполняются раз в сутки с 14:00 до 17:00 (UTC). До достижения порога средства накапливаются на вашем балансе',
+  sth:'Выплаты возможны при достижении минимального порога',
+  cond:'При продаже ЦВ взимается комиссия в соответствии с условиями оферты'};
+/* Кошельки и автовыплаты — оси сценария: как в макете, у всех или ни у кого */
+const walletOf=a=>S.awal==='none'?null:S.awal==='all'?(a.w||'ltc1****9f3x'):a.w;
+const autoOf=i=>S.apay==='all'?true:S.apay==='none'?false:i===0;
+const assetOf=s=>ASSETS.find(a=>a.s===s)||ASSETS[0];
+const curAsset=()=>assetOf(U.coin2||'BTC');
+
 V.assets=m=>{
   const k=m.empty?0:(m.huge?1e6:1);
-  const tab=U.seg['assets-tab']??0;
-  return card(`
-  <div class="hero" style="min-height:120px;align-items:center;margin:-16px -16px 16px;border-radius:var(--r-m) var(--r-m) 0 0;padding:20px 24px">
-    <div><div class="l" style="font-size:var(--fs-s)">Общий баланс</div>
-      <div class="v" style="font-size:var(--fs-h2);line-height:var(--lh-h2)">${nf(ASSETS.reduce((s,a)=>s+a[2],0)*k,0)} $
-        <span style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;opacity:.8">≈ ${nf(ASSETS.reduce((s,a)=>s+a[3],0)*k,0)} ₽</span></div></div>
-    <div class="heroact">
-      <button data-go="income"><span class="ic2">${COIN_ICON.BTC}</span><span class="lb">Доход <span class="spacer">${I.cv}</span></span></button>
-      <button data-go="payouts"><span class="ic2">${I.card}</span><span class="lb">Выплаты <span class="spacer">${I.cv}</span></span></button>
-    </div></div>
-  <div class="ch">${seg('assets-tab',['Выплаты','Продажи'],0)}</div>
-  <div class="tw"><table class="tbl"><thead><tr><th>Монеты</th><th class="srt">Баланс ${I.sortv}</th>
-    <th><span class="thico">${USD_ICON} Баланс, $</span></th><th><span class="thico">${I.rub} Баланс, ₽</span></th>
-    <th>Кошелек</th><th>Порог автовыплат ${I.inf}</th><th>Автовыплаты ${I.inf}</th><th></th></tr></thead><tbody>
-    ${ASSETS.map(([s,v,u,r,th],i)=>`<tr>
-        <td><span class="coin">${COIN_ICON[s]}${s}</span></td>
-        <td class="mono">${nf(v*k,s==='DOGE'?4:4)} ${s}</td><td class="mono">${nf(u*k)} $</td><td class="mono">${nf(r*k)} ₽</td>
-        <td><button class="addbtn" data-modal="wallet">${I.pl} Добавить</button></td>
-        <td><span class="pill flat sq mono" style="height:32px;font-size:var(--fs-c);line-height:var(--lh-c)">${th} ${I.edit}</span></td>
-        <td><span class="tog ${i===0&&!m.empty?'on':''}" data-tog></span></td>
-        <td class="num"><button class="btn sm" ${m.empty||S.role==='observer'?'disabled':''} data-modal="withdraw">${tab===0?'Вывести':'Продать'}</button></td></tr>`).join('')}
-  </tbody></table></div>`)};
+  const sell=segi('assets-tab')===1;
+  const dis=m.empty||S.role==='observer';
+  const acc=S.vacc==='yes'?ACC_NUM:null;
+  /* условия продажи: ФИО и выписка из реестра майнеров */
+  const need=S.verif==='no'||S.vdoc==='no';
+  const sum=f=>nf(ASSETS.reduce((s,a)=>s+a[f],0)*k,0);
+  const chip=(txt,ico,attr)=>`<button class="acell" ${attr}>${txt}<i>${ico}</i></button>`;
+  const copyChip=(txt,attr)=>`<button class="acell" ${attr}>${txt}<i data-copy="${txt}">${I.cp}</i></button>`;
+  const addChip=(mod,s)=>`<button class="acell add" data-modal="${mod}" data-coin="${s}">${I.pl}Добавить</button>`;
+  const hero=`<div class="abal">
+    <div class="abv"><span class="l">Общий баланс</span>
+      <span class="ar"><b>${sum('u')} $</b><span>≈ ${sum('r')} ₽</span></span></div>
+    <div class="atiles">
+      <button data-go="income"><i>${I.fbtc}</i><span>Доход${I.arr}</span></button>
+      <button data-go="payouts"><i>${I.crecv}</i><span>Выплаты${I.arr}</span></button>
+    </div></div>`;
+  const head=`<tr><th>Монеты</th><th class="srt">Баланс ${I.sortv}</th>
+    <th><span class="thico">${USD_ICON} Баланс, $</span></th>
+    <th><span class="thico">${I.rub} Баланс, ₽</span></th>
+    <th>${sell?'Расчетный счет':'Кошелек'}</th>
+    <th><span class="thico">${sell?'Порог продажи':'Порог автовыплат'}<i class="tipi" data-tip="${sell?ATIP.sth:ATIP.th}">${I.inf}</i></span></th>
+    <th><span class="thico">${sell?'Условия':'Автовыплаты'}<i class="tipi" data-tip="${sell?ATIP.cond:ATIP.auto}">${I.inf}</i></span></th>
+    <th></th></tr>`;
+  const rows=ASSETS.map((a,i)=>{
+    const w=sell?acc:walletOf(a);
+    return `<tr>
+      <td><span class="coin">${COIN_ICON[a.s]}${a.s}</span></td>
+      <td class="mono">${dec(a.v*k)} ${a.s}</td>
+      <td class="mono">${nf(a.u*k)} $</td><td class="mono">${nf(a.r*k)} ₽</td>
+      <td>${w?copyChip(w,`data-modal="${sell?'vaccm':'waledit'}" data-coin="${a.s}"`)
+            :addChip(sell?'vaccm':'wallet',a.s)}</td>
+      <td>${sell?`<span class="athr">${SELL_THR}</span>`
+            :chip(a.th,I.edit,`data-modal="athr" data-coin="${a.s}"`)}</td>
+      <td><span class="tog ${!m.empty&&(sell?!need:autoOf(i))?'on':''}" data-tog></span></td>
+      <td class="num"><button class="btn sm" ${dis?'disabled':''} data-modal="${sell?'sell':'withdraw'}" data-coin="${a.s}">${sell?'Продать':'Вывести'}</button></td></tr>`}).join('');
+  return hero+card(`<div class="ch">${seg('assets-tab',['Вывести','Продать'],0)}</div>
+    ${sell&&need?`<div class="alert info aver">${I.inf}<div><b>Для продажи цифровой валюты</b>
+      <span>Добавьте ФИО/Наименование организации и загрузите выписку из реестра майнеров в разделе
+      <button class="lnk" data-go="verification">Верификация</button></span></div></div>`:''}
+    <div class="tw"><table class="tbl atbl"><thead>${head}</thead><tbody>${rows}</tbody></table></div>`)};
+
+/* Курс монеты к рублю в модалке продажи (242:57978) */
+const RATE={BTC:'9 731 040,34',LTC:'5 081,91',DOGE:'8,13',ZEC:'4 814,63'};
+const THR_OPTS=['0,001','0,01','0,05','1','5'];
+const AERR={req:'Поле обязательно для заполнения',low:'Сумма меньше порога выплаты'};
+const WERR={req:'Поле обязательно для заполнения',bad:'Некорректный адрес'};
+const KERR={code:'Введен неверный код',old:'Код недействителен. Запросите новый'};
+/* Селект монеты внутри поля суммы: 110x40, радиус 12 (226:124696) */
+const csel=(id,cur,off)=>`<span class="pop-wrap"><button class="csel" data-pop="${id}">${COIN_ICON[cur]}${cur}<span class="spacer"></span>${I.cd}</button>
+  ${pop===id?`<div class="pop menu xmenu csmenu">${ASSETS.map((a,n)=>{
+    const d=off&&off(a);
+    return `${n?'<div class="mdiv"></div>':''}<button class="${a.s===cur?'on':''} ${d?'dis':''}" ${d?'disabled':`data-coin2="${a.s}"`}>${COIN_ICON[a.s]}${a.s}${a.s===cur?`<span class="ck">${CHECK}</span>`:''}</button>`}).join('')}</div>`:''}</span>`;
+/* Поле суммы: контейнер 106 с подписью сверху, валютой справа и строкой
+   «Минимум / Максимум» вплотную под ним (226:124696) */
+const amtField=(label,val,right,min,max)=>`<div class="amtw">
+  <div class="amt"><span class="ahead">${label}</span>
+    <div class="arow"><input class="ain" value="${val}" placeholder="0">${right}</div></div>
+  ${(min||max)?`<div class="amore">${min?`<span>Минимум <b>${min}</b></span>`:''}${max?`<span>Максимум <b>${max}</b></span>`:''}</div>`:''}
+</div>`;
+/* Ошибка суммы в макете — плашка над содержимым, окно вырастает на 60 */
+const aerrBox=()=>AERR[S.aerr]?`<div class="alert err">${I.excl}${AERR[S.aerr]}</div>`:'';
+const payBlock=(label,val)=>`<div class="apay"><span class="ahead">${label}</span><span class="aval">${val}</span></div>`;
+/* Допустимые форматы адреса по монетам (106:68854 и соседние флоу) */
+const ADDR={BTC:['P2PKH (Legacy)','P2SH-P2WPKH (SeqWit)','P2WPKH (SeqWit Bech32)','P2WSH (SeqWit Bech32)','P2TR (Taproot Bech32m)'],
+  LTC:['P2SH-P2WPKH (SeqWit)'],DOGE:['P2PKH (Legacy)','P2SH'],ZEC:[]};
+const WHIST=[['1dsf****7444','03.08.2025 14:00','06.08.2025 14:00'],
+  ['1dsh****7843','02.08.2025 13:00','05.08.2025 13:00'],
+  ['1dfd****5678','01.08.2025 12:00','04.08.2025 12:00']];
+const ADDR_VAL='1dsfh5kdkk2\u041544444Tkdpf797444';
+const walletBody=(step,edit)=>{const a=curAsset(),e=WERR[S.aerr];
+  return step===0?`<div class="mstack">${prog(0,3)}
+    <div class="wadr">
+      ${inpField(a.s+'-адрес',edit||S.aerr==='bad'?ADDR_VAL:'',e?'err':'')}
+      ${e?`<div class="errmsg">${e}</div>`:''}
+      <button class="btn link wide" data-paste="${ADDR_VAL}">Вставить</button>
+    </div>
+    <div class="wfmt"><span class="ahead">Допустимые адреса кошельков:</span>
+      ${ADDR[a.s].length?`<p class="ahint">${ADDR[a.s].join(', ')}</p>`
+        :`<button class="btn link" data-toast="Форматы адресов ZEC описаны в справке">Узнать</button>`}</div>
+    <p class="ahint">В целях безопасности выплаты будут заморожены на 3 дня. Доход будет накапливаться на балансе</p>
+    ${edit?`<div class="whist"><span class="ahead">История изменений</span>
+      <table class="tbl mini"><thead><tr><th>Адрес</th><th>Добавлен</th><th>Активирован</th></tr></thead>
+      <tbody>${WHIST.slice(0,S.data==='few'?1:3).map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`:''}
+    </div>`
+  :step===1?`<div class="cstep g32">${prog(1,3)}${codeBlock('Введите код',{word:'номер',val:'+ 7 999 999-96-05',cells:1,err:KERR[S.aerr]})}</div>`
+  :`<div class="cstep mid">${prog(2,3)}${doneBlock(edit?'Адрес успешно изменен':'Адрес успешно добавлен')}
+    <p class="mtext mut mc">В целях безопасности выплаты заморожены на 3 дня. Доход будет накапливаться на балансе</p></div>`};
+const walletFoot=(step,ok)=>step===2
+  ?`<button class="btn wide" data-close data-toast="${ok}">Отлично</button>`
+  :`<button class="btn out" data-close>Отменить</button>
+    <button class="btn" data-step="${step+1}">${step?'Добавить':'Подтвердить'}</button>`;
 
 /* Доход — по макету: индиго-карточка баланса и две белые, периоды отдельными
    пилюлями (на этом экране в макете это не Segment Control), иконки валют в шапке. */
@@ -1220,7 +1314,7 @@ ${card(`<div class="ch"><h2>Настройка реферальных выпла
   ${[['BTC','WU/****9uG1','0.001 BTC'],['LTC','','0.001 LTC'],['DOGE','DKb/****7uJT','1 DOGE']].map(([s,req,th])=>`<tr>
     <td><span class="coin">${COIN_ICON[s]}${s}</span></td>
     <td class="mono">0 ${s}</td><td class="mono">0 $</td><td class="mono">0 ₽</td>
-    <td>${req?`<span class="pill flat sq mono" style="height:32px;font-size:var(--fs-c);line-height:var(--lh-c)">${req} ${I.edit}</span>`:`<button class="addbtn" data-modal="wallet">${I.pl} Добавить</button>`}</td>
+    <td>${req?`<span class="pill flat sq mono" style="height:32px;font-size:var(--fs-c);line-height:var(--lh-c)">${req} ${I.edit}</span>`:`<button class="addbtn" data-modal="wallet" data-coin="${s}">${I.pl} Добавить</button>`}</td>
     <td><span class="pill flat sq mono" style="height:28px;font-size:var(--fs-c);line-height:var(--lh-c)">${th} ${I.edit}</span></td>
     <td><span class="tog" data-tog></span></td><td class="num"><button class="btn sm" disabled>Вывести</button></td></tr>`).join('')}
   </tbody></table></div>`)}
@@ -1868,7 +1962,8 @@ const codeBlock=(title,c)=>`<div class="ccode">
       <p class="mtext">${c.val}</p>
     </div>
     ${c.cells?`<div class="codecells">${[0,1,2,3,4,5].map(i=>`<span>${'901234'[i]}</span>`).join('')}</div>`
-      :inpField('Код подтверждения')}
+      :inpField('Код подтверждения','',c.err?'err':'')}
+    ${c.err?`<div class="errmsg">${c.err}</div>`:''}
   </div>
   <div class="cbtns">
     ${c.paste?`<button class="btn link" data-paste="901234">Вставить код</button>`:''}
@@ -2164,14 +2259,64 @@ const MODALS={
       ${xsel('Формат выгрузки','exf',['XLS','CSV'])}`,
     foot:()=>`<button class="btn" data-close data-toast="Файл готовится — пришлём ссылку на почту">Скачать</button>
       <button class="btn out" data-close>Отменить</button>`},
-  wallet:{ok:'Кошелёк добавлен',t:'Добавить кошелек',s:'Адрес будет использоваться для выводов по этой монете',b:()=>`
-    <div class="inp"><div class="k">Сеть</div><input value="Bitcoin (BTC)"></div>
-    <div class="inp"><div class="k">Адрес кошелька</div><input placeholder="Адрес кошелька"></div>
-    <div class="alert warn" style="margin-top:10px">⚠ Проверьте адрес — транзакции в блокчейне необратимы</div>`},
-  withdraw:{ok:'Заявка на вывод создана',t:'Вывод средств',s:'Средства уйдут на подтвержденный адрес',b:m=>`
-    <div class="inp"><div class="k">Сумма, ${m.bal[0].s}</div><input value="${nf(m.bal[0].v,8)}"></div>
-    <div class="inp"><div class="k">Кошелек</div><input value="bc1q…4f2a"></div>
-    <div class="field" style="margin-top:8px"><div class="k">Комиссия сети</div><div class="v mono">0,00004 ${m.bal[0].s}</div></div>`},
+  /* Вывод средств (226:124696): три шага, ошибки растят окно до 580 */
+  withdraw:{t:'Вывод средств',acts:false,tall:()=>AERR[S.aerr]?12:7,
+    b:(m,step)=>{const a=curAsset(),e=aerrBox(),w=walletOf(a)||'Не добавлен';
+      return step===0?`<div class="mstack">${prog(0,3)}${e}
+        <div class="acont">
+          ${amtField('Вывести',S.aerr==='req'?'0':S.aerr==='low'?'0,0008888888':a.max,csel('wcoin',a.s,x=>!walletOf(x)),a.min,a.max)}
+          <button class="btn g wide">Вывести все ${a.max} ${a.s}</button>
+          ${payBlock('на Кошелек',w)}
+        </div>
+        <p class="ahint">Время зачисления может составлять до 24 часов</p></div>`
+      :step===1?`<div class="cstep g32">${prog(1,3)}${codeBlock('Введите код',{word:'номер',val:'+ 7 999 999-96-05'})}</div>`
+      :`<div class="cstep mid">${prog(2,3)}${doneBlock('Заявка на вывод средств создана')}
+        <p class="mtext mut mc">Статус заявки можете посмотреть в разделе <button class="lnk" data-close data-go="payouts">Выплаты</button></p></div>`},
+    foot:(m,step)=>step===2
+      ?`<button class="btn wide" data-close data-toast="Заявка на вывод создана">Отлично</button>`
+      :`<button class="btn out" data-close>Отменить</button>
+        <button class="btn" data-step="${step+1}">${step?'Вывести':'Подтвердить'}</button>`},
+  /* Продажа средств (242:57978): два связанных поля и курс */
+  sell:{t:'Продажа средств',acts:false,tall:()=>AERR[S.aerr]?13:8,
+    b:(m,step)=>{const a=curAsset(),e=aerrBox();
+      const rub=S.aerr==='req'?'0':S.aerr==='low'?'4 590,83':'205 000';
+      return step===0?`<div class="mstack">${prog(0,3)}${e}
+        <div class="acont">
+          ${amtField('Продать',S.aerr==='req'?'0':S.aerr==='low'?'0,0008888888':a.max,csel('scoin',a.s),'',a.max)}
+          <button class="btn g wide">Продать все ${a.max} ${a.s}</button>
+          ${amtField('Получить',rub,'<span class="acur">RUB</span>','10 000','')}
+          ${payBlock('Расчетный счет',S.vacc==='yes'?ACC_NUM:'2345****1468')}
+        </div>
+        <p class="ahint">По курсу: 1 ${a.s} ≈ ${RATE[a.s]} ₽</p>
+        <ul class="mhints anote">
+          <li>Время зачисления может составлять до 24 часов в рабочие дни</li>
+          <li>Заявка будет обработана в рабочие дни с 10:00 до 18:00 (по Москве)</li>
+          <li>При продаже ЦВ взимается комиссия в соответствии с условиями оферты</li></ul></div>`
+      :step===1?`<div class="cstep g32">${prog(1,3)}${codeBlock('Введите код',{word:'номер',val:'+ 7 999 999-96-05'})}</div>`
+      :`<div class="cstep mid">${prog(2,3)}${doneBlock('Заявка на продажу средств создана')}
+        <p class="mtext mut mc">Статус заявки можете посмотреть в разделе <button class="lnk" data-close data-go="payouts">Выплаты</button></p></div>`},
+    foot:(m,step)=>step===2
+      ?`<button class="btn wide" data-close data-toast="Заявка на продажу создана">Отлично</button>`
+      :`<button class="btn out" data-close>Отменить</button>
+        <button class="btn" data-step="${step+1}">${step?'Продать':'Подтвердить'}</button>`},
+  /* Порог автовыплат (246:44137): поле, минимум и быстрые чипы */
+  athr:{t:'Порог автовыплат',acts:false,tall:9,
+    b:()=>{const a=curAsset();
+      return `<div class="mstack">
+        ${amtField('Порог автовыплат',U.thr??a.min,csel('tcoin',a.s),a.min,'')}
+        <div class="thrpick"><span class="ahead">Выбрать порог автовыплат:</span>
+          <div class="chips">${THR_OPTS.map(v=>`<button class="chip sm ${(U.thr??a.min)===v?'on':''}" data-thr="${v}">${v}</button>`).join('')}</div>
+        </div></div>`},
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-toast="Порог автовыплат успешно изменен">Подтвердить</button>`},
+  /* Добавить адрес (106:68854): поле, допустимые форматы, заморозка на 3 дня */
+  wallet:{t:'Добавить адрес',acts:false,tall:10,
+    b:(m,step)=>walletBody(step,false),
+    foot:(m,step)=>walletFoot(step,'Адрес добавлен')},
+  /* Изменить адрес (211:131764): то же плюс история изменений */
+  waledit:{t:'Изменить адрес',acts:false,tall:11,
+    b:(m,step)=>walletBody(step,true),
+    foot:(m,step)=>walletFoot(step,'Адрес изменен')},
   /* Добавить суб-аккаунт (макет 880:41731): подсказка, поле и два правила под ним */
   /* Добавить суб-аккаунт (1482:83893 и соседние кадры): два шага,
      инфо-алерт, подсказки краснеют по нарушенному правилу */
@@ -2430,7 +2575,7 @@ export function applyState(next){
 }
 export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
-  nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
+  loadFail, nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf,
   S, U, route, pop, modal, openGroups, mini,
