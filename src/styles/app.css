@@ -1990,3 +1990,27 @@ button.scsect:hover{color:var(--accent)}
 /* Переключатель аккаунта не кликабелен: суб-аккаунты наблюдателю недоступны */
 .hbtn.flat,.hbtn.flat:hover{background:var(--surface);cursor:default;opacity:1}
 .hbtn:disabled{opacity:1}
+
+/* ============ Мониторинг (прод /monitoring) ============ */
+/* Промо-страница раздела: герой по центру, списки через разделители, три шага */
+.monhero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:24px 0 0}
+.monhero h2{font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600}
+.monhero p{max-width:520px;font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c2);font-weight:500}
+.monart{width:100%;max-width:880px;height:360px;margin-top:8px;border-radius:var(--r-l);
+  background:radial-gradient(120% 120% at 50% 0%,var(--accent-sub) 0%,transparent 70%)}
+.monsec{display:flex;flex-direction:column;gap:16px;padding:8px 0}
+.monsec h3{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
+.mondash{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;
+  font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
+.mondash li{position:relative;padding-left:20px}
+.mondash li::before{content:"—";position:absolute;left:0;color:var(--c3)}
+.monsteps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.monstep{background:var(--bg);border-radius:var(--r-m);padding:24px;display:flex;flex-direction:column;gap:32px;min-height:148px}
+.monstep .n{display:grid;place-items:center;width:40px;height:40px;border-radius:var(--r-s);
+  background:var(--accent-ghost);color:var(--accent);font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
+.monstep b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+/* Карточка «Сводка по аккаунтам» в попоувере ведёт на экран сводки */
+.acard.asum{width:100%;text-align:left;cursor:pointer}
+.acard.asum:hover{background:var(--ctrl2)}
+.acard.asum .t{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.acard.asum .t svg{width:20px;height:20px;color:var(--c3)}

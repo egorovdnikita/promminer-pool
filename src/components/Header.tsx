@@ -47,7 +47,7 @@ export function Header({ m }: { m: Model }) {
           <span className="pop-wrap">
             <button className={`hbtn ${pop === 'acct' ? 'open' : ''} ${obs ? 'flat' : ''}`}
               data-pop={obs ? undefined : 'acct'} disabled={obs}>
-              {route === 'monitor' ? 'Сводка по аккаунтам (46)' : acct}
+              {route === 'summary' ? 'Сводка по аккаунтам (46)' : acct}
               {!obs && <Ico html={I.cd} />}
             </button>
             {pop === 'acct' && <Raw html={acctSummary(m)} />}

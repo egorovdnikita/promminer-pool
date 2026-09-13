@@ -355,7 +355,8 @@ const NAV=[
   {g:'ref',t:'Мои рефералы',ic:'ref',kids:[['ref','Общая информация'],['reflist','Список рефералов'],['refincome','Реферальный доход'],['refpayouts','Реферальные выплаты']]},
 ];
 const TITLES={home:'Главная',workers:'Воркеры',worker:'Ant01',serials:'Воркеры',assets:'Мои активы',income:'Доход',payouts:'Выплаты',
-  report:'Отчет о майнинге',calc:'Калькулятор доходности',tax:'Калькулятор налогов',monitor:'Главная сводки',
+  report:'Отчет о майнинге',calc:'Калькулятор доходности',tax:'Калькулятор налогов',
+  monitor:'Мониторинг',summary:'Сводка по аккаунтам',
   ref:'Promminer: реферальная программа',reflist:'Список рефералов',refincome:'Реферальный доход',refpayouts:'Реферальные выплаты',
   profile:'Личный кабинет',security:'Личный кабинет',notifsettings:'Личный кабинет',notifconfig:'Личный кабинет',subaccounts:'Личный кабинет',
   observers:'Личный кабинет',verification:'Личный кабинет',auth:'Вход'};
@@ -1340,7 +1341,9 @@ V.tax=m=>{
 };
 
 /* --- Мониторинг --- */
-V.monitor=m=>`
+/* Главная сводки (макет 92:23145) — агрегат по всем аккаунтам. На проде
+   в неё попадают из переключателя аккаунтов, а не из «Мониторинга». */
+V.summary=m=>`
 <div class="grid g3">
   ${card(`<div class="ch"><h2>Доход</h2></div><div class="hero"><div><div class="l">Текущий общий баланс</div>
     <div class="v mono">${nf(m.bal[0].v,8)} ${m.bal[0].s}</div><div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div><span class="cv">${I.cv}</span></div>
@@ -1376,6 +1379,33 @@ ${card(`<div class="ch"><h2>Общий доход</h2><div class="spacer"></div>
         <td class="num mono">${r[6]} ₽</td><td class="num dim">${I.cv}</td></tr>`).join('')}
   </tbody></table></div>
   <div style="text-align:center;padding-top:12px"><a href="#">Весь доход</a></div>`)}`;
+
+/* Мониторинг (прод /monitoring): промо-страница раздела, а не сводка */
+const MON_SECS=[
+  ['Параметры для отслеживания оборудования:',['Хэшрейт и эффективность работы',
+    'Температура плат и обороты вентиляторов','Энергопотребление и up-time',
+    'Доля отклонённых и просроченных шар','Статус подключения к пулу']],
+  ['Возможности:',['Графики хешрейта и температур','Таблицы со всеми устройствами и их статусами',
+    'Виджеты со сводной статистикой «здесь и сейчас»','История событий и операций для анализа инцидентов']],
+  ['Параметры для отслеживания оборудования:',['Настройка индивидуальных триггеров',
+    'Все предупреждения фиксируются с указанием времени, устройства и причины',
+    'Критические события (остановка устройства, падение хешрейта, перегрев, потеря связи, рост отклонённых шар) отображаются в панели уведомлений и дублируются в Telegram']]];
+const MON_STEPS=['Зарегистрируйтесь в личном кабинете','Добавьте оборудование, установленное на площадке','Журнал уведомлений'];
+V.monitor=()=>`
+${card(`<div class="monhero">
+  <h2>Мониторинг оборудования</h2>
+  <p>Раздел личного кабинета, где вы в реальном времени отслеживаете состояние оборудования
+    и доходность. Все ключевые данные собраны в одном месте, без сложных настроек</p>
+  <button class="btn" data-toast="Заявка отправлена — мы свяжемся с вами">Получить предложение</button>
+  <div class="monart"></div>
+</div>`)}
+<div style="height:12px"></div>
+${card(MON_SECS.map(([t,xs],i)=>`${i?'<div class="hr"></div>':''}
+  <div class="monsec"><h3>${t}</h3>
+    <ul class="mondash">${xs.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join(''))}
+<div style="height:12px"></div>
+${card(`<div class="monsec"><h3>Параметры для отслеживания оборудования:</h3>
+  <div class="monsteps">${MON_STEPS.map((x,i)=>`<div class="monstep"><span class="n">${i+1}</span><b>${x}</b></div>`).join('')}</div></div>`)}`;
 
 /* --- Рефералы --- */
 /* Реферальная программа (макет 514:79281). Три карточки 304, таблица выплат
@@ -2770,9 +2800,9 @@ function acctSummary(m){
   const cur=S.acct==='main'?'natarusso':'alfred';
   const rows=acctList(m);
   return `<div class="pop mid">
-    <div class="acard asum"><b class="t">Сводка по аккаунтам</b>
+    <button class="acard asum" data-go="summary"><b class="t">Сводка по аккаунтам${I.arr}</b>
       <div class="kv">Общий баланс<span class="mono">${nf(rows.reduce((a,r)=>a+r.bal,0))} $</span></div>
-      <div class="kv">Количество аккаунтов<span class="mono">${rows.length}</span></div></div>
+      <div class="kv">Количество аккаунтов<span class="mono">${rows.length}</span></div></button>
     <div class="hr"></div>
     <div class="alist">${rows.map((r,i)=>`<div class="acard ${r.name===cur?'sel':''}" data-acct="${i===0?'main':'sub'}">
       <b class="t">${r.name}<span class="tag ${r.main?'sel':''} spacer">${r.main?'Основной':'Суб-аккаунт'}</span></b>
