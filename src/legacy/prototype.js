@@ -1341,7 +1341,7 @@ V.calc=m=>{
   const cc=['BTC','LTC'][segi('calc-coin',0)];
   return `<div class="cwrap">
   <div class="cleft">
-    <div class="ctop">${fsel('calc-coin',['BTC','LTC'],v=>COIN_ICON[v])}<div class="spacer"></div>
+    <div class="ctop hr1">${fsel('calc-coin',['BTC','LTC'],v=>COIN_ICON[v])}<div class="spacer"></div>
       <button class="btn link creset" data-creset>Сбросить</button></div>
     <div class="cgrid">
       <div class="cpair">${cfield('Курс '+cc,'3 071 428,57')}${curSel('calc-cur',['₽','$'])}</div>
@@ -1370,13 +1370,13 @@ const TAX_VALS=m=>m.empty?{inc:'0',rate:'4 647 685,61',kwt:'0',price:'0,00',eq:'
     mon:'39 270',net:'249 197',year:'471 241',base:'3 461 604',el:'4 838 400',am:'3 699 996',
     c1:'39 270',c2:'0,00'};
 V.tax=m=>{
-  const v=TAX_VALS(m), ltc=segi('tax-coin',0)===1;
+  const v=TAX_VALS(m);
   const row=(l,x)=>`<div class="txrow"><span>${l}</span><b>${x} ₽</b></div>`;
   return `<div class="txtabs">${segLine('tax-coin',
-    [`${COIN_ICON.BTC}BTC`,`${COIN_ICON.LTC}${ltc?'LTC':'+ LTC'}`],0)}</div>
+    [`${COIN_ICON.BTC}BTC`,`${COIN_ICON.LTC}+ LTC`],0)}</div>
   <div class="txwrap">
     <div class="txleft">
-      <div class="txtop">${seg('tax-form',['Физическое лицо и ИП','Юридическое лицо'],0)}
+      <div class="txtop hr1">${seg('tax-form',['Физическое лицо и ИП','Юридическое лицо'],0)}
         <div class="spacer"></div><button class="btn link creset" data-creset>Сбросить</button></div>
       <div class="txlist">
         <div class="txgroup"><span class="gk">Доходы</span>
@@ -1384,11 +1384,6 @@ V.tax=m=>{
         <div class="txgroup"><span class="gk">Расходы</span>
           <div class="txrowin">${cfield('Потребление, кВт·ч',v.kwt)}${cfield('Стоимость, ₽/кВт·ч (с НДС)',v.price)}
             ${cfield('Цена оборудования, ₽ (с НДС)',v.eq)}${cfield('Срок службы оборудования, мес.',v.life)}</div></div>
-      </div>
-      <div class="txitems">
-        <div class="txitem"><span>Доход до вычета налогов <i class="tipi" data-tip="Доход по курсу на момент вывода, до удержания налогов">${I.inf}</i></span><b>0.00 ₽</b></div>
-        <div class="txitem"><span>Налоговая база на вывод</span><b>0.00 ₽</b></div>
-        <div class="txitem"><span>Налоговая база на продажу</span><b>0.00 ₽</b></div>
       </div>
     </div>
     <div class="txright">

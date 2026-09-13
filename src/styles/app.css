@@ -102,7 +102,11 @@ body.mini .ni .spacer.lbl{display:none!important}
 .logo{display:flex;align-items:flex-start;gap:8px;height:72px;padding:24px 24px 0;flex:0 0 auto;color:var(--c1)}
 .logo .lm{margin-top:2px}
 .logo .lw{display:flex;flex-direction:column;align-items:flex-end}
-.nav{display:flex;flex-direction:column;gap:0;overflow-y:auto;padding:12px 12px 0}
+/* Полоса прокрутки съедала 11px ширины пунктов: в макете пункт 228,
+   а до контента от него ровно 12 (109:19431) */
+.nav{display:flex;flex-direction:column;gap:0;overflow-y:auto;padding:12px 12px 0;
+  scrollbar-width:none;-ms-overflow-style:none}
+.nav::-webkit-scrollbar{display:none}
 .ni{display:flex;align-items:center;gap:8px;padding:0 12px;height:var(--h-ctrl);border-radius:var(--r-m);color:var(--c1);background:transparent;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;position:relative;width:100%}
 .nic{color:var(--c3);display:flex;flex:0 0 auto}
 .ni.on .nic,.ni.act .nic{color:var(--accent)}
@@ -1463,12 +1467,15 @@ button.scsect:hover{color:var(--accent)}
   background:var(--ctrl);border-radius:var(--r-m);color:var(--c1);
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .xsel:hover{background:var(--ctrl-hover)}
-.pop.menu.xmenu{width:100%;min-width:0;padding:12px!important;gap:0;scrollbar-gutter:auto}
-.pop.menu.xmenu>button{padding:0!important;height:40px;min-height:40px;gap:8px;font-size:var(--fs-b1)!important}
+/* Размер пункта зависит от типа списка: у селекта-поля 14 SemiBold (3:38030),
+   у выбора монеты в шапке — 18 (357:98871). Второй остаётся на базовом правиле. */
+.pop.menu.xmenu{width:100%;min-width:0;padding:4px 12px!important;gap:0;scrollbar-gutter:auto}
+.pop.menu.xmenu>button{padding:0!important;height:40px;min-height:40px;gap:8px;
+  font-size:var(--fs-s)!important;line-height:var(--lh-s)}
 .xsel svg,.xmenu>button svg{width:24px;height:24px;flex:0 0 auto}
 .xmenu .ck{margin-left:auto}
 .xmenu .mdiv{margin:3.5px 0}
-.xmenu button{font-size:var(--fs-b1);line-height:var(--lh-b1)}
+.xmenu button{font-size:var(--fs-s);line-height:var(--lh-s)}
 /* Инструкция в модалке подключения (макет 173:60724) */
 .steps{margin:16px 0 0;padding:0;list-style:none;counter-reset:st}
 .steps li{counter-increment:st;font-size:var(--fs-s);line-height:22px;color:var(--c1);margin-bottom:16px}
@@ -1836,6 +1843,8 @@ button.scsect:hover{color:var(--accent)}
   background:var(--ctrl);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
 .dinput{width:256px;color:var(--c2);justify-content:space-between}
 .fsel{min-width:150px}
+.ctop .fsel{min-width:110px;width:110px}
+.ctop .fsel+.pop,.ctop .pop.menu{min-width:110px}
 .dinput:hover,.fsel:hover{background:var(--ctrl-hover)}
 .dinput svg,.fsel svg{width:24px;height:24px;flex:0 0 auto}
 /* Ряд действий над карточкой выплат */
@@ -1848,13 +1857,15 @@ button.scsect:hover{color:var(--accent)}
 }
 
 /* ============ Отчет о майнинге (макет 109:19476) ============ */
-.rtop{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
-.rinfo{max-width:852px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500;
-  display:flex;flex-direction:column;gap:4px}
+/* Текст и кнопки держатся одной строкой на любой ширине: текст сжимается,
+   кнопки не переносятся под него (109:19431 и 1440-вариант 109:19526) */
+.rtop{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:nowrap}
+.rinfo{flex:1 1 auto;min-width:0;max-width:852px;font-size:var(--fs-s);line-height:var(--lh-s);
+  color:var(--c2);font-weight:500;display:flex;flex-direction:column;gap:4px}
 .rinfo .rh{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c1)}
 .rinfo b{font-weight:600;color:var(--c1)}
 .lnk.a{color:var(--accent);font-weight:600}
-.racts{display:flex;gap:8px;flex-wrap:wrap}
+.racts{display:flex;gap:8px;flex:0 0 auto;justify-content:flex-end;flex-wrap:wrap}
 .racts .btn{height:var(--h-ctrl);padding:0 24px;gap:8px}
 .racts .btn svg{width:24px;height:24px}
 /* Уведомление в карточке: серый блок 108 с крестиком */
@@ -1866,7 +1877,7 @@ button.scsect:hover{color:var(--accent)}
 .rx svg{width:24px;height:24px}
 /* Строки отчёта 48 и карточка с паддингом 8, как в макете (109:19476) */
 .card:has(.rtbl){padding:8px 8px 16px}
-.card:has(.rtbl)>.rnote{margin:8px 8px 16px}
+.card:has(.rtbl)>.rnote{margin:0 0 16px}
 .rtbl th,.rtbl td{height:48px;padding:0 12px}
 .rtbl td{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .rtbl .btn.xs{height:36px;min-width:128px;padding:0 16px;gap:8px}
@@ -1895,7 +1906,10 @@ button.scsect:hover{color:var(--accent)}
 .cwrap{display:flex;gap:32px;background:var(--accent);border-radius:var(--r-l);padding:16px;min-height:268px}
 .cleft{flex:1;min-width:0;background:var(--surface);border-radius:var(--r-m);padding:16px;
   display:flex;flex-direction:column;gap:16px}
+/* под шапкой секции линия-разделитель (Top с нижней обводкой, 3:37133) */
 .ctop{display:flex;align-items:center;gap:24px;padding-bottom:16px}
+.hr1{border-bottom:1px solid var(--ctrl-line)}
+.txtop.hr1{padding-bottom:32px}
 .cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 .cfield{display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:var(--h-field);
   background:var(--ctrl);border-radius:var(--r-m);padding:0 12px}
@@ -1938,20 +1952,12 @@ button.scsect:hover{color:var(--accent)}
 .txgroup{display:flex;flex-direction:column;gap:16px}
 .gk{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .txrowin{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:16px}
-/* в макете подложка #f7f7fa — это наш --bg, он же переключается в тёмной теме */
-.txitems{display:flex;align-items:center;gap:24px;background:var(--bg);border-radius:var(--r-s);padding:24px}
-.txitem{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;position:relative}
-.txitem+.txitem::before{content:"";position:absolute;left:-12px;top:50%;transform:translateY(-50%);
-  width:1px;height:28px;background:var(--ctrl-line)}
-.txitem span{display:flex;align-items:center;gap:4px;font-size:var(--fs-s);line-height:var(--lh-s);
-  color:var(--c2);font-weight:600}
-.txitem b{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
 .txright{width:496px;flex:0 0 auto;background:var(--accent);border-radius:var(--r-l);padding:24px;
   display:flex;flex-direction:column;gap:20px;color:#fff}
 .txchips{display:flex;gap:32px}
 .txchip{display:inline-flex;align-items:center;gap:12px;font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
 .txchip svg{width:24px;height:24px;margin-right:-8px}
-.txinfo{background:#1a1a1a;border-radius:var(--r-s);padding:24px;display:flex;flex-direction:column;gap:20px}
+.txinfo{background:#1a1a1a29;border-radius:var(--r-s);padding:24px;display:flex;flex-direction:column;gap:20px}
 .txinfo .l{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:500}
 .txinfo b{font-size:var(--fs-h1);line-height:var(--lh-h1);font-weight:600}
 .txinfo .n{display:flex;align-items:center;gap:12px;font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
