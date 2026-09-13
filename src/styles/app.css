@@ -2293,3 +2293,17 @@ button.scsect:hover{color:var(--accent)}
 /* Строка курса в шапке: рост зелёным, падение красным */
 .rate .rup{font-style:normal;color:var(--pos);font-weight:600}
 .rate .rdn{font-style:normal;color:var(--neg);font-weight:600}
+
+/* Ось «Сетка поверх макета»: линейка для проверки отступов и колонок */
+:root[data-grid="px8"] body::after,:root[data-grid="col"] body::after{
+  content:"";position:fixed;inset:0;z-index:200;pointer-events:none}
+:root[data-grid="px8"] body::after{
+  background:repeating-linear-gradient(to right,#7086fc1f 0 1px,transparent 1px 8px),
+             repeating-linear-gradient(to bottom,#7086fc1f 0 1px,transparent 1px 8px)}
+:root[data-grid="col"] body::after{
+  background:repeating-linear-gradient(to right,#7086fc1f 0 72px,transparent 72px 88px)}
+/* Ось «Границы блоков»: подсветка карточек, таблиц и кнопок при отладке */
+:root[data-outline="on"] .card,:root[data-outline="on"] .tbl,
+:root[data-outline="on"] .btn,:root[data-outline="on"] .pop{outline:1px dashed #ef444466}
+/* Ось «Скругления»: прямые углы показывают, где они вообще есть */
+:root[data-radius="none"] *{border-radius:0!important}

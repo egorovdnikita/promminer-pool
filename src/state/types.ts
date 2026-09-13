@@ -7,6 +7,8 @@ export interface Scenario {
   wf: string
   prec: string
   fiat: string
+  numfmt: string
+  tzview: string
   trend: string
   noise: string
   gap: string
@@ -23,6 +25,11 @@ export interface Scenario {
   wup: string
   wshare: string
   wlink: string
+  wfilt: string
+  wpage: string
+  wsort: string
+  wname: string
+  wtagn: string
   awal: string
   apay: string
   athr: string
@@ -30,19 +37,28 @@ export interface Scenario {
   astep: string
   aconf: string
   aerr: string
+  acoins: string
+  afee: string
   payn: string
   payst: string
   paytype: string
   paydoc: string
+  incn: string
+  incper: string
   rdata: string
   repn: string
   repst: string
   repw: string
+  repacc: string
+  repdl: string
   tier: string
   refn: string
   refact: string
   refpn: string
   refrub: string
+  refhash: string
+  refban: string
+  reflink: string
   calchw: string
   taxface: string
   taxres: string
@@ -55,11 +71,15 @@ export interface Scenario {
   fam: string
   sess: string
   del: string
+  pwdage: string
+  sesgeo: string
   subs: string
   obs: string
   notif: string
   notift: string
   avatar: string
+  sublim: string
+  obsexp: string
   phone: string
   mail: string
   tg: string
@@ -68,6 +88,8 @@ export interface Scenario {
   vdoc: string
   vacc: string
   verr: string
+  vform: string
+  vstat: string
   oerr: string
   saerr: string
   theme: string
@@ -75,6 +97,10 @@ export interface Scenario {
   fsz: string
   side: string
   motion: string
+  grid: string
+  outline: string
+  radius: string
+  toast: string
   load: string
   neterr: string
 }
@@ -128,7 +154,8 @@ export interface Ui {
   /** Устройство, чью сессию завершают. */
   sess?: string
   q: string
-  wfilter: string
+  /** Выбранная вкладка статуса воркеров; null — берём из оси «Фильтр по умолчанию». */
+  wfilter: string | null
   geo: string
   wk: any
   wtag: Set<number>

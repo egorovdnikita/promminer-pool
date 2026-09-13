@@ -13,7 +13,7 @@ export const routeOf = (pathname: string) => pathname.replace(/^\/+|\/+$/g, '') 
 const freshUi = (): Ui => ({
   seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {}, oval: false, obs: 0, sess: '',
   scgrp: [], saved: loadSaved(), sctab: 'ax', scpin: loadPins(), schist: [], scw: 420, scside: 'right',
-  q: '', wfilter: 'all', geo: '',
+  q: '', wfilter: null, geo: '',
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
   grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null, selq: '',
@@ -115,7 +115,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [navigate])
 
   const toast = useCallback((msg: string) => {
-    if (!msg) return
+    /* Ось «Всплывающие подсказки»: их можно погасить, чтобы не мешали
+       снимать экраны и записывать видео */
+    if (!msg || S.current.toast === 'off') return
     const id = ++toastId.current
     toasts.current = [...toasts.current, { id, msg }]
     bump()
@@ -156,6 +158,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     el.setAttribute('data-dens', S.current.dens)
     el.setAttribute('data-fsz', S.current.fsz)
     el.setAttribute('data-motion', S.current.motion)
+    el.setAttribute('data-grid', S.current.grid)
+    el.setAttribute('data-outline', S.current.outline)
+    el.setAttribute('data-radius', S.current.radius)
   })
 
   useEffect(() => {
