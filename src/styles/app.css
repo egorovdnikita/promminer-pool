@@ -1460,8 +1460,10 @@ button.scsect:hover{color:var(--accent)}
 /* высоту ограничивает общее правило .modal — окно минус 35 сверху и снизу */
 .tmake{width:100%;height:56px;flex:0 0 auto;justify-content:center;margin-top:16px}
 .tmake.dis{opacity:.4;pointer-events:none}
-.inp.ta{min-height:96px;align-items:stretch;justify-content:flex-start;padding:12px}
-.inp.ta input{flex:1}
+/* Text Area из ДС (173:62541): 96 в высоту, паддинг 12, подпись над значением */
+.inp.ta{min-height:96px;align-items:stretch;justify-content:flex-start;padding:12px;gap:0}
+.inp.ta .k{line-height:16px}
+.inp.ta input{flex:0 0 auto;height:20px;align-self:stretch}
 .tcolor{margin-top:16px}
 .tcolor .k{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500;margin-bottom:12px}
 .swatches{display:flex;gap:12px;flex-wrap:wrap}
@@ -1501,8 +1503,10 @@ button.scsect:hover{color:var(--accent)}
 .tempty p{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)}
 
 /* --- Серийные номера (макет 173:66711) --- */
-/* у этой таблицы нет горизонтальной прокрутки, поэтому список не обрезаем */
+/* у этой таблицы нет горизонтальной прокрутки, поэтому список не обрезаем
+   ни обёрткой, ни самой ячейкой — иначе меню моделей режется по её краю */
 .tw:has(.sertbl){overflow:visible}
+.tbl.sertbl td.sermodel{overflow:visible}
 .tbl.sertbl{table-layout:fixed}
 .tbl.sertbl th,.tbl.sertbl td{width:25%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tbl.sertbl td{padding:12px;height:47px}
@@ -1681,7 +1685,8 @@ button.scsect:hover{color:var(--accent)}
 .qlinks .lico{display:flex;flex:0 0 auto}
 
 /* Выбор модели в серийных номерах: список открывается стрелкой, без поиска */
-.serpick{display:flex;align-items:center;gap:8px;position:relative}
+.serpick{display:flex;align-items:center;gap:8px;position:relative;min-width:0}
+.serpick .sname,.serpick .serph{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .serpick .sarr{width:24px;height:24px;margin-left:auto;color:var(--c3);flex:0 0 auto}
 .serpick .sarr:hover{color:var(--c1)}
 .serpick .sarr svg{width:24px;height:24px}

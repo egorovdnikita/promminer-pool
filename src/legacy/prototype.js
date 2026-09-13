@@ -891,7 +891,7 @@ V.serials=m=>{
         ? '<span class="mono">OLTTG4BBEJDAJ062H</span>'
         : '<span class="serph">Заводской номер</span>'}</td>
       <td class="sercell sermodel ${bad?'bad':''}">
-        <span class="pop-wrap serpick">${filled?SER_MODELS[w.id%5]:'<i class="serph">Выберите модель</i>'}
+        <span class="pop-wrap serpick">${filled?`<span class="sname">${SER_MODELS[w.id%5]}</span>`:'<i class="serph">Выберите модель</i>'}
           <button class="ibr sarr" data-pop="sm${w.id}">${I.cd}</button>
           ${pop==='sm'+w.id?`<div class="pop menu smenu">${SER_MODELS.map((mo,j)=>
             `${j?'<div class="mdiv"></div>':''}<button data-toast="Модель: ${mo}">${mo}${filled&&SER_MODELS[w.id%5]===mo?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}
