@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import {
-  CHECK, I, NOTIF_N, PROF, SUM_ROUTES, TITLES, acctSummary, nf, notifications, permsOf, profTabs, type Model,
+  I, NOTIF_N, PROF, SUM_ROUTES, TITLES, acctSummary, nf, notifications, permsOf, profTabs, type Model,
 } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico, Raw } from './Raw'

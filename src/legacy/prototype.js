@@ -968,7 +968,7 @@ V.serials=m=>{
             return `<div class="pop menu smenu">
               <label class="search xfind">${I.srch}<input id="selq" placeholder="Поиск" value="${String(U.selq||'').replace(/"/g,'&quot;')}"></label>
               ${shown.length?shown.map((mo,j)=>
-                `${j?'<div class="mdiv"></div>':''}<button data-toast="Модель: ${mo}">${mo}${filled&&SER_MODELS[w.id%5]===mo?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')
+                `${j?'<div class="mdiv"></div>':''}<button data-toast="Модель: ${mo}">${mo}${filled&&SER_MODELS[w.id%5]===mo?`<span class="ck">${I.okc}</span>`:''}</button>`).join('')
                 :'<p class="fempty">Результатов не найдено</p>'}</div>`})():''}
         </span></td></tr>`};
   return `
@@ -2222,7 +2222,7 @@ V.notifsettings=m=>{
   ${n?`<button class="btn link" data-readall data-toast="Все уведомления отмечены как прочитанные">${I.checkall} Прочитать все</button>
   <span class="pop-wrap"><button class="selbox nsel" data-pop="nfilter">${segv('nfilter',['Все уведомления','Непрочитанные','Прочитанные'])}<span class="spacer">${I.cd}</span></button>
     ${pop==='nfilter'?`<div class="pop" style="min-width:230px">${['Все уведомления','Непрочитанные','Прочитанные'].map((o,i)=>
-      `<button class="${segi('nfilter')===i?'on':''}" data-seg="nfilter" data-i="${i}">${o}${segi('nfilter')===i?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`:''}
+      `<button class="${segi('nfilter')===i?'on':''}" data-seg="nfilter" data-i="${i}">${o}${segi('nfilter')===i?`<span class="ck">${I.okc}</span>`:''}</button>`).join('')}</div>`:''}</span>`:''}
   <button class="btn g" data-go="notifconfig">${I.tune} Настройка</button></div>
   ${rows.length?`<div class="tw"><table class="tbl notbl"><tbody>${rows.map(noteRow).join('')}</tbody></table></div>`
     :`<div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
@@ -2447,7 +2447,7 @@ const MODALS={
           <span class="pop-wrap full spacer"><button class="ibr dim" data-pop="tz">${I.cd}</button>
           ${pop==='tz'?`<div class="pop menu row">${TZ.map((t,i)=>
             `<button data-seg="tz" data-i="${i}">${t.replace(/[()]/g,'')}
-              ${segi('tz')===i?`<span class="ck spacer">${CHECK}</span>`:''}</button>`)
+              ${segi('tz')===i?`<span class="ck spacer">${I.okc}</span>`:''}</button>`)
             .join('<div class="hr" style="margin:0 12px"></div>')}</div>`:''}</span></div>
       </div>
       <div class="alert info" style="margin:0">${I.inf}<div>Укажите таймзону для удобной связи с поддержкой. На баланс и выплаты это не влияет</div></div>
