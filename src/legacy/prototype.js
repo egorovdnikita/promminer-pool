@@ -406,7 +406,7 @@ const xsel=(label,id,opts,ico,find)=>{const i=U.seg[id]??0; const pic=v=>ico?(ic
   const q=(U.selq||'').trim().toLowerCase();
   const shown=opts.map((o,j)=>[o,j]).filter(([o])=>!find||!q||String(o).toLowerCase().includes(q));
   return `<div class="xf"><div class="k">${label}</div>
-    <span class="pop-wrap"><button class="xsel" data-pop="${id}">${pic(opts[i])}${opts[i]}<span class="spacer"></span>${I.cd}</button>
+    <span class="pop-wrap"><button class="xsel ${pop===id?'open':''}" data-pop="${id}">${pic(opts[i])}${opts[i]}<span class="spacer"></span>${I.cd}</button>
     ${pop===id?`<div class="pop menu xmenu ${find?'find':''}">
       ${find?`<label class="search xfind">${I.srch}<input id="selq" placeholder="Поиск" value="${String(U.selq||'').replace(/"/g,'&quot;')}"></label>`:''}
       ${shown.length?shown.map(([o,j],n)=>
@@ -1145,7 +1145,7 @@ const AERR={req:'Поле обязательно для заполнения',lo
 const WERR={req:'Поле обязательно для заполнения',bad:'Некорректный адрес'};
 const KERR={code:'Введен неверный код',old:'Код недействителен. Запросите новый'};
 /* Селект монеты внутри поля суммы: 110x40, радиус 12 (226:124696) */
-const csel=(id,cur,off)=>`<span class="pop-wrap"><button class="csel" data-pop="${id}">${COIN_ICON[cur]}${cur}<span class="spacer"></span>${I.cd}</button>
+const csel=(id,cur,off)=>`<span class="pop-wrap"><button class="csel ${pop===id?'open':''}" data-pop="${id}">${COIN_ICON[cur]}${cur}<span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu csmenu">${ASSETS.map((a,n)=>{
     const d=off&&off(a);
     return `${n?'<div class="mdiv"></div>':''}<button class="${a.s===cur?'on':''} ${d?'dis':''}" ${d?'disabled':`data-coin2="${a.s}"`}>${COIN_ICON[a.s]}${a.s}${a.s===cur?`<span class="ck">${CHECK}</span>`:''}</button>`}).join('')}</div>`:''}</span>`;
@@ -1213,12 +1213,12 @@ const dayChips=(id,def=null)=>`<span class="dchips">${['7 дн','30 дн','90 д
   `<button class="chip d ${(U.seg[id]??def)===i?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</span>`;
 /* Селект в шапке карточки: 48 высотой, радиус 16 (37:56063) */
 const fsel=(id,opts,ico)=>{const i=U.seg[id]??0; const pic=v=>ico?(ico(v)||''):'';
-  return `<span class="pop-wrap"><button class="fsel" data-pop="${id}">${pic(opts[i])}${opts[i]}<span class="spacer"></span>${I.cd}</button>
+  return `<span class="pop-wrap"><button class="fsel ${pop===id?'open':''}" data-pop="${id}">${pic(opts[i])}${opts[i]}<span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu ${ico?'coins':''}">${opts.map((o,n)=>
     `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${pic(o)}${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 /* Date Input 256x48 с плейсхолдером 16 SemiBold (15:19710) — открывает календарь */
 const dateInput=(id='d')=>{const v=U.dsel['dp'+id];
-  return `<span class="pop-wrap"><button class="dinput ${v?'on':''}" data-pop="dp${id}">
+  return `<span class="pop-wrap"><button class="dinput ${v?'on':''} ${pop==='dp'+id?'open':''}" data-pop="dp${id}">
     ${dpLabel('dp'+id,'Выберите дату')}${I.cal}</button>
     ${pop==='dp'+id?datePicker([],3,2026,0,'dp'+id):''}</span>`};
 /* Карточка дохода 540x176: подпись 20, значение 48, снизу пересчёт в валюты */
@@ -1321,18 +1321,18 @@ const cfield=(label,val,extra='')=>`<div class="cfield">
   <div class="cin"><input value="${val}">${extra}</div></div>`;
 /* Валюта курса — отдельное поле 100×56 рядом с суммой (3:37133) */
 const curSel=(id,opts)=>{const i=U.seg[id]??0;
-  return `<span class="pop-wrap cur"><button class="curbtn" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
+  return `<span class="pop-wrap cur"><button class="curbtn ${pop===id?'open':''}" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu msmenu">${opts.map((o,n)=>
     `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 /* Поле-селект: выглядит как Input 56 с подписью и шевроном (3:37133) */
 const cselField=(label,id,opts)=>{const i=U.seg[id]??0;
-  return `<span class="pop-wrap full"><button class="cfield csel2 lab" data-pop="${id}">
+  return `<span class="pop-wrap full"><button class="cfield csel2 lab ${pop===id?'open':''}" data-pop="${id}">
     <span class="k">${label}</span><span class="v">${opts[i]}</span><span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu" style="min-width:348px">${opts.map((o,n)=>
     `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 /* Компактный выпадающий список внутри поля (валюта курса, 3:37127) */
 const minisel=(id,opts)=>{const i=U.seg[id]??0;
-  return `<span class="pop-wrap"><button class="msel" data-pop="${id}">${opts[i]}${I.cd}</button>
+  return `<span class="pop-wrap"><button class="msel ${pop===id?'open':''}" data-pop="${id}">${opts[i]}${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu msmenu">${opts.map((o,n)=>
     `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 
@@ -1570,11 +1570,14 @@ const TIER_PERKS=[
    'Инвайты на международные и закрытые отраслевые мероприятия','Персональные инвестиционные предложения',
    'Возможность брендирования собственных ферм совместно с Promminer']];
 /* Селектор монеты реферальной программы: название и список тикеров */
-const refCoinSel=(m,id)=>`<span class="pop-wrap"><button class="rcoin" data-pop="${id}">
+const refCoinSel=(m,id)=>`<span class="pop-wrap"><button class="rcoin ${pop===id?'open':''}" data-pop="${id}">
   <span class="t"><b>${m.c.refCoin[0]}</b><i>${m.c.refCoin[1]}</i></span>
   <span class="ic">${COIN_ICON[m.bal[0].s]}</span>${I.cd}</button>
-  ${pop===id?`<div class="pop menu xmenu coins">${AXES.coin.opts.map(([v,l],n)=>
-    `${n?'<div class="mdiv"></div>':''}<button class="${S.coin===v?'on':''}" data-axis="coin" data-val="${v}">${COIN_ICON[v==='btc'?'BTC':v==='zec'?'ZEC':'LTC']}${l}${S.coin===v?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`;
+  ${pop===id?`<div class="pop menu rcmenu">${AXES.coin.opts.map(([v],n)=>{
+    const c=COINS[v], ic=v==='ltc'?COIN_ICON.LTC+COIN_ICON.DOGE:COIN_ICON[v.toUpperCase()];
+    return `${n?'<div class="mdiv"></div>':''}<button class="${S.coin===v?'on':''}" data-axis="coin" data-val="${v}">
+      <span class="t"><b>${c.refCoin[0]}</b><i>${c.refCoin[1]}</i></span>
+      <span class="ic">${ic}</span></button>`}).join('')}</div>`:''}</span>`;
 /* Таблица реферального дохода — колонки свои (534:54490) */
 function refIncomeTable(m,n,pid){
   if(!n) return emptyBox('Дохода пока нет','Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение');
@@ -1599,8 +1602,7 @@ V.ref=m=>{
   return `<div class="rcards">
   <div class="rcard rlvcard">
     <div class="rlvtop">
-      ${m.empty?'<span class="rhex off">0%</span>'
-        :`<span class="rhex"><img src="/tier-${TIERS[+S.tier].k}.png" alt=""><b>${m.tier.p}</b></span>`}
+      <span class="rhex">${m.empty?'0%':m.tier.p}</span>
       <div class="rlvinfo">
         <div class="rlvrow"><div class="rlvk"><span class="k">Ваша комиссия</span>
           <b>${m.empty?'0%':m.tier.p}</b></div>${refCoinSel(m,'refcoin')}</div>
@@ -1611,7 +1613,9 @@ V.ref=m=>{
     <div class="rlvdown">
       <div class="rprog">
         <span class="rnext">До первого уровня: <b>${m.c.next}</b></span>
-        <div class="rbar"><i style="width:${m.empty?0:TIERS[+S.tier].f}%"></i></div>
+        <div class="rbar"><i style="width:${m.empty?0:TIERS[+S.tier].f}%"></i>
+          <div class="rstars">${TIERS.map((t,i)=>
+            `<img src="/tier-${t.k}.png" alt="" class="${m.empty||i>+S.tier?'off':''}">`).join('')}</div></div>
         <div class="rpct">${TIERS.map(t=>`<span>${t.p}</span>`).join('')}</div>
       </div>
       <button class="lnk a" data-modal="levels">Все об уровнях${I.cv}</button>
@@ -1630,8 +1634,7 @@ V.ref=m=>{
       <div class="rlinp"><span>${LINKS.ref(49282838)}</span>
         <button class="lnk" data-copy="${LINKS.ref(49282838)}">${I.cp}</button></div>
     </div>
-    <div class="rbanner"><i class="o1"></i><i class="o2"></i>
-      <img class="sh" src="/ref-banner-shape.svg" alt="">
+    <div class="rbanner"><img class="sh" src="/ref-banner-shape.svg" alt="">
       <p>Начните формировать свой<br>пассивный доход, став партнером<br>Promminer уже сегодня</p>
       <img class="coin" src="/ref-coin.png" alt="">
     </div>
@@ -2722,22 +2725,33 @@ const MODALS={
     b:(m,step)=>walletBody(step,true),
     foot:(m,step)=>walletFoot(step,'Адрес изменен')},
   /* Уровни комиссии (467:41571): пороги по монете и раскрывающиеся привилегии */
-  levels:{t:'Уровни комиссии',acts:false,size:'lv',
-    b:m=>`<div class="mstack">
-      ${refCoinSel(m,'lvcoin')}
-      <p class="mtext mut">Приглашайте друзей и получайте комиссию за услуги
-        в качестве реферального вознаграждения</p>
+  /* Уровни комиссии (467:41571): чёрная шапка с медалями, серый селектор
+     монеты, список уровней с галочками и ссылка в справку внизу */
+  levels:{t:'',acts:false,size:'lv',noHead:true,
+    b:m=>`<div class="lv">
+      <div class="lvhero">
+        <span class="g1"></span><span class="g2"></span>
+        <div class="lvmed">${TIERS.map((t,i)=>
+          `<img src="/tier-${t.k}.png" alt="" class="m${i}">`).join('')}</div>
+      </div>
+      <div class="lvtop">
+        <div class="lvtitle"><h2>Уровни комиссии</h2>${refCoinSel(m,'lvcoin')}</div>
+        <p class="mtext mut">Приглашайте друзей и получайте комиссию за услуги
+          в качестве реферального вознаграждения</p>
+      </div>
       <div class="lvlist">${TIERS.map((t,i)=>`<div class="lvitem ${U.lvl===i?'on':''}">
         <button class="lvhead" data-lvl="${i}">
-          <img src="/tier-${t.k}-s.png" alt="" width="40" height="40">
+          <img src="/tier-${t.k}.png" alt="" width="40" height="40">
           <span><b>${t.p} (${t.n})</b><i>Хэшрейт рефералов ${TIER_RANGE[S.coin][i]}</i></span>
-          ${I.cd}</button>
+          ${i<=+S.tier?`<span class="lvok">${CHECK}</span>`:''}${I.cd}</button>
         ${U.lvl===i?`<ul class="lvperks">${TIER_PERKS[i].map(x=>`<li>${x}</li>`).join('')}</ul>`:''}
       </div>`).join('')}</div>
-      <p class="mtext mut lvq">Остались вопросы?
-        <button class="lnk a" data-toast="Откроется справка о реферальной программе">Подробнее о реферальной программе</button></p>
+      <div class="hr"></div>
+      <div class="lvq"><span class="k">Остались вопросы?</span>
+        <button class="lvlink" data-toast="Откроется справка о реферальной программе">
+          ${I.book}<span>Подробнее о реферальной программе</span>${I.aru}</button></div>
     </div>`,
-    foot:()=>`<button class="btn g wide" data-close>Закрыть</button>`},
+    foot:()=>''},
   /* Выберите аккаунты (109:19936): две колонки чекбоксов и переключатель */
   repacc:{t:'Выберите аккаунты',s:'по которым будет сгенерирован отчет',acts:false,tall:14,
     b:m=>{const list=subsOf(m).filter(x=>!x.arch);

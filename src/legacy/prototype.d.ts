@@ -81,6 +81,7 @@ export declare const MODALS: Record<string, {
   sheet?: true
   /** Тело фиксированной высоты 348 — шаговые экраны контактов. */
   tall?: number | ((m: Model) => number)
+  noHead?: boolean
 }>
 /** Вкладки профиля — рисуются в шапке. */
 export declare function profTabs(cur: string, m: Model): string

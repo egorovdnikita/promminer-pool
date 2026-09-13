@@ -21,7 +21,10 @@ export function Modal({ m }: { m: Model }) {
   return (
     <div className={d.sheet ? 'mask sheet' : 'mask'} data-close>
       <div className={d.sheet ? 'modal sheet' : d.size ? 'modal ' + d.size : 'modal'}>
-        {d.img ? (
+        {d.noHead ? (
+          /* Окно без шапки: заголовок живёт внутри тела (467:41571) */
+          close
+        ) : d.img ? (
           // Modal HeaderA с иллюстрацией: баннер, крестик поверх, заголовок под ним
           <div className="mhead img">
             <img src={d.img} alt="" />
