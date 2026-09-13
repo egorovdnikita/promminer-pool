@@ -670,6 +670,7 @@ function taxonBody(k,bind){
     : `<div class="tcard ${mark.has(i)?'on':''}">
         ${cb(mark.has(i),`data-tpick="${k}:${i}"`)}
         ${k==='t'?`<span class="tag" style="background:${it.c}1f;color:${it.c}">${it.n}</span>
+          <span class="tsw" style="background:${it.c}"></span>
           <span class="tdesc">${it.d||''}</span>`:`<span class="tx">${it.n}</span>`}
         <div class="spacer"></div>
         <button class="ibr ted" data-ted="${k}:${i}" data-tip="Изменить">${I.edit}</button>

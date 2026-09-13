@@ -1477,7 +1477,10 @@ button.scsect:hover{color:var(--accent)}
 .tcard{display:flex;align-items:center;gap:12px;height:64px;padding:8px;border-radius:var(--r-m);
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
 .tcard:hover,.tcard.on{background:var(--ctrl2)}
-.tcard .tdesc{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2);
+/* Строка тега: чип, кружок цвета и описание основным цветом (173:62152) */
+.tcard .tag{font-size:var(--fs-s);line-height:var(--lh-s)}
+.tsw{width:32px;height:32px;border-radius:var(--r-s);flex:0 0 auto}
+.tcard .tdesc{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c1);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
 /* Кнопки строки: «изменить» акцентом, «удалить» красным, подложка 12 % */
 .tcard .ibr{width:48px;height:48px;border-radius:var(--r-m);flex:0 0 auto}
@@ -1529,7 +1532,7 @@ button.scsect:hover{color:var(--accent)}
 /* Заметка и ссылка под зоной перетаскивания: 20 от зоны, строки по 18 (173:67092).
    Класс .note уже занят карточкой уведомления, поэтому здесь .mnote */
 .mnote{margin-top:20px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500}
-.mnote + .btn.link{margin-top:0;height:18px}
+.mnote + .btn.link{margin-top:0;height:18px;font-size:var(--fs-s);line-height:var(--lh-s)}
 .mbody .cap.dim{margin-top:16px}
 .mbody .cap.dim .btn.link{height:auto;font-size:var(--fs-s);line-height:var(--lh-s);vertical-align:baseline}
 /* Дизейбл в ДС — та же кнопка с прозрачностью 40 % */
