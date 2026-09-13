@@ -1843,8 +1843,10 @@ button.scsect:hover{color:var(--accent)}
   background:var(--ctrl);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
 .dinput{width:256px;color:var(--c2);justify-content:space-between}
 .fsel{min-width:150px}
-.ctop .fsel{min-width:110px;width:110px}
-.ctop .fsel+.pop,.ctop .pop.menu{min-width:110px}
+/* Селект монеты как в макете: 110 = 12 + иконка 24 + текст + шеврон 24 + 12 */
+.ctop .fsel{min-width:110px;width:auto;gap:4px}
+.ctop .fsel .spacer{display:none}
+.ctop .pop.menu{min-width:110px}
 .dinput:hover,.fsel:hover{background:var(--ctrl-hover)}
 .dinput svg,.fsel svg{width:24px;height:24px;flex:0 0 auto}
 /* Ряд действий над карточкой выплат */
@@ -1917,15 +1919,24 @@ button.scsect:hover{color:var(--accent)}
 .cin{display:flex;align-items:center;gap:8px}
 .cin input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:var(--fs-m);
   line-height:var(--lh-m);font-weight:500;color:var(--c1);outline:none}
+/* Курс и валюта — две половины одного поля: слева сумма, справа валюта
+   с шевроном, скругления только по внешним углам (3:37139) */
 .cpair{display:flex;gap:0;min-width:0}
-.cpair .cfield:first-child{flex:1;min-width:0;border-top-right-radius:0;border-bottom-right-radius:0}
-.cpair .cur{flex:0 0 100px}
-.csel2{width:100%;justify-content:flex-start;gap:4px}
-.csel2.lab{flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;position:relative}
+.cpair>.cfield{flex:1;min-width:0;border-top-right-radius:0;border-bottom-right-radius:0}
+.cpair>.cur{flex:0 0 100px;display:block}
+.curbtn{display:flex;align-items:center;gap:4px;width:100%;height:100%;min-height:var(--h-field);
+  padding:0 12px;background:var(--ctrl);border-radius:0 var(--r-m) var(--r-m) 0;
+  box-shadow:inset 1px 0 0 var(--ctrl-line);
+  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;color:var(--c1)}
+.curbtn:hover{background:var(--ctrl-hover)}
+.curbtn svg{width:24px;height:24px;color:var(--c3);flex:0 0 auto}
+/* Поле-селект «Налог, %»: подпись сверху, значение снизу, шеврон справа */
+.cgrid .pop-wrap.full{display:block;width:100%;min-width:0}
+.csel2.lab{flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;
+  width:100%;position:relative;padding-right:44px}
 .csel2.lab .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
-.csel2.lab>svg{position:absolute;right:12px;top:50%;transform:translateY(-50%)}
-.cpair .csel2{border-top-left-radius:0;border-bottom-left-radius:0;box-shadow:inset 1px 0 0 var(--ctrl-line)}
-.csel2 svg{width:24px;height:24px;color:var(--c3)}
+.csel2.lab>svg{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  width:24px;height:24px;color:var(--c3)}
 .creset{color:var(--accent);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;height:28px;padding:0}
 .msel{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 8px;border-radius:var(--r-s);
   background:var(--surface);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}

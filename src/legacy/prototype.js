@@ -1307,7 +1307,7 @@ V.report=m=>{
       <td>${status(cls,lab,'caps')}</td>
       <td class="num">${noV&&!ro?`<span data-tip="${REP_TIP}">${gen}</span>`:gen}</td>
       <td class="num"><button class="btn out xs" ${st==='ok'?'':'disabled'} data-toast="Отчет скачан">${I.dl}Скачать</button></td></tr>`}).join('')}
-  </tbody></table></div>${pager('report',REPORTS.length,10)}`)}`};
+  </tbody></table></div>`)}`};
 
 /* --- Инструменты --- */
 /* Калькулятор доходности (макет 5:3779): акцентная плашка 268, слева белая
@@ -1321,7 +1321,7 @@ const cfield=(label,val,extra='')=>`<div class="cfield">
   <div class="cin"><input value="${val}">${extra}</div></div>`;
 /* Валюта курса — отдельное поле 100×56 рядом с суммой (3:37133) */
 const curSel=(id,opts)=>{const i=U.seg[id]??0;
-  return `<span class="pop-wrap cur"><button class="cfield csel2" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
+  return `<span class="pop-wrap cur"><button class="curbtn" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu msmenu">${opts.map((o,n)=>
     `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 /* Поле-селект: выглядит как Input 56 с подписью и шевроном (3:37133) */
