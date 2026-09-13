@@ -374,7 +374,7 @@ const segv=(id,opts,def=0)=>opts[U.seg[id]??def];
    значение 16, список раскрывается на 18 */
 const xsel=(label,id,opts)=>{const i=U.seg[id]??0;
   return `<div class="xf"><div class="k">${label}</div>
-    <span class="pop-wrap"><button class="xs" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
+    <span class="pop-wrap"><button class="xsel" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
     ${pop===id?`<div class="pop menu xmenu">${opts.map((o,j)=>
       `<button class="${i===j?'on':''}" data-seg="${id}" data-i="${j}">${o}${i===j?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></div>`};
 /* Segment Control Line — тот же контракт, что у seg(), но линейный вариант DS */
@@ -658,7 +658,7 @@ function taxonBody(k,bind){
   return `
   <div class="inp" style="margin:0"><div class="k">Наименование</div>
     <input id="tname" maxlength="10" placeholder="До 10 символов" value="${String(name).replace(/"/g,'&quot;')}"></div>
-  ${k==='t'?`<div class="inp"><div class="k">Описание</div>
+  ${k==='t'?`<div class="inp ta"><div class="k">Описание</div>
     <input id="tdesc" maxlength="100" placeholder="Необязательно, до 100 символов" value="${String(U.tdesc??(ed!=null&&list[ed]?list[ed].d:'')).replace(/"/g,'&quot;')}"></div>
   <div class="tcolor"><div class="k">Выберите цвет тега</div>
     <div class="swatches">${TAG_COLORS.map(c=>`<button class="sw ${(U.tcol||TAG_COLORS[0])===c?'on':''}" style="background:${c}" data-tcol="${c}">${(U.tcol||TAG_COLORS[0])===c?CHECK:''}</button>`).join('')}</div></div>`:''}
@@ -817,8 +817,9 @@ V.workers=m=>{
     <label class="search wsearch">${I.srch}<input id="q" placeholder="Найти воркер" value="${U.q.replace(/"/g,'&quot;')}"></label>
     <span class="pop-wrap"><button class="btn g wexport" data-pop="exp">${I.dl}<span class="lb">Экспорт</span></button>
     ${pop==='exp'?`<div class="pop left menu expmenu">
-      <button data-modal="export" data-ex="hours">Часы работы</button>
-      <button data-modal="export" data-ex="stat">Статистика воркеров</button></div>`:''}</span>`:''}</div>
+      <button data-modal="export" data-ex="hours">${I.dl}Часы работы</button>
+      <div class="mdiv"></div>
+      <button data-modal="export" data-ex="stat">${I.dl}Статистика воркеров</button></div>`:''}</span>`:''}</div>
   ${U.sel.size?(()=>{const busy=all.some(w=>U.sel.has(w.id)&&(w.st==='ok'||w.st==='low'));
     return `<div class="bulk">${cb(true,'data-selclear')}<b>Выбрано элементов: ${U.sel.size}</b>
     <div class="spacer"></div>
@@ -861,9 +862,10 @@ V.serials=m=>{
         ? `<span class="serval ${bad?'bad':''}">${SER_MODELS[w.id%5]}</span>`
         : '<span class="serph">Выберите модель</span>'}</td></tr>`};
   return `
-  ${card(`<div class="ch"><button class="ib sm" data-go="workers">${I.cl}</button><h2>Серийные номера</h2></div>
-    <p class="cap dim" style="margin:0">Заводской номер и модель нужны, чтобы подать отчёт о майнинге за месяц</p>`)}
-  <div style="height:12px"></div>
+  <div class="wdtop">
+    <button class="ib ctl" data-go="workers" data-tip="К списку воркеров">${I.arl}</button>
+    <h2 class="wdname">Серийные номера</h2>
+  </div>
   ${card(`<div class="ch subhead">
     <div class="seg">
       <button class="${tab===0?'on':''}" data-seg="sertab" data-i="0">Все <u>${ni(m.total)}</u></button>
@@ -871,7 +873,7 @@ V.serials=m=>{
     </div>
     <div class="spacer"></div>
     <button class="btn g" data-modal="export" data-ex="stat">${I.dl}Экспорт</button>
-    <button class="btn" data-modal="upload">${I.pl}Загрузить файл</button></div>
+    <button class="btn" data-modal="upload">${I.upm}Загрузить файл</button></div>
   ${rows.length?`<div class="tw"><table class="tbl sertbl"><thead><tr>
       <th>Идентификатор воркера</th><th>Наименование воркера</th><th>Заводской номер</th><th>Модель</th>
     </tr></thead><tbody>${rows.map(cell).join('')}</tbody></table></div>`
@@ -2035,15 +2037,15 @@ const MODALS={
     b:()=>{const st=S.upl, has=st!=='no';
       const err=st==='big'?'Размер файла не может превышать 10 Мб'
         :st==='bad'?'Файл не содержит листа «Данные»':'';
-      return `<div class="drop ${err?'bad':''}">${I.dl}
+      return `<div class="drop ${err?'bad':''}">${I.up}
         <b>Выберите файл или перетащите</b>
         <span>Не более 10 Мб в формате .xlsx</span></div>
       ${has&&st!=='bad'?`<div class="fileline"><span class="fico">${I.cv}</span>
         <span class="fnm"><b>fns_devices_template_2026-05-21_0</b><i>${st==='big'?'10.2 Мб':'53.0 КБ'}</i></span>
         <div class="spacer"></div><button class="btn link del" data-axis="upl" data-val="no">Удалить</button></div>`:''}
       ${err?`<p class="ferr">${err}</p>`:''}
-      <p class="cap dim">Допускаются только файлы, созданные на основе актуальной таблицы
-        <button class="btn link" data-toast="Файл готовится — пришлём ссылку на почту">Экспорт таблицы</button></p>`},
+      <p class="note">Допускаются только файлы, созданные на основе актуальной таблицы</p>
+      <button class="btn link" data-toast="Файл готовится — пришлём ссылку на почту">Экспорт таблицы</button>`},
     foot:()=>{const ok=S.upl==='ok';
       return `<button class="btn out" data-close>Отменить</button>
         <button class="btn ${ok?'':'dis'}" ${ok?'data-close data-toast="Файл загружен — данные обновлены"':'disabled'}>Сохранить</button>`}},
@@ -2066,7 +2068,7 @@ const MODALS={
       <div class="fh"><h3>Теги</h3><div class="spacer"></div>
         ${U.ftag.size?'<button class="btn link" data-freset="t">Сбросить</button>':''}</div>
       ${tagsOf().length?`<div class="chips">${tagsOf().map(it=>
-          `<button class="chip ${U.ftag.has(it.n)?'on':''}" data-ftag="${it.n}">${it.n}</button>`).join('')}</div>`
+          `<button class="chip ${U.ftag.has(it.n)?'on':''}" data-ftag="${it.n}">${it.n}${U.ftag.has(it.n)?I.xo:''}</button>`).join('')}</div>`
         :'<p class="fempty">У вас нет тегов</p>'}
       <button class="btn out fbtn" data-modal="tagnew">${I.pl}Создать тег</button>
     </section>
@@ -2082,7 +2084,7 @@ const MODALS={
     </section>`},
     foot:()=>U.ftag.size+U.fmod.size
       ?`<button class="btn" data-fapply>Применить</button>
-        <button class="btn link" data-freset="all">Сбросить все</button>`
+        <button class="btn out" data-freset="all">Сбросить все</button>`
       :'<button class="btn out" data-close>Закрыть</button>'},
   /* Теги (макеты 173:62151, 173:63756, 173:64237): наименование, описание,
      палитра и список своих тегов с правкой и удалением */

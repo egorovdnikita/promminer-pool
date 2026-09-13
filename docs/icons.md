@@ -25,6 +25,13 @@
 - `cal` — `Time / Calendar Minimalistic`, без точек-дней внутри.
 - `arl` — `Arrow / Arrow Left`, **Linear**: возврат из деталки воркера в список
   (`223:98556`). Именно стрелка со стержнем, а не шеврон `cl`.
+- `upm` — `Arrows Action / Upload Minimalistic`, **Bold**: кнопка «Загрузить файл»
+  на серийных номерах. Не путать с `up` (`Arrows Action / Upload`, Bold Duotone) —
+  он стоит в зоне перетаскивания внутри модалки.
+- `xo` — `Essentional, UI / Close`, **Outline**: крестик на выбранном чипе
+  в шторке фильтров. Обычный `x` — тот же Close, но Linear.
+- `wrec` пересобран: в макете это `Video, Audio, Sound / Record Circle` **Bold** —
+  кружок с квадратом внутри, а не три точки, которые лежали здесь раньше.
 - `zi` и `zo` — `Search / Magnifer Zoom In` и `Zoom Out`, **Linear**:
   в макете графика лупы контурные, поэтому каждому пути нужен `fill="none"`.
 - `PAY_ICON` в `prototype.js` — синие `us-dollar-USD` и `rouble-RUB` из Payments

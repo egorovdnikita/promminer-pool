@@ -23,14 +23,15 @@
   --n400:#a3a3a3; --n500:#737373; --n600:#525252; --n800:#262626; --n900:#171717; --n950:#0a0a0a;
   --brand:#5369e0;
   /* семантика */
-  --accent:var(--indigo-400); --accent-sub:#6366f11f; --accent-ghost:#6366f114;
+  /* акцентные подложки берём от #7086fc из ДС, а не от indigo (audit-tokens A2–A4) */
+  --accent:var(--indigo-400); --accent-sub:#7086fc1f; --accent-ghost:#7086fc1f;
   --bg:var(--n100); --surface:#fff; --bg3:var(--n200);
   --c1:var(--n900); --c2:var(--n500); --c3:#9ca3af;
   --pos:#22c55e; --warn:#f59e0b; --neg:#ef4444; --neu:#6b7280;
   --pos-sub:#22c55e29; --warn-sub:#f59e0b29; --neg-sub:#ef444429;
   --border:#6b728029; --ctrl:#6b72801f; --ctrl2:#6b728014; --ctrl-hover:#6b728029;
   --ctrl-line:#6b728029; --ctrl-line-h:#6b728052;
-  --focus:#6366f17a;
+  --focus:#7086fc7a;
   --inv-bg:var(--n900); --inv-fg:#fff;
   /* скругления по шкале DS: 2 4 6 8 12 16 24 32 48 */
   /* шкала скруглений как в DS (колонка Desktop): 2 4 6 8 12 16 24 32 48 / full */
@@ -276,13 +277,17 @@ body.mini .ni .spacer.lbl{display:none!important}
 .tbl.wtbl td.tags{padding:8px 12px}
 .tbl.wtbl td.wact{padding:6px 16px}
 .tbl.wtbl .tag{height:32px;padding:0 12px}
-.tbl.wtbl .ibr.act{width:36px;height:36px;border-radius:var(--r-s);color:var(--c1)}
+/* Кнопка действий в строке — круг 36 без подложки, значок Primary (173:59403) */
+.tbl.wtbl .ibr.act{width:36px;height:36px;border-radius:var(--r-f);color:var(--c1)}
+.tbl.wtbl .ibr.act:hover{background:var(--ctrl2)}
 .tbl.wtbl .ibr.act:hover{background:var(--ctrl2)}
 .tbl.wtbl th:first-child,.tbl.wtbl td:first-child{width:36px;padding-right:0}
 .tbl.wtbl th:last-child,.tbl.wtbl td:last-child{width:68px}
 /* Меню действий и его заблокированный пункт */
 /* Экшн-меню строки воркера — 169×192 из макета 173:59516 */
-.pop.menu.wkmenu{width:169px;min-width:169px;padding:10px 12px;gap:4px;align-items:stretch}
+.pop.menu.wkmenu{width:169px;min-width:169px;padding:4px 12px;gap:8px;align-items:stretch}
+.pop.menu.wkmenu>button,.pop.menu.wkmenu .mi{font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
+.pop.menu.wkmenu .del{color:var(--neg)}
 .wkmenu .mi.off{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:40px;
   color:var(--c3);cursor:not-allowed;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 /* Список выбора в модалках тегов и групп */
@@ -350,6 +355,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:8px;min-height:var(--h-ctrl);padding:12px;border-radius:var(--r-m);background:var(--ctrl);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1);white-space:nowrap;flex:0 0 auto}
 .chip.on{background:#6b7280;color:#fff}
+.chip svg{width:24px;height:24px;margin-right:-4px;flex:0 0 auto}
 .chip.sm{min-height:40px}
 .chip.dis{background:var(--ctrl2);opacity:.4;pointer-events:none}
 .chip b{font-weight:600;color:inherit;opacity:.65}
@@ -515,7 +521,8 @@ img.hex{object-fit:contain}
 .afoot{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500;padding-top:24px}
 .btn.xl{height:56px;width:100%;justify-content:center;font-size:var(--fs-m);line-height:var(--lh-m)}
 .btn[disabled]{opacity:.5}
-.inp{background:var(--ctrl);border:1px solid transparent;border-radius:var(--r-m);padding:12px;margin-bottom:12px;min-height:var(--h-field);display:flex;flex-direction:column;justify-content:center;transition:background .15s,border-color .15s}
+/* Input из ДС: подложка --ctrl, радиус 16, паддинг 0/12, зазор 4, высота 56 */
+.inp{background:var(--ctrl);border:1px solid transparent;border-radius:var(--r-m);padding:0 12px;gap:4px;margin-bottom:12px;min-height:var(--h-field);display:flex;flex-direction:column;justify-content:center;transition:background .15s,border-color .15s}
 .inp:hover{background:var(--ctrl-hover)}
 .inp:focus-within{background:var(--surface);border-color:var(--border)}
 .inp .k{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
@@ -1335,13 +1342,13 @@ button.scsect:hover{color:var(--accent)}
 /* --- Шторка фильтров воркеров (макет 173:65425) --- */
 /* Панель 430 у правого края: фон страницы, белые карточки секций внутри */
 .mask.sheet{place-items:stretch;justify-items:end;padding:0}
-.modal.sheet{max-width:430px;width:430px;height:100%;border-radius:0;background:var(--bg)}
-.modal.sheet .mhead{height:88px;padding:24px;flex:0 0 auto}
+/* Шторка занимает всю высоту окна, а не 86vh, как обычная модалка */
+.modal.sheet{max-width:430px;width:430px;height:100%;max-height:none;border-radius:0;background:var(--bg)}
+.modal.sheet .mhead{height:88px;padding:24px;flex:0 0 auto;background:var(--surface)}
 .modal.sheet .mhead h2{font-size:var(--fs-h5);line-height:var(--lh-h5)}
-.modal.sheet .mbody{display:flex;flex-direction:column;gap:16px}
-.modal.sheet .mfoot{flex-direction:column;gap:8px}
-.modal.sheet .mfoot .btn{flex:0 0 auto;width:100%}
-.modal.sheet .mfoot .btn.link{height:38px}
+.modal.sheet .mbody{display:flex;flex-direction:column;gap:16px;padding-top:16px;padding-bottom:16px}
+.modal.sheet .mfoot{flex-direction:column;gap:8px;background:var(--surface)}
+.modal.sheet .mfoot .btn{flex:0 0 auto;width:100%;height:56px}
 .fcard{background:var(--surface);border-radius:var(--r-l);padding:16px;
   display:flex;flex-direction:column;gap:16px;flex:0 0 auto}
 .fh{display:flex;align-items:center;gap:6px;min-height:28px}
@@ -1372,19 +1379,24 @@ button.scsect:hover{color:var(--accent)}
 .bulk .del:hover{color:var(--neg);opacity:.75}
 .bulk .off{color:var(--c3);cursor:default;height:28px;
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;display:inline-flex;align-items:center}
-.expmenu{width:200px;min-width:200px}
+.pop.menu.expmenu{width:200px;min-width:200px;padding:6px 12px;gap:0}
+.pop.menu.expmenu>button{gap:8px;height:40px;font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
+.pop.menu.expmenu button svg{width:24px;height:24px;flex:0 0 auto;color:var(--c1)}
+.mdiv{height:1px;background:var(--border);margin:4px 0}
 /* Модалка экспорта — 400 по макету 173:66473, кнопки друг под другом */
-.modal.xs{max-width:400px}
+/* Модалка экспорта в макете фиксированные 400×820: подвал прижат к низу */
+.modal.xs{max-width:400px;height:820px}
 .modal.xs .mfoot{flex-direction:column;gap:8px}
-.modal.xs .mfoot .btn{flex:0 0 auto;width:100%}
+.modal.xs .mfoot .btn{flex:0 0 auto;width:100%;height:56px}
 /* Поле-селект: подпись сверху, значение в контроле 48 */
-.xf{margin-bottom:22px}
-.xf .k{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500;margin-bottom:10px}
+.xf{margin-bottom:32px}
+.xf:last-child{margin-bottom:0}
+.xf .k{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500;margin-bottom:16px}
 .xf .pop-wrap{display:block}
-.xs{display:flex;align-items:center;gap:8px;width:100%;height:var(--h-ctrl);padding:0 12px;
+.xsel{display:flex;align-items:center;gap:8px;width:100%;height:var(--h-ctrl);padding:0 12px;
   background:var(--ctrl);border-radius:var(--r-m);color:var(--c1);
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
-.xs:hover{background:var(--ctrl-hover)}
+.xsel:hover{background:var(--ctrl-hover)}
 .xmenu{width:100%;min-width:0}
 .xmenu button{font-size:var(--fs-b1);line-height:var(--lh-b1)}
 /* Инструкция в модалке подключения (макет 173:60724) */
@@ -1399,7 +1411,9 @@ button.scsect:hover{color:var(--accent)}
 /* --- Группы и теги: создание, правка, удаление (173:61615, 173:62151) --- */
 .modal.tx{max-height:min(86vh,1010px)}
 .tmake{width:100%;height:56px;justify-content:center;margin-top:16px}
-.tmake.dis{background:var(--ctrl2);color:var(--c3);box-shadow:none;cursor:default}
+.tmake.dis{opacity:.4;pointer-events:none}
+.inp.ta{min-height:96px;align-items:stretch;justify-content:flex-start;padding:12px}
+.inp.ta input{flex:1}
 .tcolor{margin-top:16px}
 .tcolor .k{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500;margin-bottom:12px}
 .swatches{display:flex;gap:12px;flex-wrap:wrap}
@@ -1430,9 +1444,10 @@ button.scsect:hover{color:var(--accent)}
 .serval{font-weight:500}
 .serval.bad{color:var(--neg)}
 /* Модалка загрузки файла */
-.drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:24px;
-  border:1px dashed var(--ctrl-line);border-radius:var(--r-m);background:var(--ctrl2);color:var(--c3)}
-.drop.bad{border-color:var(--neg)}
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:24px;min-height:166px;
+  justify-content:center;border:1px dashed var(--focus);border-radius:var(--r-l);
+  background:var(--accent-sub);color:var(--accent)}
+.drop.bad{border-color:var(--neg);background:#ef44441f;color:var(--neg)}
 .drop b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1);margin-top:8px}
 .drop span{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)}
 .drop svg{width:24px;height:24px}
@@ -1444,9 +1459,12 @@ button.scsect:hover{color:var(--accent)}
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fileline .fnm i{font-size:var(--fs-c);line-height:var(--lh-c);font-style:normal;color:var(--c2)}
 .ferr{margin-top:8px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--neg)}
+.note{margin-top:24px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500}
+.note + .btn.link{margin-top:2px}
 .mbody .cap.dim{margin-top:16px}
 .mbody .cap.dim .btn.link{height:auto;font-size:var(--fs-s);line-height:var(--lh-s);vertical-align:baseline}
-.btn.dis{background:var(--ctrl2);color:var(--c3);box-shadow:none;cursor:default}
+/* Дизейбл в ДС — та же кнопка с прозрачностью 40 % */
+.btn.dis,.btn:disabled{opacity:.4;pointer-events:none}
 
 /* --- Деталка воркера (макет 223:98541) --- */
 /* Шапка: назад, логотип производителя, имя, статус, справа связи воркера */
