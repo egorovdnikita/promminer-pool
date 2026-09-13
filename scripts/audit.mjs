@@ -15,7 +15,8 @@ for(const m of all.matchAll(/data-([a-z0-9-]+)\s*=/g)) mk.add(m[1]);
 for(const m of all.matchAll(/data-([a-z0-9-]+)[>\s}]/g)) mk.add(m[1]);
 for(const m of store.matchAll(/\[data-([a-z0-9-]+)\]/g)) hd.add(m[1]);
 for(const m of store.matchAll(/dataset\.([a-zA-Z0-9]+)/g)) hd.add(m[1].replace(/[A-Z]/g,c=>'-'+c.toLowerCase()));
-const REACT=new Set(['close','tip','chart','theme','sel']);
+/* Читаются не как триггер, а как модификатор рядом стоящего действия */
+const REACT=new Set(['close','tip','chart','theme','sel','over']);
 H('A. data-* без обработчика');
 [...mk].sort().forEach(k=>{ if(!hd.has(k)&&!REACT.has(k)) out.push('  ! data-'+k); });
 H('A2. обработчик без разметки');
@@ -28,7 +29,9 @@ axes.forEach(a=>{
   const uses=(all.match(new RegExp('S\\.'+a+'\\b','g'))||[]).length
     +(store.match(new RegExp("S\\.current\\.'?"+a+'\\b','g'))||[]).length
     +(store.match(new RegExp("\\b"+a+":",'g'))||[]).length;
-  const real=(all.match(new RegExp('S\\.'+a+'\\b','g'))||[]).length;
+  /* Ось может жить не в разметке, а в оболочке: тема, плотность, размер текста */
+  const real=(all.match(new RegExp('S\\.'+a+'\\b','g'))||[]).length
+    +(store.match(new RegExp('S\\.current\\.'+a+'\\b','g'))||[]).length;
   if(!real) out.push('  ! '+a+' — S.'+a+' не читается в разметке');
 });
 out.push('  всего осей: '+axes.length);

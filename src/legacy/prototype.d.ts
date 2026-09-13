@@ -1,14 +1,16 @@
 /** Типы для движка прототипа (src/legacy/prototype.js). */
 import type { AppSnapshot, Scenario, Ui } from '@/state/types'
 
-export interface Axis { label: string; g: string; opts: [string, string][] }
+export interface Axis { label: string; g: string; note?: string; opts: [string, string][] }
 export interface NavItem { id?: string; t: string; ic: string; g?: string; kids?: [string, string][] }
 /** Модель текущего сценария: балансы, хэшрейт, здоровье парка, строки таблиц. */
 export type Model = any
 
 export declare const AXES: Record<keyof Scenario, Axis>
-/** Готовые связки состояний для панели: имя, пояснение, набор осей. */
-export declare const PRESETS: [string, string, Partial<Scenario>][]
+/** Готовые связки состояний для панели: имя, пояснение, набор осей, раздел. */
+export declare const PRESETS: [string, string, Partial<Scenario>, string][]
+/** Категории групп осей: заголовок и входящие в него группы. */
+export declare const AXCAT: [string, string[]][]
 export declare const DEF: Scenario
 export declare const COINS: Record<string, any>
 export declare const HEALTH: Record<string, { a: number; l: number; o: number; f: number }>

@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { AXES, COIN_ICON, I, coinsOf, type Model } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
-import { Ico } from './Raw'
+import { Ico, Raw } from './Raw'
 
 /* у калькулятора доходности монета выбирается внутри панели (макет 5:3779) */
 /* на общей информации о рефералах монета выбирается в карточке уровня (514:79281) */
@@ -55,7 +55,7 @@ export function Coinbar({ m }: { m: Model }) {
           <button className="btn" data-modal="connect"><Ico html={I.pl} />Подключить воркер</button>
         </>
       )}
-      {route === 'home' && <span className="spacer rate mono">{m.c.rate}</span>}
+      {route === 'home' && <span className="spacer rate mono"><Raw html={m.rate} /></span>}
     </div>
   )
 }

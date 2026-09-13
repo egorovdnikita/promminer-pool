@@ -10,21 +10,107 @@ import { ICONS } from './icons.js';
 /* ============================================================
    1. СЦЕНАРИИ — правится только здесь
    ============================================================ */
+/* Порядок и категории групп в панели сценариев: два уровня вместо одного
+   длинного списка — иначе восемьдесят осей не найти глазами. */
+const AXCAT=[
+  ['Данные и графики',['Данные','График','Курсы']],
+  ['Разделы',['Воркеры','Мои активы','Выплаты','Отчет','Рефералы','Калькуляторы']],
+  ['Аккаунт и доступ',['Аккаунт','Профиль','Контакты','Верификация','Наблюдатели','Суб-аккаунты']],
+  ['Интерфейс',['Интерфейс','Загрузка и ошибки']],
+];
 const AXES={
-  coin:{g:'Данные',label:'Монета',opts:[['btc','BTC'],['ltc','LTC + DOGE'],['zec','ZEC']]},
-  wf:{g:'Данные',label:'Теги и модели',opts:[['yes','Заведены'],['none','Ничего не заведено']]},
+  /* ---- Данные ---- */
+  coin:{g:'Данные',label:'Монета',note:'Меняет парк, балансы и единицы хэшрейта',
+    opts:[['btc','BTC'],['ltc','LTC + DOGE'],['zec','ZEC']]},
+  data:{g:'Данные',label:'Наполнение данными',note:'Сколько строк и какого порядка суммы',
+    opts:[['normal','Норма'],['empty','Пусто'],['few','Мало записей'],['huge','Большие значения']]},
+  health:{g:'Данные',label:'Здоровье парка',note:'Раскладка воркеров по статусам',
+    opts:[['ok','Всё живо'],['degraded','Деградация'],['critical','Авария']]},
+  wf:{g:'Данные',label:'Теги и модели',note:'Заведены ли пользовательские теги и модели',
+    opts:[['yes','Заведены'],['none','Ничего не заведено']]},
+  prec:{g:'Данные',label:'Точность сумм',note:'Сколько знаков после запятой в монетах',
+    opts:[['full','Как в макете'],['short','До четырёх знаков'],['round','Округлённо']]},
+  fiat:{g:'Данные',label:'Пересчёт в фиат',note:'Что показывать рядом с суммой в монете',
+    opts:[['both','₽ и $'],['rub','Только ₽'],['usd','Только $'],['none','Не показывать']]},
+
+  /* ---- График ---- */
+  trend:{g:'График',label:'Тренд хэшрейта',note:'Куда идёт линия на графиках',
+    opts:[['flat','Ровно'],['up','Рост'],['down','Падение'],['spike','Всплеск и провал']]},
+  noise:{g:'График',label:'Разброс точек',note:'Насколько рваная линия',
+    opts:[['normal','Обычный'],['calm','Гладко'],['wild','Рвано']]},
+  gap:{g:'График',label:'Пропуски в данных',note:'Дыры в ряду — пул не получал шары',
+    opts:[['no','Нет'],['one','Один'],['many','Несколько']]},
+  rej:{g:'График',label:'Реджект',note:'Вторая линия графика и колонка в таблице',
+    opts:[['low','Низкий'],['mid','Обычный'],['high','Высокий']]},
+  period:{g:'График',label:'Период по умолчанию',note:'Какая вкладка выбрана при открытии',
+    opts:[['24h','24 часа'],['1h','1 час'],['5m','5 минут']]},
+
+  /* ---- Курсы ---- */
+  rate:{g:'Курсы',label:'Курс монеты',note:'Строка курса и значки динамики',
+    opts:[['flat','Без изменений'],['up','Вырос'],['down','Упал']]},
+  ratesrc:{g:'Курсы',label:'Источник курса',note:'Подпись под строкой курса',
+    opts:[['pool','Пул'],['cbr','ЦБ РФ'],['market','Биржа']]},
+
+  /* ---- Воркеры ---- */
+  wn:{g:'Воркеры',label:'Размер парка',note:'Сколько строк отдаёт таблица воркеров',
+    opts:[['36','36'],['5','5'],['120','120'],['400','400']]},
   wnote:{g:'Воркеры',label:'Порог уведомлений',opts:[['yes','Задан'],['no','Не настроен']]},
   ser:{g:'Воркеры',label:'Серийные номера',opts:[['no','Не заполнены'],['ok','Заполнены'],['err','Есть ошибки']]},
   upl:{g:'Воркеры',label:'Файл серийников',opts:[['no','Не выбран'],['ok','Выбран'],
     ['big','Больше 10 Мб'],['bad','Нет листа «Данные»']]},
-  data:{g:'Данные',label:'Наполнение данными',opts:[['normal','Норма'],['empty','Пусто'],['few','Мало записей'],['huge','Большие значения']]},
-  health:{g:'Данные',label:'Здоровье парка',opts:[['ok','Всё живо'],['degraded','Деградация'],['critical','Авария']]},
-  load:{g:'Данные',label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон'],['err','Ошибка загрузки']]},
-  rdata:{g:'Отчет',label:'Данные воркеров',opts:[['ok','Заполнены'],['no','Не у всех воркеров'],['del','Нет у удалённых']]},
+  wgeo:{g:'Воркеры',label:'Площадки',note:'Лента групп над таблицей',
+    opts:[['many','Одиннадцать'],['few','Три'],['one','Одна'],['none','Нет площадок']]},
+  wvend:{g:'Воркеры',label:'Производители',note:'Разнообразие моделей в парке',
+    opts:[['mix','Разные'],['one','Только Bitmain']]},
+  wup:{g:'Воркеры',label:'Аптайм',note:'Колонка «Аптайм» в таблице',
+    opts:[['high','Высокий'],['mid','Средний'],['low','Низкий']]},
+  wshare:{g:'Воркеры',label:'Последняя шара',note:'Свежесть данных в колонке',
+    opts:[['fresh','Минуты назад'],['old','Часы назад'],['stale','Сутки назад']]},
+  wlink:{g:'Воркеры',label:'Адреса майнинга',note:'Сколько стратумов на Главной',
+    opts:[['3','Три'],['1','Один']]},
+
+  /* ---- Мои активы ---- */
   awal:{g:'Мои активы',label:'Кошельки',opts:[['some','Как в макете'],['all','У всех монет'],['none','Не добавлены']]},
   apay:{g:'Мои активы',label:'Автовыплаты',opts:[['btc','Только BTC'],['all','У всех монет'],['none','Выключены']]},
+  athr:{g:'Мои активы',label:'Пороги автовыплат',note:'Значения в колонке порога',
+    opts:[['def','По умолчанию'],['edit','Изменены'],['none','Не заданы']]},
+  asell:{g:'Мои активы',label:'Продажа ЦВ',note:'Доступна ли вкладка «Продать»',
+    opts:[['yes','Доступна'],['no','Недоступна']]},
+  astep:{g:'Мои активы',label:'Шагов подтверждения',note:'Длина мастера вывода',
+    opts:[['3','Три'],['4','Четыре']]},
+  aconf:{g:'Мои активы',label:'Способ подтверждения',note:'Куда приходит код',
+    opts:[['mail','Почта'],['sms','SMS'],['ga','Google Authenticator']]},
   aerr:{g:'Мои активы',label:'Ошибка поля в активах',opts:[['no','Нет'],['req','Не заполнено'],
     ['low','Сумма меньше порога'],['bad','Некорректный адрес'],['code','Неверный код'],['old','Код недействителен']]},
+
+  /* ---- Выплаты ---- */
+  payn:{g:'Выплаты',label:'Выплат в истории',opts:[['many','28'],['few','Одна'],['none','Нет']]},
+  payst:{g:'Выплаты',label:'Статусы выплат',note:'Что стоит в колонке «Статус»',
+    opts:[['mix','Разные'],['ok','Все успешные'],['hold','Есть в обработке'],['fail','Есть отклонённые']]},
+  paytype:{g:'Выплаты',label:'Типы операций',opts:[['all','Все'],['out','Только выводы'],['sell','Только продажи']]},
+  paydoc:{g:'Выплаты',label:'Документы',note:'Колонка со счётом и актом',
+    opts:[['yes','Есть'],['no','Нет']]},
+
+  /* ---- Отчет ---- */
+  rdata:{g:'Отчет',label:'Данные воркеров',opts:[['ok','Заполнены'],['no','Не у всех воркеров'],['del','Нет у удалённых']]},
+  repn:{g:'Отчет',label:'Отчётов в списке',opts:[['many','Шесть'],['few','Один'],['none','Нет']]},
+  repst:{g:'Отчет',label:'Статус отчёта',opts:[['ready','Готов'],['wait','Формируется'],['err','Ошибка']]},
+  repw:{g:'Отчет',label:'Кошельки пула',opts:[['yes','Добавлены'],['no','Не добавлены']]},
+
+  /* ---- Рефералы ---- */
+  tier:{g:'Рефералы',label:'Уровень рефералки',opts:[['0','5%'],['1','10%'],['2','15%'],['3','20%'],['4','25%']]},
+  refn:{g:'Рефералы',label:'Рефералов',opts:[['many','50'],['few','3'],['none','Нет']]},
+  refact:{g:'Рефералы',label:'Активные рефералы',opts:[['most','Больше половины'],['some','Единицы'],['none','Нет']]},
+  refpn:{g:'Рефералы',label:'Реферальных выплат',opts:[['many','28'],['few','Одна'],['none','Нет']]},
+  refrub:{g:'Рефералы',label:'Подсказка о рублях',note:'Уведомление над таблицей выплат',
+    opts:[['show','Показана'],['hide','Скрыта']]},
+
+  /* ---- Калькуляторы ---- */
+  calchw:{g:'Калькуляторы',label:'Оборудование в расчёте',opts:[['yes','Выбрано'],['no','Не выбрано']]},
+  taxface:{g:'Калькуляторы',label:'Тип лица в налогах',opts:[['pf','Физлицо'],['ip','ИП'],['ul','Юрлицо']]},
+  taxres:{g:'Калькуляторы',label:'Резидентство',opts:[['yes','Резидент'],['no','Нерезидент']]},
+
+  /* ---- Аккаунт ---- */
   role:{g:'Аккаунт',label:'Роль',opts:[['owner','Владелец'],['observer','Наблюдатель']]},
   perm:{g:'Аккаунт',label:'Разрешения вотчера',opts:[['all','Все разделы'],['wi','Воркеры и доход'],
     ['wo','Только воркеры'],['fin','Только финансы'],['assets','Только мои активы'],
@@ -32,39 +118,123 @@ const AXES={
   ocoins:{g:'Аккаунт',label:'Монеты наблюдателя',opts:[['all','Все'],['btc','Только BTC'],['ltc','Только LTC + DOGE']]},
   acct:{g:'Аккаунт',label:'Аккаунт',opts:[['main','Основной'],['sub','Суб-аккаунт']]},
   name:{g:'Аккаунт',label:'Имя аккаунта',opts:[['yes','Задано'],['no','Не задано']]},
-  verif:{g:'Верификация',label:'Данные',opts:[['no','Не заполнены'],['yes','Заполнены']]},
-  vdoc:{g:'Верификация',label:'Выписка из реестра',opts:[['no','Не добавлена'],['yes','Добавлена']]},
-  vacc:{g:'Верификация',label:'Расчетный счет',opts:[['no','Не добавлен'],['yes','Добавлен']]},
-  oerr:{g:'Наблюдатели',label:'Описание ссылки',opts:[['no','Заполнено'],['req','Не заполнено'],['long','Больше 100 символов']]},
-  saerr:{g:'Суб-аккаунты',label:'Имя суб-аккаунта',opts:[['no','Пусто'],['ok','Свободно'],
-    ['req','Не заполнено'],['short','Коротко и капсом'],['caps','Есть заглавные'],
-    ['busy','Уже занято'],['load','Проверяем']]},
-  verr:{g:'Верификация',label:'Ошибка поля анкеты',opts:[['no','Нет'],['tax','Код налоговой'],['inn','ИНН'],['bank','Банк не выбран'],['file','Файл больше 4 МБ']]},
+  fa:{g:'Аккаунт',label:'Двухфакторная защита',opts:[['no','Выключена'],['yes','Включена']]},
+  fam:{g:'Аккаунт',label:'Способ второго фактора',opts:[['app','Приложение'],['sms','SMS'],['mail','Почта']]},
+  sess:{g:'Аккаунт',label:'Сессии',opts:[['many','Шесть устройств'],['few','Два устройства'],['one','Только это устройство']]},
+  del:{g:'Аккаунт',label:'Удаление аккаунта',opts:[['no','Не запрошено'],['yes','Запрошено']]},
+
+  /* ---- Профиль ---- */
   subs:{g:'Профиль',label:'Суб-аккаунты',opts:[['many','3'],['few','1'],['none','Только основной']]},
   obs:{g:'Профиль',label:'Наблюдатели',opts:[['many','6'],['few','2'],['none','Нет']]},
   notif:{g:'Профиль',label:'Уведомления',opts:[['many','12 новых'],['few','2 новых'],['none','Нет']]},
-  tier:{g:'Профиль',label:'Уровень рефералки',opts:[['0','5%'],['1','10%'],['2','15%'],['3','20%'],['4','25%']]},
+  notift:{g:'Профиль',label:'Типы уведомлений',note:'Что приходит в колокольчик',
+    opts:[['all','Все'],['imp','Только важные'],['off','Выключены']]},
+  avatar:{g:'Профиль',label:'Аватар',opts:[['no','Не загружен'],['yes','Загружен']]},
+
+  /* ---- Контакты ---- */
   phone:{g:'Контакты',label:'Телефон',opts:[['yes','Привязан'],['no','Не привязан']]},
   mail:{g:'Контакты',label:'Почта',opts:[['yes','Привязана'],['no','Не привязана']]},
   tg:{g:'Контакты',label:'Telegram',opts:[['no','Не привязан'],['yes','Привязан']]},
-  fa:{g:'Аккаунт',label:'Двухфакторная защита',opts:[['no','Выключена'],['yes','Включена']]},
-  sess:{g:'Аккаунт',label:'Сессии',opts:[['many','Шесть устройств'],['few','Два устройства'],['one','Только это устройство']]},
-  del:{g:'Аккаунт',label:'Удаление аккаунта',opts:[['no','Не запрошено'],['yes','Запрошено']]},
   cerr:{g:'Контакты',label:'Ошибка в поле контакта',opts:[['no','Нет'],['req','Не заполнено'],['busy','Занято / нет бота'],['fmt','Неверный формат']]},
+
+  /* ---- Верификация ---- */
+  verif:{g:'Верификация',label:'Данные',opts:[['no','Не заполнены'],['yes','Заполнены']]},
+  vdoc:{g:'Верификация',label:'Выписка из реестра',opts:[['no','Не добавлена'],['yes','Добавлена']]},
+  vacc:{g:'Верификация',label:'Расчетный счет',opts:[['no','Не добавлен'],['yes','Добавлен']]},
+  verr:{g:'Верификация',label:'Ошибка поля анкеты',opts:[['no','Нет'],['tax','Код налоговой'],['inn','ИНН'],['bank','Банк не выбран'],['file','Файл больше 4 МБ']]},
+
+  /* ---- Наблюдатели ---- */
+  oerr:{g:'Наблюдатели',label:'Описание ссылки',opts:[['no','Заполнено'],['req','Не заполнено'],['long','Больше 100 символов']]},
+
+  /* ---- Суб-аккаунты ---- */
+  saerr:{g:'Суб-аккаунты',label:'Имя суб-аккаунта',opts:[['no','Пусто'],['ok','Свободно'],
+    ['req','Не заполнено'],['short','Коротко и капсом'],['caps','Есть заглавные'],
+    ['busy','Уже занято'],['load','Проверяем']]},
+
+  /* ---- Интерфейс ---- */
+  theme:{g:'Интерфейс',label:'Тема',note:'Уезжает в ссылку вместе со сценарием',
+    opts:[['light','Светлая'],['dark','Тёмная'],['system','Как в системе']]},
+  dens:{g:'Интерфейс',label:'Плотность',note:'Высота строк таблиц и карточек',
+    opts:[['norm','Обычная'],['comp','Компактная']]},
+  fsz:{g:'Интерфейс',label:'Размер текста',opts:[['norm','Обычный'],['big','Крупный'],['sm','Мелкий']]},
+  side:{g:'Интерфейс',label:'Сайдбар',opts:[['full','Развёрнут'],['mini','Свёрнут']]},
+  motion:{g:'Интерфейс',label:'Анимации',opts:[['on','Включены'],['off','Выключены']]},
+
+  /* ---- Загрузка и ошибки ---- */
+  load:{g:'Загрузка и ошибки',label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон'],['err','Ошибка загрузки']]},
+  neterr:{g:'Загрузка и ошибки',label:'Ошибка сети',note:'Где падает запрос',
+    opts:[['no','Нет'],['tbl','В таблице'],['form','При отправке формы']]},
 };
-/* Готовые связки состояний — один клик вместо десяти переключателей */
+/* Готовые связки состояний — один клик вместо десяти переключателей.
+   Четвёртый элемент — раздел, по нему панель раскладывает связки по полкам. */
 const PRESETS=[
   ['Свежий аккаунт','Ничего не настроено и нет данных',
-    {data:'empty',name:'no',subs:'none',obs:'none',notif:'none',verif:'no',vdoc:'no',vacc:'no',phone:'no',mail:'no',tg:'no'}],
+    {data:'empty',name:'no',subs:'none',obs:'none',notif:'none',verif:'no',vdoc:'no',vacc:'no',
+     phone:'no',mail:'no',tg:'no',awal:'none',apay:'none',payn:'none',repn:'none',refn:'none',
+     refact:'none',refpn:'none',avatar:'no'},'Жизненный цикл'],
   ['Активный майнер','Всё заполнено и работает',
-    {data:'normal',health:'ok',name:'yes',subs:'many',obs:'many',notif:'many',verif:'yes',vdoc:'yes',vacc:'yes',phone:'yes',mail:'yes',tg:'yes'}],
-  ['Авария на парке','Воркеры отваливаются',{data:'normal',health:'critical',notif:'many'}],
-  ['Наблюдатель','Доступ только на чтение',{role:'observer',subs:'few',obs:'none'}],
-  ['Крупный клиент','Большие значения и много записей',{data:'huge',subs:'many',obs:'many',tier:'4',verif:'yes',vdoc:'yes',vacc:'yes'}],
-  ['Скелетон','Экран во время загрузки',{load:'yes'}],
+    {data:'normal',health:'ok',name:'yes',subs:'many',obs:'many',notif:'many',verif:'yes',vdoc:'yes',
+     vacc:'yes',phone:'yes',mail:'yes',tg:'yes',awal:'all',apay:'all',avatar:'yes',trend:'up'},'Жизненный цикл'],
+  ['Крупный клиент','Большие значения и много записей',
+    {data:'huge',wn:'400',subs:'many',obs:'many',tier:'4',verif:'yes',vdoc:'yes',vacc:'yes',
+     payn:'many',refn:'many',refpn:'many'},'Жизненный цикл'],
+  ['Уходит','Запрошено удаление, парк гаснет',
+    {del:'yes',health:'critical',trend:'down',wshare:'stale',notif:'few'},'Жизненный цикл'],
+
+  ['Авария на парке','Воркеры отваливаются',
+    {data:'normal',health:'critical',notif:'many',trend:'down',rej:'high',wshare:'old'},'Проблемы'],
+  ['Плохая связь','Пропуски в данных и высокий реджект',
+    {gap:'many',rej:'high',noise:'wild',wshare:'old',wup:'low'},'Проблемы'],
+  ['Ошибка сети','Таблицы не догрузились',{neterr:'tbl',load:'err'},'Проблемы'],
+  ['Скелетон','Экран во время загрузки',{load:'yes'},'Проблемы'],
+  ['Всё пусто','Пустые состояния во всех разделах',
+    {data:'empty',payn:'none',repn:'none',refn:'none',refpn:'none',obs:'none',subs:'none',
+     notif:'none',awal:'none'},'Проблемы'],
+  ['Формы с ошибками','В каждой анкете своя ошибка',
+    {aerr:'bad',verr:'inn',cerr:'fmt',saerr:'busy',oerr:'req',upl:'bad',ser:'err'},'Проблемы'],
+
+  ['Наблюдатель','Доступ только на чтение',{role:'observer',subs:'few',obs:'none'},'Доступ'],
+  ['Наблюдатель: воркеры','Открыт один раздел',{role:'observer',perm:'wo',ocoins:'btc'},'Доступ'],
+  ['Наблюдатель: финансы','Только деньги, без парка',{role:'observer',perm:'fin'},'Доступ'],
+  ['Суб-аккаунт','Вход под дочерним аккаунтом',{acct:'sub',subs:'many'},'Доступ'],
+
+  ['Верификация не пройдена','Рублёвые выплаты недоступны',
+    {verif:'no',vdoc:'no',vacc:'no',refrub:'show',taxface:'pf'},'Финансы'],
+  ['Юрлицо','Анкета заполнена, документы на месте',
+    {verif:'yes',vdoc:'yes',vacc:'yes',taxface:'ul',refrub:'hide',paydoc:'yes'},'Финансы'],
+  ['Выплаты в обработке','Часть операций ещё не прошла',
+    {payn:'many',payst:'hold',paytype:'all'},'Финансы'],
+  ['Отклонённые выплаты','Есть неудачные операции',{payn:'many',payst:'fail'},'Финансы'],
+  ['Без кошельков','Вывести некуда',{awal:'none',apay:'none',athr:'none'},'Финансы'],
+
+  ['VIP рефералка','Максимальный уровень и много рефералов',
+    {tier:'4',refn:'many',refact:'most',refpn:'many'},'Рефералы'],
+  ['Рефералка на старте','Ссылку ещё никто не открыл',
+    {tier:'0',refn:'none',refact:'none',refpn:'none'},'Рефералы'],
+
+  ['Тёмная тема','Ночной режим со свёрнутым сайдбаром',{theme:'dark',side:'mini'},'Интерфейс'],
+  ['Компактный вид','Плотные таблицы и мелкий текст',{dens:'comp',fsz:'sm',side:'mini'},'Интерфейс'],
+  ['Крупный текст','Проверка вёрстки на увеличенном шрифте',{fsz:'big'},'Интерфейс'],
+  ['Без анимаций','Для записи видео и скриншотов',{motion:'off'},'Интерфейс'],
 ];
-const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',health:'degraded',role:'owner',perm:'all',ocoins:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
-  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no',rdata:'ok'};
+const DEF={
+  coin:'btc',data:'normal',health:'degraded',wf:'yes',prec:'full',fiat:'both',
+  trend:'flat',noise:'normal',gap:'no',rej:'mid',period:'24h',
+  rate:'flat',ratesrc:'pool',
+  wn:'36',wnote:'yes',ser:'no',upl:'no',wgeo:'many',wvend:'mix',wup:'high',wshare:'fresh',wlink:'3',
+  awal:'some',apay:'btc',athr:'def',asell:'yes',astep:'3',aconf:'mail',aerr:'no',
+  payn:'many',payst:'mix',paytype:'all',paydoc:'yes',
+  rdata:'ok',repn:'many',repst:'ready',repw:'yes',
+  tier:'0',refn:'many',refact:'most',refpn:'many',refrub:'show',
+  calchw:'yes',taxface:'pf',taxres:'yes',
+  role:'owner',perm:'all',ocoins:'all',acct:'main',name:'yes',fa:'no',fam:'app',sess:'many',del:'no',
+  subs:'many',obs:'many',notif:'many',notift:'all',avatar:'no',
+  phone:'no',mail:'yes',tg:'no',cerr:'no',
+  verif:'no',vdoc:'no',vacc:'no',verr:'no',
+  oerr:'no',saerr:'no',
+  theme:'light',dens:'norm',fsz:'norm',side:'full',motion:'on',
+  load:'no',neterr:'no',
+};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false,sfin:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
 let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null,dsel:{},dpm:0,zoom:0,rwarn:false,togs:{},ronly:false,exact:false};
@@ -149,8 +319,15 @@ const HEALTH_OF={btc:HEALTH,ltc:HEALTH_LTC,zec:HEALTH_ZEC};
 /* Знаков после запятой по монетам — по макету: BTC 8, LTC 4, DOGE 2 */
 const DEC={BTC:8,LTC:4,DOGE:2,ZEC:4};
 /* В пустом состоянии макет печатает ровный ноль, а не 0,00000000 */
-const amt=b=>`${b.v?nf(b.v,DEC[b.s]??8):'0'} ${b.s}`;
+/* Ось «Точность сумм»: макетные знаки, четыре знака или округление до копеек */
+const decOf=s=>{const d=DEC[s]??8;return S.prec==='round'?2:S.prec==='short'?Math.min(4,d):d};
+const amt=b=>`${b.v?nf(b.v,decOf(b.s)):'0'} ${b.s}`;
 const cur=(v,sym)=>`${v?nf(v):'0'} ${sym}`;
+/* Ось «Пересчёт в фиат»: что стоит под суммой в монете */
+const fiatLine=(usd,rub)=>S.fiat==='none'?''
+  :S.fiat==='rub'?`≈ ${cur(rub,'₽')}`
+  :S.fiat==='usd'?`≈ ${cur(usd,'$')}`
+  :`≈ ${cur(usd,'$')} • ${cur(rub,'₽')}`;
 /* Уровни рефералки. k — медаль (public/tier-<k>.png, выгрузка pic_star),
    f — ширина заполнения дорожки в процентах (макет 1283:59582: 114/222/352/484/583 из 590) */
 const TIERS=[{k:5,p:'5%',n:'Бронза',c:'#B87333',f:19.3},{k:10,p:'10%',n:'Серебро',c:'#9AA3B2',f:37.6},
@@ -170,7 +347,11 @@ function M(){
     d24:c.d24.map(b=>({...b,v:empty?0:b.v*k})),all:c.all.map(b=>({...b,v:empty?0:b.v*k})),
     avg:empty?'0':c.avg,h5:empty?'0':c.h5,h1:empty?'0':c.h1,
     pool:empty?0:(huge?4805450000:4805.45),
-    tier:TIERS[+S.tier],alert:!empty&&S.health!=='ok'};
+    tier:TIERS[+S.tier],alert:!empty&&S.health!=='ok',
+    /* Оси «Курс монеты» и «Источник курса» дописывают строку курса в шапке */
+    rate:c.rate
+      +(S.rate==='up'?' <i class="rup">+2,4 %</i>':S.rate==='down'?' <i class="rdn">−3,1 %</i>':'')
+      +(S.ratesrc==='cbr'?' • курс ЦБ РФ':S.ratesrc==='market'?' • курс биржи':'')};
 }
 
 /* ============================================================
@@ -392,6 +573,12 @@ const card=(inner,cls='')=>`<section class="card ${cls}">${inner}</section>`;
 const emptyBox=(t,p,act='')=>`<div class="empty"><img src="/empty-state.svg" alt="" width="221" height="175">
   <b>${t}</b><p>${p}</p>${act}</div>`;
 /* Экран не загрузился (223:33637): заголовок 24, подпись 16 и «Обновить» */
+/* Ось «Ошибка сети» на значении «В таблице»: вместо строк — сообщение
+   о сбое с кнопкой повтора. Общая для всех таблиц прототипа. */
+const tblFail=()=>`<div class="empty fail"><img src="/empty-state.svg" alt="" width="221" height="175">
+  <b>Не удалось загрузить данные</b><p>Сервер не ответил на запрос. Попробуйте ещё раз</p>
+  <button class="btn out" data-toast="Повторяем запрос">Повторить</button></div>`;
+const netFail=()=>S.neterr==='tbl';
 const loadFail=()=>`<div class="empty fail"><img src="/empty-state.svg" alt="" width="221" height="175">
   <b>Не загрузилось</b><p>Попробуйте обновить</p>
   <button class="btn" data-axis="load" data-val="no">Обновить</button></div>`;
@@ -464,6 +651,8 @@ const dpLabel=(key,def)=>{const st=U.dsel[key]; if(!st)return def;
 const dyn=(kind,val)=>`<span class="dyn ${kind}">${I.sortUp}${val}</span>`;
 /* Переключатели в таблицах помнят состояние между перерисовками */
 const togOn=(k,def)=>U.togs[k]===undefined?def:U.togs[k];
+/* Ось «Период по умолчанию»: какая вкладка 5 мин / 1 ч / 24 ч выбрана при открытии */
+const periodI=()=>({'5m':0,'1h':1,'24h':2}[S.period]??2);
 const status=(t,label,cls='')=>`<span class="status ${t} ${cls}"><i class="dot"></i>${label}</span>`;
 const rd=(on,attr='',cls='')=>`<span class="rd ${on?'on':''} ${cls}" ${attr}></span>`;
 /* Пагинация — кликабельная */
@@ -499,15 +688,31 @@ function chart(m,opts={}){
   const z=Math.max(0,Math.min(3,U.zoom||0));
   const N=Math.round(120/(1+z*0.6)), r=rng(S.coin==='btc'?7:13);
   const smooth=opts.smooth;
+  /* Оси графика: «Разброс точек» растягивает амплитуду, «Тренд хэшрейта»
+     наклоняет ряд, «Пропуски в данных» рвут линию — пул не получал шары. */
+  const amp={calm:.35,normal:1,wild:2.2}[S.noise]??1;
+  const slope={up:1,down:-1}[S.trend]||0;
+  const clip=v=>Math.max(0,Math.min(100,v));
   let p=[];
   for(let i=0;i<N;i++){
     if(m.empty){p.push(0);continue}
-    if(smooth) p.push(6+ (i/N)*70 + Math.sin(i/14)*7);
-    else p.push(i<14 ? 2+r()*3 : Math.max(0,Math.min(100, 62+(r()-.5)*26+Math.sin(i/6)*6)));
+    const t=N>1?i/(N-1):0;
+    let v=smooth ? 6+(i/N)*70+Math.sin(i/14)*7*amp
+      : (i<14 ? 2+r()*3 : clip(62+(r()-.5)*26*amp+Math.sin(i/6)*6*amp));
+    if(slope&&(smooth||i>=14)) v=clip(v+slope*(t-.5)*46);
+    if(S.trend==='spike'&&i>=14) v=clip(v+(t>.45&&t<.6?32:t>.62&&t<.72?-28:0));
+    p.push(v);
   }
+  const holes=m.empty?[]:S.gap==='one'?[[.55,.62]]:S.gap==='many'?[[.2,.25],[.48,.53],[.76,.82]]:[];
+  if(holes.length) p=p.map((v,i)=>{const t=N>1?i/(N-1):0;
+    return holes.some(([a,b])=>t>=a&&t<=b)?null:v});
   const x=i=>(i/(N-1))*PW, y=v=>PH-(v/100)*PH;
-  const ln=p.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
-  const ar=`${ln} L${PW},${PH} L0,${PH} Z`;
+  /* Линия и заливка режутся на куски: на пропуске сегмент закрывается */
+  const segs=[]; let cu=[];
+  p.forEach((v,i)=>{ if(v==null){if(cu.length>1)segs.push(cu);cu=[]} else cu.push([i,v]) });
+  if(cu.length>1) segs.push(cu);
+  const ln=segs.map(sg=>sg.map(([i,v],j)=>`${j?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')).join(' ');
+  const ar=segs.map(sg=>`${sg.map(([i,v],j)=>`${j?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ')} L${x(sg[sg.length-1][0]).toFixed(1)},${PH} L${x(sg[0][0]).toFixed(1)},${PH} Z`).join(' ');
   const ticks=opts.ticks||[0,150,300,450,600,750,900,1050,1200,1350,1500];
   const hrs0=opts.xs||['14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00','01:00','02:00','03:00','04:00','05:00','06:00'];
   const hrs=z?hrs0.slice(0,Math.max(3,hrs0.length-z*3)):hrs0;
@@ -517,7 +722,7 @@ function chart(m,opts={}){
   /* Наведение: геометрию считает обработчик по самому .chartwrap —
      он теперь совпадает с полем графика, поля в данные не кладём. */
   const hov=opts.hover?` data-chart='${JSON.stringify({N,
-    p:p.map(v=>+v.toFixed(1)),hrs,max:ticks[ticks.length-1],unit:m.c.unit})}'`:'';
+    p:p.map(v=>v==null?null:+v.toFixed(1)),hrs,max:ticks[ticks.length-1],unit:m.c.unit})}'`:'';
   const hovDom=opts.hover?`<i class="chline"></i><i class="cdot ch"></i><i class="cdot cr"></i><div class="ctip"></div>`:'';
   return `<div class="cbody">
   ${yl||right?`<div class="caxis"><span>${yl}</span>${right?'<span>Реджект, %</span>':''}</div>`:''}
@@ -529,7 +734,11 @@ function chart(m,opts={}){
           return `<line x1="0" y1="${yy}" x2="${PW}" y2="${yy}" stroke="var(--border)" vector-effect="non-scaling-stroke"/>`}).join('')}
         ${m.empty?'':`<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".22"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
           <path d="${ar}" fill="url(#ag)"/><path d="${ln}" fill="none" stroke="var(--accent)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
-          ${right?`<path d="M0,${PH-2} L${PW},${PH-3}" fill="none" stroke="var(--warn)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>`:''}`}
+          ${right?(()=>{/* ось «Реджект»: чем выше, тем выше линия и заметнее рябь */
+            const lvl={low:1.2,mid:6,high:24}[S.rej]??6;
+            const ry=i=>(PH-(clip(lvl+Math.sin(i/5)*lvl*.35)/100)*PH).toFixed(1);
+            const pts=[];for(let i=0;i<N;i++)pts.push(`${i?'L':'M'}${x(i).toFixed(1)},${ry(i)}`);
+            return `<path d="${pts.join(' ')}" fill="none" stroke="var(--warn)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>`})():''}`}
       </svg>${hovDom}
     </div>
     ${right?`<div class="cyr">${ticks.map((t,i)=>`<i style="top:${at(i)}%">${i*10}</i>`).join('')}</div>`:''}
@@ -553,7 +762,7 @@ V.home=m=>{
   const ti=Math.min(U.seg['home-tab']??0,Math.max(0,tabs.length-1)), inc=tabs[ti]==='Доход';
   const cards=[];
   if(p.assets)cards.push(card(`<div class="ch"><h2>Доход</h2>${S.role==='owner'?'<button class="hlink spacer" data-go="assets">Продать</button>':''}</div>
-    ${heroBox('Текущий баланс',m.bal.map(b=>heroVal(amt(b),`≈ ${cur(b.usd,'$')} • ${cur(b.rub,'₽')}`)).join(''),'income')}
+    ${heroBox('Текущий баланс',m.bal.map(b=>heroVal(amt(b),fiatLine(b.usd,b.rub))).join(''),'income')}
     <div class="stats"><div><div class="l">За 24 ч</div>${m.d24.map(b=>`<div class="v mono">${amt(b)}</div>`).join('')}</div>
       <div><div class="l">За все время</div>${m.all.map(b=>`<div class="v mono">${amt(b)}</div>`).join('')}</div></div>`));
   if(p.workers){
@@ -568,7 +777,7 @@ V.home=m=>{
   return `<div class="hcol">
 ${cards.length?`<div class="grid g3" style="gap:16px;margin:0">${cards.join('')}</div>`:''}
 ${p.workers?card(`<div class="ch"><h2>График изменения хэшрейта (${m.bal[0].s})</h2>
-  <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],2)}
+  <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],periodI())}
   <span class="pop-wrap"><button class="pill ctl sq mono lg" data-pop="date">${dpLabel('date','29.01.2026 – 30.01.2026')} ${I.cal}</button>${pop==='date'?datePicker([29,30],0,2026,0,'date'):''}</span>
   <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{h:359,hover:true})}`,'chartcard'):''}
 ${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,0):`<h2>${tabs[0]}</h2>`}
@@ -579,7 +788,7 @@ ${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,
 ${obs?'':`${card(refBlock(m),'tblcard')}
 <div class="grid g3" style="gap:16px;margin:0">
   ${card(`<div class="ch"><h2>Адреса майнинга</h2></div>
-    ${(POOL_URLS[S.coin]||POOL_URLS.btc).map((u,i)=>urlRow('URL '+(i+1),'stratum+tcp://'+u)).join('')}
+    ${(POOL_URLS[S.coin]||POOL_URLS.btc).slice(0,+S.wlink||3).map((u,i)=>urlRow('URL '+(i+1),'stratum+tcp://'+u)).join('')}
     <button class="btn" data-modal="connect">${I.pl} Подключить воркер</button>`)}
   ${card(`<div class="ch"><h2>Связаться с нами</h2></div>
     ${HOME_CONTACTS.map(([ic,k,v,u])=>`<a class="linkrow" href="${u}" target="_blank" rel="noopener">
@@ -606,6 +815,7 @@ function workerTiles(m){
 }
 
 function incomeTable(m,n,pid){
+  if(netFail()) return tblFail();
   const R=m.c.row,u=m.c.label.split(' ')[0];
   const d=['22.07.2025 11:07','22.07.2025 11:07','11.09.2025 14:32','22.07.2025 11:07','22.07.2025 11:07','03.04.2026 09:15','27.11.2025 18:55','01.12.2025 07:53','15.06.2026 21:48','08.01.2026 02:21'];
   const hs=['510','288','320','286','256','244','200','278','298','288'];
@@ -634,15 +844,29 @@ const PAYOUTS=[
   ['22.01.2026 11:07','0,000654321','Автовыплата','1A1z****8uGT','done'],
   ['22.01.2026 11:07','0,000185087','Продажа','1234****9856','err'],
   ['03.01.2026 09:15','0,000345678','Автовыплата','1A1z****8uGT','done']];
-const PAY_TYPES=['Все выплаты','Ручная выплата','Автовыплата','Продажа'];
+const PAY_TYPES_ALL=['Все выплаты','Ручная выплата','Автовыплата','Продажа'];
+/* Ось «Типы операций» режет и фильтр, и сами строки истории */
+const PAY_TYPES=()=>S.paytype==='out'?['Все выплаты','Ручная выплата','Автовыплата']
+  :S.paytype==='sell'?['Все выплаты','Продажа']:PAY_TYPES_ALL;
 const PAY_ST={work:['warn','В работе'],err:['err','Ошибка'],done:['ok','Завершен']};
+/* Ось «Статусы выплат»: чем закончились операции в истории */
+const PAY_ST_MAP={ok:()=> 'done',hold:i=>i%3?'done':'work',fail:i=>i%4===1?'err':'done'};
+const payStOf=(i,st)=>PAY_ST_MAP[S.payst]?PAY_ST_MAP[S.payst](i):st;
+/* Ось «Выплат в истории» — сколько строк отдаёт таблица */
+const payN=m=>m.empty?0:S.payn==='none'?0:S.payn==='few'?1:(S.data==='few'?1:28);
+/* Ось «Реферальных выплат» — своя от истории собственных выплат */
+const refPayN=m=>m.empty?0:S.refpn==='none'?0:S.refpn==='few'?1:(S.data==='few'?1:28);
+const paySrc=()=>S.paytype==='out'?PAYOUTS.filter(r=>r[2]!=='Продажа')
+  :S.paytype==='sell'?PAYOUTS.filter(r=>r[2]==='Продажа'):PAYOUTS;
 function payoutsTable(m,n,pid,type){
+  if(netFail()) return tblFail();
   if(!n) return emptyBox('Выплат пока не было','Как только будут выплаты, вы увидите здесь информацию');
   const u=m.bal[0].s;
   /* фильтр «Тип операции» из шапки карточки (37:56063) */
-  const src=(!type||type===PAY_TYPES[0])?PAYOUTS:PAYOUTS.filter(r=>r[2]===type);
+  const base=paySrc();
+  const src=(!type||type===PAY_TYPES_ALL[0])?base:base.filter(r=>r[2]===type);
   if(!src.length) return emptyBox('Ничего не найдено','Попробуйте изменить тип операции');
-  n=Math.min(n,type&&type!==PAY_TYPES[0]?src.length:n);
+  n=Math.min(n,type&&type!==PAY_TYPES_ALL[0]?src.length:n);
   let from=0,to=n;
   if(pid){const per=perOf(pid,10),pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
   return `<div class="tw"><table class="tbl paytbl"><thead><tr>
@@ -650,12 +874,12 @@ function payoutsTable(m,n,pid,type){
     <th><span class="thico paico">${COIN_ICON[u]}</span> Сумма, ${u}</th>
     <th>Тип транзакции</th><th>Кошелек/Расчетный счет</th><th>Статус</th>
     <th class="docs">Документы <i class="tipi" data-tip="При переходе транзакции «Продажа» в статус «Завершен» вам необходимо будет скачать документы">${I.inf}</i></th></tr></thead><tbody>
-    ${Array.from({length:to-from},(_,j)=>{const i=from+j; const [d,a,t,w,st]=src[i%src.length];
-      const [cls,lab]=PAY_ST[st];
+    ${Array.from({length:to-from},(_,j)=>{const i=from+j; const [d,a,t,w,st0]=src[i%src.length];
+      const st=payStOf(i,st0), [cls,lab]=PAY_ST[st];
       return `<tr><td class="mono">${d}</td><td class="mono">${a} ${u}</td>
       <td>${t}</td><td class="mono">${w}</td>
       <td>${status(cls,lab,'caps')}</td>
-      <td class="docs">${st==='done'?`<button class="btn out xs" data-toast="Документ скачан">${I.dl} Скачать</button>`:st==='err'?'—':''}</td></tr>`}).join('')}
+      <td class="docs">${S.paydoc==='no'?'—':st==='done'?`<button class="btn out xs" data-toast="Документ скачан">${I.dl} Скачать</button>`:st==='err'?'—':''}</td></tr>`}).join('')}
   </tbody></table></div>${pid?pager(pid,n,10):''}`;
 }
 /* Реферальная программа (макет 185:105544): табличная карточка, внутри две
@@ -681,7 +905,7 @@ function refBlock(m){
     <div class="reftot">
       <h3>Общие данные по всем монетам</h3>
       <div class="rtgrid">
-        ${st('Активные рефералы',e?0:20)}${st('Все рефералы',e?0:50)}
+        ${st('Активные рефералы',refActive(m))}${st('Все рефералы',refAll(m))}
         ${st('Текущий баланс',e?'0 ₽':'7 500,56 ₽')}${st('Доход за все время',e?'0 ₽':'90 000,99 ₽')}
       </div>
     </div>
@@ -714,7 +938,10 @@ const TAG_COLORS=['#ef4444','#f97316','#d65384','#2dba46','#a855f7','#7086fc'];
 /* Группы и теги — изменяемые списки: их создают, правят и удаляют прямо
    в модалке (макеты 173:61615 и 173:62151). Сценарий «Ничего не заведено»
    отдаёт пустой список, поэтому сид зависит от оси wf. */
-const seedG=()=>S.wf==='none'?[]:GEO.slice(1).map(([n,c])=>({n,c}));
+/* Ось «Площадки» режет ленту групп: одиннадцать, три, одна или ни одной */
+const GEO_N={many:10,few:3,one:1,none:0};
+const seedG=()=>S.wf==='none'||S.wgeo==='none'?[]
+  :GEO.slice(1,1+(GEO_N[S.wgeo]??10)).map(([n,c])=>({n,c}));
 const seedT=()=>S.wf==='none'?[]:TAGS.map(([n,d],i)=>({n,d,c:TAG_COLORS[i%6]}));
 const groups=()=>U.grp||(U.grp=seedG());
 const tagsOf=()=>U.tg||(U.tg=seedT());
@@ -789,18 +1016,31 @@ const vlogo=k=>`<span class="vlogo"><img src="/logo-${k}.svg" alt="" width="24" 
 /* Сколько фильтров применено — счётчик на кнопке «Фильтры» (612:100188) */
 const fcount=()=>U.fapp?U.fapp.t.length+U.fapp.m.length:0;
 /* Время последней шары: отсчитываем назад от 9 апреля, 07:32 */
-const shareAt=off=>{const t=7*60+32-off, h=Math.floor((t+1440)%1440/60), mi=(t+1440)%1440%60;
-  return `${t<0?8:9} Апреля, ${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')}`};
+const MONTHS_R=['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа',
+  'Сентября','Октября','Ноября','Декабря'];
+/* Ось «Последняя шара» разносит отсчёт на часы и сутки, поэтому дату
+   считаем от точки, а не подменяем число вручную */
+const SHARE_BASE=new Date(2026,3,9,7,32);
+const shareAt=off=>{const d=new Date(SHARE_BASE.getTime()-off*60000);
+  return `${d.getDate()} ${MONTHS_R[d.getMonth()]}, ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`};
 const WST={ok:['Активен','#22c55e'],low:['Низкий хэшрейт','#f59e0b'],off:['Отключен','#ef4444'],fail:['Оффлайн','#6b7280']};
 function workersList(m){
   if(m.empty) return [];
   /* Полные названия моделей: в таблице их режет колонка, а деталка
      показывает целиком вместе с производителем (макет 223:98556) */
-  const models=S.coin==='ltc'?['Antminer L9 17 GH/s','Antminer L7 9.5 GH/s','Avalon A1566 12 GH/s','Antminer L9 16 GH/s']
-    :['Antminer S19 XP Hydro 257 TH/s','Antminer S21+ 235 TH/s','Avalon Q 90 TH/s','Antminer S21+ 225 TH/s'];
+  const models=S.wvend==='one'
+    ? (S.coin==='ltc'?['Antminer L9 17 GH/s','Antminer L7 9.5 GH/s','Antminer L9 16 GH/s','Antminer L7 8.8 GH/s']
+      :['Antminer S19 XP Hydro 257 TH/s','Antminer S21+ 235 TH/s','Antminer S21 200 TH/s','Antminer S19j Pro 104 TH/s'])
+    : (S.coin==='ltc'?['Antminer L9 17 GH/s','Antminer L7 9.5 GH/s','Avalon A1566 12 GH/s','Antminer L9 16 GH/s']
+      :['Antminer S19 XP Hydro 257 TH/s','Antminer S21+ 235 TH/s','Avalon Q 90 TH/s','Antminer S21+ 225 TH/s']);
   /* У воркера один видимый тег и, если есть второй, чип «+1» с подсказкой */
   const tags=[['Разогнан','Собран'],['Готов','Завершен'],['Без прошивки','Подготовлен']];
-  const N=S.data==='few'?5:36, r=rng(S.coin==='btc'?11:23);
+  /* Ось «Размер парка» задаёт длину списка; «Мало записей» всё равно режет до пяти */
+  const N=S.data==='few'?5:(+S.wn||36), r=rng(S.coin==='btc'?11:23);
+  /* Оси «Реджект», «Аптайм» и «Последняя шара» правят три колонки таблицы */
+  const rejK={low:.3,mid:1,high:4}[S.rej]??1;
+  const upB={high:99,mid:94,low:78}[S.wup]??99;
+  const shK={fresh:1,old:26,stale:340}[S.wshare]??1;
   const share=[['ok',m.h.a],['low',m.h.l],['off',m.h.o],['fail',m.h.f]];
   const tot=share.reduce((s,x)=>s+x[1],0)||1, out=[];
   for(let i=0;i<N;i++){
@@ -810,13 +1050,13 @@ function workersList(m){
     const tg=tags[i%3], extra=i%2;
     /* правки привязок из модалок живут в U.wov и переживают перерисовку */
     out.push(Object.assign({id:i+1,name:'Ant'+String(i+1).padStart(2,'0'),model:models[i%4],st,
-      h5:base+5,h1:base+12,h24:base+8,rej:((i%8)+1)/100,up:99+(i%2),
+      h5:base+5,h1:base+12,h24:base+8,rej:((i%8)+1)/100*rejK,up:upB+(i%2),
       tag:tg[0],tags:extra?tg:[tg[0]],extra,
       /* площадки воркера — их показывает деталка и правит «Изменить группы» */
       grp:[i%3,(i+2)%7,(i+5)%9].filter((v,j,a)=>a.indexOf(v)===j),
       /* время последней шары разное — по нему список сортируется по умолчанию
          (заметка дизайнера 290:157360) */
-      sh:(i*7+i%5)%143},(U.wov||{})[i+1]||{}));
+      sh:((i*7+i%5)%143)*shK},(U.wov||{})[i+1]||{}));
   }
   return out;
 }
@@ -927,7 +1167,7 @@ V.workers=m=>{
     <button class="btn link" data-modal="wgroups">Изменить группы</button>
     ${busy?`<span class="btn link off" data-tip="Вы не сможете удалить воркеры в статусе «Активен» или «Низкий хэшрейт»">Удалить</span>`
       :`<button class="btn link del" data-modal="wkdels">Удалить</button>`}</div>`})():''}
-  ${all.length?(shown.length?`<div class="tw"><table class="tbl wtbl"><thead><tr>
+  ${netFail()?tblFail():all.length?(shown.length?`<div class="tw"><table class="tbl wtbl"><thead><tr>
       <th>${cb(allSel,'data-selall')}</th>${sortTh('name','Наименование')}${sortTh('model','Модель')}${sortTh('st','Статус')}
       ${sortTh('h5','Хэшрейт, 5 мин')}${sortTh('h1','Хэшрейт, 1 ч')}${sortTh('h24','Хэшрейт, 24 ч')}${sortTh('rej','Реджект, 24 ч')}
       <th>Uptime <span class="tipi" data-tip="Доля времени за 24 часа, когда воркер присылал шары">${I.inf}</span></th><th>Отпр. шары</th><th>Мои теги</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
@@ -1057,7 +1297,7 @@ V.worker=m=>{
   </div>
   <div class="wdmain">
     ${card(`<div class="ch"><h2>График изменения хэшрейта</h2><div class="spacer"></div>
-      ${seg('wk-range',['5 мин','1 ч','24 ч'],2)}
+      ${seg('wk-range',['5 мин','1 ч','24 ч'],periodI())}
       <span class="pop-wrap"><button class="pill ctl sq mono lg wdcal" data-pop="wdate">${dpLabel('wdate','05.04.2026 – 12.04.2026')} ${I.cal}</button>${pop==='wdate'?datePicker([5,12],3,2026,0,'wdate'):''}</span>
       <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>
       ${chart(m,{h:626,hover:true})}`)}
@@ -1095,12 +1335,17 @@ const ATIP={th:'Выплаты возможны при достижении ми
 /* Кошельки и автовыплаты — оси сценария: как в макете, у всех или ни у кого */
 const walletOf=a=>S.awal==='none'?null:S.awal==='all'?(a.w||'ltc1****9f3x'):a.w;
 const autoOf=i=>S.apay==='all'?true:S.apay==='none'?false:i===0;
+/* Ось «Пороги автовыплат»: макетные значения, свои или ещё не заданные */
+const THR_EDIT={BTC:'0,01 BTC',LTC:'0,5 LTC',DOGE:'250 DOGE',ZEC:'20 ZEC'};
+const thrOf=a=>S.athr==='none'?'Не задан':S.athr==='edit'?(THR_EDIT[a.s]||a.th):a.th;
+/* Ось «Продажа ЦВ»: без неё вкладки «Продать» в активах нет вовсе */
+const canSell=()=>S.asell!=='no';
 const assetOf=s=>ASSETS.find(a=>a.s===s)||ASSETS[0];
 const curAsset=()=>assetOf(U.coin2||'BTC');
 
 V.assets=m=>{
   const k=m.empty?0:(m.huge?1e6:1);
-  const sell=segi('assets-tab')===1;
+  const sell=canSell()&&segi('assets-tab')===1;
   const dis=m.empty||S.role==='observer';
   const acc=S.vacc==='yes'?ACC_NUM:null;
   /* условия продажи: ФИО и выписка из реестра майнеров */
@@ -1132,10 +1377,10 @@ V.assets=m=>{
       <td>${w?copyChip(w,`data-modal="${sell?'vaccm':'waledit'}" data-coin="${a.s}"`)
             :addChip(sell?'vaccm':'wallet',a.s)}</td>
       <td>${sell?`<span class="athr">${SELL_THR}</span>`
-            :chip(a.th,I.edit,`data-modal="athr" data-coin="${a.s}"`)}</td>
+            :chip(thrOf(a),I.edit,`data-modal="athr" data-coin="${a.s}"`)}</td>
       <td><span class="tog ${togOn('a'+a.s,!m.empty&&(sell?!need:autoOf(i)))?'on':''}" data-tog="a${a.s}"></span></td>
       <td class="num"><button class="btn sm" ${dis?'disabled':''} data-modal="${sell?'sell':'withdraw'}" data-coin="${a.s}">${sell?'Продать':'Вывести'}</button></td></tr>`}).join('');
-  return hero+card(`<div class="ch">${seg('assets-tab',['Вывести','Продать'],0)}</div>
+  return hero+card(`<div class="ch">${seg('assets-tab',canSell()?['Вывести','Продать']:['Вывести'],0)}</div>
     ${sell&&need?`<div class="alert info aver">${I.inf}<div><b>Для продажи цифровой валюты</b>
       <span>Добавьте ФИО/Наименование организации и загрузите выписку из реестра майнеров в разделе
       <button class="lnk" data-go="verification">Верификация</button></span></div></div>`:''}
@@ -1248,10 +1493,10 @@ ${card(`<div class="ch"><h2>История дохода</h2><div class="spacer">
 /* Выплаты (макет 37:56063): ряд действий с переходом в «Мои активы»,
    карточка «История выплат» с фильтром по типу, периодам и дате. */
 function payoutsScreen(m,own){
-  const N=m.empty?0:periodN('pay-range','pay',S.data==='few'?1:28);
-  const type=PAY_TYPES[segi('pay-type',0)];
+  const N=periodN('pay-range','pay',payN(m));
+  const type=PAY_TYPES()[segi('pay-type',0)];
   return `${card(`<div class="ch"><h2>${own?'История выплат':'Реферальные выплаты'}</h2><div class="spacer"></div>
-  ${N?`${fsel('pay-type',PAY_TYPES)}${dayChips('pay-range')}${dateInput('pay')}
+  ${N?`${fsel('pay-type',PAY_TYPES())}${dayChips('pay-range')}${dateInput('pay')}
     <button class="ib" data-modal="export" data-ex="pay">${I.dl}</button>`:''}</div>
   ${payoutsTable(m,N,'payouts',type)}`)}`;
 }
@@ -1277,6 +1522,12 @@ const REP_WK=[['pmineraccount.0010189567777','нет','есть'],['pmineraccoun
   ['Ant05','нет','есть'],['Ant06','есть','нет']];
 const REP_TIP='Для генерации отчета, заполните данные в разделе «Верификация»';
 const repModal=()=>S.rdata==='no'?'repwk':S.rdata==='del'?'repdel':'repacc';
+/* Ось «Отчётов в списке» режет таблицу, «Статус отчёта» подменяет колонку статуса */
+const REP_N={many:5,few:1,none:0};
+const repRows=()=>REPORTS.slice(0,REP_N[S.repn]??5).map(r=>
+  S.repst==='ready'?[r[0],r[1],r[2]||'natarusso',r[3]||'04.05.2026 12:07','ok']
+  :S.repst==='wait'?[r[0],r[1],r[2],'','gen']
+  :S.repst==='err'?[r[0],r[1],r[2],r[3],'err']:r);
 
 V.report=m=>{
   const ro=S.role==='observer', noV=S.verif==='no';
@@ -1290,9 +1541,9 @@ V.report=m=>{
   <div class="racts">
     <button class="btn w" data-modal="export" data-ex="hours">${I.dl}Часы работы воркеров</button>
     <button class="btn w" data-modal="export" data-ex="inc">${I.dl}Доход за период</button>
-    <button class="btn w" data-modal="poolw">${I.wallet}Кошельки пула</button>
+    <button class="btn w" ${S.repw==='no'?'disabled data-tip="Кошельки пула ещё не добавлены"':'data-modal="poolw"'}>${I.wallet}Кошельки пула</button>
   </div></div>
-  ${card(`${U.rnote?'':`<div class="rnote">
+  ${card(`${netFail()?tblFail():`${U.rnote?'':`<div class="rnote">
     <div><b>Для генерации корректного отчета</b>
       <ol><li>Единоразово заполните поля «Модель» и «Заводской номер»
         <button class="lnk a" data-go="workers">в детальных карточках воркеров</button></li>
@@ -1301,7 +1552,8 @@ V.report=m=>{
     <button class="rx" data-rnote>${I.x}</button></div>`}
   <div class="tw"><table class="tbl rtbl"><thead><tr><th>Месяц</th><th>Год</th><th>Аккаунты</th>
     <th>Дата генерации</th><th>Статус</th><th></th><th></th></tr></thead><tbody>
-  ${REPORTS.map(([mo,y,a,d,st])=>{const [cls,lab]=REP_ST[st];
+  ${repRows().length?'':`<tr><td colspan="7">${emptyBox('Отчетов пока нет','Отчет появится здесь после генерации')}</td></tr>`}
+  ${repRows().map(([mo,y,a,d,st])=>{const [cls,lab]=REP_ST[st];
     const off=ro||noV||st==='none';
     const gen=`<button class="btn xs" ${off?'disabled':''} data-modal="${repModal()}">Сгенерировать</button>`;
     return `<tr><td>${mo}</td><td class="mono">${y}</td>
@@ -1310,7 +1562,7 @@ V.report=m=>{
       <td>${status(cls,lab,'caps')}</td>
       <td class="num">${noV&&!ro?`<span data-tip="${REP_TIP}">${gen}</span>`:gen}</td>
       <td class="num"><button class="btn out xs" ${st==='ok'?'':'disabled'} data-toast="Отчет скачан">${I.dl}Скачать</button></td></tr>`}).join('')}
-  </tbody></table></div>`,'rcard')}`};
+  </tbody></table></div>`}`,'rcard')}`};
 
 /* --- Инструменты --- */
 /* Калькулятор доходности (макет 5:3779): акцентная плашка 268, слева белая
@@ -1342,24 +1594,26 @@ const minisel=(id,opts)=>{const i=U.seg[id]??0;
 V.calc=m=>{
   const d30=segi('calc-period',1);
   const cc=['BTC','LTC'][segi('calc-coin',0)];
+  /* Ось «Оборудование в расчёте»: без него поля пустые и результат нулевой */
+  const hw=S.calchw!=='no';
   return `<div class="cwrap">
   <div class="cleft">
     <div class="ctop hr1">${fsel('calc-coin',['BTC','LTC'],v=>COIN_ICON[v])}<div class="spacer"></div>
       <button class="btn link creset" data-creset>Сбросить</button></div>
     <div class="cgrid">
       <div class="cpair">${cfield('Курс '+cc,'3 071 428,57')}${curSel('calc-cur',['₽','$'])}</div>
-      ${cfield('Хэшрейт, '+m.c.unit,'100')}
-      ${cfield('Комиссия пула, %','0,0')}
-      ${cfield('Потребление, кВт·ч','0,00')}
-      ${cfield('Стоимость, ₽/кВт·ч с НДС','3,57')}
+      ${cfield('Хэшрейт, '+m.c.unit,hw?'100':'')}
+      ${cfield('Комиссия пула, %',hw?'0,0':'')}
+      ${cfield('Потребление, кВт·ч',hw?'0,00':'')}
+      ${cfield('Стоимость, ₽/кВт·ч с НДС',hw?'3,57':'')}
       ${cselField('Налог, %','calc-tax',TAXES)}
     </div>
   </div>
   <div class="cright">
     ${segLine('calc-period',['Доход за 1 день','Доход за 30 дней'],1,'inv fill')}
     <div class="cres">
-      <b class="mono">≈ ${d30?'0,00048469':'0,00001616'} ${cc}</b>
-      <span class="mono">≈ ${d30?'20,84 $ / 1 488,7 ₽':'0,69 $ / 49,62 ₽'}</span>
+      <b class="mono">≈ ${hw?(d30?'0,00048469':'0,00001616'):'0'} ${cc}</b>
+      <span class="mono">≈ ${hw?(d30?'20,84 $ / 1 488,7 ₽':'0,69 $ / 49,62 ₽'):'0 $ / 0 ₽'}</span>
     </div>
     <button class="btn w" data-modal="connect">Начать добывать</button>
   </div></div>`;
@@ -1367,11 +1621,22 @@ V.calc=m=>{
 
 /* Налоговый калькулятор (макет 6:40886): вкладки монет, слева поля
    и промежуточные итоги, справа сумма налогов и годовые цифры. */
-const TAX_VALS=m=>m.empty?{inc:'0',rate:'4 647 685,61',kwt:'0',price:'0,00',eq:'0,00',life:'24',
-    mon:'0,00',net:'0,00',year:'0,00',base:'0,00',el:'0,00',am:'0,00',c1:'0,00',c2:'0,00'}
-  :{inc:'0.1',rate:'4 647 685,61',kwt:'140',price:'4',eq:'7 400 000',life:'24',
+/* Оси «Тип лица в налогах» и «Резидентство» двигают ставку, а с ней —
+   сумму налога, годовой итог и чистый доход */
+const TAX_K=()=>({pf:1,ip:.92,ul:1.72}[S.taxface]??1)*(S.taxres==='no'?2.3:1);
+const taxNum=v=>Number(String(v).replace(/\s/g,'').replace(',','.'));
+const taxMul=(v,k)=>{const n=taxNum(v);return Number.isFinite(n)?ni(Math.round(n*k)):v};
+const TAX_VALS=m=>{
+  if(m.empty) return {inc:'0',rate:'4 647 685,61',kwt:'0',price:'0,00',eq:'0,00',life:'24',
+    mon:'0,00',net:'0,00',year:'0,00',base:'0,00',el:'0,00',am:'0,00',c1:'0,00',c2:'0,00'};
+  const k=TAX_K(), base={inc:'0.1',rate:'4 647 685,61',kwt:'140',price:'4',eq:'7 400 000',life:'24',
     mon:'39 270',net:'249 197',year:'471 241',base:'3 461 604',el:'4 838 400',am:'3 699 996',
     c1:'39 270',c2:'0,00'};
+  if(k===1) return base;
+  const dm=taxNum(base.mon)*(k-1);
+  return {...base,mon:taxMul(base.mon,k),year:taxMul(base.year,k),c1:taxMul(base.c1,k),
+    net:ni(Math.round(taxNum(base.net)-dm))};
+};
 V.tax=m=>{
   const v=TAX_VALS(m);
   const row=(l,x)=>`<div class="txrow"><span>${l}</span><b>${x} ₽</b></div>`;
@@ -1379,7 +1644,7 @@ V.tax=m=>{
     [`${COIN_ICON.BTC}BTC`,`${COIN_ICON.LTC}+ LTC`],0)}</div>
   <div class="txwrap">
     <div class="txleft">
-      <div class="txtop hr1">${seg('tax-form',['Физическое лицо и ИП','Юридическое лицо'],0)}
+      <div class="txtop hr1">${seg('tax-form',['Физическое лицо и ИП','Юридическое лицо'],S.taxface==='ul'?1:0)}
         <div class="spacer"></div><button class="btn link creset" data-creset>Сбросить</button></div>
       <div class="txlist">
         <div class="txgroup"><span class="gk">Доходы</span>
@@ -1436,7 +1701,7 @@ const totalIncomeTable=m=>`<div class="tw"><table class="tbl"><thead><tr><th>Д�
 V.summary=m=>`
 <div class="grid g3">
   ${card(`<div class="ch"><h2>Доход</h2></div><div class="hero"><div><div class="l">Текущий общий баланс</div>
-    <div class="v mono">${nf(m.bal[0].v,8)} ${m.bal[0].s}</div><div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div><span class="cv">${I.cv}</span></div>
+    <div class="v mono">${nf(m.bal[0].v,8)} ${m.bal[0].s}</div><div class="s mono">${fiatLine(m.bal[0].usd,m.bal[0].rub)}</div></div><span class="cv">${I.cv}</span></div>
     <div class="stats"><div><div class="l">За 24 ч</div><div class="v mono">${nf(m.d24[0].v,8)} ${m.d24[0].s}</div></div>
     <div><div class="l">За все время</div><div class="v mono">${nf(m.all[0].v,8)} ${m.all[0].s}</div></div></div>`)}
   ${card(`<div class="ch"><h2>Средний хэшрейт</h2></div><div class="hero"><div><div class="l">Общий хэшрейт за 24 ч</div>
@@ -1481,7 +1746,7 @@ V.sumassets=m=>{
 V.sumincome=m=>`
 ${card(`<div class="hero"><div class="hval"><div class="l">Текущий общий баланс</div>
     <div class="v mono">${dec(m.bal[0].v)} ${m.bal[0].s}</div>
-    <div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div></div>`)}
+    <div class="s mono">${fiatLine(m.bal[0].usd,m.bal[0].rub)}</div></div></div>`)}
 ${card(`<div class="ch"><h2>График общего дохода</h2><div class="spacer"></div>
   ${dayChips('sumincome-range')}${dateInput('sumi')}${zoomBtns()}</div>
   ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:periodXs('sumincome-range')})}`)}
@@ -1583,6 +1848,7 @@ const refCoinSel=(m,id)=>`<span class="pop-wrap"><button class="rcoin ${pop===id
       <span class="ic">${ic}</span></button>`}).join('')}</div>`:''}</span>`;
 /* Таблица реферального дохода — колонки свои (534:54490) */
 function refIncomeTable(m,n,pid){
+  if(netFail()) return tblFail();
   if(!n) return emptyBox('Дохода пока нет','Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение');
   const u=m.bal[0].s;
   let from=0,to=n;
@@ -1626,7 +1892,7 @@ V.ref=m=>{
   </div>
   <div class="rcard">
     <h2>Общие данные</h2>
-    <div class="rgrid">${[['Активные рефералы',m.empty?'0':'20'],['Все рефералы',m.empty?'0':'50'],
+    <div class="rgrid">${[['Активные рефералы',String(refActive(m))],['Все рефералы',String(refAll(m))],
       ['Текущий баланс',(m.empty?'0':'7 500,56')+' ₽'],['Доход за все время',(m.empty?'0':'90 000,99')+' ₽']]
       .map(([k,v])=>`<div class="rtile"><span class="k">${k}</span><b class="mono">${v}</b></div>`).join('')}</div>
   </div>
@@ -1643,7 +1909,7 @@ V.ref=m=>{
     </div>
   </div></div>
 ${card(`<div class="ch"><h2>Настройка реферальных выплат</h2></div>
-  ${U.rwarn?'':`<div class="alert info rinfo2"><div><b>Если хотите выводить в рублях</b><br>
+  ${U.rwarn||S.refrub==='hide'?'':`<div class="alert info rinfo2"><div><b>Если хотите выводить в рублях</b><br>
     <span class="mut">Заполните форму, как Юридическое лицо или Индивидуальный предприниматель в разделе
       <button class="lnk a" data-go="verification">Верификация и реквизиты</button></span></div>
     <button class="rx spacer" data-rwarn>${I.x}</button></div>`}
@@ -1674,11 +1940,13 @@ const refStats=cards=>`<div class="rstats">${cards.map(([l,v,u,go])=>
     <span class="v mono">${v}${u?`<i>${u}</i>`:''}</span></div>`).join('')}</div>`;
 /* Реферальные выплаты: восемь колонок, «Реквизиты» вместо кошелька (979:108712) */
 function refPayoutsTable(m,n,pid,type){
+  if(netFail()) return tblFail();
   if(!n) return emptyBox('Выплат пока не было','Как только будут выплаты, вы увидите здесь информацию');
   const u=m.bal[0].s;
-  const src=(!type||type===PAY_TYPES[0])?PAYOUTS:PAYOUTS.filter(r=>r[2]===type);
+  const base=paySrc();
+  const src=(!type||type===PAY_TYPES_ALL[0])?base:base.filter(r=>r[2]===type);
   if(!src.length) return emptyBox('Ничего не найдено','Попробуйте изменить тип операции');
-  n=Math.min(n,type&&type!==PAY_TYPES[0]?src.length:n);
+  n=Math.min(n,type&&type!==PAY_TYPES_ALL[0]?src.length:n);
   let from=0,to=n;
   if(pid){const per=perOf(pid,10),pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
   return `<div class="tw"><table class="tbl paytbl rpaytbl"><thead><tr>
@@ -1689,18 +1957,25 @@ function refPayoutsTable(m,n,pid,type){
     <th>Тип транзакции</th><th>Реквизиты</th><th>Статус</th>
     <th class="docs">Документы <i class="tipi" data-tip="При переходе транзакции «Продажа» в статус «Завершен» вам необходимо будет скачать документы">${I.inf}</i></th>
     </tr></thead><tbody>
-    ${Array.from({length:to-from},(_,j)=>{const i=from+j; const [d,a,t,w,st]=src[i%src.length];
-      const [cls,lab]=PAY_ST[st];
+    ${Array.from({length:to-from},(_,j)=>{const i=from+j; const [d,a,t,w,st0]=src[i%src.length];
+      const st=payStOf(i,st0), [cls,lab]=PAY_ST[st];
       return `<tr><td class="mono">${d}</td><td class="mono">${a} ${u}</td>
       <td class="mono">${nf(120+i*37)} $</td><td class="mono">${nf(9000+i*270)} ₽</td>
       <td>${t}</td><td class="mono">${w}</td>
       <td>${status(cls,lab,'caps')}</td>
-      <td class="docs">${st==='done'?`<button class="btn out xs" data-toast="Документ скачан">${I.dl} Скачать</button>`:st==='err'?'—':''}</td></tr>`}).join('')}
+      <td class="docs">${S.paydoc==='no'?'—':st==='done'?`<button class="btn out xs" data-toast="Документ скачан">${I.dl} Скачать</button>`:st==='err'?'—':''}</td></tr>`}).join('')}
   </tbody></table></div>${pid?pager(pid,n,10):''}`;
 }
 
+/* Оси «Рефералов» и «Активные рефералы»: сколько строк в списке
+   и какая доля из них активна — числа расходятся по трём экранам */
+const REF_N={many:50,few:3,none:0};
+const refAll=m=>m.empty?0:(REF_N[S.refn]??50);
+const refActive=m=>{const a=refAll(m);
+  return S.refact==='none'?0:S.refact==='some'?Math.min(a,a?Math.max(1,Math.round(a*0.1)):0):Math.round(a*0.4)};
 function refListTable(m){
-  if(!m.rows) return `<div class="empty">
+  if(netFail()) return tblFail();
+  if(!refAll(m)) return `<div class="empty">
     <img src="/empty-state.svg" alt="" width="221" height="175">
     <b>Рефералов пока нет</b><p>Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение</p>
     <div class="reflink">${urlRow('',LINKS.ref(49282838))}</div></div>`;
@@ -1710,17 +1985,17 @@ function refListTable(m){
     <th class="num"><span class="thico paico">${COIN_ICON[u]}</span> Доход, ${u}, 24 ч</th>
     <th class="num"><span class="thico paico">${PAY_ICON['$']}</span> Доход, $, 24 ч</th>
     <th class="num"><span class="thico paico">${PAY_ICON['₽']}</span> Доход, ₽, 24 ч</th></tr></thead><tbody>
-  ${(()=>{const base=S.data==='few'?3:24;
+  ${(()=>{const base=Math.min(refAll(m),S.data==='few'?3:24);
     /* чип «Активные» оставляет только активных рефералов (752:99372) */
-    const N=U.ronly?Math.max(1,Math.round(base*0.4)):base;
+    const N=U.ronly?Math.min(base,refActive(m)):base;
     const[f,t]=pageSlice('reflist',N);return Array.from({length:t-f},(_,j)=>{const i=f+j;
     return `<tr><td class="mono">0${(i%9)+1}.03.2026</td><td>miner_${1000+i*7}</td>
     <td class="mono">${TIERS[i%5].p}</td><td class="mono">${ni(1200+i*340)} ${m.c.unit}</td>
     <td class="num mono">0,000${(i%9)+1}2345</td><td class="num mono">${nf(12+i*3.7)} $</td><td class="num mono">${nf(900+i*270)} ₽</td></tr>`}).join('')})()}
-  </tbody></table></div>${pager('reflist',(()=>{const b=S.data==='few'?3:24;return U.ronly?Math.max(1,Math.round(b*0.4)):b})(),10)}`;
+  </tbody></table></div>${pager('reflist',(()=>{const b=Math.min(refAll(m),S.data==='few'?3:24);return U.ronly?Math.min(b,refActive(m)):b})(),10)}`;
 }
-V.reflist=m=>`${refStats([['Средний хэшрейт за 24 часа',m.empty?'0 '+m.c.unit:m.c.refHash],
-    ['Активные рефералы',m.empty?'0':'20'],['Все рефералы',m.empty?'0':'50']])}
+V.reflist=m=>`${refStats([['Средний хэшрейт за 24 часа',refAll(m)?m.c.refHash:'0 '+m.c.unit],
+    ['Активные рефералы',String(refActive(m))],['Все рефералы',String(refAll(m))]])}
   ${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><div class="spacer"></div>${fsel('reflist-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
   <button class="chip d ${U.ronly?'on':''}" data-ronly>Активные</button>${dateInput('rl')}
   <button class="ib" data-modal="export" data-ex="rlist">${I.dlm}</button></div>${refListTable(m)}`)}`;
@@ -1732,13 +2007,13 @@ V.refincome=m=>`${refStats([['Текущий баланс',m.empty?'0':'7 500,56
   <button class="ib" data-modal="export" data-ex="rinc">${I.dlm}</button></div>
   ${refIncomeTable(m,m.empty?0:periodN('refincome-range','ri',32))}`)}`;
 V.refpayouts=m=>{
-  const N=m.empty?0:periodN('pay-range','pay',S.data==='few'?1:28);
-  const type=PAY_TYPES[segi('pay-type',0)];
+  const N=periodN('pay-range','pay',refPayN(m));
+  const type=PAY_TYPES()[segi('pay-type',0)];
   return `${refStats([['Сумма всех выплат',m.empty?'0':'10 278,45','₽','assets'],
     ['Выплаты, BTC',m.empty?'0':'8 000','₽'],['Выплаты, LTC',m.empty?'0':'2 000','₽'],
     ['Выплаты, DOGE',m.empty?'0':'278,45','₽']])}
   ${card(`<div class="ch"><h2>История выплат</h2><div class="spacer"></div>${N?`${fsel('rpay-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
-    ${fsel('pay-type',PAY_TYPES)}${dayChips('pay-range')}${dateInput('rp')}
+    ${fsel('pay-type',PAY_TYPES())}${dayChips('pay-range')}${dateInput('rp')}
     <button class="ib" data-modal="export" data-ex="rpay">${I.dlm}</button>`:''}</div>
     ${refPayoutsTable(m,N,'refpayouts',type)}`)}`};
 
@@ -1787,6 +2062,9 @@ const NOTES=[
   ['Новый реферал','miner_1042 зарегистрировался по вашей ссылке','21/07/2025 19:04'],
   ['Отчет за апрель сгенерирован','Доступен для скачивания','20/07/2025 11:32'],
   ['Вход с нового IP','Выполнен вход с нового IP — 45.234.123.345','19/07/2025 08:10']];
+/* Ось «Типы уведомлений»: важные — деньги и безопасность, остальные гасим */
+const NOTES_IMP=[0,1,4];
+const notesOf=()=>S.notift==='off'?[]:S.notift==='imp'?NOTES_IMP.map(i=>NOTES[i]):NOTES;
 /* Разрешения и монеты наблюдателя — списки из макета 2219:32420 */
 const OBS_PERMS=['Воркеры','Мои активы','Начисления','Выплаты','Продажи',
   'Список рефералов','Реферальный доход','Реферальные выплаты'];
@@ -2170,13 +2448,19 @@ const sessGroup=(label,list,gray)=>list.length?`<div class="sgroup">
    Строка секции — плашка 56, заголовок 16/20, подпись 14/18 и действие справа. */
 const secRow=(ic,t,d,right)=>`<div class="srow"><span class="sico">${ic}</span>
   <span class="tx"><b>${t}</b><i>${d}</i></span>${right}</div>`;
+/* Ось «Способ второго фактора»: приложение, SMS или письмо */
+const FA_ICON=()=>S.fam==='sms'?I.phone:S.fam==='mail'?I.mail:GOOGLE;
+const FA_NAME=()=>S.fam==='sms'?'Код в SMS':S.fam==='mail'?'Код на почту':'Google Authentication';
+const FA_DESC=()=>S.fam==='sms'?'2FA через код из сообщения на телефон'
+  :S.fam==='mail'?'2FA через код из письма на вашу почту'
+  :'2FA через код из приложения Google';
 V.security=m=>{
   const rows=sessOf(m), cur=rows[0], fa=S.fa==='yes';
   return `<div class="grid cols2" style="grid-template-columns:1176fr 460fr;align-items:start;gap:16px">
   <div style="display:flex;flex-direction:column;gap:16px">
     ${card(`<div class="stitle"><h2>Двухфакторная аутентификация</h2>
       <p>Защитите свой аккаунт, вывод средств, изменение настроек безопасности и подтверждение с помощью 2FA</p></div>
-      ${secRow(GOOGLE,'Google Authentication','2FA через код из приложения Google',
+      ${secRow(FA_ICON(),FA_NAME(),FA_DESC(),
         `<span class="tog ${fa?'on':''} spacer ${RO()?'off':''}" ${RO()?'':`data-modal="${fa?'fa2off':'fa2on'}"`}></span>`)}`)}
     ${card(`<h2>Безопасность данных</h2>
       ${secRow(I.key,'Ваш пароль','Этот пароль используется для входа в ваш аккаунт',
@@ -2372,6 +2656,13 @@ const codeBlock=(title,c)=>`<div class="ccode">
 </div>`;
 /* Экран успеха: круг 64 с галочкой и подпись, блок по центру свободного места */
 const doneBlock=t=>`<div class="cdone"><span class="cok">${CHECK}</span><b class="ctitle">${t}</b></div>`;
+/* Ось «Шагов подтверждения» задаёт длину мастера вывода, ось «Способ
+   подтверждения» — канал, куда уходит код */
+const wSteps=()=>+S.astep||3;
+const CONF_CHAN={mail:{word:'адрес почты',val:'i****v@mail.ru'},
+  sms:{word:'номер',val:'+ 7 999 999-96-05'},
+  ga:{word:'аккаунт в Google Authenticator',val:'Код из приложения'}};
+const confChan=()=>CONF_CHAN[S.aconf]||CONF_CHAN.mail;
 const prog=(cur,n)=>`<div class="mprog">${Array.from({length:n},(_,i)=>`<i class="${i<=cur?'on':''}"></i>`).join('')}</div>`;
 /* Модалки контактов. Телефон и почта: 4 шага на добавление и изменение
    (подтверждение по второму каналу → значение → код → успех) и 3 на отвязку.
@@ -2455,7 +2746,7 @@ const MODALS={
       <div style="display:flex;flex-direction:column;gap:20px">
         <div class="msec">Тема интерфейса</div>
         <div>${THEMES.map(([v,t],i)=>`<label class="rrow" data-theme-set="${v}">
-          <span class="mi">${[I.sun,I.moon,I.monitor][i]}</span><span>${t}</span>${rd(U.theme===v)}</label>`).join('')}</div>
+          <span class="mi">${[I.sun,I.moon,I.monitor][i]}</span><span>${t}</span>${rd(S.theme===v)}</label>`).join('')}</div>
       </div>
     </div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
@@ -2657,7 +2948,7 @@ const MODALS={
     s:()=>({hours:'часов работы воркеров',inc:'дохода',pay:'выплат',
       rlist:'по рефералам',rinc:'реферального дохода',rpay:'реферальных выплат'}[U.exk]||'статистики воркеров'),
     b:()=>`${xsel('Монета','exc',['BTC','LTC','DOGE','ZEC'],v=>COIN_ICON[v]||'',true)}
-      ${U.exk==='pay'||U.exk==='rpay'?xsel('Тип операции','ext',PAY_TYPES):''}
+      ${U.exk==='pay'||U.exk==='rpay'?xsel('Тип операции','ext',PAY_TYPES()):''}
       ${U.exk==='hours'?xsel('Период','exp',['Май','Апрель','Март'])
         :xsel(U.exk==='rlist'?'Дата регистрации':'Период','exp',['Весь период','7 д','30 д','90 д'])}
       ${xsel('Формат выгрузки','exf',['XLS','CSV'])}
@@ -2667,21 +2958,31 @@ const MODALS={
       <button class="btn out" data-close>Отменить</button>`},
   /* Вывод средств (226:124696): три шага, ошибки растят окно до 580 */
   withdraw:{t:'Вывод средств',acts:false,tall:()=>AERR[S.aerr]?12:7,
-    b:(m,step)=>{const a=curAsset(),e=aerrBox(),w=walletOf(a)||'Не добавлен';
-      return step===0?`<div class="mstack">${prog(0,3)}${e}
+    b:(m,step)=>{const n=wSteps(), a=curAsset(),e=aerrBox(),w=walletOf(a)||'Не добавлен';
+      const code=n-2, done=n-1;
+      if(step===0) return `<div class="mstack">${prog(0,n)}${e}
         <div class="acont">
           ${amtField('Вывести',S.aerr==='req'?'0':S.aerr==='low'?'0,0008888888':a.max,csel('wcoin',a.s,x=>!walletOf(x)),a.min,a.max)}
           <button class="btn g wide">Вывести все ${a.max} ${a.s}</button>
           ${payBlock('на Кошелек',w)}
         </div>
-        <p class="ahint">Время зачисления может составлять до 24 часов</p></div>`
-      :step===1?`<div class="cstep g32">${prog(1,3)}${codeBlock('Введите код',{word:'номер',val:'+ 7 999 999-96-05'})}</div>`
-      :`<div class="cstep mid">${prog(2,3)}${doneBlock('Заявка на вывод средств создана')}
+        <p class="ahint">Время зачисления может составлять до 24 часов</p></div>`;
+      /* Ось «Шагов подтверждения»: в длинном пути между суммой и кодом
+         встаёт сводка заявки — её проверяют глазами перед отправкой */
+      if(n===4&&step===1) return `<div class="mstack">${prog(1,n)}
+        <div class="acont">
+          <div class="amt"><span class="k">Сумма</span><b class="mono">${a.max} ${a.s}</b></div>
+          <div class="amt"><span class="k">Кошелек</span><b class="mono">${w}</b></div>
+          <div class="amt"><span class="k">Комиссия сети</span><b class="mono">0,00002 ${a.s}</b></div>
+        </div>
+        <p class="ahint">Проверьте реквизиты: отменить перевод после отправки нельзя</p></div>`;
+      if(step===code) return `<div class="cstep g32">${prog(code,n)}${codeBlock('Введите код',confChan())}</div>`;
+      return `<div class="cstep mid">${prog(done,n)}${doneBlock('Заявка на вывод средств создана')}
         <p class="mtext mut mc">Статус заявки можете посмотреть в разделе <button class="lnk" data-close data-go="payouts">Выплаты</button></p></div>`},
-    foot:(m,step)=>step===2
+    foot:(m,step)=>step===wSteps()-1
       ?`<button class="btn wide" data-close data-toast="Заявка на вывод создана">Отлично</button>`
       :`<button class="btn out" data-close>Отменить</button>
-        <button class="btn" data-step="${step+1}">${step?'Вывести':'Подтвердить'}</button>`},
+        <button class="btn" data-step="${step+1}">${step===wSteps()-2?'Вывести':'Подтвердить'}</button>`},
   /* Продажа средств (242:57978): два связанных поля и курс */
   sell:{t:'Продажа средств',acts:false,tall:()=>AERR[S.aerr]?13:8,
     b:(m,step)=>{const a=curAsset(),e=aerrBox();
@@ -3004,8 +3305,8 @@ Object.assign(MODALS, contactModals());
 /* Попоувер уведомлений — по проду: заголовок + «Прочитать все», список,
    внизу кнопка «Посмотреть все» во всю ширину. */
 function notifications(){
-  const n=NOTIF_N[S.notif];
-  const list=NOTES;
+  const list=notesOf();
+  const n=Math.min(NOTIF_N[S.notif],list.length?NOTIF_N[S.notif]:0);
   return `<div class="pop wide">
     <div class="nhead"><b>Новые уведомления</b>${n?`<span class="cnt">${n>99?'99+':n}</span>`:''}
       <button class="ra ${n?'':'off'}" ${n?'data-readall data-toast="Все уведомления отмечены как прочитанные"':'disabled'}>${I.checkall}Прочитать все</button></div>
@@ -3051,7 +3352,7 @@ export function applyState(next){
   pop = next.pop; modal = next.modal; openGroups = next.openGroups; mini = next.mini;
 }
 export {
-  AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
+  AXES, AXCAT, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   loadFail, nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   SUM_NAV, SUM_ROUTES, SCREEN_NAMES, V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf, coinsOf,

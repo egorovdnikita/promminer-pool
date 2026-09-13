@@ -55,13 +55,17 @@ export function Header({ m }: { m: Model }) {
 
           <span className="pop-wrap">
             <button className={`hbtn tight ${pop === 'user' ? 'open' : ''}`} data-pop="user">
-              <Ico className="i3" html={I.user} />
+              {/* Ось «Аватар»: с загруженным снимком в шапке стоит кружок
+                  с инициалом, без него — обезличенный значок дизайн-системы */}
+              {S.avatar === 'yes'
+                ? <span className="avat sm">{acct[0].toUpperCase()}</span>
+                : <Ico className="i3" html={I.user} />}
               <Ico html={I.cd} />
             </button>
             {pop === 'user' && (
               <div className="pop" style={{ minWidth: 280 }}>
                 <div className="phead">
-                  <span className="avat">{acct[0].toUpperCase()}</span>
+                  <span className={`avat ${S.avatar === 'yes' ? 'pic' : ''}`}>{acct[0].toUpperCase()}</span>
                   <span className="uname">
                     <b>{acct}<button className="lnk" style={{ color: 'var(--accent)' }} data-copy={acct}>
                       <Ico html={I.cp} /></button></b>

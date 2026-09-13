@@ -1,30 +1,82 @@
-/** Оси сценария — то, что попадает в ссылку. */
+/** Оси сценария — то, что попадает в ссылку. Список совпадает с DEF
+    в `legacy/prototype.js`: новая ось заводится там и дублируется сюда. */
 export interface Scenario {
   coin: string
   data: string
   health: string
+  wf: string
+  prec: string
+  fiat: string
+  trend: string
+  noise: string
+  gap: string
+  rej: string
+  period: string
+  rate: string
+  ratesrc: string
+  wn: string
+  wnote: string
+  ser: string
+  upl: string
+  wgeo: string
+  wvend: string
+  wup: string
+  wshare: string
+  wlink: string
+  awal: string
+  apay: string
+  athr: string
+  asell: string
+  astep: string
+  aconf: string
+  aerr: string
+  payn: string
+  payst: string
+  paytype: string
+  paydoc: string
+  rdata: string
+  repn: string
+  repst: string
+  repw: string
+  tier: string
+  refn: string
+  refact: string
+  refpn: string
+  refrub: string
+  calchw: string
+  taxface: string
+  taxres: string
   role: string
   perm: string
-  tier: string
-  verif: string
-  notif: string
+  ocoins: string
+  acct: string
+  name: string
+  fa: string
+  fam: string
+  sess: string
+  del: string
   subs: string
   obs: string
-  name: string
-  load: string
-  acct: string
+  notif: string
+  notift: string
+  avatar: string
   phone: string
   mail: string
   tg: string
   cerr: string
-  fa: string
-  sess: string
-  del: string
+  verif: string
   vdoc: string
   vacc: string
   verr: string
-  saerr: string
   oerr: string
+  saerr: string
+  theme: string
+  dens: string
+  fsz: string
+  side: string
+  motion: string
+  load: string
+  neterr: string
 }
 
 /** Эфемерное состояние интерфейса — в ссылку не попадает. */
@@ -42,9 +94,21 @@ export interface Ui {
   /** Свёрнутые группы осей в панели. */
   scgrp?: string[]
   /** Свои сохранённые сценарии (живут в localStorage). */
-  saved?: { name: string; axes: Record<string, string> }[]
+  saved?: { name: string; axes: Record<string, string>; at?: number }[]
   /** Фильтр в панели сценариев. */
   scq?: string
+  /** Вкладка панели: оси, наборы или переходы. */
+  sctab?: 'ax' | 'sets' | 'go'
+  /** Закреплённые оси — всплывают наверх списка (живут в localStorage). */
+  scpin?: string[]
+  /** Показывать только закреплённые оси. */
+  sconly?: boolean
+  /** История сценариев для кнопки «Отменить». */
+  schist?: Scenario[]
+  /** Ширина панели: 380 / 520 / 720. */
+  scw?: number
+  /** Сторона, к которой пришвартована панель. */
+  scside?: 'right' | 'left'
   page: Record<string, number>
   /** Выбранный размер страницы в пагинации. */
   per: Record<string, number>
@@ -104,7 +168,6 @@ export interface Ui {
   arch: boolean
   /** Имя аккаунта, открытого в карточке. */
   sub: string
-  theme: 'light' | 'dark' | 'system'
   step: number
   /** монета, на которой открыта модалка активов */
   coin2: string

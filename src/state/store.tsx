@@ -12,16 +12,23 @@ export const routeOf = (pathname: string) => pathname.replace(/^\/+|\/+$/g, '') 
 
 const freshUi = (): Ui => ({
   seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {}, oval: false, obs: 0, sess: '',
-  scgrp: [], saved: loadSaved(),
+  scgrp: [], saved: loadSaved(), sctab: 'ax', scpin: loadPins(), schist: [], scw: 420, scside: 'right',
   q: '', wfilter: 'all', geo: '',
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
   grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null, selq: '',
-  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false, lvl: null, dsel: {}, dpm: 0, zoom: 0, rwarn: false, togs: {}, ronly: false, exact: false,
+  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false, lvl: null, dsel: {}, dpm: 0, zoom: 0, rwarn: false, togs: {}, ronly: false, exact: false,
 })
 
 /** Свои сценарии живут в localStorage отдельно от текущего состояния. */
 const SAVED_KEY = 'pm.saved'
+const PIN_KEY = 'pm.pins'
+function loadPins(): string[] {
+  try { return JSON.parse(localStorage.getItem(PIN_KEY) || '[]') } catch { return [] }
+}
+function storePins(list: string[]) {
+  try { localStorage.setItem(PIN_KEY, JSON.stringify(list)) } catch { /* приватный режим */ }
+}
 function loadSaved(): Ui['saved'] {
   try { return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]') } catch { return [] }
 }
@@ -87,10 +94,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const pop = useRef<string | null>(null)
   const modal = useRef<string | null>(null)
   const openGroups = useRef<Record<string, boolean>>({ fin: false, tools: false, ref: false, sfin: false })
-  const mini = useRef(false)
   const panel = useRef(false)
   const toasts = useRef<{ id: number; msg: string }[]>([])
   const toastId = useRef(0)
+
+  /* Стопка предыдущих сценариев — «Отменить» в панели откатывает по одному шагу.
+     Глубину держим небольшой: это инструмент отладки, а не редактор. */
+  const pushHist = useCallback(() => {
+    const h = U.current.schist || []
+    U.current.schist = [...h, { ...S.current }].slice(-30)
+  }, [])
 
   const go = useCallback((r: string) => {
     pop.current = null
@@ -116,7 +129,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try { localStorage.setItem('pm', q.toString()) } catch { /* приватный режим */ }
   })
 
-  useEffect(() => { document.body.classList.toggle('mini', mini.current) })
+  /* Свёрнутый сайдбар — тоже ось: кнопка в сайдбаре её переключает */
+  useEffect(() => { document.body.classList.toggle('mini', S.current.side === 'mini') })
   /* Меню строки таблицы висит фиксированно — ставим его под кнопкой,
      иначе прокрутка таблицы его обрезает, а снятая обрезка ломает вёрстку */
   useEffect(() => {
@@ -130,12 +144,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     menu.style.top = Math.max(8, top) + 'px'
     menu.style.left = Math.max(8, Math.min(r.right - w, innerWidth - w - 8)) + 'px'
   })
+  /* Оси «Интерфейса» живут атрибутами на <html>: тема, плотность,
+     размер текста и анимации — всё стилями, без перерисовки экранов. */
   useEffect(() => {
-    const t = U.current.theme
+    const t = S.current.theme
     const eff = t === 'system'
       ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
       : t
-    document.documentElement.setAttribute('data-theme', eff)
+    const el = document.documentElement
+    el.setAttribute('data-theme', eff)
+    el.setAttribute('data-dens', S.current.dens)
+    el.setAttribute('data-fsz', S.current.fsz)
+    el.setAttribute('data-motion', S.current.motion)
   })
 
   useEffect(() => {
@@ -146,9 +166,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         else if (panel.current) { panel.current = false; bump() }
       }
       const tag = (e.target as HTMLElement)?.tagName || ''
-      if ((e.key === 's' || e.key === 'ы') && !/input|textarea/i.test(tag)) {
+      const typing = /input|textarea/i.test(tag)
+      if ((e.key === 's' || e.key === 'ы') && !typing) {
         panel.current = !panel.current
         bump()
+      }
+      /* «/» открывает панель и ставит курсор в поиск — как в дев-инструментах */
+      if (e.key === '/' && !typing) {
+        e.preventDefault()
+        if (!panel.current) { panel.current = true; bump() }
+        setTimeout(() => (document.getElementById('scq') as HTMLInputElement | null)?.focus(), 60)
       }
     }
     addEventListener('keydown', onKey)
@@ -169,6 +196,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const i = Math.round(t01 * (cfg.N - 1))
       if (i < 0 || i > cfg.N - 1) { wrap.classList.remove('on'); return }
       const v = cfg.p[i]
+      /* На пропуске в данных подсказки нет — линия там разорвана */
+      if (v == null) { wrap.classList.remove('on'); return }
       const px = (i / (cfg.N - 1)) * box.width
       const py = box.height - (v / 100) * box.height
       const pr = box.height - 2
@@ -224,7 +253,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const snapshot = useCallback((): AppSnapshot => ({
     S: S.current, U: U.current, route,
     pop: pop.current, modal: modal.current,
-    openGroups: openGroups.current, mini: mini.current,
+    openGroups: openGroups.current, mini: S.current.side === 'mini',
   }), [route])
 
   const onClick = useCallback((e: React.MouseEvent) => {
@@ -337,16 +366,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const nt = at('[data-note]')
     if (nt) { u.note = Number(nt.dataset.note); modal.current = 'noteinfo'; pop.current = null; return bump() }
     const th = at('[data-theme-set]')
-    if (th) {
-      const v = th.dataset.themeSet!
-      /* «Как в системе» — берём предпочтение ОС, но помним сам выбор */
-      u.theme = v as Ui['theme']
-      const eff = v === 'system'
-        ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-        : v
-      document.documentElement.setAttribute('data-theme', eff)
-      return bump()
-    }
+    /* Тема — ось сценария: уезжает в ссылку вместе с остальным состоянием */
+    if (th) { S.current.theme = th.dataset.themeSet!; return bump() }
     if (at('[data-arch]')) { u.arch = !u.arch; return bump() }
     const sg = at('[data-seg]')
     if (sg) {
@@ -494,13 +515,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return bump()
     }
     const tst = at('[data-toast]')
+    /* Ось «Ошибка сети» на значении «При отправке формы»: любое действие,
+       которое рапортует об успехе, вместо этого сообщает о сбое связи */
+    const say = (msg: string) => toast(
+      S.current.neterr === 'form' && !/не удалось|ошибка/i.test(msg)
+        ? 'Не удалось сохранить: нет связи с сервером'
+        : msg)
     /* Ось сценария применяем до закрытия: кнопки модалок несут и data-axis,
        и data-close, а ветка закрытия выходит из обработчика. */
     const ax = at('[data-axis]')
     if (ax) {
-      (S.current as any)[ax.dataset.axis!] = ax.dataset.val
-      /* сценарий «Ничего не заведено» пересобирает списки групп и тегов */
-      if (ax.dataset.axis === 'wf') { u.grp = null; u.tg = null }
+      pushHist()
+      ;(S.current as any)[ax.dataset.axis!] = ax.dataset.val
+      /* Списки групп и тегов кэшируются в U — оси, которые их задают,
+         сбрасывают кэш, иначе лента площадок не меняется */
+      if (ax.dataset.axis === 'wf' || ax.dataset.axis === 'wgeo') { u.grp = null; u.tg = null }
       pop.current = null
       guardRoute()
       if (!ax.hasAttribute('data-close')) return bump()
@@ -512,17 +541,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const back = modal.current === 'tagnew' && u.fback
       modal.current = back ? 'filters' : null
       if (back) u.fback = false
-      bump(); if (tst) toast(tst.dataset.toast!); return
+      bump(); if (tst) say(tst.dataset.toast!); return
     }
     /* «Вставить» — подставляет номер в поле рядом */
     const ps = at('[data-paste]')
     if (ps) {
       const inp = ps.parentElement?.querySelector('input') as HTMLInputElement | null
       if (inp) { inp.value = ps.dataset.paste!; inp.dispatchEvent(new Event('input', { bubbles: true })) }
-      if (tst) toast(tst.dataset.toast!)
+      if (tst) say(tst.dataset.toast!)
       return
     }
-    if (tst) return toast(tst.dataset.toast!)
+    if (tst) return say(tst.dataset.toast!)
     const gt = at('[data-go]')
     if (gt) { go(gt.dataset.go!); return bump() }
     /* Вотчер без разрешения на раздел не должен на нём стоять: уводим
@@ -659,17 +688,76 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (k) { u.togs[k] = !tg.classList.contains('on'); return bump() }
       tg.classList.toggle('on'); return
     }
-    if (at('[data-mini]')) { mini.current = !mini.current; document.body.classList.toggle('mini', mini.current); return bump() }
+    if (at('[data-mini]')) { S.current.side = S.current.side === 'mini' ? 'full' : 'mini'; return bump() }
     if (at('[data-panel]')) { panel.current = !panel.current; return bump() }
     const pr = at('[data-preset]')
     if (pr) {
       const found = PRESETS.find(([n]) => n === pr.dataset.preset)
-      if (found) { S.current = { ...DEF, ...found[2] }; modal.current = null; toast(`Сценарий «${found[0]}»`) }
+      if (found) {
+        pushHist()
+        S.current = pr.hasAttribute('data-over') ? { ...S.current, ...found[2] } : { ...DEF, ...found[2] }
+        modal.current = null; toast(`Сценарий «${found[0]}»`)
+      }
       return bump()
     }
-    if (at('[data-reset]')) { S.current = { ...DEF }; modal.current = null; go(HOME); return bump() }
+    if (at('[data-reset]')) { pushHist(); S.current = { ...DEF }; modal.current = null; go(HOME); return bump() }
     /* ==== Панель сценариев ==== */
     if (at('[data-onlydirty]')) { u.scdirty = !u.scdirty; return bump() }
+    if (at('[data-onlypin]')) { u.sconly = !u.sconly; return bump() }
+    const tab = at('[data-sctab]')
+    if (tab) { u.sctab = tab.dataset.sctab as Ui['sctab']; return bump() }
+    /* Закреплённые оси всплывают наверх списка и переживают перезагрузку */
+    const pin = at('[data-scpin]')
+    if (pin) {
+      const k = pin.dataset.scpin!
+      const list = u.scpin || []
+      u.scpin = list.includes(k) ? list.filter((x) => x !== k) : [...list, k]
+      storePins(u.scpin)
+      return bump()
+    }
+    /* Шаг назад по истории: каждая смена оси кладёт предыдущий сценарий в стопку */
+    if (at('[data-scback]')) {
+      const h = u.schist || []
+      if (!h.length) return toast('История пуста')
+      S.current = h[h.length - 1]
+      u.schist = h.slice(0, -1)
+      return bump()
+    }
+    /* Сброс и случайные значения внутри одной группы */
+    const gr = at('[data-grpreset]')
+    if (gr) {
+      pushHist()
+      const g = gr.dataset.grpreset!
+      for (const k of Object.keys(AXES) as (keyof typeof DEF)[]) if (AXES[k].g === g) S.current[k] = DEF[k]
+      return bump()
+    }
+    const gx = at('[data-grprand]')
+    if (gx) {
+      pushHist()
+      const g = gx.dataset.grprand!
+      for (const k of Object.keys(AXES) as (keyof typeof DEF)[]) if (AXES[k].g === g) {
+        const opts = AXES[k].opts.map(([v]: [string, string]) => v)
+        S.current[k] = opts[Math.floor(Math.random() * opts.length)]
+      }
+      return bump()
+    }
+    /* Свернуть или развернуть сразу все группы */
+    const col = at('[data-sccol]')
+    if (col) {
+      const all = [...new Set(Object.keys(AXES).map((k) => AXES[k as keyof typeof AXES].g))]
+      u.scgrp = col.dataset.sccol === 'all' ? all : []
+      return bump()
+    }
+    /* Ширина панели и сторона швартовки */
+    const sw = at('[data-scw]')
+    if (sw) { u.scw = Number(sw.dataset.scw); return bump() }
+    if (at('[data-scside]')) { u.scside = u.scside === 'left' ? 'right' : 'left'; return bump() }
+    if (at('[data-copyjson]')) {
+      const diff: Record<string, string> = {}
+      for (const k of Object.keys(DEF) as (keyof typeof DEF)[]) if (S.current[k] !== DEF[k]) diff[k] = S.current[k]
+      navigator.clipboard?.writeText(JSON.stringify(diff, null, 2))
+      return toast('Сценарий скопирован как JSON')
+    }
     const grp = at('[data-scgrp]')
     if (grp) {
       const g = grp.dataset.scgrp!
@@ -678,8 +766,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return bump()
     }
     const axr = at('[data-axreset]')
-    if (axr) { const k = axr.dataset.axreset! as keyof typeof DEF; S.current[k] = DEF[k]; return bump() }
+    if (axr) { pushHist(); const k = axr.dataset.axreset! as keyof typeof DEF; S.current[k] = DEF[k]; return bump() }
     if (at('[data-rand]')) {
+      pushHist()
       const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]
       for (const k of Object.keys(AXES) as (keyof typeof DEF)[])
         S.current[k] = pick(AXES[k].opts.map(([v]: [string, string]) => v))
@@ -692,7 +781,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const axes: Record<string, string> = {}
       for (const k of Object.keys(DEF) as (keyof typeof DEF)[])
         if (S.current[k] !== DEF[k]) axes[k] = S.current[k]
-      u.saved = [...(u.saved || []).filter((x) => x.name !== name), { name, axes }]
+      u.saved = [...(u.saved || []).filter((x) => x.name !== name), { name, axes, at: Date.now() }]
       storeSaved(u.saved)
       if (inp) inp.value = ''
       toast(`Сценарий «${name}» сохранён`)
@@ -701,7 +790,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const ap = at('[data-apply]')
     if (ap) {
       const found = (u.saved || []).find((x) => x.name === ap.dataset.apply)
-      if (found) { S.current = { ...DEF, ...found.axes }; modal.current = null; toast(`Сценарий «${found.name}»`) }
+      if (found) {
+        pushHist()
+        /* «Поверх текущего» не сбрасывает остальные оси — так наборы складываются */
+        S.current = ap.hasAttribute('data-over') ? { ...S.current, ...found.axes } : { ...DEF, ...found.axes }
+        modal.current = null; toast(`Сценарий «${found.name}»`)
+      }
       return bump()
     }
     const dls = at('[data-delsave]')
