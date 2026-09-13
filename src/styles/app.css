@@ -290,7 +290,12 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Меню действий и его заблокированный пункт */
 /* Экшн-меню строки воркера — 169×192 из макета 173:59516 */
 /* Размер из макета: четыре пункта по 40 с шагом 8 в поле 169×192 */
-.pop.menu.wkmenu{width:169px;min-width:169px;height:192px;padding:4px 12px;gap:4px;align-items:stretch;overflow:hidden}
+/* Пункты 40 с шагом 48: разделитель несёт зазор сам, поэтому gap нулевой,
+   иначе строки расходятся и последний пункт обрезается высотой меню */
+.pop.menu.wkmenu{width:169px;min-width:169px;height:192px;padding:4px 12px;gap:0;
+  align-items:stretch;overflow:visible}
+.pop.menu.wkmenu>button,.pop.menu.wkmenu>.mi{flex:0 0 40px}
+.pop.menu.wkmenu .mdiv{flex:0 0 1px;margin:3.5px 0}
 .pop.menu.wkmenu>button,.pop.menu.wkmenu .mi{padding:0!important}
 /* меню не прокручивается, жёлоб под полосу не нужен */
 .pop.menu.wkmenu,.pop.menu.expmenu,.pop.menu.coinmenu{scrollbar-gutter:auto}
@@ -1430,7 +1435,7 @@ button.scsect:hover{color:var(--accent)}
 .pop.menu.expmenu{width:200px;min-width:200px;padding:6px 12px;gap:0}
 .pop.menu.expmenu>button{gap:8px;height:40px;padding:0!important;font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
 .pop.menu.expmenu button svg{width:24px;height:24px;flex:0 0 auto;color:var(--c1)}
-.mdiv{height:1px;background:var(--border);margin:4px 0}
+.mdiv{height:1px;flex:0 0 1px;background:var(--border);margin:4px 0}
 /* Модалка экспорта — 400 по макету 173:66473, кнопки друг под другом */
 /* Модалка экспорта в макете фиксированные 400×820: подвал прижат к низу */
 .modal.xs{max-width:400px;height:820px}
