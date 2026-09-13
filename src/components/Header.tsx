@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import {
-  CHECK, I, NOTIF_N, PROF, TITLES, acctSummary, nf, notifications, permsOf, profTabs, type Model,
+  CHECK, I, NOTIF_N, PROF, SUM_ROUTES, TITLES, acctSummary, nf, notifications, permsOf, profTabs, type Model,
 } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico, Raw } from './Raw'
@@ -47,7 +47,7 @@ export function Header({ m }: { m: Model }) {
           <span className="pop-wrap">
             <button className={`hbtn ${pop === 'acct' ? 'open' : ''} ${obs ? 'flat' : ''}`}
               data-pop={obs ? undefined : 'acct'} disabled={obs}>
-              {route === 'summary' ? 'Сводка по аккаунтам (46)' : acct}
+              {SUM_ROUTES.has(route) ? 'Сводка по аккаунтам (46)' : acct}
               {!obs && <Ico html={I.cd} />}
             </button>
             {pop === 'acct' && <Raw html={acctSummary(m)} />}

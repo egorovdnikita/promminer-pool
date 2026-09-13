@@ -1,4 +1,4 @@
-import { allowed, GROUP_OF, I, LINKS, LOGO, NAV } from '@/legacy/prototype'
+import { allowed, GROUP_OF, I, LINKS, LOGO, NAV, SUM_NAV, SUM_ROUTES } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico } from './Raw'
 
@@ -8,11 +8,15 @@ export function Sidebar() {
   const ok = allowed()
   /* «Серийные номера» и деталка живут внутри «Воркеров» — подсвечиваем их */
   const act = route === 'serials' || route === 'worker' ? 'workers' : route
-  const nav = ok
-    ? NAV.map((o) =>
-        o.kids ? { ...o, kids: o.kids.filter(([id]) => ok.has(id)) } : o,
-      ).filter((o) => (o.kids ? o.kids.length > 0 : ok.has(o.id!)))
-    : NAV
+  /* В сводке по аккаунтам сайдбар другой: Главная, Воркеры и Финансы (92:23145) */
+  const sum = SUM_ROUTES.has(route)
+  const nav = sum
+    ? SUM_NAV
+    : ok
+      ? NAV.map((o) =>
+          o.kids ? { ...o, kids: o.kids.filter(([id]) => ok.has(id)) } : o,
+        ).filter((o) => (o.kids ? o.kids.length > 0 : ok.has(o.id!)))
+      : NAV
 
   return (
     <aside className="sb">
@@ -47,14 +51,19 @@ export function Sidebar() {
           )
         })}
       </nav>
-      <div className="sep" />
-      <div style={{ padding: '0 12px' }}>
-        <a className="ni" href={LINKS.kb} target="_blank" rel="noopener">
-          <Ico className="nic" html={I.book} />
-          <span className="lbl">База знаний</span>
-          <Ico className="spacer lbl ico" html={I.ext} />
-        </a>
-      </div>
+      {/* «База знаний» в режиме сводки не показывается */}
+      {!sum && (
+        <>
+          <div className="sep" />
+          <div style={{ padding: '0 12px' }}>
+            <a className="ni" href={LINKS.kb} target="_blank" rel="noopener">
+              <Ico className="nic" html={I.book} />
+              <span className="lbl">База знаний</span>
+              <Ico className="spacer lbl ico" html={I.ext} />
+            </a>
+          </div>
+        </>
+      )}
       <button className="mini-btn" data-mini>
         <Ico className="nic" html={mini ? I.cv : I.cl} />
         <span className="lbl">Свернуть</span>

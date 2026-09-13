@@ -111,6 +111,8 @@ export declare function obsOf(m: any): any[]
 export declare function subsOf(m: any): any[]
 export declare function permsOf(): Record<string, number>
 export declare function coinsOf(): Set<string> | null
+export declare const SUM_NAV: typeof NAV
+export declare const SUM_ROUTES: Set<string>
 export declare const MODELS: [string, string][]
 export declare const TAGS: [string, string][]
 export declare function vendorOf(model: string): string

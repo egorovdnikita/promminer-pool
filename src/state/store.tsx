@@ -3,7 +3,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, groups, tagsOf, applyState, workersList, workersRows, obsOf, subsOf, coinsOf } from '@/legacy/prototype'
+import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, groups, tagsOf, applyState, workersList, workersRows, obsOf, subsOf, coinsOf, SUM_ROUTES } from '@/legacy/prototype'
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
@@ -86,7 +86,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const U = useRef<Ui>(freshUi())
   const pop = useRef<string | null>(null)
   const modal = useRef<string | null>(null)
-  const openGroups = useRef<Record<string, boolean>>({ fin: false, tools: false, ref: false })
+  const openGroups = useRef<Record<string, boolean>>({ fin: false, tools: false, ref: false, sfin: false })
   const mini = useRef(false)
   const panel = useRef(false)
   const toasts = useRef<{ id: number; msg: string }[]>([])
@@ -587,8 +587,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (ac) {
       S.current.acct = ac.dataset.acct!
       pop.current = null
+      /* выбор аккаунта выводит из режима сводки в кабинет этого аккаунта */
+      if (SUM_ROUTES.has(route)) go('home')
       /* под суб-аккаунтом часть разделов профиля недоступна — уводим на сводку */
-      if (S.current.acct === 'sub' && ['security', 'verification', 'subaccounts'].includes(route)) go('profile')
+      else if (S.current.acct === 'sub' && ['security', 'verification', 'subaccounts'].includes(route)) go('profile')
       return bump()
     }
     const pp = at('[data-pop]')

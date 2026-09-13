@@ -65,7 +65,7 @@ const PRESETS=[
 ];
 const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',health:'degraded',role:'owner',perm:'all',ocoins:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no',rdata:'ok'};
-let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
+let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false,sfin:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
 let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null};
 
@@ -354,13 +354,21 @@ const NAV=[
   {id:'monitor',t:'Мониторинг',ic:'bars'},
   {g:'ref',t:'Мои рефералы',ic:'ref',kids:[['ref','Общая информация'],['reflist','Список рефералов'],['refincome','Реферальный доход'],['refpayouts','Реферальные выплаты']]},
 ];
+/* Режим сводки по аккаунтам (92:23145, 101:30358, 92:24121, 92:23658):
+   сайдбар ужимается до трёх пунктов, и у каждого экрана свой заголовок. */
+const SUM_NAV=[
+  {id:'summary',t:'Главная',ic:'home'},
+  {id:'sumworkers',t:'Воркеры',ic:'pick2'},
+  {g:'sfin',t:'Финансы',ic:'card',kids:[['sumassets','Мои активы'],['sumincome','Доход']]}];
+const SUM_ROUTES=new Set(['summary','sumworkers','sumassets','sumincome']);
 const TITLES={home:'Главная',workers:'Воркеры',worker:'Ant01',serials:'Воркеры',assets:'Мои активы',income:'Доход',payouts:'Выплаты',
   report:'Отчет о майнинге',calc:'Калькулятор доходности',tax:'Калькулятор налогов',
-  monitor:'Мониторинг',summary:'Сводка по аккаунтам',
+  monitor:'Мониторинг',summary:'Главная сводки',sumworkers:'Сводка по воркерам',
+  sumassets:'Сводка по моим активам',sumincome:'Сводка по доходу',
   ref:'Promminer: реферальная программа',reflist:'Список рефералов',refincome:'Реферальный доход',refpayouts:'Реферальные выплаты',
   profile:'Личный кабинет',security:'Личный кабинет',notifsettings:'Личный кабинет',notifconfig:'Личный кабинет',subaccounts:'Личный кабинет',
   observers:'Личный кабинет',verification:'Личный кабинет',auth:'Вход'};
-const GROUP_OF={assets:'fin',income:'fin',payouts:'fin',calc:'tools',tax:'tools',ref:'ref',reflist:'ref',refincome:'ref',refpayouts:'ref'};
+const GROUP_OF={sumassets:'sfin',sumincome:'sfin',assets:'fin',income:'fin',payouts:'fin',calc:'tools',tax:'tools',ref:'ref',reflist:'ref',refincome:'ref',refpayouts:'ref'};
 
 /* ============================================================
    5. ОБЩИЕ БЛОКИ
@@ -1341,6 +1349,26 @@ V.tax=m=>{
 };
 
 /* --- Мониторинг --- */
+/* Таблица «Общий доход» — общая для главной сводки и сводки по доходу (92:23145) */
+const TOTAL_INC=[['30.04.2026',10,'499 320','0,09','0,08096645','6 561,93','488 836,1'],
+  ['29.04.2026',4,'498 176','0,08','0,03001855','2 418,35','178 447,61'],
+  ['28.04.2026',4,'494 925','0,08','0,07898724','6 317,08','468 866,52'],
+  ['27.04.2026',5,'495 999','0,06','0,07934908','6 332,85','471 014,39'],
+  ['26.04.2026',4,'498 176','0,09','0,08166533','6 517,71','484 763,6']];
+const totalIncomeTable=m=>`<div class="tw"><table class="tbl"><thead><tr><th>Дата</th>
+  <th>Количество аккаунтов</th>
+  <th>Хэшрейт, 24 ч <i class="tipi" data-tip="Средний хэшрейт по всем аккаунтам за 24 ч">${I.inf}</i></th>
+  <th class="num">Доход с 1 ${m.c.short}, ${m.bal[0].s}</th><th class="num">Доход, ${m.bal[0].s}</th>
+  <th class="num">Доход, $ <i class="tipi" data-tip="Доход в $ рассчитывается исходя из курса валюты в этот день в 00:00 (UTC)">${I.inf}</i></th>
+  <th class="num">Доход, ₽ <i class="tipi" data-tip="Доход в ₽ рассчитывается исходя из курса валюты в этот день в 00:00 (UTC)">${I.inf}</i></th>
+  <th></th></tr></thead><tbody>
+  ${TOTAL_INC.map(r=>`<tr><td class="mono">${r[0]}</td><td class="mono">${r[1]}</td>
+    <td class="mono">${r[2]} ${m.c.unit}</td>
+    <td class="num mono">${r[3]} ${m.bal[0].s}</td><td class="num mono">${r[4]} ${m.bal[0].s}</td>
+    <td class="num mono">${r[5]} $</td><td class="num mono">${r[6]} ₽</td>
+    <td class="num dim">${I.cv}</td></tr>`).join('')}
+</tbody></table></div>`;
+
 /* Главная сводки (макет 92:23145) — агрегат по всем аккаунтам. На проде
    в неё попадают из переключателя аккаунтов, а не из «Мониторинга». */
 V.summary=m=>`
@@ -1368,17 +1396,73 @@ ${card(`<div class="ch"><h2>Детализация хэшрейта (${m.bal[0].
     <tr class="hl"><td><b>Все аккаунты</b></td><td class="mono">16 000 ${m.c.unit}</td><td class="mono">14 543 ${m.c.unit}</td><td class="mono">16 216 ${m.c.unit}</td><td class="mono">700</td><td class="mono">100</td><td class="mono">134</td><td class="mono">561</td><td class="mono">0,1 %</td></tr>
   </tbody></table></div>`)}
 <div style="height:12px"></div>
-${card(`<div class="ch"><h2>Общий доход</h2><div class="spacer"></div><button class="ib sm">${I.dl}</button></div>
-  <div class="tw"><table class="tbl"><thead><tr><th>Дата</th><th>Количество аккаунтов</th><th>Хэшрейт, 24 ч ${I.inf}</th>
-    <th class="num">Доход с 1 ${m.c.short}, ${m.bal[0].s}</th><th class="num">Доход, ${m.bal[0].s}</th><th class="num">Доход, $ ${I.inf}</th><th class="num">Доход, ₽ ${I.inf}</th><th></th></tr></thead><tbody>
-    ${[['30.04.2026',10,'499 320','0,09','0,08096645','6 561,93','488 836,1'],['29.04.2026',4,'498 176','0,08','0,03001855','2 418,35','178 447,61'],
-      ['28.04.2026',4,'494 925','0,08','0,07898724','6 317,08','468 866,52'],['27.04.2026',5,'495 999','0,06','0,07934908','6 332,85','471 014,39'],
-      ['26.04.2026',4,'498 176','0,09','0,08166533','6 517,71','484 763,6']]
-      .map(r=>`<tr><td class="mono">${r[0]}</td><td class="mono">${r[1]}</td><td class="mono">${r[2]} ${m.c.unit}</td>
-        <td class="num mono">${r[3]} ${m.bal[0].s}</td><td class="num mono">${r[4]} ${m.bal[0].s}</td><td class="num mono">${r[5]} $</td>
-        <td class="num mono">${r[6]} ₽</td><td class="num dim">${I.cv}</td></tr>`).join('')}
-  </tbody></table></div>
-  <div style="text-align:center;padding-top:12px"><a href="#">Весь доход</a></div>`)}`;
+${card(`<div class="ch"><h2>Общий доход</h2><div class="spacer"></div>
+  <button class="ib" data-modal="export" data-ex="inc">${I.dl}</button></div>
+  ${totalIncomeTable(m)}
+  <div class="sumall"><button class="btn g xs" data-go="sumincome">Весь доход</button></div>`)}`;
+
+/* Сводка по моим активам (92:24121): плашка баланса и таблица только на чтение */
+V.sumassets=m=>{
+  const k=m.empty?0:1;
+  const sum=f=>nf(ASSETS.reduce((a,x)=>a+x[f],0)*k,0);
+  return `<div class="abal">
+    <div class="abv"><span class="l">Общий баланс</span>
+      <span class="ar"><b>${sum('u')} $</b><span>≈ ${sum('r')} ₽</span></span></div></div>
+  ${card(`<div class="tw"><table class="tbl atbl"><thead><tr><th>Монеты</th><th>Баланс</th>
+    <th><span class="thico">${USD_ICON} Баланс, $</span></th>
+    <th><span class="thico">${I.rub} Баланс, ₽</span></th></tr></thead><tbody>
+    ${ASSETS.map(a=>`<tr><td><span class="coin">${COIN_ICON[a.s]}${a.s}</span></td>
+      <td class="mono">${dec(a.v*k)} ${a.s}</td><td class="mono">${nf(a.u*k)} $</td>
+      <td class="mono">${nf(a.r*k)} ₽</td></tr>`).join('')}
+  </tbody></table></div>`)}`};
+
+/* Сводка по доходу (92:23658): баланс, график общего дохода и та же таблица */
+V.sumincome=m=>`
+${card(`<div class="hero"><div class="hval"><div class="l">Текущий общий баланс</div>
+    <div class="v mono">${dec(m.bal[0].v)} ${m.bal[0].s}</div>
+    <div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div></div>`)}
+<div style="height:12px"></div>
+${card(`<div class="ch"><h2>График общего дохода</h2><div class="spacer"></div>
+  ${dayChips('sumincome-range')}${dateInput()}</div>
+  ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:['15.07','16.07','17.07','18.07','19.07','20.07','21.07']})}`)}
+<div style="height:12px"></div>
+${card(`<div class="ch"><h2>Общий доход</h2><div class="spacer"></div>
+  <button class="ib" data-modal="export" data-ex="inc">${I.dl}</button></div>${totalIncomeTable(m)}`)}`;
+
+/* Сводка по воркерам (101:30358): те же показатели и плитки, но в таблице
+   добавлена колонка «Аккаунт» — парк собран со всех суб-аккаунтов. */
+V.sumworkers=m=>{
+  const st=[['Активные',m.h.a,'#22c55e',I.warr],['Низкий хэшрейт',m.h.l,'#f59e0b',I.wdng],
+            ['Отключены',m.h.o,'#ef4444',I.wrec],['Оффлайн',m.h.f,'#6b7280',I.woff]];
+  const wst=(l,v,d='')=>`<div class="wst"><div class="l">${l}</div><div class="v mono">${v}${d}</div></div>`;
+  const rows=workersRows(m).slice(0,20).map((w,i)=>{const[lbl,col]=WST[w.st];
+    return `<tr><td><b>${w.name}</b></td><td class="mut">${ACCOUNTS[i%ACCOUNTS.length]}</td>
+      <td class="mut"><span class="vcell">${vlogo(vendorOf(w.model))}<span>${w.model}</span></span></td>
+      <td><i class="dot" style="display:inline-block;background:${col};margin-right:8px"></i>${lbl}</td>
+      <td class="mono">${nf(w.h5,2)} ${m.c.unit}</td><td class="mono">${nf(w.h1,2)} ${m.c.unit}</td>
+      <td class="mono">${nf(w.h24,2)} ${m.c.unit}</td><td class="mono">${nf(w.rej,2)}%</td>
+      <td class="mono">${w.up}%</td><td class="mono mut">${shareAt(w.sh)}</td></tr>`}).join('');
+  return `
+  ${card(`<div class="whero"><span class="l">Общий средний хэшрейт за 24 ч</span>
+      <span class="vrow"><b class="v mono">${m.avg} ${m.c.unit}</b>${dyn('teal','10%')}</span></div>
+    <div class="wstats">
+      ${wst('Средний хэшрейт за 5 мин',`${m.h5} ${m.c.unit}`)}
+      ${wst('Реджект за 24 ч',m.empty?'0%':m.c.rej,dyn('neg','10%'))}
+      ${wst('Средний хэшрейт за 1 ч',`${m.h1} ${m.c.unit}`)}
+      ${wst('Uptime за 24 ч',m.empty?'0%':m.c.up,dyn('ok','10%'))}
+    </div>`,'wcard')}
+  <div class="grid g4" style="gap:16px;margin:0">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap">${l}</div><div class="n mono">${ni(n)}</div></div>
+    <div class="ic" style="background:${c}29;color:${c}">${g}</div></div>`).join('')}</div>
+  <div style="height:16px"></div>
+  ${card(`<div class="ch"><h2>Воркеры (${ni(m.total)})</h2><div class="spacer"></div>
+    <span class="search">${I.srch} Найти воркер</span>
+    <button class="ib" data-modal="export" data-ex="hours">${I.dl}</button></div>
+    ${m.rows?`<div class="tw"><table class="tbl"><thead><tr><th>Наименование</th><th>Аккаунт</th><th>Модель</th>
+      <th>Статус</th><th>Хэшрейт, 5 мин</th><th>Хэшрейт, 1 ч</th><th>Хэшрейт, 24 ч</th>
+      <th>Реджект, 24 ч</th><th>Uptime</th><th>Отпр. шары</th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${pager('sumworkers',m.total,20)}`
+      :emptyBox('Воркеров пока нет','Подключите оборудование, чтобы увидеть его в сводке')}`)}`;
+};
 
 /* Мониторинг (прод /monitoring): промо-страница раздела, а не сводка */
 const MON_SECS=[
@@ -1397,7 +1481,7 @@ ${card(`<div class="monhero">
   <p>Раздел личного кабинета, где вы в реальном времени отслеживаете состояние оборудования
     и доходность. Все ключевые данные собраны в одном месте, без сложных настроек</p>
   <button class="btn" data-toast="Заявка отправлена — мы свяжемся с вами">Получить предложение</button>
-  <div class="monart"></div>
+  <img class="monart" src="/monitoring-hero.webp" alt="" width="2000" height="656">
 </div>`)}
 <div style="height:12px"></div>
 ${card(MON_SECS.map(([t,xs],i)=>`${i?'<div class="hr"></div>':''}
@@ -2825,6 +2909,6 @@ export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   loadFail, nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
-  V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf, coinsOf,
+  SUM_NAV, SUM_ROUTES, V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf, coinsOf,
   S, U, route, pop, modal, openGroups, mini,
 };
