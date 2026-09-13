@@ -527,6 +527,10 @@ img.hex{object-fit:contain}
 .inp:hover{background:var(--ctrl-hover)}
 .inp:focus-within{background:var(--surface);border-color:var(--border)}
 .inp .k{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
+/* Input из ДС: пока поле пустое, видна только подсказка 16; как только
+   в поле что-то есть или оно в фокусе — сверху появляется подпись 12 */
+.inp:not(:focus-within):has(input:placeholder-shown) .k{display:none}
+.inp input::placeholder{color:var(--c2);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .inp input{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .tabs2{display:flex;gap:2px;background:var(--bg);border-radius:var(--r-2xs);padding:3px;margin-bottom:18px}
 .tabs2 button{flex:1;text-align:center;padding:8px;border-radius:var(--r-2xs);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c2)}
@@ -1431,7 +1435,7 @@ button.scsect:hover{color:var(--accent)}
 .qlinks .btn{height:40px;gap:8px;font-size:var(--fs-s);line-height:var(--lh-s)}
 
 /* --- Группы и теги: создание, правка, удаление (173:61615, 173:62151) --- */
-.modal.tx{max-height:min(86vh,1010px)}
+/* высоту ограничивает общее правило .modal — окно минус 35 сверху и снизу */
 .tmake{width:100%;height:56px;justify-content:center;margin-top:16px}
 .tmake.dis{opacity:.4;pointer-events:none}
 .inp.ta{min-height:96px;align-items:stretch;justify-content:flex-start;padding:12px}
@@ -1443,17 +1447,28 @@ button.scsect:hover{color:var(--accent)}
 .sw.on{box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--focus)}
 .sw svg{width:16px;height:16px}
 .tyour{display:block;font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;margin-bottom:20px}
-.trow{display:flex;align-items:center;gap:12px;min-height:44px;
-  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
-.tlist{display:flex;flex-direction:column;gap:4px;padding-bottom:8px}
+/* Строка «Выбрать все»: подпись Tertiary и разделитель снизу (173:61616) */
+.trow{display:flex;align-items:center;gap:12px;min-height:44px;padding-bottom:8px;
+  border-bottom:1px solid var(--border);
+  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c3)}
+/* Прокручивается только список, форма сверху остаётся на месте (173:61671) */
+.tlist{display:flex;flex-direction:column;gap:4px;padding:8px 0;overflow-y:auto;min-height:0}
+.modal.tx .mbody{display:flex;flex-direction:column;overflow:hidden}
+.modal.tx .mbody>.slot{display:contents}
 .tcard{display:flex;align-items:center;gap:12px;height:64px;padding:8px;border-radius:var(--r-m);
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
 .tcard:hover,.tcard.on{background:var(--ctrl2)}
 .tcard .tdesc{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
-.tcard .ibr{width:48px;height:48px;border-radius:var(--r-m);color:var(--c3);flex:0 0 auto}
-.tcard .ibr:hover{background:var(--ctrl);color:var(--c1)}
-.tcard .ibr.del:hover{color:var(--neg)}
+/* Кнопки строки: «изменить» акцентом, «удалить» красным, подложка 12 % */
+.tcard .ibr{width:48px;height:48px;border-radius:var(--r-m);flex:0 0 auto}
+.tcard .ted{background:var(--accent-sub);color:var(--accent)}
+.tcard .tdl{background:#ef44441f;color:var(--neg)}
+.tcard .tyes{background:var(--accent-sub);color:var(--accent)}
+.tcard .tno{background:var(--ctrl);color:var(--c1)}
+.tcard .ibr:hover{opacity:.8}
+.tcard.edit{gap:8px}
+.tcard .inp.row{flex:1;min-width:0;margin:0;height:48px;min-height:48px}
 .tempty{text-align:center;padding:40px 0 24px}
 .tempty b{display:block;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;margin-bottom:8px}
 .tempty p{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)}

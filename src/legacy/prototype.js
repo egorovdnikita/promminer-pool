@@ -655,33 +655,41 @@ const TX={g:{one:'группу',your:'Ваши группы',make:'Создат�
    тогда чекбокс означает «привязан», а не «выбран для удаления». */
 function taxonBody(k,bind){
   const list=taxon(k), t=TX[k], ed=U.ted;
-  const name=U.tname??(ed!=null&&list[ed]?list[ed].n:'');
   const sel=k==='g'?U.gsel:U.tsel, bound=k==='g'?U.wgrp:U.wtag;
   const mark=bind?bound:sel;
   const allOn=list.length>0&&list.every((_,i)=>mark.has(i));
+  const name=U.tname||'';
+  /* Форма сверху всегда создаёт новое; правка идёт прямо в строке списка
+     (макет 173:67199): имя превращается в поле с крестиком и галочкой */
+  const row=(it,i)=>ed===i
+    ? `<div class="tcard edit">${cb(mark.has(i))}
+        <label class="inp row"><input id="tedit" maxlength="10" placeholder="Наименование"
+          value="${String(it.n).replace(/"/g,'&quot;')}"></label>
+        <button class="ibr tno" data-tcancel data-tip="Отменить">${I.x}</button>
+        <button class="ibr tyes" data-tsave2="${k}" data-tip="Сохранить">${CHECK}</button></div>`
+    : `<div class="tcard ${mark.has(i)?'on':''}">
+        ${cb(mark.has(i),`data-tpick="${k}:${i}"`)}
+        ${k==='t'?`<span class="tag" style="background:${it.c}1f;color:${it.c}">${it.n}</span>
+          <span class="tdesc">${it.d||''}</span>`:`<span class="tx">${it.n}</span>`}
+        <div class="spacer"></div>
+        <button class="ibr ted" data-ted="${k}:${i}" data-tip="Изменить">${I.edit}</button>
+        <button class="ibr tdl" data-modal="${k}del" data-ted1="${k}:${i}" data-tip="Удалить">${I.tr}</button>
+      </div>`;
   return `
   <div class="inp" style="margin:0"><div class="k">Наименование</div>
-    <input id="tname" maxlength="10" placeholder="До 10 символов" value="${String(name).replace(/"/g,'&quot;')}"></div>
+    <input id="tname" maxlength="10" placeholder="Наименование" value="${String(name).replace(/"/g,'&quot;')}"></div>
   ${k==='t'?`<div class="inp ta"><div class="k">Описание</div>
-    <input id="tdesc" maxlength="100" placeholder="Необязательно, до 100 символов" value="${String(U.tdesc??(ed!=null&&list[ed]?list[ed].d:'')).replace(/"/g,'&quot;')}"></div>
+    <input id="tdesc" maxlength="100" placeholder="Описание" value="${String(U.tdesc||'').replace(/"/g,'&quot;')}"></div>
   <div class="tcolor"><div class="k">Выберите цвет тега</div>
     <div class="swatches">${TAG_COLORS.map(c=>`<button class="sw ${(U.tcol||TAG_COLORS[0])===c?'on':''}" style="background:${c}" data-tcol="${c}">${(U.tcol||TAG_COLORS[0])===c?CHECK:''}</button>`).join('')}</div></div>`:''}
-  <button class="btn tmake ${name.trim()?'':'dis'}" ${name.trim()?`data-tsave="${k}" data-toast="${ed!=null?(k==='g'?'Группа изменена':'Тег изменён'):(k==='g'?'Группа создана':'Тег создан')}"`:'disabled'}>
-    ${ed!=null?'Сохранить':t.make}</button>
+  <button class="btn tmake ${name.trim()?'':'dis'}" ${name.trim()?`data-tsave="${k}" data-toast="${k==='g'?'Группа создана':'Тег создан'}"`:'disabled'}>${t.make}</button>
   <div class="hr"></div>
   <b class="tyour">${t.your}</b>
   ${list.length?`
   <div class="trow head">${cb(allOn,`data-tall="${k}"`)}<span class="tx">Выбрать все</span>
     <div class="spacer"></div>
     ${!bind&&sel.size?`<button class="btn link del" data-modal="${k}del">Удалить</button>`:''}</div>
-  <div class="tlist">${list.map((it,i)=>`<div class="tcard ${mark.has(i)?'on':''}">
-    ${cb(mark.has(i),`data-tpick="${k}:${i}"`)}
-    ${k==='t'?`<span class="tag" style="background:${it.c}1f;color:${it.c}">${it.n}</span>
-      <span class="tdesc">${it.d||''}</span>`:`<span class="tx">${it.n}</span>`}
-    <div class="spacer"></div>
-    <button class="ibr" data-ted="${k}:${i}" data-tip="Изменить">${I.edit}</button>
-    <button class="ibr del" data-modal="${k}del" data-ted1="${k}:${i}" data-tip="Удалить">${I.tr}</button>
-  </div>`).join('')}</div>`
+  <div class="tlist">${list.map(row).join('')}</div>`
   :`<div class="tempty"><b>${t.none}</b><p>${t.hint}</p></div>`}`;
 }
 
@@ -2134,7 +2142,7 @@ const MODALS={
       <button class="btn out" data-close>Отменить</button>`},
   wallet:{ok:'Кошелёк добавлен',t:'Добавить кошелек',s:'Адрес будет использоваться для выводов по этой монете',b:()=>`
     <div class="inp"><div class="k">Сеть</div><input value="Bitcoin (BTC)"></div>
-    <div class="inp"><div class="k">Адрес кошелька</div><input placeholder="bc1q…"></div>
+    <div class="inp"><div class="k">Адрес кошелька</div><input placeholder="Адрес кошелька"></div>
     <div class="alert warn" style="margin-top:10px">⚠ Проверьте адрес — транзакции в блокчейне необратимы</div>`},
   withdraw:{ok:'Заявка на вывод создана',t:'Вывод средств',s:'Средства уйдут на подтвержденный адрес',b:m=>`
     <div class="inp"><div class="k">Сумма, ${m.bal[0].s}</div><input value="${nf(m.bal[0].v,8)}"></div>

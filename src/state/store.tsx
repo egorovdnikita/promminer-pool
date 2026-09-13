@@ -236,13 +236,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
       set.has(n) ? set.delete(n) : set.add(n)
       return bump()
     }
-    /* «Изменить» в строке — имя и описание уезжают в форму сверху */
+    /* «Изменить» превращает строку в поле ввода (макет 173:67199) */
     const ted = at('[data-ted]')
     if (ted) {
-      const [k, i] = ted.dataset.ted!.split(':')
-      const it = listOf(k)[+i] as { n: string; d?: string; c?: string }
-      u.ted = +i; u.tname = it.n; u.tdesc = it.d || ''; u.tcol = it.c || '#ef4444'
+      const [, i] = ted.dataset.ted!.split(':')
+      u.ted = +i; u.tname = ''
       return bump()
+    }
+    if (at('[data-tcancel]')) { u.ted = null; u.tname = ''; return bump() }
+    const ts2 = at('[data-tsave2]')
+    if (ts2) {
+      const k = ts2.dataset.tsave2!, list = listOf(k)
+      const inp = ts2.closest('.tcard')?.querySelector('input') as HTMLInputElement | null
+      const name = (inp?.value || '').trim()
+      if (name && u.ted != null && list[u.ted]) Object.assign(list[u.ted] as object, { n: name })
+      u.ted = null; u.tname = ''
+      bump()
+      return toast(k === 'g' ? 'Группа изменена' : 'Тег изменён')
     }
     /* Корзина в строке — удаляем именно её, не трогая общий выбор */
     const ted1 = at('[data-ted1]')
@@ -255,8 +265,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (tsave) {
       const k = tsave.dataset.tsave!, list = listOf(k), name = (u.tname || '').trim()
       if (!name) return
-      if (u.ted != null && list[u.ted]) Object.assign(list[u.ted] as object, { n: name, d: u.tdesc, c: u.tcol })
-      else (list as { n: string; d?: string; c?: string }[]).push(
+      ;(list as { n: string; d?: string; c?: string }[]).push(
         k === 'g' ? { n: name, c: '0' } : { n: name, d: u.tdesc || '', c: u.tcol || '#ef4444' })
       u.ted = null; u.tname = ''; u.tdesc = ''
       bump()
