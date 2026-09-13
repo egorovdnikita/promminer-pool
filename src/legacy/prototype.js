@@ -20,6 +20,7 @@ const AXES={
   data:{g:'Данные',label:'Наполнение данными',opts:[['normal','Норма'],['empty','Пусто'],['few','Мало записей'],['huge','Большие значения']]},
   health:{g:'Данные',label:'Здоровье парка',opts:[['ok','Всё живо'],['degraded','Деградация'],['critical','Авария']]},
   load:{g:'Данные',label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон'],['err','Ошибка загрузки']]},
+  rdata:{g:'Отчет',label:'Данные воркеров',opts:[['ok','Заполнены'],['no','Не у всех воркеров'],['del','Нет у удалённых']]},
   awal:{g:'Мои активы',label:'Кошельки',opts:[['some','Как в макете'],['all','У всех монет'],['none','Не добавлены']]},
   apay:{g:'Мои активы',label:'Автовыплаты',opts:[['btc','Только BTC'],['all','У всех монет'],['none','Выключены']]},
   aerr:{g:'Мои активы',label:'Ошибка в поле',opts:[['no','Нет'],['req','Не заполнено'],
@@ -62,10 +63,10 @@ const PRESETS=[
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
 const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',health:'degraded',role:'owner',perm:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
-  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no'};
+  phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no',rdata:'ok'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -1188,34 +1189,59 @@ function payoutsScreen(m,own){
 V.payouts=m=>payoutsScreen(m,true);
 
 /* --- Отчет о майнинге --- */
-V.report=m=>`
-<div class="row" style="align-items:flex-start;gap:20px;margin-bottom:14px;flex-wrap:wrap">
-  <div style="flex:1;min-width:320px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)">
-    <b style="color:var(--c1)">Важно</b> <a href="#">Как это работает?</a><br>
-    Отчет о майнинге необходимо подавать <b style="color:var(--c1)">до 20 числа</b> месяца, следующего за отчетным.<br>
-    Если вы подключились к пулу после начала отчетного периода, данные в отчете будут неполными.<br>
-    После генерации отчета в разделе профиля <a href="#" data-go="observers">Наблюдатели</a> будет создана ссылка на просмотр ваших воркеров и финансов
-  </div>
-  <div class="row" style="gap:8px;flex-wrap:wrap">
-    <button class="btn w sm">${I.dl} Часы работы воркеров</button>
-    <button class="btn w sm">${I.dl} Доход за период</button>
-    <button class="btn w sm">${I.dl} Кошельки пула</button>
-  </div>
-</div>
-${card(`<div class="callout" style="margin-bottom:14px"><button class="x">${I.x}</button>
-  <b>Для генерации корректного отчета</b>
-  <ol><li>Единоразово заполните поля «Модель» и «Заводской номер» <a href="#" data-go="workers">в детальных карточках воркеров</a></li>
-  <li>Единоразово заполните свои данные в Профиле в разделе <a href="#" data-go="verification">Верификация</a></li></ol></div>
-  <div class="tw"><table class="tbl"><thead><tr><th>Месяц</th><th>Год</th><th>Аккаунты</th><th>Дата генерации</th><th>Статус</th><th></th><th></th></tr></thead><tbody>
-  ${[['Май','2026','','','wait'],['Апрель','2026','natarusso','04.05.2026 12:07','ok'],
-    ['Март','2026','natarusso, ivanivanov, loricarson, natapetrova, alex12345, petrminer77, sergeiv, billterry, petrovan, alexminer,…','11.04.2026 14:32','ok'],
-    ['Февраль','2026','natarusso, larusso','01.04.2026 11:07','err'],['Январь','2026','natarusso, larusso','22.01.2026 11:07','ok']]
-    .map(([mo,y,a,d,st])=>`<tr><td>${mo}</td><td class="mono">${y}</td>
-      <td class="mut" style="max-width:420px;overflow:hidden;text-overflow:ellipsis">${m.empty?'':a}</td><td class="mono mut">${m.empty?'':d}</td>
-      <td>${status(st==='ok'?'ok':st==='err'?'err':'off',st==='ok'?'СГЕНЕРИРОВАН':st==='err'?'ЕСТЬ ОШИБКИ':'ОЖИДАЕТ')}</td>
-      <td class="num"><button class="btn sm" ${S.role==='observer'?'disabled':''} data-toast="Отчёт за ${mo} ${y} поставлен в очередь">Сгенерировать</button></td>
-      <td class="num"><button class="btn g sm" ${st==='ok'?'':'disabled'}>${I.dl} Скачать</button></td></tr>`).join('')}
-  </tbody></table></div>`)}`;
+/* Отчет о майнинге (макет 109:19476). Кнопка «Сгенерировать» — это флоу:
+   без данных верификации она заблокирована, дальше одна из трёх модалок. */
+const REPORTS=[
+  ['Май','2026','','','wait'],
+  ['Апрель','2026','natarusso','04.05.2026 12:07','ok'],
+  ['Март','2026','natarusso, ivanivanov, loricarson, natapetrova, alex12345, petrminer77, sergeiv, billterry, petrovan, alexminer','11.04.2026 14:32','ok'],
+  ['Февраль','2026','natarusso, larusso','01.04.2026 11:07','err'],
+  ['Январь','2026','natarusso, larusso','22.01.2026 11:07','none']];
+const REP_ST={wait:['off','Ожидает'],gen:['warn','Генерируется'],ok:['ok','Сгенерирован'],
+  err:['err','Есть ошибки'],none:['off','Нет данных']};
+/* Кошельки пула (109:20548) и воркеры без модели и номера (109:19774) */
+const POOL_W=[['BTC','bc1qgyfhl3nkjwfjrklf2ud88gaqtnr90mrvfsds00'],
+  ['LTC','LUuWBhjTbR7ubptzmZWsHTH5viDAcAK4pu'],
+  ['DOGE','DGMB5PtVcC8QmTmz6iDWJmpxu1k23Dqz2y'],
+  ['ZEC','DGMB5PtVcC8QmTmz6iDWJmpxu1k23Dqz2y']];
+const REP_WK=[['pmineraccount.0010189567777','нет','есть'],['pmineraccount.002','нет','нет'],
+  ['Ant05','нет','есть'],['Ant06','есть','нет']];
+const REP_TIP='Для генерации отчета, заполните данные в разделе «Верификация»';
+const repModal=()=>S.rdata==='no'?'repwk':S.rdata==='del'?'repdel':'repacc';
+
+V.report=m=>{
+  const ro=S.role==='observer', noV=S.verif==='no';
+  return `<div class="rtop">
+  <div class="rinfo">
+    <p class="rh"><b>Важно</b><button class="lnk a" data-toast="Инструкция откроется в справке">Как это работает?</button></p>
+    <p>Отчет о майнинге необходимо подавать <b>до 20 числа</b> месяца, следующего за отчетным.
+      В случае, если вы подключились к нашему пулу после начала отчетного периода, данные в отчете будут неполными.
+      После генерации отчета в разделе профиля <button class="lnk a" data-go="observers">Наблюдатели</button>
+      будет создана ссылка на просмотр ваших воркеров и финансов</p></div>
+  <div class="racts">
+    <button class="btn w" data-modal="export" data-ex="hours">${I.dl}Часы работы воркеров</button>
+    <button class="btn w" data-modal="export" data-ex="inc">${I.dl}Доход за период</button>
+    <button class="btn w" data-modal="poolw">${I.dl}Кошельки пула</button>
+  </div></div>
+  ${card(`${U.rnote?'':`<div class="rnote">
+    <div><b>Для генерации корректного отчета</b>
+      <ol><li>Единоразово заполните поля «Модель» и «Заводской номер»
+        <button class="lnk a" data-go="workers">в детальных карточках воркеров</button></li>
+      <li>Единоразово заполните свои данные в Профиле в разделе
+        <button class="lnk a" data-go="verification">Верификация</button></li></ol></div>
+    <button class="rx" data-rnote>${I.x}</button></div>`}
+  <div class="tw"><table class="tbl rtbl"><thead><tr><th>Месяц</th><th>Год</th><th>Аккаунты</th>
+    <th>Дата генерации</th><th>Статус</th><th></th><th></th></tr></thead><tbody>
+  ${REPORTS.map(([mo,y,a,d,st])=>{const [cls,lab]=REP_ST[st];
+    const off=ro||noV||st==='none';
+    const gen=`<button class="btn sm" ${off?'disabled':''} data-modal="${repModal()}">Сгенерировать</button>`;
+    return `<tr><td>${mo}</td><td class="mono">${y}</td>
+      <td class="racc">${m.empty?'':`<span data-tip="${a}">${a}</span>`}</td>
+      <td class="mono mut">${m.empty?'':d}</td>
+      <td>${status(cls,lab,'caps')}</td>
+      <td class="num">${noV&&!ro?`<span data-tip="${REP_TIP}">${gen}</span>`:gen}</td>
+      <td class="num"><button class="btn g sm" ${st==='ok'?'':'disabled'} data-toast="Отчет скачан">${I.dl}Скачать</button></td></tr>`}).join('')}
+  </tbody></table></div>${pager('report',REPORTS.length,10)}`)}`};
 
 /* --- Инструменты --- */
 V.calc=m=>card(`
@@ -2332,6 +2358,45 @@ const MODALS={
   waledit:{t:'Изменить адрес',acts:false,tall:11,
     b:(m,step)=>walletBody(step,true),
     foot:(m,step)=>walletFoot(step,'Адрес изменен')},
+  /* Выберите аккаунты (109:19936): две колонки чекбоксов и переключатель */
+  repacc:{t:'Выберите аккаунты',s:'по которым будет сгенерирован отчет',acts:false,tall:14,
+    b:m=>{const list=subsOf(m).filter(x=>!x.arch);
+      const sel=U.rsel||new Set(list.map(x=>x.name));
+      const half=Math.ceil(list.length/2);
+      const col=arr=>`<div class="racol">${arr.map(x=>
+        `<span class="rchk">${cb(sel.has(x.name),`data-rsel="${x.name}"`)}<span>${x.name}</span>
+          ${x.main?'<span class="tag g">Основной</span>':''}</span>`).join('')}</div>`;
+      return `<div class="mstack">${prog(0,1)}
+        <div class="rlist">
+          <div class="rhead"><span>Аккаунт</span>
+            <button class="lnk a" data-rall="${sel.size?'off':'on'}">${sel.size?'Снять все':'Выбрать все'}</button></div>
+          <div class="rcols">${col(list.slice(0,half))}${col(list.slice(half))}</div>
+        </div>
+        <div class="rsw"><div class="t"><span class="tog ${U.rdel?'on':''}" data-rdel></span>
+          <span>Включить в отчет удаленные воркеры</span></div>
+          <p class="ahint">Включайте, если вы заполнили у удаленных воркеров заводские номера и модели.
+            Если не заполнили — обратитесь в поддержку</p></div></div>`},
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-toast="Отчет поставлен в очередь на генерацию">Сгенерировать отчет</button>`},
+  /* Не заполнены данные воркеров (109:19774) */
+  repwk:{t:'Не заполнены данные',s:'воркеров',acts:false,tall:15,
+    b:()=>`<div class="mstack">
+      <p class="mtext">Для генерации корректного отчета заполните поля «Модель» и «Заводской номер»
+        в детальных карточках воркеров (нажмите на иконку карандаша).</p>
+      <div class="tw"><table class="tbl mini rwtbl"><thead><tr><th>Наименование</th><th>Номер</th><th>Модель</th></tr></thead>
+        <tbody>${REP_WK.map(([n,num,mod])=>`<tr><td>${n}</td>
+          <td class="${num==='нет'?'bad':''}">${num}</td><td class="${mod==='нет'?'bad':''}">${mod}</td></tr>`).join('')}
+        </tbody></table></div></div>`,
+    foot:()=>`<button class="btn wide" data-close>Закрыть</button>`},
+  /* Тот же заголовок, но данных нет только у удалённых (109:20541) */
+  repdel:{t:'Не заполнены данные',s:'воркеров',acts:false,tall:16,
+    b:()=>`<p class="mtext">У ваших удаленных воркеров не заполнены заводские номера и модели.
+      Если хотите их включить в отчет — обратитесь в поддержку</p>`,
+    foot:()=>`<button class="btn wide" data-close>Понятно</button>`},
+  /* Адреса кошельков пула (109:20548) */
+  poolw:{t:'Адреса кошельков пула',acts:false,tall:17,
+    b:()=>POOL_W.map(([c,a])=>urlRow(`Кошелек пула (${c})`,a)).join(''),
+    foot:()=>`<button class="btn g wide" data-close>Закрыть</button>`},
   /* Добавить суб-аккаунт (макет 880:41731): подсказка, поле и два правила под ним */
   /* Добавить суб-аккаунт (1482:83893 и соседние кадры): два шага,
      инфо-алерт, подсказки краснеют по нарушенному правилу */
@@ -2592,6 +2657,6 @@ export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   loadFail, nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
-  V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf,
+  V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf,
   S, U, route, pop, modal, openGroups, mini,
 };

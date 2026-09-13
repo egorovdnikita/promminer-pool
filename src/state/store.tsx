@@ -3,7 +3,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, groups, tagsOf, applyState, workersList, workersRows, obsOf } from '@/legacy/prototype'
+import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, groups, tagsOf, applyState, workersList, workersRows, obsOf, subsOf } from '@/legacy/prototype'
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
@@ -17,7 +17,7 @@ const freshUi = (): Ui => ({
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
   grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null, selq: '',
-  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null,
+  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false,
 })
 
 /** Свои сценарии живут в localStorage отдельно от текущего состояния. */
@@ -468,6 +468,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (md.dataset.ex) u.exk = md.dataset.ex
       /* модалки активов открываются на монете той строки, из которой нажали */
       if (md.dataset.coin) { u.coin2 = md.dataset.coin; u.thr = null }
+      /* генерация отчёта открывается со всеми отмеченными аккаунтами */
+      if (md.dataset.modal === 'repacc') {
+        u.rsel = new Set(subsOf(M()).filter((x: any) => !x.arch).map((x: any) => x.name))
+        u.rdel = false
+      }
       if (md.dataset.wk2) {
         const w2 = workersList(M()).find((w: any) => w.id === +md.dataset.wk2!)
         if (w2) { u.wk = w2; seedBind(w2) }
@@ -604,6 +609,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (vf) { U.current.vfile = vf.dataset.vfile !== 'off'; return bump() }
     const vb = at('[data-vbank]')
     if (vb) { U.current.vbank = vb.dataset.vbank!; pop.current = null; return bump() }
+    const rs = at('[data-rsel]')
+    if (rs) {
+      const n = rs.dataset.rsel!
+      const set = new Set(u.rsel || [])
+      set.has(n) ? set.delete(n) : set.add(n)
+      u.rsel = set; return bump()
+    }
+    const ra = at('[data-rall]')
+    if (ra) {
+      u.rsel = ra.dataset.rall === 'on'
+        ? new Set(subsOf(M()).filter((x: any) => !x.arch).map((x: any) => x.name))
+        : new Set()
+      return bump()
+    }
+    if (at('[data-rdel]')) { u.rdel = !u.rdel; return bump() }
+    if (at('[data-rnote]')) { u.rnote = true; return bump() }
     const c2 = at('[data-coin2]')
     if (c2) { u.coin2 = c2.dataset.coin2!; u.thr = null; pop.current = null; return bump() }
     const tr = at('[data-thr]')

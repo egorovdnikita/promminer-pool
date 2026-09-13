@@ -110,6 +110,12 @@ export interface Ui {
   coin2: string
   /** выбранный порог автовыплат в модалке */
   thr: string | null
+  /** отмеченные аккаунты в модалке генерации отчёта */
+  rsel: Set<string> | null
+  /** «включить удалённые воркеры» в той же модалке */
+  rdel: boolean
+  /** уведомление в карточке отчёта закрыто */
+  rnote: boolean
 }
 
 export interface AppSnapshot {

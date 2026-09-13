@@ -596,7 +596,8 @@ img.hex{object-fit:contain}
    иначе футер вылезет за max-height окна. */
 .mbody.tall,.mbody.tall2,.mbody.tall3,.mbody.tall4,.mbody.tall5,.mbody.tall6,
 .mbody.tall7,.mbody.tall8,.mbody.tall9,.mbody.tall10,.mbody.tall11,
-.mbody.tall12,.mbody.tall13{flex:0 1 auto}
+.mbody.tall12,.mbody.tall13,.mbody.tall14,.mbody.tall15,.mbody.tall16,
+.mbody.tall17{flex:0 1 auto}
 .mbody.tall{height:348px}
 .mbody.tall2{height:530px}
 .mbody.tall3{height:356px}
@@ -1839,3 +1840,39 @@ button.scsect:hover{color:var(--accent)}
   .icard{min-height:158px}
   .iv{font-size:var(--fs-h3);line-height:var(--lh-h3)}
 }
+
+/* ============ Отчет о майнинге (макет 109:19476) ============ */
+.rtop{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:16px;flex-wrap:wrap}
+.rinfo{max-width:852px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500;
+  display:flex;flex-direction:column;gap:4px}
+.rinfo .rh{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c1)}
+.rinfo b{font-weight:600;color:var(--c1)}
+.lnk.a{color:var(--accent);font-weight:600}
+.racts{display:flex;gap:8px;flex-wrap:wrap}
+.racts .btn{height:var(--h-ctrl);padding:0 24px;gap:8px}
+.racts .btn svg{width:24px;height:24px}
+/* Уведомление в карточке: серый блок 108 с крестиком */
+.rnote{display:flex;align-items:flex-start;gap:8px;background:var(--bg);border-radius:var(--r-m);
+  padding:16px;margin-bottom:16px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500}
+.rnote b{display:block;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;margin-bottom:8px}
+.rnote ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.rx{margin-left:auto;color:var(--c3);flex:0 0 auto}
+.rx svg{width:24px;height:24px}
+.rtbl td.racc{max-width:420px}
+.rtbl td.racc span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--c2)}
+/* Модалка «Выберите аккаунты» */
+.rlist{background:var(--ctrl);border-radius:var(--r-m);padding:16px;display:flex;flex-direction:column;gap:16px}
+.rhead{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500}
+.rcols{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.racol{display:flex;flex-direction:column;gap:12px}
+.rchk{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
+.rsw{display:flex;flex-direction:column;gap:8px}
+.rsw .t{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.rwtbl td.bad{color:var(--neg)}
+.mbody.tall14{height:256px}
+.mbody.tall15{height:316px}
+.mbody.tall16{height:60px}
+.mbody.tall17{height:248px}
+/* в «Кошельках пула» последний адрес без нижнего отступа: тело ровно 248 */
+.mbody.tall17 .urlrow:last-of-type{margin-bottom:0}
