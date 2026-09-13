@@ -17,7 +17,7 @@ const freshUi = (): Ui => ({
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
   grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null, selq: '',
-  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false,
+  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false, lvl: null,
 })
 
 /** Свои сценарии живут в localStorage отдельно от текущего состояния. */
@@ -625,6 +625,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     if (at('[data-rdel]')) { u.rdel = !u.rdel; return bump() }
     if (at('[data-rnote]')) { u.rnote = true; return bump() }
+    const lv = at('[data-lvl]')
+    if (lv) { const i = +lv.dataset.lvl!; u.lvl = u.lvl === i ? null : i; return bump() }
     /* «Сбросить» в калькуляторах возвращает поля к состоянию по умолчанию */
     if (at('[data-creset]')) {
       for (const k of Object.keys(u.seg)) if (k.startsWith('calc-') || k.startsWith('tax-')) delete u.seg[k]

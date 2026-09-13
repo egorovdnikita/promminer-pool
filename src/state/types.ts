@@ -116,6 +116,8 @@ export interface Ui {
   rdel: boolean
   /** уведомление в карточке отчёта закрыто */
   rnote: boolean
+  /** раскрытый уровень в модалке «Уровни комиссии» */
+  lvl: number | null
 }
 
 export interface AppSnapshot {

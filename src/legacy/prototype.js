@@ -66,7 +66,7 @@ const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',healt
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no',rdata:'ok'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -1374,46 +1374,110 @@ ${card(`<div class="ch"><h2>Общий доход</h2><div class="spacer"></div>
   <div style="text-align:center;padding-top:12px"><a href="#">Весь доход</a></div>`)}`;
 
 /* --- Рефералы --- */
-V.ref=m=>`
-<div class="grid" style="grid-template-columns:1.25fr 1fr 1fr">
-  ${card(`<div class="row" style="align-items:flex-start;gap:16px">
-    <div class="hex" style="background:${m.empty?'var(--bg3)':m.tier.c};color:${m.empty?'var(--c3)':'#fff'}">${m.empty?'0%':m.tier.p}</div>
-    <div style="flex:1"><div class="cap dim">Ваша комиссия</div><div style="font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600;margin-bottom:8px">${m.empty?'0%':m.tier.p}</div>
-      <div class="cap dim">Хэшрейт рефералов</div><div class="mono" style="font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600">${m.empty?'0 '+m.c.unit:m.c.refHash}</div></div>
-    <span class="pill flat sq">${COIN_ICON[m.bal[0].s]} ${m.c.refCoin[0]} ${I.cd}</span></div>
-    <div class="cap dim" style="margin-top:12px">До первого уровня: 200 ${m.c.short}/s</div>${tierTrack(m)}
-    <div style="margin-top:12px"><a href="#">Все об уровнях ${I.cv}</a></div>`)}
-  ${card(`<div class="ch"><h2>Общие данные</h2></div><div class="grid g2" style="margin:0;gap:10px">
-    ${[['Активные рефералы',m.empty?0:20],['Все рефералы',m.empty?0:50],['Текущий баланс',(m.empty?0:'7 500,56')+' ₽'],['Доход за все время',(m.empty?0:'90 000,99')+' ₽']]
-      .map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v mono" style="font-size:var(--fs-h5);line-height:var(--lh-h5)">${v}</div></div>`).join('')}</div>`)}
-  ${card(`<div class="ch"><h2>Реферальная ссылка</h2></div>
-    <p class="cap dim" style="margin-bottom:10px">Отправляйте эту ссылку друзьям или делитесь в соцсетях</p>
-    <div class="urlrow"><div class="v mono">${LINKS.ref(49282838)}</div><button class="spacer lnk" style="color:var(--accent)" data-copy="${LINKS.ref(49282838)}">${I.cp}</button></div>
-    <div class="promo" style="padding:14px;box-shadow:none"><div class="orb" style="width:120px;height:120px;right:-16px;bottom:-30px"></div>
-      <p style="font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;position:relative;max-width:70%">Начните формировать свой пассивный доход, став партнером Promminer уже сегодня</p></div>`)}
-</div>
+/* Реферальная программа (макет 514:79281). Три карточки 304, таблица выплат
+   на четыре монеты и две таблицы со своими колонками. */
+const TIER_RANGE={
+  btc:['от 200 TH/s до 59 999 TH/s','от 60 000 TH/s до 119 999 TH/s','от 120 000 TH/s до 239 999 TH/s',
+    'от 240 000 TH/s до 399 999 TH/s','от 400 000 TH/s'],
+  ltc:['от 15 GH/s до 749 GH/s','от 750 GH/s до 1499 GH/s','от 1500 GH/s до 2999 GH/s',
+    'от 3 000 GH/s до 5 999 GH/s','от 6 000 GH/s'],
+  zec:['от 5 KSol/s до 249 KSol/s','от 250 KSol/s до 499 KSol/s','от 500 KSol/s до 999 KSol/s',
+    'от 1 000 KSol/s до 1 999 KSol/s','от 2 000 KSol/s']};
+/* Привилегии уровней — одинаковы для всех монет (483:41758) */
+const TIER_PERKS=[
+  ['Доступ к закрытым гайдам «Как увеличить доходность майнинга»','Фирменные цифровые стикеры / NFT от Promminer',
+   'Участие в ежемесячных розыгрышах промокодов'],
+  ['Расширенный мерч (худи, кепки, аксессуары для фермы)','Подарочные сертификаты на сервисы Promminer',
+   'Приоритетная поддержка (быстрее ответы саппорта)','Бесплатная диагностика оборудования (онлайн)'],
+  ['Кэшбэк в цифровой валюте за активность рефералов','Бесплатное участие в профильных вебинарах и AMA-сессиях',
+   'Доступ к аналитике пула (доходность, прогнозы, тренды)','Подарки от партнёров Promminer'],
+  ['Расширенное членство Promminer Club+','Индивидуальные условия по комиссиям пула',
+   'Персональный аудит майнинг-стратегии','Ранний доступ к новым продуктам и функциям пула',
+   'Закрытые чаты с экспертами и топ-майнерами'],
+  ['Эксклюзивные условия на размещение и обслуживание оборудования','Совместные кейсы и PR-публикации с Promminer',
+   'Участие в стратегии развития продукта (feedback board)',
+   'Инвайты на международные и закрытые отраслевые мероприятия','Персональные инвестиционные предложения',
+   'Возможность брендирования собственных ферм совместно с Promminer']];
+/* Селектор монеты реферальной программы: название и список тикеров */
+const refCoinSel=(m,id)=>`<span class="pop-wrap"><button class="rcoin" data-pop="${id}">
+  ${COIN_ICON[m.bal[0].s]}<span><b>${m.c.refCoin[0]}</b><i>${m.c.refCoin[1]}</i></span>${I.cd}</button>
+  ${pop===id?`<div class="pop menu xmenu">${AXES.coin.opts.map(([v,l],n)=>
+    `${n?'<div class="mdiv"></div>':''}<button class="${S.coin===v?'on':''}" data-axis="coin" data-val="${v}">${l}${S.coin===v?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`;
+/* Таблица реферального дохода — колонки свои (534:54490) */
+function refIncomeTable(m,n,pid){
+  if(!n) return emptyBox('Дохода пока нет','Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение');
+  const u=m.bal[0].s;
+  let from=0,to=n;
+  if(pid){const per=perOf(pid,10),pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
+  return `<div class="tw"><table class="tbl"><thead><tr><th>Дата и время</th><th>Активные рефералы</th>
+    <th>Суммарный хэшрейт</th><th class="num"><span class="thico paico">${COIN_ICON[u]}</span> Доход, ${u}</th>
+    <th class="num"><span class="thico paico">${PAY_ICON['$']}</span> Доход, $</th>
+    <th class="num"><span class="thico paico">${PAY_ICON['₽']}</span> Доход, ₽</th></tr></thead><tbody>
+    ${Array.from({length:to-from},(_,j)=>{const i=from+j;return `<tr>
+      <td class="mono">0${(i%9)+1}.03.2026 1${i%9}:07</td><td class="mono">${8+(i%12)}</td>
+      <td class="mono">${ni(1200+i*340)} ${m.c.unit}</td>
+      <td class="num mono">${m.c.row.amount}</td><td class="num mono">${nf(12+i*3.7)} $</td>
+      <td class="num mono">${nf(900+i*270)} ₽</td></tr>`}).join('')}
+  </tbody></table></div>${pid?pager(pid,n,10):''}`;
+}
+const refCount=m=>m.empty?0:(S.data==='few'?3:12);
+
+V.ref=m=>{
+  const inc=segi('ref-tab',0)===0;
+  return `<div class="rcards">
+  <div class="rcard">
+    <div class="rlv"><span class="hex" style="background:${m.empty?'var(--bg3)':m.tier.c};color:${m.empty?'var(--c3)':'#fff'}">${m.empty?'0%':m.tier.p}</span>
+      <div class="rlvk"><span class="k">Ваша комиссия</span><b>${m.empty?'0%':m.tier.p}</b></div>
+      ${refCoinSel(m,'refcoin')}</div>
+    <div class="rlvk"><span class="k">Хэшрейт рефералов</span><b class="mono">${m.empty?'0 '+m.c.unit:m.c.refHash}</b></div>
+    <span class="k">До первого уровня: ${m.c.next}</span>
+    ${tierTrack(m)}
+    <button class="lnk a" data-modal="levels">Все об уровнях${I.cv}</button>
+  </div>
+  <div class="rcard">
+    <h2>Общие данные</h2>
+    <div class="rgrid">${[['Активные рефералы',m.empty?'0':'20'],['Все рефералы',m.empty?'0':'50'],
+      ['Текущий баланс',(m.empty?'0':'7 500,56')+' ₽'],['Доход за все время',(m.empty?'0':'90 000,99')+' ₽']]
+      .map(([k,v])=>`<div class="rstat"><span class="k">${k}</span><b class="mono">${v}</b></div>`).join('')}</div>
+  </div>
+  <div class="rcard rlink">
+    <h2>Реферальная ссылка</h2>
+    <p class="k">Отправляйте эту ссылку друзьям или делитесь в соцсетях</p>
+    ${urlRow('',LINKS.ref(49282838))}
+    <div class="promo"><div class="orb"></div>
+      <p>Начните формировать свой пассивный доход, став партнером Promminer уже сегодня</p></div>
+  </div></div>
 ${card(`<div class="ch"><h2>Настройка реферальных выплат</h2></div>
   <div class="alert warn" style="margin-bottom:12px"><div><b>Если хотите выводить в рублях</b><br>
-    <span class="mut">Заполните форму, как Юридическое лицо или Индивидуальный предприниматель в разделе <a href="#" data-go="verification">Верификация и реквизиты</a></span></div>
+    <span class="mut">Заполните форму, как Юридическое лицо или Индивидуальный предприниматель в разделе
+      <button class="lnk a" data-go="verification">Верификация и реквизиты</button></span></div>
     <button class="spacer dim">${I.x}</button></div>
-  <div class="tw"><table class="tbl"><thead><tr><th>Монеты</th><th>Баланс</th><th>Баланс, $</th><th>Баланс, ₽</th><th>Реквизиты</th><th>Порог автовыплат ${I.inf}</th><th>Автовыплаты ${I.inf}</th><th></th></tr></thead><tbody>
-  ${[['BTC','WU/****9uG1','0.001 BTC'],['LTC','','0.001 LTC'],['DOGE','DKb/****7uJT','1 DOGE']].map(([s,req,th])=>`<tr>
-    <td><span class="coin">${COIN_ICON[s]}${s}</span></td>
-    <td class="mono">0 ${s}</td><td class="mono">0 $</td><td class="mono">0 ₽</td>
-    <td>${req?`<span class="pill flat sq mono" style="height:32px;font-size:var(--fs-c);line-height:var(--lh-c)">${req} ${I.edit}</span>`:`<button class="addbtn" data-modal="wallet" data-coin="${s}">${I.pl} Добавить</button>`}</td>
-    <td><span class="pill flat sq mono" style="height:28px;font-size:var(--fs-c);line-height:var(--lh-c)">${th} ${I.edit}</span></td>
-    <td><span class="tog" data-tog></span></td><td class="num"><button class="btn sm" disabled>Вывести</button></td></tr>`).join('')}
+  <div class="tw"><table class="tbl atbl"><thead><tr><th>Монеты</th><th>Баланс</th>
+    <th><span class="thico">${USD_ICON} Баланс, $</span></th><th><span class="thico">${I.rub} Баланс, ₽</span></th>
+    <th>Реквизиты</th><th><span class="thico">Порог автовыплат<i class="tipi" data-tip="${ATIP.th}">${I.inf}</i></span></th>
+    <th><span class="thico">Автовыплаты<i class="tipi" data-tip="${ATIP.auto}">${I.inf}</i></span></th><th></th></tr></thead><tbody>
+  ${ASSETS.map(a=>`<tr>
+    <td><span class="coin">${COIN_ICON[a.s]}${a.s}</span></td>
+    <td class="mono">0 ${a.s}</td><td class="mono">0 $</td><td class="mono">0 ₽</td>
+    <td><button class="acell add" data-modal="wallet" data-coin="${a.s}">${I.pl}Добавить</button></td>
+    <td><button class="acell" data-modal="athr" data-coin="${a.s}">${a.th}<i>${I.edit}</i></button></td>
+    <td><span class="tog" data-tog></span></td>
+    <td class="num"><button class="btn sm" disabled>Вывести</button></td></tr>`).join('')}
   </tbody></table></div>`)}
 <div style="height:12px"></div>
-${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><div class="spacer"></div><span class="pill flat sq">${COIN_ICON[m.bal[0].s]} ${m.bal[0].s} ${I.cd}</span></div>
+${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
+  <div class="spacer"></div>${fsel('ref-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}</div>
   ${refListTable(m)}`)}
 <div style="height:12px"></div>
 ${card(`<div class="ch">${seg('ref-tab',['Доход','Выплаты'],0)}<div class="spacer"></div>
-  <span class="pill flat sq">${COIN_ICON[m.bal[0].s]} ${m.bal[0].s} ${I.cd}</span></div>
-  ${m.rows?incomeTable(m,5):emptyBox('Дохода пока нет','Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение')}`)}`;
+  ${fsel('ref-coin2',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}</div>
+  ${inc?refIncomeTable(m,m.rows?5:0):payoutsTable(m,m.rows?5:0)}`)}`};
 
 function refListTable(m){
-  if(!m.rows) return emptyBox('Рефералов пока нет','Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение');
+  if(!m.rows) return `<div class="empty">
+    <img src="/empty-state.svg" alt="" width="221" height="175">
+    <b>Рефералов пока нет</b><p>Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение</p>
+    <div class="reflink">${urlRow('',LINKS.ref(49282838))}</div></div>`;
   return `<div class="tw"><table class="tbl"><thead><tr><th>Регистрация</th><th>Рефералы</th><th>Комиссия реферала</th>
     <th>Хэшрейт, 24 ч</th><th class="num">Доход, ${m.bal[0].s}, 24 ч</th><th class="num">Доход, $, 24 ч</th><th class="num">Доход, ₽, 24 ч</th></tr></thead><tbody>
   ${(()=>{const N=S.data==='few'?3:24,[f,t]=pageSlice('reflist',N);return Array.from({length:t-f},(_,j)=>{const i=f+j;
@@ -1422,10 +1486,15 @@ function refListTable(m){
     <td class="num mono">0,000${(i%9)+1}2345</td><td class="num mono">${nf(12+i*3.7)} $</td><td class="num mono">${nf(900+i*270)} ₽</td></tr>`}).join('')})()}
   </tbody></table></div>${pager('reflist',S.data==='few'?3:24,10)}`;
 }
-V.reflist=m=>card(`<div class="ch"><h2>Список рефералов</h2><div class="spacer"></div><span class="search">${I.srch} Найти реферала</span>
-  <button class="btn g sm">${I.dl} Экспорт</button></div>${refListTable(m)}`);
-V.refincome=m=>card(`<div class="ch"><h2>Реферальный доход</h2><div class="spacer"></div>
-  ${seg('refincome-range',['7 дн','30 дн','90 дн'],1)}<button class="ib sm">${I.dl}</button></div>${incomeTable(m,m.empty?0:32,'refincome')}`);
+V.reflist=m=>card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
+  <div class="spacer"></div>${fsel('reflist-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
+  ${fsel('reflist-act',['Активные','Все'])}${dateInput()}
+  <button class="ib" data-modal="export" data-ex="ref">${I.dl}</button></div>${refListTable(m)}`);
+V.refincome=m=>card(`<div class="ch"><h2>Доход (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
+  <div class="spacer"></div>${fsel('refinc-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
+  ${dayChips('refincome-range')}${dateInput()}
+  <button class="ib" data-modal="export" data-ex="ref">${I.dl}</button></div>
+  ${refIncomeTable(m,m.empty?0:32,'refincome')}`);
 V.refpayouts=m=>payoutsScreen(m,false);
 
 /* --- Профиль --- */
@@ -2406,6 +2475,23 @@ const MODALS={
   waledit:{t:'Изменить адрес',acts:false,tall:11,
     b:(m,step)=>walletBody(step,true),
     foot:(m,step)=>walletFoot(step,'Адрес изменен')},
+  /* Уровни комиссии (467:41571): пороги по монете и раскрывающиеся привилегии */
+  levels:{t:'Уровни комиссии',acts:false,size:'lv',
+    b:m=>`<div class="mstack">
+      ${refCoinSel(m,'lvcoin')}
+      <p class="mtext mut">Приглашайте друзей и получайте комиссию за услуги
+        в качестве реферального вознаграждения</p>
+      <div class="lvlist">${TIERS.map((t,i)=>`<div class="lvitem ${U.lvl===i?'on':''}">
+        <button class="lvhead" data-lvl="${i}">
+          <img src="/tier-${t.k}-s.png" alt="" width="40" height="40">
+          <span><b>${t.p} (${t.n})</b><i>Хэшрейт рефералов ${TIER_RANGE[S.coin][i]}</i></span>
+          ${I.cd}</button>
+        ${U.lvl===i?`<ul class="lvperks">${TIER_PERKS[i].map(x=>`<li>${x}</li>`).join('')}</ul>`:''}
+      </div>`).join('')}</div>
+      <p class="mtext mut lvq">Остались вопросы?
+        <button class="lnk a" data-toast="Откроется справка о реферальной программе">Подробнее о реферальной программе</button></p>
+    </div>`,
+    foot:()=>`<button class="btn g wide" data-close>Закрыть</button>`},
   /* Выберите аккаунты (109:19936): две колонки чекбоксов и переключатель */
   repacc:{t:'Выберите аккаунты',s:'по которым будет сгенерирован отчет',acts:false,tall:14,
     b:m=>{const list=subsOf(m).filter(x=>!x.arch);

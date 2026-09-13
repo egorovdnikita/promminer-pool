@@ -1933,3 +1933,53 @@ button.scsect:hover{color:var(--accent)}
 .txrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .txrow span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .txrow b{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+
+/* ============ Реферальная программа (макет 514:79281) ============ */
+.rcards{display:grid;grid-template-columns:560fr 560fr 500fr;gap:16px;margin-bottom:16px;align-items:stretch}
+.rcard{background:var(--surface);border-radius:var(--r-l);padding:24px;min-height:304px;
+  display:flex;flex-direction:column;gap:8px}
+.rcard h2{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;margin-bottom:4px}
+.rcard>.lnk.a{align-self:flex-start;margin-top:auto;display:inline-flex;align-items:center;gap:4px}
+.rcard>.lnk.a svg{width:20px;height:20px}
+.rcard .k{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
+.rlv{display:flex;align-items:flex-start;gap:16px}
+.rlv .hex{width:80px;height:80px;flex:0 0 auto;font-size:var(--fs-h2);line-height:1}
+.rlvk{display:flex;flex-direction:column;gap:4px;flex:0 0 auto;min-width:0}
+.rlv .rlvk{flex:1}
+.rlvk b{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
+.rcoin{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 12px;border-radius:var(--r-m);
+  background:var(--ctrl);flex:0 0 auto}
+.rcoin:hover{background:var(--ctrl-hover)}
+.rcoin>svg:last-child{width:24px;height:24px}
+.rcoin span{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
+.rcoin b{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.rcoin i{font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rstat{display:flex;flex-direction:column;gap:4px}
+.rstat b{font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600}
+.rlink .urlrow{margin-bottom:0}
+.rlink .urlrow .k{display:none}
+.rlink .promo{margin-top:auto;padding:16px;box-shadow:none;position:relative;overflow:hidden;
+  min-height:114px;height:114px;display:flex;align-items:center}
+.rlink .promo p{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;position:relative;max-width:75%}
+.rlink .promo .orb{width:120px;height:120px;right:-16px;bottom:-30px}
+.cnt.g{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;
+  border-radius:var(--r-f);background:var(--ctrl);color:var(--c2);
+  font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600}
+.empty .reflink{width:100%;max-width:520px;margin-top:12px}
+/* Модалка «Уровни комиссии» */
+.modal.lv{max-width:500px}
+.lvlist{display:flex;flex-direction:column;gap:8px}
+.lvitem{border-radius:var(--r-m);background:var(--ctrl)}
+.lvhead{display:flex;align-items:center;gap:12px;width:100%;padding:12px;text-align:left}
+.lvhead img{flex:0 0 auto}
+.lvhead span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.lvhead b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.lvhead i{font-style:normal;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
+.lvhead>svg{width:24px;height:24px;flex:0 0 auto;color:var(--c3);transition:transform .15s}
+.lvitem.on .lvhead>svg{transform:rotate(180deg)}
+.lvperks{list-style:none;margin:0;padding:0 12px 12px 64px;display:flex;flex-direction:column;gap:8px;
+  font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
+.lvperks li{position:relative;padding-left:14px}
+.lvperks li::before{content:"";position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
+.lvq{text-align:center}
