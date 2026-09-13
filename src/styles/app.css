@@ -2070,3 +2070,15 @@ button.scsect:hover{color:var(--accent)}
 .dinput.on{color:var(--c1)}
 .dp-d[data-dpd]{cursor:pointer}
 .dp-d[data-dpd]:hover{background:var(--ctrl)}
+/* Ряд карточек над таблицами рефералки (534:54490): 140, подпись 20, значение 48 */
+.rstats{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:16px}
+.rstat2{background:var(--surface);border-radius:var(--r-l);padding:24px;min-height:140px;
+  display:flex;flex-direction:column;justify-content:center;gap:12px}
+.rstat2.acc{background:var(--accent);color:#fff}
+.rstat2 .l{display:flex;align-items:center;gap:10px;font-size:var(--fs-h5);line-height:var(--lh-h5);
+  font-weight:500;color:var(--c2)}
+.rstat2.acc .l{color:#fff}
+.rstat2 .v{display:flex;align-items:baseline;gap:8px;font-size:var(--fs-h1);line-height:var(--lh-h1);font-weight:600}
+.rstat2 .v i{font-style:normal;font-weight:600}
+.rstat2 .iarr{margin-left:auto;color:inherit}
+.rstat2 .iarr svg{width:24px;height:24px}

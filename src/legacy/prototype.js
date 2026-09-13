@@ -67,7 +67,7 @@ const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',healt
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no',rdata:'ok'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false,sfin:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null,dsel:{},dpm:0,zoom:0,rwarn:false,togs:{}};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null,dsel:{},dpm:0,zoom:0,rwarn:false,togs:{},ronly:false};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -1641,6 +1641,39 @@ ${card(`<div class="ch">${seg('ref-tab',['Доход','Выплаты'],0)}<div 
   ${fsel('ref-coin2',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}</div>
   ${inc?refIncomeTable(m,m.rows?5:0):payoutsTable(m,m.rows?5:0)}`)}`};
 
+/* Ряд карточек над таблицей на списочных экранах рефералки (534:54490):
+   высота 140, подпись 20 Medium, значение 48 SemiBold, первая бывает акцентной */
+const refStats=cards=>`<div class="rstats">${cards.map(([l,v,u,go])=>
+  `<div class="rstat2 ${go===undefined?'':'acc'}">
+    <span class="l">${l}${go?`<button class="iarr" data-go="${go}">${I.arr}</button>`:''}</span>
+    <span class="v mono">${v}${u?`<i>${u}</i>`:''}</span></div>`).join('')}</div>`;
+/* Реферальные выплаты: восемь колонок, «Реквизиты» вместо кошелька (979:108712) */
+function refPayoutsTable(m,n,pid,type){
+  if(!n) return emptyBox('Выплат пока не было','Как только будут выплаты, вы увидите здесь информацию');
+  const u=m.bal[0].s;
+  const src=(!type||type===PAY_TYPES[0])?PAYOUTS:PAYOUTS.filter(r=>r[2]===type);
+  if(!src.length) return emptyBox('Ничего не найдено','Попробуйте изменить тип операции');
+  n=Math.min(n,type&&type!==PAY_TYPES[0]?src.length:n);
+  let from=0,to=n;
+  if(pid){const per=perOf(pid,10),pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
+  return `<div class="tw"><table class="tbl paytbl"><thead><tr>
+    <th>Дата и время</th>
+    <th><span class="thico paico">${COIN_ICON[u]}</span> Сумма, ${u}</th>
+    <th><span class="thico paico">${PAY_ICON['$']}</span> Сумма, $</th>
+    <th><span class="thico paico">${PAY_ICON['₽']}</span> Сумма, ₽</th>
+    <th>Тип транзакции</th><th>Реквизиты</th><th>Статус</th>
+    <th class="docs">Документы <i class="tipi" data-tip="При переходе транзакции «Продажа» в статус «Завершен» вам необходимо будет скачать документы">${I.inf}</i></th>
+    </tr></thead><tbody>
+    ${Array.from({length:to-from},(_,j)=>{const i=from+j; const [d,a,t,w,st]=src[i%src.length];
+      const [cls,lab]=PAY_ST[st];
+      return `<tr><td class="mono">${d}</td><td class="mono">${a} ${u}</td>
+      <td class="mono">${nf(120+i*37)} $</td><td class="mono">${nf(9000+i*270)} ₽</td>
+      <td>${t}</td><td class="mono">${w}</td>
+      <td>${status(cls,lab,'caps')}</td>
+      <td class="docs">${st==='done'?`<button class="btn out xs" data-toast="Документ скачан">${I.dl} Скачать</button>`:st==='err'?'—':''}</td></tr>`}).join('')}
+  </tbody></table></div>${pid?pager(pid,n,10):''}`;
+}
+
 function refListTable(m){
   if(!m.rows) return `<div class="empty">
     <img src="/empty-state.svg" alt="" width="221" height="175">
@@ -1648,22 +1681,40 @@ function refListTable(m){
     <div class="reflink">${urlRow('',LINKS.ref(49282838))}</div></div>`;
   return `<div class="tw"><table class="tbl"><thead><tr><th>Регистрация</th><th>Рефералы</th><th>Комиссия реферала</th>
     <th>Хэшрейт, 24 ч</th><th class="num">Доход, ${m.bal[0].s}, 24 ч</th><th class="num">Доход, $, 24 ч</th><th class="num">Доход, ₽, 24 ч</th></tr></thead><tbody>
-  ${(()=>{const N=S.data==='few'?3:24,[f,t]=pageSlice('reflist',N);return Array.from({length:t-f},(_,j)=>{const i=f+j;
+  ${(()=>{const base=S.data==='few'?3:24;
+    /* чип «Активные» оставляет только активных рефералов (752:99372) */
+    const N=U.ronly?Math.max(1,Math.round(base*0.4)):base;
+    const[f,t]=pageSlice('reflist',N);return Array.from({length:t-f},(_,j)=>{const i=f+j;
     return `<tr><td class="mono">0${(i%9)+1}.03.2026</td><td>miner_${1000+i*7}</td>
     <td class="mono">${TIERS[i%5].p}</td><td class="mono">${ni(1200+i*340)} ${m.c.unit}</td>
     <td class="num mono">0,000${(i%9)+1}2345</td><td class="num mono">${nf(12+i*3.7)} $</td><td class="num mono">${nf(900+i*270)} ₽</td></tr>`}).join('')})()}
-  </tbody></table></div>${pager('reflist',S.data==='few'?3:24,10)}`;
+  </tbody></table></div>${pager('reflist',(()=>{const b=S.data==='few'?3:24;return U.ronly?Math.max(1,Math.round(b*0.4)):b})(),10)}`;
 }
-V.reflist=m=>card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
+V.reflist=m=>`${refStats([['Средний хэшрейт за 24 часа',m.empty?'0 '+m.c.unit:m.c.refHash],
+    ['Активные рефералы',m.empty?'0':'20'],['Все рефералы',m.empty?'0':'50']])}
+  ${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
   <div class="spacer"></div>${fsel('reflist-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
-  ${fsel('reflist-act',['Активные','Все'])}${dateInput('rl')}
-  <button class="ib" data-modal="export" data-ex="ref">${I.dl}</button></div>${refListTable(m)}`);
-V.refincome=m=>card(`<div class="ch"><h2>Доход (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
+  <button class="chip d ${U.ronly?'on':''}" data-ronly>Активные</button>${dateInput('rl')}
+  <button class="ib" data-modal="export" data-ex="ref">${I.dl}</button></div>${refListTable(m)}`)}`;
+V.refincome=m=>`${refStats([['Текущий баланс',m.empty?'0':'7 500,56','₽','payouts'],
+    ['Доход за 24 часа',m.empty?'0':'3 324,12','₽'],['Доход за 30 дней',m.empty?'0':'45 873,08','₽'],
+    ['Доход за все время',m.empty?'0':'9 000 000,99','₽']])}
+  ${card(`<div class="ch"><h2>Доход (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
   <div class="spacer"></div>${fsel('refinc-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
   ${dayChips('refincome-range')}${dateInput('ri')}
   <button class="ib" data-modal="export" data-ex="ref">${I.dl}</button></div>
-  ${refIncomeTable(m,m.empty?0:periodN('refincome-range','ri',32),'refincome')}`);
-V.refpayouts=m=>payoutsScreen(m,false);
+  ${refIncomeTable(m,m.empty?0:periodN('refincome-range','ri',32))}`)}`;
+V.refpayouts=m=>{
+  const N=m.empty?0:periodN('pay-range','pay',S.data==='few'?1:28);
+  const type=PAY_TYPES[segi('pay-type',0)];
+  return `${refStats([['Сумма всех выплат',m.empty?'0':'10 278,45','₽','assets'],
+    ['Выплаты, BTC',m.empty?'0':'8 000','₽'],['Выплаты, LTC',m.empty?'0':'2 000','₽'],
+    ['Выплаты, DOGE',m.empty?'0':'278,45','₽']])}
+  ${card(`<div class="ch"><h2>История выплат</h2><span class="cnt g">${refCount(m)}</span>
+    <div class="spacer"></div>${N?`${fsel('rpay-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
+    ${fsel('pay-type',PAY_TYPES)}${dayChips('pay-range')}${dateInput('rp')}
+    <button class="ib" data-modal="export" data-ex="pay">${I.dl}</button>`:''}</div>
+    ${refPayoutsTable(m,N,'refpayouts',type)}`)}`};
 
 /* --- Профиль --- */
 /* Порядок и подписи — как в выпадающем меню на проде */

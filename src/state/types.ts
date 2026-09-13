@@ -128,6 +128,8 @@ export interface Ui {
   rwarn: boolean
   /** состояния переключателей в таблицах */
   togs: Record<string, boolean>
+  /** чип «Активные» в списке рефералов */
+  ronly: boolean
 }
 
 export interface AppSnapshot {
