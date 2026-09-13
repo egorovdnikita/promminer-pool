@@ -23,6 +23,8 @@
 - `inf` — `Essentional, UI / Info Circle` **стиль Bold**, а не Bold Duotone:
   в шапках таблиц это сплошной кружок с белой «i» (макет 1447:160163).
 - `cal` — `Time / Calendar Minimalistic`, без точек-дней внутри.
+- `arl` — `Arrow / Arrow Left`, **Linear**: возврат из деталки воркера в список
+  (`223:98556`). Именно стрелка со стержнем, а не шеврон `cl`.
 - `zi` и `zo` — `Search / Magnifer Zoom In` и `Zoom Out`, **Linear**:
   в макете графика лупы контурные, поэтому каждому пути нужен `fill="none"`.
 - `PAY_ICON` в `prototype.js` — синие `us-dollar-USD` и `rouble-RUB` из Payments

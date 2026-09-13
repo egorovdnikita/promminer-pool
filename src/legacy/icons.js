@@ -8,6 +8,8 @@ export const ICONS = {
   /* Arrow / Alt Arrow Right — Linear */
   cv: '<path d="M9 5L15 12L9 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
   /* Arrow / Alt Arrow Left — Linear */
+  // UI icons / Arrow / Arrow Left, Linear — возврат в списки (223:98556)
+  arl: '<path d="M20 12H4M10 18L4 12L10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
   cl: '<path d="M15 5L9 12L15 19" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>',
   /* Notifications / Bell */
   bell: '<path opacity="0.5" d="M18.7491 9V9.7041C18.7491 10.5491 18.9903 11.3752 19.4422 12.0782L20.5496 13.8012C21.5612 15.3749 20.789 17.5139 19.0296 18.0116C14.4273 19.3134 9.57274 19.3134 4.97036 18.0116C3.21105 17.5139 2.43882 15.3749 3.45036 13.8012L4.5578 12.0782C5.00972 11.3752 5.25087 10.5491 5.25087 9.7041V9C5.25087 5.13401 8.27256 2 12 2C15.7274 2 18.7491 5.13401 18.7491 9Z" fill="currentColor"/><path d="M7.24414 18.5452C7.89508 20.5504 9.77865 22 12.0008 22C14.2229 22 16.1065 20.5504 16.7574 18.5452C13.612 19.1355 10.3896 19.1355 7.24414 18.5452Z" fill="currentColor"/>',

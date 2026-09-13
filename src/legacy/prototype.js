@@ -880,14 +880,15 @@ const EVENTS=[['ok','04:50:23, 14.04.2025'],['low','03:40:12, 13.04.2025'],
   ['low','03:40:12, 07.04.2025'],['ok','01:20:45, 06.04.2025'],
   ['low','03:40:12, 05.04.2025'],['ok','07:12:03, 04.04.2025']];
 /* Связи воркера в шапке: два первых значения строкой, остальное — в «+N» */
-const linkRow=(label,items,cls='')=>{
+const linkRow=(label,items,tags)=>{
   const head=items.slice(0,2), rest=items.slice(2);
+  /* цвет чипа берём у самого тега — в макете они разноцветные (223:98556) */
+  const chip=t=>{const it=tagsOf().find(x=>x.n===t), c=(it&&it.c)||'#7086fc';
+    return `<span class="tag" style="background:${c}1f;color:${c}">${t}</span>`};
   return `<span class="wdlink"><i>${label}</i>${items.length
-    ? (cls
-        ? head.map(t=>`<span class="tag">${t}</span>`).join('')
-        : `<b>${head.join(', ')}</b>`) +
+    ? (tags?head.map(chip).join(''):`<b>${head.join(', ')}</b>`) +
       (rest.length?`<span class="tag n" data-tip="${rest.join(', ')}">+${rest.length}</span>`:'')
-    : '<b>—</b>'}</span>`};
+    : '<b>—</b>'}<span class="wdpen">${I.edit}</span></span>`};
 V.worker=m=>{
   const w=U.wk||workersList(m)[0]||{id:1,name:'Ant01',model:'S19 XP Hydro 257 TH/s',st:'ok',
     h5:231.16,h1:239.21,h24:235.76,rej:.04,up:100,tags:['Разогнан'],grp:[0,1]};
@@ -904,43 +905,50 @@ V.worker=m=>{
   const kv=(k,val)=>`<div class="wdkv"><span class="k">${k}</span><b class="v">${val}</b></div>`;
   return `
   <div class="wdtop">
-    <button class="ib sm" data-go="workers">${I.cl}</button>
+    <button class="ib ctl" data-go="workers" data-tip="К списку воркеров">${I.arl}</button>
+    ${ser?vlogo(vendorOf(w.model)):''}
     <h2 class="wdname">${w.name}</h2>
-    <span class="tag" style="background:${col}1f;color:${col}">${lbl}</span>
+    <span class="wdst"><i style="background:${col}"></i>${lbl}</span>
     <div class="spacer"></div>
     <button class="wdinfo" data-modal="wgroups" data-wk2="${w.id}">${linkRow('Группы:',gn)}</button>
-    <button class="wdinfo" data-modal="wtags" data-wk2="${w.id}">${linkRow('Теги:',tn,'tag')}</button>
+    <button class="wdinfo" data-modal="wtags" data-wk2="${w.id}">${linkRow('Теги:',tn,true)}</button>
     <button class="wdinfo" data-modal="wnotify">
-      <span class="wdlink"><i>Порог уведомлений:</i><b>${thr?`225 ${m.c.unit}`:'Не настроено'}</b></span></button>
+      <span class="wdlink"><i>Порог уведомлений:</i><b>${thr?`225 ${m.c.unit}`:'Не настроено'}</b>
+        <span class="wdpen">${I.edit}</span></span></button>
   </div>
   <div class="grid g3" style="gap:16px;margin:0">
-    ${card(`<div class="wdhero">
+    ${card(`<div class="wdplate">
       <span class="l">Средний хэшрейт за 24 ч</span>
-      <b class="v mono">${m.empty?0:nf(w.h24,2)} ${m.c.unit}</b>
+      <b class="v mono">${m.empty?0:nf(w.h24,2)} ${m.c.unit}</b></div>
+    <div class="wdhero">
       <div class="wdsub">
         <div><span>За 5 мин</span><b class="mono">${m.empty?0:nf(w.h5,2)} ${m.c.unit}</b></div>
         <div><span>За 1 ч</span><b class="mono">${m.empty?0:nf(w.h1,2)} ${m.c.unit}</b></div>
       </div></div>`,'wdcard')}
     ${card(`<h3 class="wdh">Показатели воркера</h3><div class="wdrows">
-      ${kv('Цифровая валюта',m.bal[0].s)}
+      ${kv('Цифровая валюта',`<span class="wdcoin">${COIN_ICON[m.bal[0].s]||''}${m.bal[0].s}</span>`)}
       ${kv('Последняя шара',m.empty?'—':(w.sh?shareAt(w.sh):'10 сек назад'))}
       ${kv('Реджект, 24 ч',m.empty?'0%':nf(w.rej,2)+'%')}</div>`,'wdcard')}
     ${card(`<div class="wdhead"><h3 class="wdh">Параметры воркера</h3><div class="spacer"></div>
       <button class="ibr wdedit" data-modal="wparams" data-tip="${ser?'Изменить параметры':'Добавить параметры'}">${I.edit}</button></div>
     <div class="wdrows">
-      ${kv('Завод. номер',ser?'<span class="mono">OLTTG4BBEJDAJ062H</span>':'—')}
+      ${kv('Завод. номер',ser?`<span class="wdsn"><span class="mono">OLTTG4BBEJDAJ062H</span>
+        <button class="ibr wdcopy" data-copy="OLTTG4BBEJDAJ062H" data-tip="Скопировать">${I.cp}</button></span>`:'—')}
       ${kv('Модель',ser?`${vendorName(vendorOf(w.model))} ${w.model}`:'—')}</div>`,'wdcard')}
   </div>
   <div class="wdmain">
     ${card(`<div class="ch"><h2>График изменения хэшрейта</h2><div class="spacer"></div>
       ${seg('wk-range',['5 мин','1 ч','24 ч'],2)}
-      <span class="pop-wrap"><button class="pill ctl sq mono lg" data-pop="wdate">05.04.2026 – 12.04.2026 ${I.cal}</button>${pop==='wdate'?datePicker():''}</span></div>
+      <span class="pop-wrap"><button class="pill ctl sq mono lg wdcal" data-pop="wdate">05.04.2026 – 12.04.2026 ${I.cal}</button>${pop==='wdate'?datePicker():''}</span>
+      <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>
       ${chart(m,{h:638,cw:1173,axisHtml:true,hover:true})}`)}
     <div class="wdside">
       ${card(`<h2 class="wdh2">События</h2>
         ${m.empty?'<p class="fempty">Событий пока нет</p>'
-          :`<div class="wdevents">${EVENTS.map(([k,t])=>{const[el,ec]=WST[k];
-            return `<div class="wdev"><i style="background:${ec}"></i><b>${el}</b><span>${t}</span></div>`}).join('')}</div>`}`,'wdevcard')}
+          :`<div class="wdevents">${EVENTS.map(([k,t],i)=>{const[el,ec]=WST[k];
+            return `<div class="wdev ${i===EVENTS.length-1?'last':''}">
+              <span class="wdmark" style="background:${ec}29"><i style="background:${ec}"></i></span>
+              <b>${el}</b><span class="wdtime">${t}</span></div>`}).join('')}</div>`}`,'wdevcard')}
       <section class="promo pbox"><img class="art" src="/promo-prombox.png" alt="">
         <b>PromBox</b><p>Расширенная статистика<br>по устройствам</p>
         <button class="btn w" data-toast="Откроем страницу PromBox">Узнать больше</button></section>
