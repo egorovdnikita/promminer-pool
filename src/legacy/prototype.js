@@ -1214,7 +1214,7 @@ const dayChips=(id,def=null)=>`<span class="dchips">${['7 дн','30 дн','90 д
 /* Селект в шапке карточки: 48 высотой, радиус 16 (37:56063) */
 const fsel=(id,opts,ico)=>{const i=U.seg[id]??0; const pic=v=>ico?(ico(v)||''):'';
   return `<span class="pop-wrap"><button class="fsel" data-pop="${id}">${pic(opts[i])}${opts[i]}<span class="spacer"></span>${I.cd}</button>
-  ${pop===id?`<div class="pop menu xmenu">${opts.map((o,n)=>
+  ${pop===id?`<div class="pop menu xmenu ${ico?'coins':''}">${opts.map((o,n)=>
     `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${pic(o)}${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 /* Date Input 256x48 с плейсхолдером 16 SemiBold (15:19710) — открывает календарь */
 const dateInput=(id='d')=>{const v=U.dsel['dp'+id];
@@ -1596,35 +1596,51 @@ const refCount=m=>m.empty?0:(S.data==='few'?3:12);
 V.ref=m=>{
   const inc=segi('ref-tab',0)===0;
   return `<div class="rcards">
-  <div class="rcard">
-    <div class="rlv"><span class="hex" style="background:${m.empty?'var(--bg3)':m.tier.c};color:${m.empty?'var(--c3)':'#fff'}">${m.empty?'0%':m.tier.p}</span>
-      <div class="rlvk"><span class="k">Ваша комиссия</span><b>${m.empty?'0%':m.tier.p}</b></div>
-      ${refCoinSel(m,'refcoin')}</div>
-    <div class="rlvk"><span class="k">Хэшрейт рефералов</span><b class="mono">${m.empty?'0 '+m.c.unit:m.c.refHash}</b></div>
-    <span class="k">До первого уровня: ${m.c.next}</span>
-    ${tierTrack(m)}
-    <button class="lnk a" data-modal="levels">Все об уровнях${I.cv}</button>
+  <div class="rcard rlvcard">
+    <div class="rlvtop">
+      <span class="rhex ${m.empty?'off':''}">${m.empty?'0%':m.tier.p}</span>
+      <div class="rlvinfo">
+        <div class="rlvrow"><div class="rlvk"><span class="k">Ваша комиссия</span>
+          <b>${m.empty?'0%':m.tier.p}</b></div>${refCoinSel(m,'refcoin')}</div>
+        <div class="rlvk"><span class="k">Хэшрейт рефералов</span>
+          <b class="mono">${m.empty?'0 '+m.c.unit:m.c.refHash}</b></div>
+      </div>
+    </div>
+    <div class="rlvdown">
+      <div class="rprog">
+        <span class="rnext">До первого уровня: <b>${m.c.next}</b></span>
+        <div class="rbar"><i style="width:${m.empty?0:TIERS[+S.tier].f}%"></i></div>
+        <div class="rpct">${TIERS.map(t=>`<span>${t.p}</span>`).join('')}</div>
+      </div>
+      <button class="lnk a" data-modal="levels">Все об уровнях${I.cv}</button>
+    </div>
   </div>
   <div class="rcard">
     <h2>Общие данные</h2>
     <div class="rgrid">${[['Активные рефералы',m.empty?'0':'20'],['Все рефералы',m.empty?'0':'50'],
       ['Текущий баланс',(m.empty?'0':'7 500,56')+' ₽'],['Доход за все время',(m.empty?'0':'90 000,99')+' ₽']]
-      .map(([k,v])=>`<div class="rstat"><span class="k">${k}</span><b class="mono">${v}</b></div>`).join('')}</div>
+      .map(([k,v])=>`<div class="rtile"><span class="k">${k}</span><b class="mono">${v}</b></div>`).join('')}</div>
   </div>
   <div class="rcard rlink">
-    <h2>Реферальная ссылка</h2>
-    <p class="k">Отправляйте эту ссылку друзьям или делитесь в соцсетях</p>
-    ${urlRow('',LINKS.ref(49282838))}
-    <div class="promo"><div class="orb"></div>
-      <p>Начните формировать свой пассивный доход, став партнером Promminer уже сегодня</p></div>
+    <div class="rlgroup">
+      <div class="rlhead"><h2>Реферальная ссылка</h2>
+        <p class="k">Отправляйте эту ссылку друзьям или делитесь в соцсетях</p></div>
+      <div class="rlinp"><span>${LINKS.ref(49282838)}</span>
+        <button class="lnk" data-copy="${LINKS.ref(49282838)}">${I.cp}</button></div>
+    </div>
+    <div class="rbanner"><i class="o1"></i><i class="o2"></i>
+      <p>Начните формировать свой<br>пассивный доход, став партнером<br>Promminer уже сегодня</p>
+      <img src="/banner-referral.png" alt="">
+    </div>
   </div></div>
 ${card(`<div class="ch"><h2>Настройка реферальных выплат</h2></div>
-  ${U.rwarn?'':`<div class="alert warn" style="margin-bottom:12px"><div><b>Если хотите выводить в рублях</b><br>
+  ${U.rwarn?'':`<div class="alert info rinfo2"><div><b>Если хотите выводить в рублях</b><br>
     <span class="mut">Заполните форму, как Юридическое лицо или Индивидуальный предприниматель в разделе
       <button class="lnk a" data-go="verification">Верификация и реквизиты</button></span></div>
     <button class="spacer dim" data-rwarn>${I.x}</button></div>`}
   <div class="tw"><table class="tbl atbl"><thead><tr><th>Монеты</th><th>Баланс</th>
-    <th><span class="thico">${USD_ICON} Баланс, $</span></th><th><span class="thico">${I.rub} Баланс, ₽</span></th>
+    <th><span class="thico paico">${PAY_ICON['$']}</span> Баланс, $</th>
+    <th><span class="thico paico">${PAY_ICON['₽']}</span> Баланс, ₽</th>
     <th>Реквизиты</th><th><span class="thico">Порог автовыплат<i class="tipi" data-tip="${ATIP.th}">${I.inf}</i></span></th>
     <th><span class="thico">Автовыплаты<i class="tipi" data-tip="${ATIP.auto}">${I.inf}</i></span></th><th></th></tr></thead><tbody>
   ${ASSETS.map(a=>`<tr>
@@ -1657,7 +1673,7 @@ function refPayoutsTable(m,n,pid,type){
   n=Math.min(n,type&&type!==PAY_TYPES[0]?src.length:n);
   let from=0,to=n;
   if(pid){const per=perOf(pid,10),pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
-  return `<div class="tw"><table class="tbl paytbl"><thead><tr>
+  return `<div class="tw"><table class="tbl paytbl rpaytbl"><thead><tr>
     <th>Дата и время</th>
     <th><span class="thico paico">${COIN_ICON[u]}</span> Сумма, ${u}</th>
     <th><span class="thico paico">${PAY_ICON['$']}</span> Сумма, $</th>
@@ -1700,14 +1716,14 @@ V.reflist=m=>`${refStats([['Средний хэшрейт за 24 часа',m.em
   ${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
   <div class="spacer"></div>${fsel('reflist-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
   <button class="chip d ${U.ronly?'on':''}" data-ronly>Активные</button>${dateInput('rl')}
-  <button class="ib" data-modal="export" data-ex="rlist">${I.dl}</button></div>${refListTable(m)}`)}`;
+  <button class="ib" data-modal="export" data-ex="rlist">${I.dlm}</button></div>${refListTable(m)}`)}`;
 V.refincome=m=>`${refStats([['Текущий баланс',m.empty?'0':'7 500,56','₽','payouts'],
     ['Доход за 24 часа',m.empty?'0':'3 324,12','₽'],['Доход за 30 дней',m.empty?'0':'45 873,08','₽'],
     ['Доход за все время',m.empty?'0':'9 000 000,99','₽']])}
   ${card(`<div class="ch"><h2>Доход (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
   <div class="spacer"></div>${fsel('refinc-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
   ${dayChips('refincome-range')}${dateInput('ri')}
-  <button class="ib" data-modal="export" data-ex="rinc">${I.dl}</button></div>
+  <button class="ib" data-modal="export" data-ex="rinc">${I.dlm}</button></div>
   ${refIncomeTable(m,m.empty?0:periodN('refincome-range','ri',32))}`)}`;
 V.refpayouts=m=>{
   const N=m.empty?0:periodN('pay-range','pay',S.data==='few'?1:28);
@@ -1718,7 +1734,7 @@ V.refpayouts=m=>{
   ${card(`<div class="ch"><h2>История выплат</h2><span class="cnt g">${refCount(m)}</span>
     <div class="spacer"></div>${N?`${fsel('rpay-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
     ${fsel('pay-type',PAY_TYPES)}${dayChips('pay-range')}${dateInput('rp')}
-    <button class="ib" data-modal="export" data-ex="rpay">${I.dl}</button>`:''}</div>
+    <button class="ib" data-modal="export" data-ex="rpay">${I.dlm}</button>`:''}</div>
     ${refPayoutsTable(m,N,'refpayouts',type)}`)}`};
 
 /* --- Профиль --- */
