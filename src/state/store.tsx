@@ -16,7 +16,7 @@ const freshUi = (): Ui => ({
   q: '', wfilter: 'all', geo: '',
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
-  grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null,
+  grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null, selq: '',
   qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
 
@@ -200,6 +200,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (sq) { U.current.scq = sq.value; bump() }
     const fq = (e.target as HTMLElement).closest('#fq') as HTMLInputElement | null
     if (fq) { U.current.fq = fq.value; bump() }
+    const sq2 = (e.target as HTMLElement).closest('#selq') as HTMLInputElement | null
+    if (sq2) { U.current.selq = sq2.value; bump() }
     const tn = (e.target as HTMLElement).closest('#tname') as HTMLInputElement | null
     if (tn) { U.current.tname = tn.value; bump() }
     const td = (e.target as HTMLElement).closest('#tdesc') as HTMLInputElement | null

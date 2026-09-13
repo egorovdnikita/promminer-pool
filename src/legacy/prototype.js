@@ -372,11 +372,17 @@ const seg=(id,opts,def=0)=>{const c=U.seg[id]??def;
 const segv=(id,opts,def=0)=>opts[U.seg[id]??def];
 /* Поле-селект из макета экспорта (173:66473): подпись 14 над контролом 48,
    значение 16, список раскрывается на 18 */
-const xsel=(label,id,opts,ico)=>{const i=U.seg[id]??0; const pic=v=>ico?(ico(v)||''):'';
+/* Поле-селект. opts.find — список с поиском внутри (макет 223:100453) */
+const xsel=(label,id,opts,ico,find)=>{const i=U.seg[id]??0; const pic=v=>ico?(ico(v)||''):'';
+  const q=(U.selq||'').trim().toLowerCase();
+  const shown=opts.map((o,j)=>[o,j]).filter(([o])=>!find||!q||String(o).toLowerCase().includes(q));
   return `<div class="xf"><div class="k">${label}</div>
     <span class="pop-wrap"><button class="xsel" data-pop="${id}">${pic(opts[i])}${opts[i]}<span class="spacer"></span>${I.cd}</button>
-    ${pop===id?`<div class="pop menu xmenu">${opts.map((o,j)=>
-      `${j?'<div class="mdiv"></div>':''}<button class="${i===j?'on':''}" data-seg="${id}" data-i="${j}">${pic(o)}${o}${i===j?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></div>`};
+    ${pop===id?`<div class="pop menu xmenu ${find?'find':''}">
+      ${find?`<label class="search xfind">${I.srch}<input id="selq" placeholder="Поиск" value="${String(U.selq||'').replace(/"/g,'&quot;')}"></label>`:''}
+      ${shown.length?shown.map(([o,j],n)=>
+        `${n?'<div class="mdiv"></div>':''}<button class="${i===j?'on':''}" data-seg="${id}" data-i="${j}">${pic(o)}${o}${i===j?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')
+        :'<p class="fempty">Результатов не найдено</p>'}</div>`:''}</span></div>`};
 /* Segment Control Line — тот же контракт, что у seg(), но линейный вариант DS */
 const segLine=(id,opts,def=0,cls='')=>{const c=U.seg[id]??def;
   return `<div class="segl ${cls}">${opts.map((o,i)=>`<button class="${i===c?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</div>`};
@@ -2061,7 +2067,7 @@ const MODALS={
       <p class="mnote" style="margin-top:8px">Не можете найти заводской номер?
         <a class="btn link" href="${LINKS.kb}" target="_blank" rel="noopener">База знаний</a></p>
       <p class="mnote">Пожалуйста, не изменяйте название воркера после добавления заводского номера</p>
-      ${xsel('Модель','wpmodel',['Выберите модель'].concat(SER_MODELS))}
+      ${xsel('Модель','wpmodel',['Выберите модель'].concat(SER_MODELS),null,true)}
       <p class="mnote" style="margin-top:8px">Не нашли свою модель?
         <a class="btn link" href="${LINKS.tgSupport}" target="_blank" rel="noopener">Напишите нам</a></p>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>

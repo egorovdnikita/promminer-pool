@@ -93,6 +93,8 @@ export interface Ui {
   tcol: string
   /** Снимок привязки на открытии — чтобы поймать «выбор не изменился». */
   tbase: string
+  /** Поиск внутри выпадающего списка селекта. */
+  selq: string
   /** Правки привязок по id воркера — переживают перерисовку списка. */
   wov: Record<number, { grp?: number[]; tags?: string[] }> | null
   qfocus: boolean

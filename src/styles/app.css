@@ -180,8 +180,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mrow{position:relative}
 .mrow .pop-wrap.full{position:static}
 .pop.menu.row{width:auto;left:0;right:0}
-/* Галочка выбранного пункта — зелёная (макеты выбора монеты и периода) */
-.pop.menu>button .ck,.pop .ck{display:flex;color:var(--pos)}
+/* Галочка выбранного пункта — фирменный акцент (357:98871) */
+.pop.menu>button .ck,.pop .ck{display:flex;color:var(--accent)}
 .pop.menu>button{padding:8px 12px!important;min-height:40px;gap:8px!important;
   font-size:var(--fs-b1)!important;line-height:var(--lh-b1)!important;font-weight:600}
 /* Состояния пунктов по макету 483:17894: ховер красит текст, подложки нет */
@@ -542,6 +542,7 @@ img.hex{object-fit:contain}
 /* Input из ДС: пока поле пустое, видна только подсказка 16; как только
    в поле что-то есть или оно в фокусе — сверху появляется подпись 12 */
 .inp:not(:focus-within):has(input:placeholder-shown) .k{display:none}
+.inp:focus-within input::placeholder{color:transparent}
 .inp input::placeholder{color:var(--c2);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .inp input{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .tabs2{display:flex;gap:2px;background:var(--bg);border-radius:var(--r-2xs);padding:3px;margin-bottom:18px}
@@ -557,7 +558,8 @@ img.hex{object-fit:contain}
   max-height:calc(100vh - 70px);overflow:hidden;display:flex;flex-direction:column}
 /* Шапка ДС: заголовок и под ним подзаголовок, крестик справа сверху */
 .mhead{display:flex;align-items:flex-start;gap:12px;min-height:40px;padding:24px 24px 16px;flex:0 0 auto}
-.mtitle{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.mtitle{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.mtitle h2{flex:0 0 auto;text-align:left;width:100%}
 .modal .mhead p.s{margin:0}
 /* Полоса прокрутки живёт в зарезервированном жёлобе, поэтому ширина
    контента одинакова и со скроллом, и без него. */
@@ -1489,8 +1491,8 @@ button.scsect:hover{color:var(--accent)}
 .tcard .ibr{width:48px;height:48px;border-radius:var(--r-m);flex:0 0 auto}
 .tcard .ted{background:var(--accent-sub);color:var(--accent)}
 .tcard .tdl{background:#ef44441f;color:var(--neg)}
-.tcard .tyes{background:var(--accent-sub);color:var(--accent)}
-.tcard .tno{background:var(--ctrl);color:var(--c1)}
+.tcard .tyes{background:var(--accent);color:#fff}
+.tcard .tno{background:transparent;border:1px solid var(--ctrl-line);color:var(--c1)}
 .tcard .ibr:hover{opacity:.8}
 .tcard.edit{gap:8px}
 .tcard .inp.row{flex:1;min-width:0;margin:0;height:48px;min-height:48px}
@@ -1499,6 +1501,8 @@ button.scsect:hover{color:var(--accent)}
 .tempty p{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)}
 
 /* --- Серийные номера (макет 173:66711) --- */
+/* у этой таблицы нет горизонтальной прокрутки, поэтому список не обрезаем */
+.tw:has(.sertbl){overflow:visible}
 .tbl.sertbl{table-layout:fixed}
 .tbl.sertbl th,.tbl.sertbl td{width:25%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tbl.sertbl td{padding:12px;height:47px}
@@ -1588,10 +1592,10 @@ button.scsect:hover{color:var(--accent)}
 .wdcopy:hover{color:var(--accent)}
 .wdcopy svg{width:24px;height:24px}
 .wdhead{display:flex;align-items:center;gap:8px}
-/* Подсказки у правого края карточки прижимаем вправо, иначе они
-   вылезают за страницу и дают горизонтальную прокрутку на 1440 */
-.wdedit[data-tip]::after,.wdcopy[data-tip]::after{left:auto;right:-8px;transform:none}
-.wdedit[data-tip]::before,.wdcopy[data-tip]::before{left:auto;right:4px;transform:none}
+/* Подсказки у правого края прижимаем вправо, иначе они вылезают
+   за контейнер и дают горизонтальную прокрутку */
+.wdedit[data-tip]::after,.wdcopy[data-tip]::after,.inp.cp .ibr[data-tip]::after{left:auto;right:-8px;transform:none}
+.wdedit[data-tip]::before,.wdcopy[data-tip]::before,.inp.cp .ibr[data-tip]::before{left:auto;right:4px;transform:none}
 .wdedit{width:24px;height:24px;color:var(--c3);flex:0 0 auto}
 .wdedit:hover{color:var(--accent)}
 .wdedit svg{width:24px;height:24px}
@@ -1654,7 +1658,7 @@ button.scsect:hover{color:var(--accent)}
 .inp.cp .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .inp.cp .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.inp.cp .ibr{width:24px;height:24px;color:var(--c3);flex:0 0 auto}
+.inp.cp .ibr{width:24px;height:24px;color:var(--accent);flex:0 0 auto}
 .inp.cp .ibr:hover{color:var(--accent)}
 .inp.cp .ibr svg{width:24px;height:24px}
 /* Инструкция: точки на таймлайне и линия между ними */
@@ -1685,3 +1689,9 @@ button.scsect:hover{color:var(--accent)}
 .pop.menu.smenu>button{padding:0!important;height:40px;gap:8px;font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
 .pop.menu.smenu .mdiv{margin:3.5px 0}
 .pop.menu.smenu .ck{margin-left:auto}
+
+/* Список моделей с поиском внутри (макет 223:100453) */
+.pop.menu.xmenu.find{max-height:386px;overflow-y:auto}
+.xfind{width:100%;height:40px;border-radius:var(--r-s);margin-bottom:8px;flex:0 0 auto}
+.xfind input{min-width:0}
+.xmenu .fempty{padding:8px 0}
