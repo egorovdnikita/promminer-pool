@@ -667,7 +667,7 @@ function refBlock(m){
   <div class="refrow">
     <div class="refmain">
       ${e?'<div class="hex none">0%</div>'
-        :`<img class="hex" src="/tier-${t.k}.png" alt="${t.p}" width="152" height="152">`}
+        :`<img class="hex" src="/tier-${t.k}-s.png" alt="${t.p}" width="152" height="152">`}
       <div class="refinfo">
         <div class="refstats">
           <div class="rstrow">${st('Ваша комиссия',e?'0%':`${t.p} (${t.n})`)}
@@ -692,7 +692,7 @@ function refBlock(m){
 const tierTrack=m=>`<div class="rprog track">
   <div class="rbar"><i style="width:${m.empty?0:TIERS[+S.tier].f}%"></i>
     <div class="rstars">${TIERS.map((t,i)=>
-      `<img src="/tier-${t.k}.png" alt="" class="${m.empty||i>+S.tier?'off':''}">`).join('')}</div></div>
+      `<img src="/tier-${t.k}-s.png" alt="">`).join('')}</div></div>
   <div class="rpct">${TIERS.map(t=>`<span>${t.p}</span>`).join('')}</div></div>`;
 
 /* --- Воркеры --- */
@@ -1606,7 +1606,7 @@ V.ref=m=>{
   <div class="rcard rlvcard">
     <div class="rlvtop">
       ${m.empty?'<span class="rhex off">0%</span>'
-        :`<span class="rhex"><img src="/tier-${TIERS[+S.tier].k}.png" alt=""></span>`}
+        :`<span class="rhex"><img src="/tier-${TIERS[+S.tier].k}-s.png" alt=""></span>`}
       <div class="rlvinfo">
         <div class="rlvrow"><div class="rlvk"><span class="k">Ваша комиссия</span>
           <b>${m.empty?'0%':m.tier.p}</b></div>${refCoinSel(m,'refcoin')}</div>
@@ -1619,7 +1619,7 @@ V.ref=m=>{
         <span class="rnext">До первого уровня: <b>${m.c.next}</b></span>
         <div class="rbar"><i style="width:${m.empty?0:TIERS[+S.tier].f}%"></i>
           <div class="rstars">${TIERS.map((t,i)=>
-            `<img src="/tier-${t.k}.png" alt="" class="${m.empty||i>+S.tier?'off':''}">`).join('')}</div></div>
+            `<img src="/tier-${t.k}-s.png" alt="">`).join('')}</div></div>
         <div class="rpct">${TIERS.map(t=>`<span>${t.p}</span>`).join('')}</div>
       </div>
       <button class="lnk a" data-modal="levels">Все об уровнях${I.cv}</button>
@@ -1647,7 +1647,7 @@ ${card(`<div class="ch"><h2>Настройка реферальных выпла
   ${U.rwarn?'':`<div class="alert info rinfo2"><div><b>Если хотите выводить в рублях</b><br>
     <span class="mut">Заполните форму, как Юридическое лицо или Индивидуальный предприниматель в разделе
       <button class="lnk a" data-go="verification">Верификация и реквизиты</button></span></div>
-    <button class="spacer dim" data-rwarn>${I.x}</button></div>`}
+    <button class="rx spacer" data-rwarn>${I.x}</button></div>`}
   <div class="tw"><table class="tbl atbl"><thead><tr><th>Монеты</th><th>Баланс</th>
     <th><span class="thico paico">${PAY_ICON['$']}</span> Баланс, $</th>
     <th><span class="thico paico">${PAY_ICON['₽']}</span> Баланс, ₽</th>
@@ -2731,12 +2731,12 @@ const MODALS={
   /* Уровни комиссии (467:41571): пороги по монете и раскрывающиеся привилегии */
   /* Уровни комиссии (467:41571): чёрная шапка с медалями, серый селектор
      монеты, список уровней с галочками и ссылка в справку внизу */
-  levels:{t:'',acts:false,size:'lv',noHead:true,
+  levels:{t:'',acts:false,size:'lv',noHead:true,noClose:true,
     b:m=>`<div class="lv">
       <div class="lvhero">
         <span class="g1"></span><span class="g2"></span>
         <div class="lvmed">${TIERS.map((t,i)=>
-          `<img src="/tier-${t.k}.png" alt="" class="m${i}">`).join('')}</div>
+          `<img src="/tier-${t.k}-s.png" alt="" class="m${i}">`).join('')}</div>
       </div>
       <div class="lvtop">
         <div class="lvtitle"><h2>Уровни комиссии</h2>${refCoinSel(m,'lvcoin')}</div>
@@ -2745,7 +2745,7 @@ const MODALS={
       </div>
       <div class="lvlist">${TIERS.map((t,i)=>`<div class="lvitem ${U.lvl===i?'on':''}">
         <button class="lvhead" data-lvl="${i}">
-          <img src="/tier-${t.k}.png" alt="" width="40" height="40">
+          <img src="/tier-${t.k}-s.png" alt="" width="40" height="40">
           <span><b>${t.p} (${t.n})</b><i>Хэшрейт рефералов ${TIER_RANGE[S.coin][i]}</i></span>
           ${i<=+S.tier?`<span class="lvok">${CHECK}</span>`:''}${I.cd}</button>
         ${U.lvl===i?`<ul class="lvperks">${TIER_PERKS[i].map(x=>`<li>${x}</li>`).join('')}</ul>`:''}

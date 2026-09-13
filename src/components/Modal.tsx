@@ -23,7 +23,7 @@ export function Modal({ m }: { m: Model }) {
       <div className={d.sheet ? 'modal sheet' : d.size ? 'modal ' + d.size : 'modal'}>
         {d.noHead ? (
           /* Окно без шапки: заголовок живёт внутри тела (467:41571) */
-          close
+          d.noClose ? null : close
         ) : d.img ? (
           // Modal HeaderA с иллюстрацией: баннер, крестик поверх, заголовок под ним
           <div className="mhead img">

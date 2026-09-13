@@ -1454,7 +1454,9 @@ button.scsect:hover{color:var(--accent)}
 .pop.menu.expmenu{width:200px;min-width:200px;padding:6px 12px;gap:0}
 .pop.menu.expmenu>button{gap:8px;height:40px;padding:0!important;font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
 .pop.menu.expmenu button svg{width:24px;height:24px;flex:0 0 auto;color:var(--c1)}
-.mdiv{height:1px;flex:0 0 1px;background:var(--border);margin:4px 0}
+/* Разделитель пункта списка — обводка #6b7280, как в компоненте ДС (514:79122);
+   прежние 16 % были почти не видны */
+.mdiv{height:1px;flex:0 0 1px;background:var(--ctrl-line-h);margin:4px 0}
 /* Модалка экспорта — 400 по макету 173:66473, кнопки друг под другом */
 /* Модалка экспорта в макете фиксированные 400×820: подвал прижат к низу */
 .modal.xs{max-width:400px;height:820px}
@@ -1885,6 +1887,8 @@ button.scsect:hover{color:var(--accent)}
 .card.rcard{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
 .card.rcard>.tw{flex:1 1 auto;min-height:0;overflow:auto}
 .card:has(.rtbl){padding:8px 8px 16px}
+/* Шапка карточки выплат: заголовок и уведомление с паддингом 16 и шагом 16 */
+.card:has(.atbl)>.ch+.rinfo2{margin:0 16px 16px}
 .card:has(.rtbl)>.rnote{margin:0 0 16px}
 .rtbl th,.rtbl td{height:48px;padding:0 12px}
 .rtbl td{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
@@ -2017,9 +2021,8 @@ button.scsect:hover{color:var(--accent)}
 /* Полоса с медалями уровней прямо на ней (514:81255) */
 .rbar{position:relative;height:20px;border-radius:var(--r-f);background:var(--ctrl)}
 .rbar>i{display:block;height:100%;border-radius:var(--r-f);background:var(--accent)}
-.rstars{position:absolute;inset:-10px 0;display:flex;align-items:center;justify-content:space-between}
+.rstars{position:absolute;inset:-10px -2px;display:flex;align-items:center;justify-content:space-between}
 .rstars img{width:40px;height:40px;object-fit:contain}
-.rstars img.off{filter:grayscale(1);opacity:.45}
 .rpct{display:flex;justify-content:space-between;gap:4px;
   font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:600}
 /* Селектор монеты уровня (514:67943): название и тикер, иконка 32 перед стрелкой */
@@ -2071,7 +2074,8 @@ button.scsect:hover{color:var(--accent)}
 /* Модалка «Уровни комиссии» */
 /* Модалка «Уровни комиссии» (467:41571) */
 .modal.lv{max-width:500px}
-.modal.lv .mbody{padding:8px 8px 24px}
+.modal.lv{max-height:none}
+.modal.lv .mbody{padding:8px 8px 24px;overflow:visible}
 .lv{display:flex;flex-direction:column;gap:24px}
 .lvhero{position:relative;overflow:hidden;height:144px;border-radius:20px;background:#000;
   display:grid;place-items:center}
@@ -2171,8 +2175,11 @@ button.scsect:hover{color:var(--accent)}
   background:var(--bg);color:var(--c1)}
 .alert.rinfo2>svg{color:var(--c3)}
 .alert.rinfo2 b{color:var(--c1);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
-.alert.rinfo2 .mut{display:block;margin-top:8px;color:var(--c2);
+.alert.rinfo2 .mut{display:block;margin-top:4px;color:var(--c2);
   font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500}
+.alert.rinfo2 br{display:none}
+.alert.rinfo2 .rx{margin-left:auto;color:var(--c3);flex:0 0 auto}
+.alert.rinfo2 .rx svg{width:24px;height:24px}
 /* Селект монеты строится по содержимому, как Hug в макете (788:113658) */
 .fsel{min-width:0;width:auto}
 .ch .fsel{gap:4px}
