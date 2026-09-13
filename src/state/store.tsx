@@ -149,17 +149,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const wrap = (e.target as HTMLElement)?.closest?.('.chartwrap[data-chart]') as HTMLElement | null
       if (!wrap) return
       const cfg = JSON.parse(wrap.dataset.chart!)
-      const svg = wrap.querySelector('svg')!
-      const box = svg.getBoundingClientRect()
-      const kx = box.width / cfg.W, ky = box.height / cfg.H
-      const iw = cfg.W - cfg.PL - cfg.PR, ih = cfg.H - cfg.PT - cfg.PB
-      const rel = (e.clientX - box.left) / kx
-      const i = Math.round(((rel - cfg.PL) / iw) * (cfg.N - 1))
+      /* .chartwrap теперь ровно поле графика: подписи осей живут в HTML рядом,
+         поэтому проценты считаем прямо от его размеров */
+      const box = wrap.getBoundingClientRect()
+      const t01 = (e.clientX - box.left) / box.width
+      const i = Math.round(t01 * (cfg.N - 1))
       if (i < 0 || i > cfg.N - 1) { wrap.classList.remove('on'); return }
       const v = cfg.p[i]
-      const px = (cfg.PL + (i / (cfg.N - 1)) * iw) * kx
-      const py = (cfg.PT + ih - (v / 100) * ih) * ky
-      const pr = (cfg.PT + ih - 2) * ky
+      const px = (i / (cfg.N - 1)) * box.width
+      const py = box.height - (v / 100) * box.height
+      const pr = box.height - 2
       const line = wrap.querySelector('.chline') as HTMLElement
       const dh = wrap.querySelector('.cdot.ch') as HTMLElement
       const dr = wrap.querySelector('.cdot.cr') as HTMLElement

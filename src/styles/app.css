@@ -285,7 +285,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .tbl.wtbl th:last-child,.tbl.wtbl td:last-child{width:68px}
 /* Меню действий и его заблокированный пункт */
 /* Экшн-меню строки воркера — 169×192 из макета 173:59516 */
-.pop.menu.wkmenu{width:169px;min-width:169px;padding:4px 12px;gap:8px;align-items:stretch}
+/* Размер из макета: четыре пункта по 40 с шагом 8 в поле 169×192 */
+.pop.menu.wkmenu{width:169px;min-width:169px;height:192px;padding:4px 12px;gap:8px;align-items:stretch;overflow:hidden}
 .pop.menu.wkmenu>button,.pop.menu.wkmenu .mi{font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
 .pop.menu.wkmenu .del{color:var(--neg)}
 .wkmenu .mi.off{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:40px;
@@ -1199,11 +1200,25 @@ html{scrollbar-gutter:stable}
 .card.chartcard{display:flex;flex-direction:column;gap:24px}
 .card.chartcard>.ch{margin:0}
 .cbody{display:flex;flex-direction:column;gap:20px}
+/* Поле графика и подписи: деления живут в HTML, поэтому их кегль
+   не зависит от ширины блока (audit-worker-detail, пункт 7) */
+.cplot{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-rows:auto auto}
+.cyl,.cyr{position:relative;width:44px}
+.cyl{grid-column:1;grid-row:1}
+.cyr{grid-column:3;grid-row:1}
+.cyl i,.cyr i{position:absolute;transform:translateY(-50%);font-style:normal;
+  font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--c1);white-space:nowrap}
+.cyl i{right:8px}
+.cyr i{left:8px}
+.cxl{grid-column:2;grid-row:2;position:relative;height:22px}
+.cxl i{position:absolute;top:6px;transform:translateX(-50%);font-style:normal;
+  font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--c3);white-space:nowrap}
 /* Наведение на график: вертикальная линия, точки на сериях и подсказка */
-.chartwrap{position:relative}
+.chartwrap{position:relative;grid-column:2;grid-row:1;min-width:0}
+.chartwrap svg{display:block;width:100%;height:100%}
 .chartwrap .chline,.chartwrap .cdot,.chartwrap .ctip{position:absolute;opacity:0;transition:opacity .12s;pointer-events:none}
 .chartwrap.on .chline,.chartwrap.on .cdot,.chartwrap.on .ctip{opacity:1}
-.chline{top:0;bottom:26px;width:1px;background:var(--ctrl-line-h)}
+.chline{top:0;bottom:0;width:1px;background:var(--ctrl-line-h)}
 .cdot{width:10px;height:10px;border-radius:50%;margin:-5px 0 0 -5px;border:2px solid var(--surface)}
 .cdot.ch{background:var(--accent)}
 .cdot.cr{background:var(--warn)}
@@ -1487,6 +1502,8 @@ button.scsect:hover{color:var(--accent)}
 .wdinfo:hover .wdpen{color:var(--accent)}
 /* Три карточки 208: сводка с акцентной плашкой, показатели, параметры */
 .card.wdcard{min-height:208px;display:flex;flex-direction:column;padding:24px}
+/* На 1440 три карточки остаются в ряд, как в кадре 230:5518 */
+@media(max-width:1450px){.main .grid.g3.wdgrid{grid-template-columns:repeat(3,1fr)}}
 .wdplate{background:var(--accent);border-radius:var(--r-m);padding:16px;color:#fff}
 .wdplate .l{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .wdplate .v{display:block;font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600;margin-top:12px}
@@ -1502,13 +1519,19 @@ button.scsect:hover{color:var(--accent)}
 .wdkv .v{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;
   font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.wdcoin,.wdsn{display:inline-flex;align-items:center;gap:8px;max-width:100%;vertical-align:middle}
+.wdcoin,.wdsn{display:inline-flex;align-items:center;gap:8px;max-width:100%;min-width:0;vertical-align:middle}
+/* Длинная модель обрезается многоточием, а не распирает карточку */
+.wdkv .v>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .wdcoin svg{width:24px;height:24px;flex:0 0 auto}
 .wdsn .mono{overflow:hidden;text-overflow:ellipsis}
 .wdcopy{width:24px;height:24px;color:var(--c3);flex:0 0 auto}
 .wdcopy:hover{color:var(--accent)}
 .wdcopy svg{width:24px;height:24px}
 .wdhead{display:flex;align-items:center;gap:8px}
+/* Подсказки у правого края карточки прижимаем вправо, иначе они
+   вылезают за страницу и дают горизонтальную прокрутку на 1440 */
+.wdedit[data-tip]::after,.wdcopy[data-tip]::after{left:auto;right:-8px;transform:none}
+.wdedit[data-tip]::before,.wdcopy[data-tip]::before{left:auto;right:4px;transform:none}
 .wdedit{width:24px;height:24px;color:var(--c3);flex:0 0 auto}
 .wdedit:hover{color:var(--accent)}
 .wdedit svg{width:24px;height:24px}

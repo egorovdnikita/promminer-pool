@@ -430,8 +430,14 @@ function pager(id,total,def=10){
 }
 
 function chart(m,opts={}){
+  /* Геометрия макета: viewBox 1400×H с полями под подписи. Сами подписи
+     живут в HTML, а svg рисует только поле графика — поэтому растягивание
+     по ширине (preserveAspectRatio="none") больше не плющит текст.
+     Пропорции поля сохраняем через aspect-ratio, чтобы высота блока
+     менялась с шириной ровно как раньше. */
   const W=1400,H=opts.h||290,PL=56,PR=opts.right===false?20:46,PT=12,PB=26;
-  const iw=W-PL-PR, ih=H-PT-PB, N=120, r=rng(S.coin==='btc'?7:13);
+  const PW=W-PL-PR, PH=H-PT-PB;
+  const N=120, r=rng(S.coin==='btc'?7:13);
   const smooth=opts.smooth;
   let p=[];
   for(let i=0;i<N;i++){
@@ -439,40 +445,38 @@ function chart(m,opts={}){
     if(smooth) p.push(6+ (i/N)*70 + Math.sin(i/14)*7);
     else p.push(i<14 ? 2+r()*3 : Math.max(0,Math.min(100, 62+(r()-.5)*26+Math.sin(i/6)*6)));
   }
-  const x=i=>PL+(i/(N-1))*iw, y=v=>PT+ih-(v/100)*ih;
+  const x=i=>(i/(N-1))*PW, y=v=>PH-(v/100)*PH;
   const ln=p.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
-  const ar=`${ln} L${x(N-1).toFixed(1)},${PT+ih} L${PL},${PT+ih} Z`;
-  /* svg тянется по ширине (1400 → ~1593 на 1920), поэтому кегль делений
-     задаём с поправкой, чтобы на экране получилось 12 */
-  /* svg тянется по ширине контейнера, поэтому кегль делений пересчитываем
-     из ширины блока: cw — сколько пикселей занимает график на экране */
-  const TS=(opts.ts||12)*(1400/(opts.cw||1593));
+  const ar=`${ln} L${PW},${PH} L0,${PH} Z`;
   const ticks=opts.ticks||[0,150,300,450,600,750,900,1050,1200,1350,1500];
   const hrs=opts.xs||['14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00','01:00','02:00','03:00','04:00','05:00','06:00'];
-  /* Подписи осей в макете живут вне графика строкой 20 (16 Medium), иначе их
-     растягивает вместе с svg; цифры делений — 12 SemiBold, время — Tertiary */
-  const outer=opts.axisHtml;
+  const right=opts.right!==false;
   const yl=opts.yl??('Хэшрейт, '+m.c.unit);
-  const caps=outer?`<div class="caxis"><span>${yl}</span>${opts.right===false?'':'<span>Реджект, %</span>'}</div>`:'';
-  /* Наведение: геометрию и значения кладём в data-атрибут, чтобы обработчик
-     двигал линию и подсказку по живому DOM, не перерисовывая экран */
-  const hov=opts.hover?` data-chart='${JSON.stringify({W,H,PL,PR,PT,PB,N,
+  const at=i=>(100-i/(ticks.length-1)*100).toFixed(3);
+  /* Наведение: геометрию считает обработчик по самому .chartwrap —
+     он теперь совпадает с полем графика, поля в данные не кладём. */
+  const hov=opts.hover?` data-chart='${JSON.stringify({N,
     p:p.map(v=>+v.toFixed(1)),hrs,max:ticks[ticks.length-1],unit:m.c.unit})}'`:'';
   const hovDom=opts.hover?`<i class="chline"></i><i class="cdot ch"></i><i class="cdot cr"></i><div class="ctip"></div>`:'';
-  return `${outer?'<div class="cbody">':''}${caps}<div class="chartwrap"${hov}><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:${opts.hpx?opts.hpx+'px':'auto'}" preserveAspectRatio="none">
-    ${outer?'':`<text x="${PL}" y="9" font-size="12" fill="var(--c3)" font-weight="600">${yl}</text>`}
-    ${outer||opts.right===false?'':`<text x="${W-PR}" y="9" font-size="12" fill="var(--c3)" text-anchor="end" font-weight="600">Реджект, %</text>`}
-    ${ticks.map((t,i)=>{const yy=PT+ih-(i/(ticks.length-1))*ih;return`<line x1="${PL}" y1="${yy}" x2="${W-PR}" y2="${yy}" stroke="var(--border)"/>
-      <text x="${PL-8}" y="${yy+4}" font-size="${TS}" font-weight="600" fill="var(--c1)" text-anchor="end">${m.empty?0:t}</text>
-      ${opts.right===false?'':`<text x="${W-PR+8}" y="${yy+4}" font-size="${TS}" font-weight="600" fill="var(--c1)">${i*10}</text>`}`}).join('')}
-    ${m.empty?'':`<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".22"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
-      <path d="${ar}" fill="url(#ag)"/><path d="${ln}" fill="none" stroke="var(--accent)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
-      ${opts.right===false?'':`<path d="M${PL},${PT+ih-2} L${W-PR},${PT+ih-3}" fill="none" stroke="var(--warn)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>`}`}
-    ${hrs.map((h,i)=>`<text x="${PL+(i/(hrs.length-1))*iw}" y="${H-5}" font-size="${TS}" font-weight="600" fill="var(--c3)" text-anchor="middle">${h}</text>`).join('')}
-  </svg>${hovDom}</div>${outer?'</div>':''}
-  ${opts.right===false?'':`<div class="clegend">
+  return `<div class="cbody">
+  ${yl||right?`<div class="caxis"><span>${yl}</span>${right?'<span>Реджект, %</span>':''}</div>`:''}
+  <div class="cplot">
+    <div class="cyl">${ticks.map((t,i)=>`<i style="top:${at(i)}%">${m.empty?0:t}</i>`).join('')}</div>
+    <div class="chartwrap" style="aspect-ratio:${PW} / ${PH}"${hov}>
+      <svg viewBox="0 0 ${PW} ${PH}" preserveAspectRatio="none">
+        ${ticks.map((t,i)=>{const yy=PH-(i/(ticks.length-1))*PH;
+          return `<line x1="0" y1="${yy}" x2="${PW}" y2="${yy}" stroke="var(--border)" vector-effect="non-scaling-stroke"/>`}).join('')}
+        ${m.empty?'':`<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--accent)" stop-opacity=".22"/><stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
+          <path d="${ar}" fill="url(#ag)"/><path d="${ln}" fill="none" stroke="var(--accent)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+          ${right?`<path d="M0,${PH-2} L${PW},${PH-3}" fill="none" stroke="var(--warn)" stroke-width="1.4" vector-effect="non-scaling-stroke"/>`:''}`}
+      </svg>${hovDom}
+    </div>
+    ${right?`<div class="cyr">${ticks.map((t,i)=>`<i style="top:${at(i)}%">${i*10}</i>`).join('')}</div>`:''}
+    <div class="cxl">${hrs.map((h,i)=>`<i style="left:${(i/(hrs.length-1)*100).toFixed(3)}%">${h}</i>`).join('')}</div>
+  </div>
+  ${right?`<div class="clegend">
     <span><i style="background:var(--accent)"></i>Хэшрейт</span>
-    <span><i style="background:var(--warn)"></i>Реджект</span></div>`}`;
+    <span><i style="background:var(--warn)"></i>Реджект</span></div>`:''}</div>`;
 }
 
 /* ============================================================
@@ -505,7 +509,7 @@ ${cards.length?`<div class="grid g3" style="gap:16px;margin:0">${cards.join('')}
 ${p.workers?card(`<div class="ch"><h2>График изменения хэшрейта (${m.bal[0].s})</h2>
   <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],2)}
   <span class="pop-wrap"><button class="pill ctl sq mono lg" data-pop="date">29.01.2026 – 30.01.2026 ${I.cal}</button>${pop==='date'?datePicker():''}</span>
-  <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{h:359,axisHtml:true,hover:true})}`,'chartcard'):''}
+  <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{h:359,hover:true})}`,'chartcard'):''}
 ${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,0):`<h2>${tabs[0]}</h2>`}
   <div class="spacer"></div>${m.bal.length>1?`<span class="pill flat sq">${COIN_ICON.LTC} LTC ${I.cd}</span>`:''}
   <button class="ib ctl" data-toast="Отчет скачан">${I.dl}</button></div>
@@ -683,12 +687,22 @@ function taxonBody(k,bind){
 
 /* Производители из дизайн-системы (Brands 148:49846) — логотипы выгружены
    в public/logo-*.svg. По ним же группирует фильтр моделей в шторке. */
+/* Фильтр в шторке группирует по пяти производителям из макета 173:65616 */
 const MODELS=[['bitmain','Bitmain'],['canaan','Canaan Avalon'],['whatsminer','Whatsminer'],
   ['iceriver','IceRiver'],['bitdeer','Bitdeer']];
-const VENDORS=[[/avalon/i,'canaan'],[/whatsminer|^M\d/i,'whatsminer'],[/ice|^KS/i,'iceriver'],
+/* Логотипы выгружены на все 14 брендов из ДС (Brands 148:49846) — в таблице
+   значок должен находиться для любой модели, а не только для пяти из фильтра */
+const VENDOR_NAMES={bitmain:'Bitmain',canaan:'Canaan Avalon',whatsminer:'Whatsminer',
+  iceriver:'IceRiver',bitdeer:'Bitdeer',anexminer:'AnexMiner',hummer:'Hummer',
+  goldshell:'Goldshell',elphapex:'Elphapex',yami:'YAMI',ipollo:'iPollo',
+  ibelink:'iBeLink',jasminer:'Jasminer',innosilicon:'Innosilicon'};
+const VENDORS=[[/avalon/i,'canaan'],[/whatsminer|^M\d/i,'whatsminer'],[/ice\s?river|^KS/i,'iceriver'],
+  [/bitdeer|^SEAL/i,'bitdeer'],[/anex/i,'anexminer'],[/hummer/i,'hummer'],[/goldshell/i,'goldshell'],
+  [/elphapex|^DG/i,'elphapex'],[/yami/i,'yami'],[/ipollo/i,'ipollo'],[/ibelink/i,'ibelink'],
+  [/jasminer/i,'jasminer'],[/innosilicon/i,'innosilicon'],
   [/antminer|^S\d|^L\d/i,'bitmain']];
 const vendorOf=model=>(VENDORS.find(([re])=>re.test(String(model)))||[0,'bitmain'])[1];
-const vendorName=k=>(MODELS.find(x=>x[0]===k)||[0,''])[1];
+const vendorName=k=>VENDOR_NAMES[k]||'';
 const vlogo=k=>`<span class="vlogo"><img src="/logo-${k}.svg" alt="" width="24" height="24"></span>`;
 /* Сколько фильтров применено — счётчик на кнопке «Фильтры» (612:100188) */
 const fcount=()=>U.fapp?U.fapp.t.length+U.fapp.m.length:0;
@@ -924,7 +938,7 @@ V.worker=m=>{
       <span class="wdlink"><i>Порог уведомлений:</i><b>${thr?`225 ${m.c.unit}`:'Не настроено'}</b>
         <span class="wdpen">${I.edit}</span></span></button>
   </div>
-  <div class="grid g3" style="gap:16px;margin:0">
+  <div class="grid g3 wdgrid" style="gap:16px;margin:0">
     ${card(`<div class="wdplate">
       <span class="l">Средний хэшрейт за 24 ч</span>
       <b class="v mono">${m.empty?0:nf(w.h24,2)} ${m.c.unit}</b></div>
@@ -949,7 +963,7 @@ V.worker=m=>{
       ${seg('wk-range',['5 мин','1 ч','24 ч'],2)}
       <span class="pop-wrap"><button class="pill ctl sq mono lg wdcal" data-pop="wdate">05.04.2026 – 12.04.2026 ${I.cal}</button>${pop==='wdate'?datePicker():''}</span>
       <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>
-      ${chart(m,{h:638,cw:1173,axisHtml:true,hover:true})}`)}
+      ${chart(m,{h:626,hover:true})}`)}
     <div class="wdside">
       ${card(`<h2 class="wdh2">События</h2>
         ${m.empty?'<p class="fempty">Событий пока нет</p>'
