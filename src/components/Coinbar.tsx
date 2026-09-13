@@ -4,7 +4,8 @@ import { useApp } from '@/state/store'
 import { Ico } from './Raw'
 
 /* у калькулятора доходности монета выбирается внутри панели (макет 5:3779) */
-const WITH_COIN = ['home', 'workers', 'income', 'payouts', 'ref', 'summary', 'sumworkers', 'sumincome']
+/* на общей информации о рефералах монета выбирается в карточке уровня (514:79281) */
+const WITH_COIN = ['home', 'workers', 'income', 'payouts', 'summary', 'sumworkers', 'sumincome']
 
 export function Coinbar({ m }: { m: Model }) {
   const { S, route, pop } = useApp()

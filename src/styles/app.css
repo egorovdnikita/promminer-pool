@@ -187,7 +187,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mrow .pop-wrap.full{position:static}
 .pop.menu.row{width:auto;left:0;right:0}
 /* Галочка выбранного пункта — фирменный акцент (357:98871) */
-.pop.menu>button .ck,.pop .ck{display:flex;color:var(--accent)}
+.pop.menu>button .ck,.pop .ck{display:flex;color:var(--accent);margin-left:auto}
+.pop.menu>button .ck svg,.pop .ck svg{width:24px;height:24px}
 .pop.menu>button{padding:8px 12px!important;min-height:40px;gap:8px!important;
   font-size:var(--fs-b1)!important;line-height:var(--lh-b1)!important;font-weight:600}
 /* Состояния пунктов по макету 483:17894: ховер красит текст, подложки нет */
@@ -504,7 +505,8 @@ img.hex{object-fit:contain}
 .hex.none{background:url('/tier-0.svg') center/130px 146px no-repeat;
   font-size:var(--fs-h2);line-height:22px;font-weight:500;color:var(--c3)}
 /* дорожка 590 из 642: справа ещё 24, отсюда просвет до панели */
-.track{margin-top:0;padding:0 24px 0 0}
+/* дорожка уровней использует стили .rprog из раздела рефералов */
+.track{padding:0 24px 0 0}
 /* полоса заходит под крайние медали: их шестиугольник начинается на 8 % от
    края картинки, поэтому без отступа 3 она торчит слева от первой звезды */
 .tbar{height:20px;margin:0 3px;border-radius:var(--r-f);background:#6b728014;overflow:hidden}
@@ -1995,9 +1997,11 @@ button.scsect:hover{color:var(--accent)}
 /* у карточки уровня паддинги живут внутри блоков, как в макете */
 .rlvcard{padding:0 0 24px;gap:8px;justify-content:space-between;overflow:hidden}
 .rlvtop{display:flex;align-items:flex-start;gap:4px}
-/* Шестиугольник уровня: серая фигура и процент 40 Medium (514:67943) */
-.rhex{width:152px;height:152px;flex:0 0 auto;display:grid;place-items:center;background:var(--bg);
-  color:var(--c3);font-size:var(--fs-h2);line-height:1;font-weight:500;
+/* Шестиугольник уровня: медаль достигнутого уровня, на нулевом — серая
+   фигура с процентом 40 Medium (514:67943) */
+.rhex{width:152px;height:152px;flex:0 0 auto;display:grid;place-items:center}
+.rhex img{width:152px;height:152px;object-fit:contain}
+.rhex.off{background:var(--bg);color:var(--c3);font-size:var(--fs-h2);line-height:1;font-weight:500;
   clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
 .rlvinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding:24px 24px 16px 4px}
 .rlvrow{display:flex;align-items:center;gap:12px}
@@ -2161,10 +2165,14 @@ button.scsect:hover{color:var(--accent)}
 /* Кнопка выгрузки в шапке карточки — серая заливка, без обводки (788:113658) */
 .ch .ib{background:var(--ctrl);border:0;border-radius:var(--r-m)}
 .ch .ib:hover{background:var(--ctrl-hover)}
-/* Уведомление о рублёвых выплатах — информационное, отступ снизу 16 (514:79281) */
-.alert.rinfo2{margin:0 0 16px;align-items:flex-start}
-.alert.rinfo2 b{color:#3b82f6}
-.alert.rinfo2 .mut{display:block;color:var(--c2);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500}
+/* Уведомление о рублёвых выплатах: серая подложка #f3f4f6, радиус 16,
+   паддинг 16, зазор 8, заголовок тёмный (514:79281) */
+.alert.rinfo2{margin:0 0 16px;align-items:flex-start;gap:8px;padding:16px;border-radius:var(--r-m);
+  background:var(--bg);color:var(--c1)}
+.alert.rinfo2>svg{color:var(--c3)}
+.alert.rinfo2 b{color:var(--c1);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.alert.rinfo2 .mut{display:block;margin-top:8px;color:var(--c2);
+  font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500}
 /* Селект монеты строится по содержимому, как Hug в макете (788:113658) */
 .fsel{min-width:0;width:auto}
 .ch .fsel{gap:4px}

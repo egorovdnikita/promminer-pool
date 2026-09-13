@@ -410,7 +410,7 @@ const xsel=(label,id,opts,ico,find)=>{const i=U.seg[id]??0; const pic=v=>ico?(ic
     ${pop===id?`<div class="pop menu xmenu ${find?'find':''}">
       ${find?`<label class="search xfind">${I.srch}<input id="selq" placeholder="Поиск" value="${String(U.selq||'').replace(/"/g,'&quot;')}"></label>`:''}
       ${shown.length?shown.map(([o,j],n)=>
-        `${n?'<div class="mdiv"></div>':''}<button class="${i===j?'on':''}" data-seg="${id}" data-i="${j}">${pic(o)}${o}${i===j?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')
+        `${n?'<div class="mdiv"></div>':''}<button class="${i===j?'on':''}" data-seg="${id}" data-i="${j}">${pic(o)}${o}${i===j?`<span class="ck">${I.okc}</span>`:''}</button>`).join('')
         :'<p class="fempty">Результатов не найдено</p>'}</div>`:''}</span></div>`};
 /* Segment Control Line — тот же контракт, что у seg(), но линейный вариант DS */
 const segLine=(id,opts,def=0,cls='')=>{const c=U.seg[id]??def;
@@ -475,8 +475,8 @@ function pager(id,total,def=10){
   /* Pagination дизайн-системы: подпись «Показать» стоит над селектом */
   return `<div class="pager"><span class="perpage"><span class="lb">Показать</span>
     <span class="pop-wrap"><button class="selbox sm" data-pop="per-${id}">${per} строк<span class="spacer">${I.cd}</span></button>
-      ${pop==='per-'+id?`<div class="pop menu up" style="width:110px">${PER_OPTS.map(o=>
-        `<button data-per="${id}:${o}">${o} строк${o===per?`<span class="ck spacer">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></span>
+      ${pop==='per-'+id?`<div class="pop menu up" style="width:110px">${PER_OPTS.map((o,n)=>
+        `${n?'<div class="mdiv"></div>':''}<button data-per="${id}:${o}">${o} строк${o===per?`<span class="ck">${I.okc}</span>`:''}</button>`).join('')}</div>`:''}</span></span>
     <span class="pshown">Показано ${from}–${to} из ${ni(total)}</span>
     <span class="pg"><button data-page="${id}" data-p="${cur-1}" ${cur<=1?'disabled':''}>${I.cl}</button>
     ${nums.map(n=>n==='…'?'<button disabled>…</button>':`<button class="${n===cur?'on':''}" data-page="${id}" data-p="${n}">${n}</button>`).join('')}
@@ -688,9 +688,12 @@ function refBlock(m){
   </div>
   <div class="tfoot"><button class="btn link" data-go="ref">Подробно о программе</button></div>`;
 }
-const tierTrack=m=>`<div class="track">
-  <div class="tbar"><div class="tfill" style="width:${m.empty?0:TIERS[+S.tier].f}%"></div></div>
-  <div class="tpts">${TIERS.map(x=>`<div class="pt"><img src="/tier-${x.k}-s.png" alt="" width="40" height="40"><span>${x.p}</span></div>`).join('')}</div></div>`;
+/* Дорожка уровней — тот же прогресс-бар, что в разделе рефералов (514:81255) */
+const tierTrack=m=>`<div class="rprog track">
+  <div class="rbar"><i style="width:${m.empty?0:TIERS[+S.tier].f}%"></i>
+    <div class="rstars">${TIERS.map((t,i)=>
+      `<img src="/tier-${t.k}.png" alt="" class="${m.empty||i>+S.tier?'off':''}">`).join('')}</div></div>
+  <div class="rpct">${TIERS.map(t=>`<span>${t.p}</span>`).join('')}</div></div>`;
 
 /* --- Воркеры --- */
 /* Группы площадок — лента Segment Control Line из макета «Воркеры» */
@@ -1148,7 +1151,7 @@ const KERR={code:'Введен неверный код',old:'Код недейс
 const csel=(id,cur,off)=>`<span class="pop-wrap"><button class="csel ${pop===id?'open':''}" data-pop="${id}">${COIN_ICON[cur]}${cur}<span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu csmenu">${ASSETS.map((a,n)=>{
     const d=off&&off(a);
-    return `${n?'<div class="mdiv"></div>':''}<button class="${a.s===cur?'on':''} ${d?'dis':''}" ${d?'disabled':`data-coin2="${a.s}"`}>${COIN_ICON[a.s]}${a.s}${a.s===cur?`<span class="ck">${CHECK}</span>`:''}</button>`}).join('')}</div>`:''}</span>`;
+    return `${n?'<div class="mdiv"></div>':''}<button class="${a.s===cur?'on':''} ${d?'dis':''}" ${d?'disabled':`data-coin2="${a.s}"`}>${COIN_ICON[a.s]}${a.s}${a.s===cur?`<span class="ck">${I.okc}</span>`:''}</button>`}).join('')}</div>`:''}</span>`;
 /* Поле суммы: контейнер 106 с подписью сверху, валютой справа и строкой
    «Минимум / Максимум» вплотную под ним (226:124696) */
 const amtField=(label,val,right,min,max)=>`<div class="amtw">
@@ -1215,7 +1218,7 @@ const dayChips=(id,def=null)=>`<span class="dchips">${['7 дн','30 дн','90 д
 const fsel=(id,opts,ico)=>{const i=U.seg[id]??0; const pic=v=>ico?(ico(v)||''):'';
   return `<span class="pop-wrap"><button class="fsel ${pop===id?'open':''}" data-pop="${id}">${pic(opts[i])}${opts[i]}<span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu ${ico?'coins':''}">${opts.map((o,n)=>
-    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${pic(o)}${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
+    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${pic(o)}${o}${i===n?`<span class="ck">${I.okc}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 /* Date Input 256x48 с плейсхолдером 16 SemiBold (15:19710) — открывает календарь */
 const dateInput=(id='d')=>{const v=U.dsel['dp'+id];
   return `<span class="pop-wrap"><button class="dinput ${v?'on':''} ${pop==='dp'+id?'open':''}" data-pop="dp${id}">
@@ -1323,18 +1326,18 @@ const cfield=(label,val,extra='')=>`<div class="cfield">
 const curSel=(id,opts)=>{const i=U.seg[id]??0;
   return `<span class="pop-wrap cur"><button class="curbtn ${pop===id?'open':''}" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu msmenu">${opts.map((o,n)=>
-    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
+    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${I.okc}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 /* Поле-селект: выглядит как Input 56 с подписью и шевроном (3:37133) */
 const cselField=(label,id,opts)=>{const i=U.seg[id]??0;
   return `<span class="pop-wrap full"><button class="cfield csel2 lab ${pop===id?'open':''}" data-pop="${id}">
     <span class="k">${label}</span><span class="v">${opts[i]}</span><span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu" style="min-width:348px">${opts.map((o,n)=>
-    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
+    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${I.okc}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 /* Компактный выпадающий список внутри поля (валюта курса, 3:37127) */
 const minisel=(id,opts)=>{const i=U.seg[id]??0;
   return `<span class="pop-wrap"><button class="msel ${pop===id?'open':''}" data-pop="${id}">${opts[i]}${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu msmenu">${opts.map((o,n)=>
-    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
+    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${I.okc}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 
 V.calc=m=>{
   const d30=segi('calc-period',1);
@@ -1577,7 +1580,7 @@ const refCoinSel=(m,id)=>`<span class="pop-wrap"><button class="rcoin ${pop===id
     const c=COINS[v], ic=v==='ltc'?COIN_ICON.LTC+COIN_ICON.DOGE:COIN_ICON[v.toUpperCase()];
     return `${n?'<div class="mdiv"></div>':''}<button class="${S.coin===v?'on':''}" data-axis="coin" data-val="${v}">
       <span class="t"><b>${c.refCoin[0]}</b><i>${c.refCoin[1]}</i></span>
-      <span class="ic">${ic}</span></button>`}).join('')}</div>`:''}</span>`;
+      <span class="ic">${ic}</span>${S.coin===v?`<span class="ck">${I.okc}</span>`:''}</button>`}).join('')}</div>`:''}</span>`;
 /* Таблица реферального дохода — колонки свои (534:54490) */
 function refIncomeTable(m,n,pid){
   if(!n) return emptyBox('Дохода пока нет','Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение');
@@ -1602,7 +1605,8 @@ V.ref=m=>{
   return `<div class="rcards">
   <div class="rcard rlvcard">
     <div class="rlvtop">
-      <span class="rhex">${m.empty?'0%':m.tier.p}</span>
+      ${m.empty?'<span class="rhex off">0%</span>'
+        :`<span class="rhex"><img src="/tier-${TIERS[+S.tier].k}.png" alt=""></span>`}
       <div class="rlvinfo">
         <div class="rlvrow"><div class="rlvk"><span class="k">Ваша комиссия</span>
           <b>${m.empty?'0%':m.tier.p}</b></div>${refCoinSel(m,'refcoin')}</div>
