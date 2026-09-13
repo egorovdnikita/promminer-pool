@@ -1182,7 +1182,6 @@ ${card(`<div class="ch"><h2>График дохода (${m.bal[0].s})</h2><div c
   ${dayChips('income-chart')}${dateInput()}
   <button class="ib" data-tip="Приблизить">${I.zi}</button><button class="ib" data-tip="Отдалить">${I.zo}</button></div>
   ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:['15.07','16.07','17.07','18.07','19.07','20.07','21.07']})}`)}
-<div style="height:12px"></div>
 ${card(`<div class="ch"><h2>История дохода</h2><div class="spacer"></div>
   ${dayChips('income-hist')}${dateInput()}
   <button class="ib" data-modal="export" data-ex="inc">${I.dl}</button></div>
@@ -1385,7 +1384,6 @@ V.summary=m=>`
 </div>
 ${card(`<div class="ch"><h2>График общего хэшрейта</h2><div class="spacer"></div>
   <button class="ib sm">${I.zi}</button><button class="ib sm">${I.zo}</button></div>${chart(m)}`)}
-<div style="height:12px"></div>
 ${card(`<div class="ch"><h2>Детализация хэшрейта (${m.bal[0].s})</h2><div class="spacer"></div><button class="ib sm">${I.dl}</button></div>
   <div class="tw"><table class="tbl">
   <thead><tr><th rowspan="2">Аккаунт</th><th colspan="3" style="text-align:center">Хэшрейт</th><th colspan="4" style="text-align:center">Воркеры</th><th rowspan="2">Реджект ${I.sortv}</th></tr>
@@ -1395,7 +1393,6 @@ ${card(`<div class="ch"><h2>Детализация хэшрейта (${m.bal[0].
     <tr><td>alfred <span class="tag n">Суб-аккаунт</span></td><td class="mono">5 600 ${m.c.unit}</td><td class="mono">4 610 ${m.c.unit}</td><td class="mono">4 783 ${m.c.unit}</td><td class="mono">28</td><td class="mono">0</td><td class="mono">124</td><td class="mono">341</td><td class="mono">0,1 %</td></tr>
     <tr class="hl"><td><b>Все аккаунты</b></td><td class="mono">16 000 ${m.c.unit}</td><td class="mono">14 543 ${m.c.unit}</td><td class="mono">16 216 ${m.c.unit}</td><td class="mono">700</td><td class="mono">100</td><td class="mono">134</td><td class="mono">561</td><td class="mono">0,1 %</td></tr>
   </tbody></table></div>`)}
-<div style="height:12px"></div>
 ${card(`<div class="ch"><h2>Общий доход</h2><div class="spacer"></div>
   <button class="ib" data-modal="export" data-ex="inc">${I.dl}</button></div>
   ${totalIncomeTable(m)}
@@ -1421,11 +1418,9 @@ V.sumincome=m=>`
 ${card(`<div class="hero"><div class="hval"><div class="l">Текущий общий баланс</div>
     <div class="v mono">${dec(m.bal[0].v)} ${m.bal[0].s}</div>
     <div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div></div>`)}
-<div style="height:12px"></div>
 ${card(`<div class="ch"><h2>График общего дохода</h2><div class="spacer"></div>
   ${dayChips('sumincome-range')}${dateInput()}</div>
   ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:['15.07','16.07','17.07','18.07','19.07','20.07','21.07']})}`)}
-<div style="height:12px"></div>
 ${card(`<div class="ch"><h2>Общий доход</h2><div class="spacer"></div>
   <button class="ib" data-modal="export" data-ex="inc">${I.dl}</button></div>${totalIncomeTable(m)}`)}`;
 
@@ -1453,7 +1448,6 @@ V.sumworkers=m=>{
     </div>`,'wcard')}
   <div class="grid g4" style="gap:16px;margin:0">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap">${l}</div><div class="n mono">${ni(n)}</div></div>
     <div class="ic" style="background:${c}29;color:${c}">${g}</div></div>`).join('')}</div>
-  <div style="height:16px"></div>
   ${card(`<div class="ch"><h2>Воркеры (${ni(m.total)})</h2><div class="spacer"></div>
     <span class="search">${I.srch} Найти воркер</span>
     <button class="ib" data-modal="export" data-ex="hours">${I.dl}</button></div>
@@ -1483,11 +1477,9 @@ ${card(`<div class="monhero">
   <button class="btn" data-toast="Заявка отправлена — мы свяжемся с вами">Получить предложение</button>
   <img class="monart" src="/monitoring-hero.webp" alt="" width="2000" height="656">
 </div>`)}
-<div style="height:12px"></div>
 ${card(MON_SECS.map(([t,xs],i)=>`${i?'<div class="hr"></div>':''}
   <div class="monsec"><h3>${t}</h3>
     <ul class="mondash">${xs.map(x=>`<li>${x}</li>`).join('')}</ul></div>`).join(''))}
-<div style="height:12px"></div>
 ${card(`<div class="monsec"><h3>Параметры для отслеживания оборудования:</h3>
   <div class="monsteps">${MON_STEPS.map((x,i)=>`<div class="monstep"><span class="n">${i+1}</span><b>${x}</b></div>`).join('')}</div></div>`)}`;
 
@@ -1582,11 +1574,9 @@ ${card(`<div class="ch"><h2>Настройка реферальных выпла
     <td><span class="tog" data-tog></span></td>
     <td class="num"><button class="btn sm" disabled>Вывести</button></td></tr>`).join('')}
   </tbody></table></div>`)}
-<div style="height:12px"></div>
 ${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
   <div class="spacer"></div>${fsel('ref-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}</div>
   ${refListTable(m)}`)}
-<div style="height:12px"></div>
 ${card(`<div class="ch">${seg('ref-tab',['Доход','Выплаты'],0)}<div class="spacer"></div>
   ${fsel('ref-coin2',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}</div>
   ${inc?refIncomeTable(m,m.rows?5:0):payoutsTable(m,m.rows?5:0)}`)}`};

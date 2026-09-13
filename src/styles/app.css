@@ -119,7 +119,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mini-btn{margin-top:auto;display:flex;align-items:center;gap:8px;padding:12px 8px;margin:auto 16px 0;border-radius:var(--r-m);color:var(--c3);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .mini-btn:hover{background:var(--ctrl2)}
 
-.main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 8px;min-height:100vh}
+/* В макете контент прижат к сайдбару, а справа отступ 16 (15:19710:
+   сайдбар кончается на 882, карточка начинается там же, правый край 2534 из 2550) */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 16px 0 0;min-height:100vh}
 .page{padding:16px 0 0;width:100%;flex:1;display:flex;flex-direction:column;gap:16px;min-height:0}
 .page>*{flex:0 0 auto}
 
@@ -193,9 +195,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .pop.menu.coinmenu{width:226px}
 .pop.menu svg{width:24px;height:24px}
 .pop b.ph{display:block;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 0 6px}
-.pop button:not(.btn):not(.ra):not(.lnk):not(.dp-nav){display:flex;align-items:center;gap:8px;width:100%;padding:8px 0;min-height:40px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
-.pop button:not(.btn):not(.ra):not(.lnk):not(.dp-nav):hover{color:var(--accent)}
-.pop button:not(.btn):not(.ra):not(.lnk):not(.dp-nav):hover .i3{color:var(--accent)}
+.pop button:not(.btn):not(.ra):not(.lnk):not(.dp-nav):not(.acard){display:flex;align-items:center;gap:8px;width:100%;padding:8px 0;min-height:40px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
+.pop button:not(.btn):not(.ra):not(.lnk):not(.dp-nav):not(.acard):hover{color:var(--accent)}
+.pop button:not(.btn):not(.ra):not(.lnk):not(.dp-nav):not(.acard):hover .i3{color:var(--accent)}
 .pop button .i3{color:var(--c3);display:flex;flex:0 0 auto;transition:color .15s}
 .pop button.dang{color:var(--neg)}
 .pop button.dis{opacity:.4;pointer-events:none}
@@ -214,7 +216,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .note .act{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--accent);text-align:left}
 
 /* cards */
-.grid{display:grid;gap:12px;margin-bottom:12px}
+/* Шаг между блоками страницы и внутри сеток в макетах везде 16 */
+.grid{display:grid;gap:16px}
 .grid>*{min-width:0}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -1727,7 +1730,7 @@ button.scsect:hover{color:var(--accent)}
 /* ============ Мои активы (макеты 95:19946, 212:107049) ============ */
 /* Плашка баланса — отдельный блок над карточкой: 154, паддинг 24, радиус 24 */
 .abal{position:relative;overflow:hidden;background:var(--accent);color:#fff;border-radius:var(--r-l);
-  padding:24px;margin-bottom:16px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-height:154px}
+  padding:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-height:154px}
 .abal::before,.abal::after{content:"";position:absolute;border-radius:50%;background:#ffffff0f;pointer-events:none}
 .abal::before{width:318px;height:318px;right:18%;top:-120px}
 .abal::after{width:866px;height:238px;right:-180px;top:-40px}
@@ -1811,7 +1814,7 @@ button.scsect:hover{color:var(--accent)}
 
 /* ============ Доход и Выплаты (макеты 15:19710, 37:56063) ============ */
 /* Три карточки 540×176: подпись 20, значение 48, снизу пересчёт */
-.icards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}
+.icards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .icard{background:var(--surface);border-radius:var(--r-l);padding:24px;display:flex;flex-direction:column;gap:12px;min-height:176px}
 .icard.acc{background:var(--accent);color:#fff}
 .ih{display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -1833,7 +1836,7 @@ button.scsect:hover{color:var(--accent)}
 .dinput:hover,.fsel:hover{background:var(--ctrl-hover)}
 .dinput svg,.fsel svg{width:24px;height:24px;flex:0 0 auto}
 /* Ряд действий над карточкой выплат */
-.prow{display:flex;justify-content:flex-end;margin-bottom:16px}
+.prow{display:flex;justify-content:flex-end}
 .prow .btn svg{width:24px;height:24px}
 /* На 1440 карточки дохода в макете ниже, а значение мельче (49:75121) */
 @media(max-width:1450px){
@@ -1842,7 +1845,7 @@ button.scsect:hover{color:var(--accent)}
 }
 
 /* ============ Отчет о майнинге (макет 109:19476) ============ */
-.rtop{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:16px;flex-wrap:wrap}
+.rtop{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap}
 .rinfo{max-width:852px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500;
   display:flex;flex-direction:column;gap:4px}
 .rinfo .rh{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c1)}
@@ -1901,7 +1904,7 @@ button.scsect:hover{color:var(--accent)}
 .cres span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .cright .btn.w{margin-top:auto;height:var(--h-field);justify-content:center;border-radius:var(--r-m)}
 /* Налоговый: вкладки монет, две карточки */
-.txtabs{margin-bottom:16px}
+.txtabs{margin:0}
 .txtabs .segl button{gap:8px}
 .txtabs .segl svg{width:24px;height:24px}
 .txwrap{display:flex;gap:16px;align-items:stretch}
@@ -1935,7 +1938,7 @@ button.scsect:hover{color:var(--accent)}
 .txrow b{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
 
 /* ============ Реферальная программа (макет 514:79281) ============ */
-.rcards{display:grid;grid-template-columns:560fr 560fr 500fr;gap:16px;margin-bottom:16px;align-items:stretch}
+.rcards{display:grid;grid-template-columns:560fr 560fr 500fr;gap:16px;align-items:stretch}
 .rcard{background:var(--surface);border-radius:var(--r-l);padding:24px;min-height:304px;
   display:flex;flex-direction:column;gap:8px}
 .rcard h2{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;margin-bottom:4px}
@@ -2008,10 +2011,12 @@ button.scsect:hover{color:var(--accent)}
   background:var(--accent-ghost);color:var(--accent);font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
 .monstep b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 /* Карточка «Сводка по аккаунтам» в попоувере ведёт на экран сводки */
-.acard.asum{width:100%;text-align:left;cursor:pointer}
+/* Карточка-кнопка: базовый стиль кнопок делает её флексом в строку,
+   поэтому раскладку возвращаем к блочной, как у соседних карточек */
+.acard.asum{display:block;width:100%;padding:12px 14px;text-align:left;cursor:pointer}
 .acard.asum:hover{background:var(--ctrl2)}
 .acard.asum .t{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.acard.asum .t svg{width:20px;height:20px;color:var(--c3)}
+.acard.asum .t svg{width:20px;height:20px;color:var(--c3);flex:0 0 auto}
 /* Иллюстрация героя «Мониторинга» с прода */
 .monart{display:block;width:100%;height:auto;margin-top:8px}
 /* Ссылка «Весь доход» под таблицей сводки */
