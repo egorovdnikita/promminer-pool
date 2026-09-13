@@ -718,7 +718,7 @@ const fcount=()=>U.fapp?U.fapp.t.length+U.fapp.m.length:0;
 /* Время последней шары: отсчитываем назад от 9 апреля, 07:32 */
 const shareAt=off=>{const t=7*60+32-off, h=Math.floor((t+1440)%1440/60), mi=(t+1440)%1440%60;
   return `${t<0?8:9} Апреля, ${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')}`};
-const WST={ok:['Активен','var(--pos)'],low:['Низкий хэшрейт','var(--warn)'],off:['Отключен','var(--neg)'],fail:['Оффлайн','var(--neu)']};
+const WST={ok:['Активен','#22c55e'],low:['Низкий хэшрейт','#f59e0b'],off:['Отключен','#ef4444'],fail:['Оффлайн','#6b7280']};
 function workersList(m){
   if(m.empty) return [];
   /* Полные названия моделей: в таблице их режет колонка, а деталка
@@ -885,7 +885,11 @@ V.serials=m=>{
         ? '<span class="mono">OLTTG4BBEJDAJ062H</span>'
         : '<span class="serph">Заводской номер</span>'}</td>
       <td class="sercell sermodel ${bad?'bad':''}">
-        <span class="serpick">${filled?SER_MODELS[w.id%5]:'<i class="serph">Выберите модель</i>'}${I.cd}</span></td></tr>`};
+        <span class="pop-wrap serpick">${filled?SER_MODELS[w.id%5]:'<i class="serph">Выберите модель</i>'}
+          <button class="ibr sarr" data-pop="sm${w.id}">${I.cd}</button>
+          ${pop==='sm'+w.id?`<div class="pop menu smenu">${SER_MODELS.map((mo,j)=>
+            `${j?'<div class="mdiv"></div>':''}<button data-toast="Модель: ${mo}">${mo}${filled&&SER_MODELS[w.id%5]===mo?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}
+        </span></td></tr>`};
   return `
   <div class="wdtop">
     <button class="ib ctl" data-go="workers" data-tip="К списку воркеров">${I.arl}</button>
@@ -2016,18 +2020,19 @@ const MODALS={
       const row=(k,v)=>`<div class="inp cp"><span class="tx"><div class="k">${k}</div>
         <div class="v mono">${v}</div></span>
         <button class="ibr" data-copy="${v}" data-tip="Скопировать">${I.cp}</button></div>`;
+      const tab=(v)=>`${COIN_ICON[v]||''}${v}`;
       return `<div class="alert info">${I.inf}Новый воркер появится в списке в течение 10 минут</div>
-      ${seg('conn',['BTC','LTC','ZEC'])}
+      ${seg('conn',['BTC','LTC','ZEC'].map(tab))}
       <div class="inps">
         ${POOL_URLS[c].map((u,i)=>row('URL '+(i+1),'stratum+tcp://'+u)).join('')}
         ${row('Воркер','natarusso.001')}${row('Пароль','123')}</div>
       <ol class="steps">
-        <li>Зайдите в веб-панель управления вашего Asic-майнера — введите в адресной строке браузера его IP-адрес.</li>
-        <li>В панели управления Asic откройте вкладку Miner configuration (Конфигурация майнера) и выберите раздел Pool Settings (Настройка пулов).</li>
-        <li>Заполните поля в соответствии с данными для подключения, которые указаны выше:
+        <li><span class="sdot"><i></i></span>Зайдите в веб-панель управления вашего Asic-майнера — введите в адресной строке браузера его IP-адрес.</li>
+        <li><span class="sdot"><i></i></span>В панели управления Asic откройте вкладку Miner configuration (Конфигурация майнера) и выберите раздел Pool Settings (Настройка пулов).</li>
+        <li><span class="sdot"><i></i></span>Заполните поля в соответствии с данными для подключения, которые указаны выше:
           <p class="mnote">Воркер = имя_аккаунта.имя_воркера. Имя_воркера является обязательным. Это произвольное наименование, которое вы должны задать самостоятельно на стороне устройства (может содержать строчные буквы, цифры и не должен превышать 64 символа).</p>
           <p class="mnote">Пароль: оставьте пустым или введите любое значение по желанию (на стороне устройства)</p></li>
-        <li>Новый воркер появится в списке в течение 10 минут, и вы сможете отслеживать основные показатели его работы (статус, хэшрейт и пр.)</li>
+        <li><span class="sdot"><i></i></span>Новый воркер появится в списке в течение 10 минут, и вы сможете отслеживать основные показатели его работы (статус, хэшрейт и пр.)</li>
       </ol>
       <b class="qst">Остались вопросы?</b>
       <div class="qlinks">${HOME_CONTACTS.slice(0,3).map(([ic,k,,u])=>

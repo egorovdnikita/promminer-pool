@@ -180,7 +180,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .mrow{position:relative}
 .mrow .pop-wrap.full{position:static}
 .pop.menu.row{width:auto;left:0;right:0}
-.pop.menu>button .ck{display:flex;color:var(--c1)}
+/* Галочка выбранного пункта — зелёная (макеты выбора монеты и периода) */
+.pop.menu>button .ck,.pop .ck{display:flex;color:var(--pos)}
 .pop.menu>button{padding:8px 12px!important;min-height:40px;gap:8px!important;
   font-size:var(--fs-b1)!important;line-height:var(--lh-b1)!important;font-weight:600}
 /* Состояния пунктов по макету 483:17894: ховер красит текст, подложки нет */
@@ -1455,7 +1456,7 @@ button.scsect:hover{color:var(--accent)}
 
 /* --- Группы и теги: создание, правка, удаление (173:61615, 173:62151) --- */
 /* высоту ограничивает общее правило .modal — окно минус 35 сверху и снизу */
-.tmake{width:100%;height:56px;justify-content:center;margin-top:16px}
+.tmake{width:100%;height:56px;flex:0 0 auto;justify-content:center;margin-top:16px}
 .tmake.dis{opacity:.4;pointer-events:none}
 .inp.ta{min-height:96px;align-items:stretch;justify-content:flex-start;padding:12px}
 .inp.ta input{flex:1}
@@ -1472,7 +1473,9 @@ button.scsect:hover{color:var(--accent)}
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c3)}
 /* Прокручивается только список, форма сверху остаётся на месте (173:61671) */
 .tlist{display:flex;flex-direction:column;gap:4px;padding:8px 0;overflow-y:auto;min-height:0}
-.modal.tx .mbody{display:flex;flex-direction:column;overflow:hidden}
+/* тело не прокручивается — это делает список; фокус полей не обрезается */
+.modal.tx .mbody{display:flex;flex-direction:column;overflow:visible}
+.modal.tx .mbody>*{flex:0 0 auto}
 .modal.tx .mbody>.slot{display:contents}
 .tcard{display:flex;align-items:center;gap:12px;height:64px;padding:8px;border-radius:var(--r-m);
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
@@ -1516,7 +1519,7 @@ button.scsect:hover{color:var(--accent)}
   background:var(--accent-sub);color:var(--accent)}
 /* Ошибка не красит зону в красный — меняется только текст ошибки под ней */
 .drop.bad{border-color:var(--focus);background:var(--accent-sub);color:var(--accent)}
-.drop>span:first-child,.drop>svg:first-child{background:var(--surface);border-radius:var(--r-f);
+.drop>span:first-child,.drop>svg:first-child{background:var(--surface);border-radius:var(--r-m);
   width:48px;height:48px;display:grid;place-items:center;padding:12px;box-sizing:border-box}
 .drop b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1);margin-top:8px}
 .drop span{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)}
@@ -1606,8 +1609,11 @@ button.scsect:hover{color:var(--accent)}
 .wdmain .ch .seg,.wdmain .ch .pop-wrap,.wdmain .ch .ib{flex:0 0 auto}
 .wdside{display:flex;flex-direction:column;gap:16px}
 .card.wdevcard{max-height:529px;display:flex;flex-direction:column}
-/* При прокрутке списка под шапкой появляется разделитель (403:36950) */
-.wdevcard.scrolled .wdh2{border-bottom:1px solid var(--border);padding-bottom:24px;margin:0 -24px 16px;padding-left:24px;padding-right:24px}
+/* Шапка списка событий: разделитель проявляется плавно при прокрутке,
+   и список обрезается ровно по этой линии (403:36950) */
+.wdevcard .wdh2{margin:0 -24px 0;padding:0 24px 24px;border-bottom:1px solid transparent;
+  transition:border-color .2s}
+.wdevcard.scrolled .wdh2{border-bottom-color:var(--border)}
 .wdevents{overflow-y:auto;margin-right:calc(-1 * var(--sbw))}
 /* Таймлайн: кружок статуса с соединительной линией вниз */
 .wdev{display:grid;grid-template-columns:28px 1fr;column-gap:20px;align-items:start;
@@ -1635,13 +1641,16 @@ button.scsect:hover{color:var(--accent)}
 /* Алерт вместо подзаголовка: белая карточка с синей подложкой 16 % */
 .alert{display:flex;align-items:center;gap:8px;min-height:44px;padding:12px 16px;
   border-radius:var(--r-m);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;color:var(--c1)}
-.alert.info{background:#3b82f629;color:var(--c1)}
+.alert.info{background:#3b82f629;color:#3b82f6}
 .alert svg{width:24px;height:24px;flex:0 0 auto;color:#3b82f6}
-.modal .seg{width:100%}
+.modal .seg{width:100%;margin-top:20px}
+.modal .seg button svg{width:20px;height:20px}
 .modal .seg button{flex:1;justify-content:center}
 .inps{display:flex;flex-direction:column;gap:8px;margin-top:20px}
 /* Адрес пула — поле ДС с подписью сверху и кнопкой копирования */
-.inp.cp{flex-direction:row;align-items:center;gap:12px;margin:0}
+/* Подложка адресов акцентная, как в макете 173:60725 */
+.inp.cp{flex-direction:row;align-items:center;gap:12px;margin:0;background:var(--accent-sub)}
+.inp.cp:hover{background:var(--accent-sub)}
 .inp.cp .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 .inp.cp .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -1652,9 +1661,11 @@ button.scsect:hover{color:var(--accent)}
 .steps{margin:20px 0 0;padding:0;list-style:none;counter-reset:st;display:flex;flex-direction:column}
 .steps li{counter-increment:st;position:relative;padding:0 0 16px 24px;
   font-size:var(--fs-s);line-height:22px;color:var(--c1)}
-.steps li::before{content:"";position:absolute;left:0;top:8px;width:8px;height:8px;
-  border-radius:var(--r-f);background:var(--accent)}
-.steps li:not(:last-child)::after{content:"";position:absolute;left:3.5px;top:20px;bottom:0;
+.sdot{position:absolute;left:0;top:2px;width:16px;height:16px;border-radius:var(--r-f);
+  background:var(--accent-sub);display:grid;place-items:center}
+.sdot i{width:6px;height:6px;border-radius:var(--r-f);background:var(--accent)}
+.steps li{padding-left:28px}
+.steps li:not(:last-child)::after{content:"";position:absolute;left:7.5px;top:18px;bottom:0;
   width:1px;background:#6b728029}
 .steps .mnote{margin-top:8px}
 .qst{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;
@@ -1664,3 +1675,13 @@ button.scsect:hover{color:var(--accent)}
   justify-content:flex-start;font-size:var(--fs-s);overflow:hidden}
 .qlinks .btn svg{width:24px;height:24px}
 .qlinks .lico{display:flex;flex:0 0 auto}
+
+/* Выбор модели в серийных номерах: список открывается стрелкой, без поиска */
+.serpick{display:flex;align-items:center;gap:8px;position:relative}
+.serpick .sarr{width:24px;height:24px;margin-left:auto;color:var(--c3);flex:0 0 auto}
+.serpick .sarr:hover{color:var(--c1)}
+.serpick .sarr svg{width:24px;height:24px}
+.pop.menu.smenu{width:320px;min-width:320px;padding:12px!important;gap:0;right:0;left:auto;scrollbar-gutter:auto}
+.pop.menu.smenu>button{padding:0!important;height:40px;gap:8px;font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
+.pop.menu.smenu .mdiv{margin:3.5px 0}
+.pop.menu.smenu .ck{margin-left:auto}
