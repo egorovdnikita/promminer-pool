@@ -667,7 +667,7 @@ function refBlock(m){
   <div class="refrow">
     <div class="refmain">
       ${e?'<div class="hex none">0%</div>'
-        :`<img class="hex" src="/tier-${t.k}-s.png" alt="${t.p}" width="152" height="152">`}
+        :`<img class="hex" src="/tier-${t.k}.png" alt="${t.p}" width="152" height="152">`}
       <div class="refinfo">
         <div class="refstats">
           <div class="rstrow">${st('Ваша комиссия',e?'0%':`${t.p} (${t.n})`)}
@@ -1580,7 +1580,7 @@ const refCoinSel=(m,id)=>`<span class="pop-wrap"><button class="rcoin ${pop===id
     const c=COINS[v], ic=v==='ltc'?COIN_ICON.LTC+COIN_ICON.DOGE:COIN_ICON[v.toUpperCase()];
     return `${n?'<div class="mdiv"></div>':''}<button class="${S.coin===v?'on':''}" data-axis="coin" data-val="${v}">
       <span class="t"><b>${c.refCoin[0]}</b><i>${c.refCoin[1]}</i></span>
-      <span class="ic">${ic}</span>${S.coin===v?`<span class="ck">${I.okc}</span>`:''}</button>`}).join('')}</div>`:''}</span>`;
+      <span class="ic">${ic}</span></button>`}).join('')}</div>`:''}</span>`;
 /* Таблица реферального дохода — колонки свои (534:54490) */
 function refIncomeTable(m,n,pid){
   if(!n) return emptyBox('Дохода пока нет','Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение');
@@ -1598,7 +1598,6 @@ function refIncomeTable(m,n,pid){
       <td class="num mono">${nf(900+i*270)} ₽</td></tr>`}).join('')}
   </tbody></table></div>${pid?pager(pid,n,10):''}`;
 }
-const refCount=m=>m.empty?0:(S.data==='few'?3:12);
 
 V.ref=m=>{
   const inc=segi('ref-tab',0)===0;
@@ -1606,7 +1605,7 @@ V.ref=m=>{
   <div class="rcard rlvcard">
     <div class="rlvtop">
       ${m.empty?'<span class="rhex off">0%</span>'
-        :`<span class="rhex"><img src="/tier-${TIERS[+S.tier].k}-s.png" alt=""></span>`}
+        :`<span class="rhex"><img src="/tier-${TIERS[+S.tier].k}.png" alt=""></span>`}
       <div class="rlvinfo">
         <div class="rlvrow"><div class="rlvk"><span class="k">Ваша комиссия</span>
           <b>${m.empty?'0%':m.tier.p}</b></div>${refCoinSel(m,'refcoin')}</div>
@@ -1661,8 +1660,7 @@ ${card(`<div class="ch"><h2>Настройка реферальных выпла
     <td><span class="tog ${togOn('r'+a.s,false)?'on':''}" data-tog="r${a.s}"></span></td>
     <td class="num"><button class="btn sm" disabled>Вывести</button></td></tr>`).join('')}
   </tbody></table></div>`)}
-${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
-  <div class="spacer"></div>${fsel('ref-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}</div>
+${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><div class="spacer"></div>${fsel('ref-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}</div>
   ${refListTable(m)}`)}
 ${card(`<div class="ch">${seg('ref-tab',['Доход','Выплаты'],0)}<div class="spacer"></div>
   ${fsel('ref-coin2',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}</div>
@@ -1723,15 +1721,13 @@ function refListTable(m){
 }
 V.reflist=m=>`${refStats([['Средний хэшрейт за 24 часа',m.empty?'0 '+m.c.unit:m.c.refHash],
     ['Активные рефералы',m.empty?'0':'20'],['Все рефералы',m.empty?'0':'50']])}
-  ${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
-  <div class="spacer"></div>${fsel('reflist-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
+  ${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><div class="spacer"></div>${fsel('reflist-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
   <button class="chip d ${U.ronly?'on':''}" data-ronly>Активные</button>${dateInput('rl')}
   <button class="ib" data-modal="export" data-ex="rlist">${I.dlm}</button></div>${refListTable(m)}`)}`;
 V.refincome=m=>`${refStats([['Текущий баланс',m.empty?'0':'7 500,56','₽','payouts'],
     ['Доход за 24 часа',m.empty?'0':'3 324,12','₽'],['Доход за 30 дней',m.empty?'0':'45 873,08','₽'],
     ['Доход за все время',m.empty?'0':'9 000 000,99','₽']])}
-  ${card(`<div class="ch"><h2>Доход (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
-  <div class="spacer"></div>${fsel('refinc-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
+  ${card(`<div class="ch"><h2>Доход (${m.bal[0].s})</h2><div class="spacer"></div>${fsel('refinc-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
   ${dayChips('refincome-range')}${dateInput('ri')}
   <button class="ib" data-modal="export" data-ex="rinc">${I.dlm}</button></div>
   ${refIncomeTable(m,m.empty?0:periodN('refincome-range','ri',32))}`)}`;
@@ -1741,8 +1737,7 @@ V.refpayouts=m=>{
   return `${refStats([['Сумма всех выплат',m.empty?'0':'10 278,45','₽','assets'],
     ['Выплаты, BTC',m.empty?'0':'8 000','₽'],['Выплаты, LTC',m.empty?'0':'2 000','₽'],
     ['Выплаты, DOGE',m.empty?'0':'278,45','₽']])}
-  ${card(`<div class="ch"><h2>История выплат</h2><span class="cnt g">${refCount(m)}</span>
-    <div class="spacer"></div>${N?`${fsel('rpay-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
+  ${card(`<div class="ch"><h2>История выплат</h2><div class="spacer"></div>${N?`${fsel('rpay-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
     ${fsel('pay-type',PAY_TYPES)}${dayChips('pay-range')}${dateInput('rp')}
     <button class="ib" data-modal="export" data-ex="rpay">${I.dlm}</button>`:''}</div>
     ${refPayoutsTable(m,N,'refpayouts',type)}`)}`};
@@ -2731,27 +2726,33 @@ const MODALS={
   /* Уровни комиссии (467:41571): пороги по монете и раскрывающиеся привилегии */
   /* Уровни комиссии (467:41571): чёрная шапка с медалями, серый селектор
      монеты, список уровней с галочками и ссылка в справку внизу */
+  /* Уровни комиссии (467:41257): чёрный герой 484x144 с медалями и крестиком,
+     заголовок с селектором монеты, пять строк 40 с шагом 24, разделитель
+     во всю ширину и ссылка на справку в подложке 452x56 */
   levels:{t:'',acts:false,size:'lv',noHead:true,noClose:true,
     b:m=>`<div class="lv">
-      <div class="lvhero">
-        <span class="g1"></span><span class="g2"></span>
-        <div class="lvmed">${TIERS.map((t,i)=>
-          `<img src="/tier-${t.k}-s.png" alt="" class="m${i}">`).join('')}</div>
-      </div>
-      <div class="lvtop">
-        <div class="lvtitle"><h2>Уровни комиссии</h2>${refCoinSel(m,'lvcoin')}</div>
-        <p class="mtext mut">Приглашайте друзей и получайте комиссию за услуги
-          в качестве реферального вознаграждения</p>
+      <div class="lvblock">
+        <div class="lvhero">
+          <span class="g1"></span><span class="g2"></span><span class="g3"></span>
+          <button class="lvx" data-close>${I.x}</button>
+          <div class="lvmed">${[0,1,4,3,2].map(i=>
+            `<img src="/tier-${TIERS[i].k}.png" alt="">`).join('')}</div>
+        </div>
+        <div class="lvtop">
+          <div class="lvtitle"><h2>Уровни комиссии</h2>${refCoinSel(m,'lvcoin')}</div>
+          <p class="lvsub">Приглашайте друзей и получайте комиссию за услуги
+            в качестве реферального вознаграждения</p>
+        </div>
       </div>
       <div class="lvlist">${TIERS.map((t,i)=>`<div class="lvitem ${U.lvl===i?'on':''}">
         <button class="lvhead" data-lvl="${i}">
           <img src="/tier-${t.k}-s.png" alt="" width="40" height="40">
-          <span><b>${t.p} (${t.n})</b><i>Хэшрейт рефералов ${TIER_RANGE[S.coin][i]}</i></span>
-          ${i<=+S.tier?`<span class="lvok">${CHECK}</span>`:''}${I.cd}</button>
+          <span class="t"><b>${t.p} (${t.n})</b><i>Хэшрейт рефералов ${TIER_RANGE[S.coin][i]}</i></span>
+          ${I.cd}</button>
         ${U.lvl===i?`<ul class="lvperks">${TIER_PERKS[i].map(x=>`<li>${x}</li>`).join('')}</ul>`:''}
       </div>`).join('')}</div>
-      <div class="hr"></div>
-      <div class="lvq"><span class="k">Остались вопросы?</span>
+      <div class="lvdiv"></div>
+      <div class="lvq">
         <button class="lvlink" data-toast="Откроется справка о реферальной программе">
           ${I.book}<span>Подробнее о реферальной программе</span>${I.aru}</button></div>
     </div>`,
