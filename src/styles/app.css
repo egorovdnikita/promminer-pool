@@ -1995,16 +1995,21 @@ button.scsect:hover{color:var(--accent)}
 /* у карточки уровня паддинги живут внутри блоков, как в макете */
 .rlvcard{padding:0 0 24px;gap:8px;justify-content:space-between}
 .rlvtop{display:flex;align-items:flex-start;gap:4px}
-.rhex{width:152px;height:152px;flex:0 0 auto;display:grid;place-items:center;
-  background:var(--bg);color:#fff;font-size:var(--fs-h2);line-height:1;font-weight:500;
+/* Шестиугольник уровня: медаль из макета, проценты поверх неё (514:67943) */
+.rhex{width:152px;height:152px;flex:0 0 auto;position:relative;display:grid;place-items:center}
+.rhex img{width:152px;height:152px;object-fit:contain}
+.rhex b{position:absolute;font-size:var(--fs-h5);line-height:1;font-weight:600;color:#fff;
+  text-shadow:0 1px 2px #0006}
+.rhex.off{background:var(--bg);color:var(--c3);font-size:var(--fs-h2);line-height:1;font-weight:500;
   clip-path:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}
-.rhex.off{color:var(--c3)}
 .rlvinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;padding:24px 24px 16px 4px}
 .rlvrow{display:flex;align-items:center;gap:12px}
 .rlvk{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
 .rlvk b{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
 .rlvdown{display:flex;flex-direction:column;gap:12px;padding:0 24px}
-.rlvcard>.rlvdown .lnk.a{height:24px;margin:0;align-self:flex-start}
+.rlvcard>.rlvdown .lnk.a{display:inline-flex;align-items:center;gap:8px;height:24px;margin:0;
+  align-self:flex-start;white-space:nowrap;padding:0}
+.rlvcard>.rlvdown .lnk.a svg{width:24px;height:24px;flex:0 0 auto}
 .rprog{display:flex;flex-direction:column;gap:16px}
 .rnext{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
 .rnext b{color:var(--c1);font-weight:600}
@@ -2012,17 +2017,20 @@ button.scsect:hover{color:var(--accent)}
 .rbar i{display:block;height:100%;border-radius:var(--r-f);background:var(--accent)}
 .rpct{display:flex;justify-content:space-between;gap:4px;
   font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:600}
-.rcoin{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 12px;border-radius:var(--r-m);
-  background:var(--ctrl);flex:0 0 auto}
-.rcoin:hover{background:var(--ctrl-hover)}
-.rcoin>svg:last-child{width:24px;height:24px}
-.rcoin span{display:flex;flex-direction:column;align-items:flex-start;line-height:1}
+/* Селектор монеты уровня (514:67943): название и тикер, иконка 32 перед стрелкой */
+.rcoin{display:inline-flex;align-items:center;gap:8px;height:48px;padding:8px 12px;border-radius:var(--r-m);
+  background:var(--accent-sub);flex:0 0 auto}
+.rcoin:hover{background:var(--accent-ghost)}
+.rcoin>svg{width:24px;height:24px;flex:0 0 auto;color:var(--c1)}
+.rcoin .t{display:flex;flex-direction:column;align-items:flex-start;gap:0;line-height:1}
+.rcoin .ic{display:flex;margin-right:2px}
+.rcoin .ic svg{width:32px;height:32px}
 .rcoin b{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
-.rcoin i{font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
-.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rcoin i{font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;align-content:stretch}
 /* Плитки «Общих данных» на подложке (514:79281): 92, паддинг 12, радиус 16 */
 .rtile{background:var(--bg);border-radius:var(--r-m);padding:12px;min-height:92px;
-  display:flex;flex-direction:column;justify-content:center;gap:6px}
+  display:flex;flex-direction:column;justify-content:center;gap:6px;height:100%}
 .rtile .k{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:600}
 .rtile b{font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600}
 /* Карточка ссылки (514:82784): поле на акцентной подложке 12 %,
@@ -2036,14 +2044,16 @@ button.scsect:hover{color:var(--accent)}
 .rlinp span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rlinp .lnk{color:var(--accent);display:flex}
 .rlinp svg{width:24px;height:24px}
+/* Баннер (514:112069): акцент, два эллипса на 40 %, фигура и монета */
 .rbanner{position:relative;overflow:hidden;margin-top:auto;height:114px;border-radius:var(--r-l);
-  background:var(--bg);display:flex;align-items:center;padding:16px}
-.rbanner i{position:absolute;border-radius:50%;pointer-events:none}
-.rbanner .o1{width:209px;height:249px;background:#e7eaff;left:-40px;top:-70px}
-.rbanner .o2{width:340px;height:176px;background:#fff;right:-60px;bottom:-60px}
+  background:var(--accent);display:flex;align-items:center;padding:16px}
+.rbanner i{position:absolute;border-radius:50%;opacity:.4;pointer-events:none}
+.rbanner .o1{width:209px;height:249px;background:#e7eaff;left:-125px;top:-142px}
+.rbanner .o2{width:340px;height:176px;background:#fff;right:-171px;top:70px}
+.rbanner .sh{position:absolute;left:210px;top:-49px;width:163px;height:168px;pointer-events:none}
 .rbanner p{position:relative;max-width:270px;font-size:var(--fs-m);line-height:var(--lh-m);
-  font-weight:600;color:var(--c1)}
-.rbanner img{position:absolute;right:-10px;bottom:-16px;width:130px;height:auto;pointer-events:none}
+  font-weight:600;color:#fff}
+.rbanner .coin{position:absolute;right:0;top:-27px;width:158px;height:168px;object-fit:contain;pointer-events:none}
 /* Восемь колонок реферальных выплат помещаются в карточку — делим ширину поровну */
 .rpaytbl{table-layout:fixed}
 .rpaytbl th,.rpaytbl td{overflow:hidden;text-overflow:ellipsis}
@@ -2130,4 +2140,8 @@ button.scsect:hover{color:var(--accent)}
 .ch .fsel{gap:4px}
 .ch .fsel .spacer{display:none}
 /* Пункты выбора монеты — 18, как в макете списка монет */
-.pop.menu.xmenu.coins>button{font-size:var(--fs-b1)!important;line-height:var(--lh-b1)}
+/* Список монет — фиксированные 226 и правый край по контролу, чтобы
+   не уезжал за экран (514:113480) */
+.pop.menu.xmenu.coins{width:226px;min-width:226px;padding:8px 12px!important;left:auto;right:0}
+.pop.menu.xmenu.coins>button{font-size:var(--fs-b1)!important;line-height:var(--lh-b1);gap:4px}
+

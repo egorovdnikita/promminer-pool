@@ -1571,9 +1571,10 @@ const TIER_PERKS=[
    'Возможность брендирования собственных ферм совместно с Promminer']];
 /* Селектор монеты реферальной программы: название и список тикеров */
 const refCoinSel=(m,id)=>`<span class="pop-wrap"><button class="rcoin" data-pop="${id}">
-  ${COIN_ICON[m.bal[0].s]}<span><b>${m.c.refCoin[0]}</b><i>${m.c.refCoin[1]}</i></span>${I.cd}</button>
-  ${pop===id?`<div class="pop menu xmenu">${AXES.coin.opts.map(([v,l],n)=>
-    `${n?'<div class="mdiv"></div>':''}<button class="${S.coin===v?'on':''}" data-axis="coin" data-val="${v}">${l}${S.coin===v?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`;
+  <span class="t"><b>${m.c.refCoin[0]}</b><i>${m.c.refCoin[1]}</i></span>
+  <span class="ic">${COIN_ICON[m.bal[0].s]}</span>${I.cd}</button>
+  ${pop===id?`<div class="pop menu xmenu coins">${AXES.coin.opts.map(([v,l],n)=>
+    `${n?'<div class="mdiv"></div>':''}<button class="${S.coin===v?'on':''}" data-axis="coin" data-val="${v}">${COIN_ICON[v==='btc'?'BTC':v==='zec'?'ZEC':'LTC']}${l}${S.coin===v?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`;
 /* Таблица реферального дохода — колонки свои (534:54490) */
 function refIncomeTable(m,n,pid){
   if(!n) return emptyBox('Дохода пока нет','Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение');
@@ -1598,7 +1599,8 @@ V.ref=m=>{
   return `<div class="rcards">
   <div class="rcard rlvcard">
     <div class="rlvtop">
-      <span class="rhex ${m.empty?'off':''}">${m.empty?'0%':m.tier.p}</span>
+      ${m.empty?'<span class="rhex off">0%</span>'
+        :`<span class="rhex"><img src="/tier-${TIERS[+S.tier].k}.png" alt=""><b>${m.tier.p}</b></span>`}
       <div class="rlvinfo">
         <div class="rlvrow"><div class="rlvk"><span class="k">Ваша комиссия</span>
           <b>${m.empty?'0%':m.tier.p}</b></div>${refCoinSel(m,'refcoin')}</div>
@@ -1629,8 +1631,9 @@ V.ref=m=>{
         <button class="lnk" data-copy="${LINKS.ref(49282838)}">${I.cp}</button></div>
     </div>
     <div class="rbanner"><i class="o1"></i><i class="o2"></i>
+      <img class="sh" src="/ref-banner-shape.svg" alt="">
       <p>Начните формировать свой<br>пассивный доход, став партнером<br>Promminer уже сегодня</p>
-      <img src="/banner-referral.png" alt="">
+      <img class="coin" src="/ref-coin.png" alt="">
     </div>
   </div></div>
 ${card(`<div class="ch"><h2>Настройка реферальных выплат</h2></div>
