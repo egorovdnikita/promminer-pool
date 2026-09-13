@@ -17,7 +17,7 @@ const freshUi = (): Ui => ({
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
   grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null, selq: '',
-  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false, lvl: null,
+  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false, lvl: null, dsel: {}, dpm: 0, zoom: 0, rwarn: false,
 })
 
 /** Свои сценарии живут в localStorage отдельно от текущего состояния. */
@@ -567,14 +567,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       u.ftag.clear(); u.fmod.clear(); u.fq = ''; u.fapp = null; u.page.workers = 1
       return bump()
     }
-    const wp = at('[data-wpick]')
-    if (wp) {
-      const [kind, i] = wp.dataset.wpick!.split(':')
-      const set = kind === 'tag' ? u.wtag : u.wgrp
-      const n = +i
-      set.has(n) ? set.delete(n) : set.add(n)
-      return bump()
-    }
     const gs = at('[data-gscroll]')
     if (gs) {
       const strip = gs.parentElement?.querySelector('.segl') as HTMLElement | null
@@ -593,6 +585,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       else if (S.current.acct === 'sub' && ['security', 'verification', 'subaccounts'].includes(route)) go('profile')
       return bump()
     }
+    if (at('[data-pop]')) u.dpm = 0
     const pp = at('[data-pop]')
     if (pp) { pop.current = pop.current === pp.dataset.pop ? null : pp.dataset.pop!; return bump() }
     const eye = at('[data-eye]')
@@ -630,6 +623,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     if (at('[data-rdel]')) { u.rdel = !u.rdel; return bump() }
     if (at('[data-rnote]')) { u.rnote = true; return bump() }
+    const zm = at('[data-zoom]')
+    if (zm) { u.zoom = Math.max(0, Math.min(3, (u.zoom || 0) + Number(zm.dataset.zoom))); return bump() }
+    if (at('[data-rwarn]')) { u.rwarn = true; return bump() }
+    /* Календарь: стрелки листают месяц, клики набирают диапазон */
+    const dm = at('[data-dpm]')
+    if (dm) { u.dpm = (u.dpm || 0) + Number(dm.dataset.dpm); return bump() }
+    const dd = at('[data-dpd]')
+    if (dd) {
+      const key = pop.current || ''
+      const [mi, yr, d] = dd.dataset.dpd!.split(':').map(Number)
+      const cur = u.dsel[key]
+      u.dsel[key] = !cur || cur.b || cur.mi !== mi || cur.yr !== yr
+        ? { mi, yr, a: d, b: 0 }
+        : { mi, yr, a: Math.min(cur.a, d), b: Math.max(cur.a, d) }
+      return bump()
+    }
     const lv = at('[data-lvl]')
     if (lv) { const i = +lv.dataset.lvl!; u.lvl = u.lvl === i ? null : i; return bump() }
     /* «Сбросить» в калькуляторах возвращает поля к состоянию по умолчанию */

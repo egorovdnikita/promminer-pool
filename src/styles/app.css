@@ -334,7 +334,7 @@ body.mini .ni .spacer.lbl{display:none!important}
   display:flex;flex-direction:column;justify-content:space-between;gap:16px}
 .whero .l{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
 .whero .vrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.whero .v{font-size:48px;line-height:56px;font-weight:600}
+.whero .v{font-size:var(--fs-h1);line-height:var(--lh-h1);font-weight:600}
 .wstats{flex:1 1 0;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:24px 32px;align-content:space-between}
 .wst .l{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c3);margin-bottom:8px}
 .wst .v{display:flex;align-items:center;gap:8px;font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
@@ -498,7 +498,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .hex{width:152px;height:152px;flex:0 0 auto;display:grid;place-items:center}
 img.hex{object-fit:contain}
 .hex.none{background:url('/tier-0.svg') center/130px 146px no-repeat;
-  font-size:40px;line-height:22px;font-weight:500;color:var(--c3)}
+  font-size:var(--fs-h2);line-height:22px;font-weight:500;color:var(--c3)}
 /* дорожка 590 из 642: справа ещё 24, отсюда просвет до панели */
 .track{margin-top:0;padding:0 24px 0 0}
 /* полоса заходит под крайние медали: их шестиугольник начинается на 8 % от
@@ -1386,6 +1386,7 @@ html{scrollbar-gutter:stable}
 .scrow>button:first-child:hover{background:var(--ctrl)}
 .scrow b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .scrow i{display:block;font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
+/* внутренние размеры панели сценариев — не из DS, это служебный инструмент */
 .scdel{width:28px;border-radius:var(--r-s);background:var(--bg);color:var(--c3);font-size:18px;flex:0 0 auto}
 .scdel:hover{background:#ef444429;color:var(--neg)}
 /* сворачиваемые группы */
@@ -1915,7 +1916,8 @@ button.scsect:hover{color:var(--accent)}
 .txgroup{display:flex;flex-direction:column;gap:16px}
 .gk{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .txrowin{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:16px}
-.txitems{display:flex;align-items:center;gap:24px;background:#f7f7fa;border-radius:var(--r-s);padding:24px}
+/* в макете подложка #f7f7fa — это наш --bg, он же переключается в тёмной теме */
+.txitems{display:flex;align-items:center;gap:24px;background:var(--bg);border-radius:var(--r-s);padding:24px}
 .txitem{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;position:relative}
 .txitem+.txitem::before{content:"";position:absolute;left:-12px;top:50%;transform:translateY(-50%);
   width:1px;height:28px;background:var(--ctrl-line)}
@@ -2021,3 +2023,7 @@ button.scsect:hover{color:var(--accent)}
 .monart{display:block;width:100%;height:auto;margin-top:8px}
 /* Ссылка «Весь доход» под таблицей сводки */
 .sumall{display:flex;justify-content:center;padding-top:12px}
+/* Выбранная дата в поле «Выберите дату» — основным цветом */
+.dinput.on{color:var(--c1)}
+.dp-d[data-dpd]{cursor:pointer}
+.dp-d[data-dpd]:hover{background:var(--ctrl)}

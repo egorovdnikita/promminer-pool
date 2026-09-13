@@ -1,4 +1,4 @@
-import { AXES, PRESETS, DEF, TITLES } from '@/legacy/prototype'
+import { AXES, PRESETS, DEF, SCREEN_NAMES, TITLES } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import type { Scenario } from '@/state/types'
 
@@ -14,7 +14,9 @@ export function ScenarioPanel() {
   /* Оси, уведённые от значения по умолчанию — их подсвечиваем и считаем */
   const changed = keys.filter((k) => S[k] !== DEF[k])
   const groups = [...new Set(keys.map((k) => AXES[k].g))]
-  const screens = Object.entries(TITLES).filter(([, t]) => hit(t))
+  const screens = Object.entries(TITLES)
+    .map(([id, t]) => [id, SCREEN_NAMES[id] || t] as [string, string])
+    .filter(([, t]) => hit(t))
   const onlyDirty = !!U.scdirty
   const saved = U.saved || []
 

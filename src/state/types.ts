@@ -118,6 +118,14 @@ export interface Ui {
   rnote: boolean
   /** раскрытый уровень в модалке «Уровни комиссии» */
   lvl: number | null
+  /** выбранные даты календарей по ключу попоувера */
+  dsel: Record<string, { mi: number; yr: number; a: number; b: number }>
+  /** смещение месяца в открытом календаре */
+  dpm: number
+  /** масштаб графика: 0 — весь период, 3 — самый близкий */
+  zoom: number
+  /** предупреждение о рублёвых выплатах закрыто */
+  rwarn: boolean
 }
 
 export interface AppSnapshot {

@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "audit": "node scripts/audit.mjs",
+    "sweep": "node scripts/sweep.mjs"
   },
   "type": "module",
   "private": true,

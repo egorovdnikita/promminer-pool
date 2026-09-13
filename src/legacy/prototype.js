@@ -23,7 +23,7 @@ const AXES={
   rdata:{g:'Отчет',label:'Данные воркеров',opts:[['ok','Заполнены'],['no','Не у всех воркеров'],['del','Нет у удалённых']]},
   awal:{g:'Мои активы',label:'Кошельки',opts:[['some','Как в макете'],['all','У всех монет'],['none','Не добавлены']]},
   apay:{g:'Мои активы',label:'Автовыплаты',opts:[['btc','Только BTC'],['all','У всех монет'],['none','Выключены']]},
-  aerr:{g:'Мои активы',label:'Ошибка в поле',opts:[['no','Нет'],['req','Не заполнено'],
+  aerr:{g:'Мои активы',label:'Ошибка поля в активах',opts:[['no','Нет'],['req','Не заполнено'],
     ['low','Сумма меньше порога'],['bad','Некорректный адрес'],['code','Неверный код'],['old','Код недействителен']]},
   role:{g:'Аккаунт',label:'Роль',opts:[['owner','Владелец'],['observer','Наблюдатель']]},
   perm:{g:'Аккаунт',label:'Разрешения вотчера',opts:[['all','Все разделы'],['wi','Воркеры и доход'],
@@ -39,7 +39,7 @@ const AXES={
   saerr:{g:'Суб-аккаунты',label:'Имя суб-аккаунта',opts:[['no','Пусто'],['ok','Свободно'],
     ['req','Не заполнено'],['short','Коротко и капсом'],['caps','Есть заглавные'],
     ['busy','Уже занято'],['load','Проверяем']]},
-  verr:{g:'Верификация',label:'Ошибка в поле',opts:[['no','Нет'],['tax','Код налоговой'],['inn','ИНН'],['bank','Банк не выбран'],['file','Файл больше 4 МБ']]},
+  verr:{g:'Верификация',label:'Ошибка поля анкеты',opts:[['no','Нет'],['tax','Код налоговой'],['inn','ИНН'],['bank','Банк не выбран'],['file','Файл больше 4 МБ']]},
   subs:{g:'Профиль',label:'Суб-аккаунты',opts:[['many','3'],['few','1'],['none','Только основной']]},
   obs:{g:'Профиль',label:'Наблюдатели',opts:[['many','6'],['few','2'],['none','Нет']]},
   notif:{g:'Профиль',label:'Уведомления',opts:[['many','12 новых'],['few','2 новых'],['none','Нет']]},
@@ -67,7 +67,7 @@ const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',healt
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no',rdata:'ok'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false,sfin:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null,dsel:{},dpm:0,zoom:0,rwarn:false};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -368,6 +368,13 @@ const TITLES={home:'Главная',workers:'Воркеры',worker:'Ant01',seri
   ref:'Promminer: реферальная программа',reflist:'Список рефералов',refincome:'Реферальный доход',refpayouts:'Реферальные выплаты',
   profile:'Личный кабинет',security:'Личный кабинет',notifsettings:'Личный кабинет',notifconfig:'Личный кабинет',subaccounts:'Личный кабинет',
   observers:'Личный кабинет',verification:'Личный кабинет',auth:'Вход'};
+/* В панели сценариев заголовки вкладок повторяются («Личный кабинет» семь раз),
+   поэтому у списка экранов свои подписи. */
+const SCREEN_NAMES={serials:'Серийные номера',worker:'Карточка воркера',
+  profile:'Профиль: сводка',security:'Профиль: безопасность',
+  verification:'Профиль: верификация',subaccounts:'Профиль: суб-аккаунты',
+  observers:'Профиль: наблюдатели',notifsettings:'Профиль: уведомления',
+  notifconfig:'Профиль: настройка уведомлений'};
 const GROUP_OF={sumassets:'sfin',sumincome:'sfin',assets:'fin',income:'fin',payouts:'fin',calc:'tools',tax:'tools',ref:'ref',reflist:'ref',refincome:'ref',refpayouts:'ref'};
 
 /* ============================================================
@@ -422,19 +429,36 @@ const cb=(on,attr='',cls='')=>`<span class="cb ${on?'on':''} ${cls}" ${attr}>${o
 const MONTHS=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 /* Календарь на любой месяц. min — первый доступный день: раньше него
    даты гасятся (в сроке действия ссылки выбор только вперёд). */
-function datePicker(sel=[29,30],mi=0,yr=2026,min=0){
+function datePicker(sel=[29,30],mi=0,yr=2026,min=0,key){
   const dows=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+  /* С ключом календарь живой: стрелки листают месяц, клики выбирают диапазон */
+  if(key){
+    /* открываем на месяце уже выбранной даты, иначе на месяце по умолчанию */
+    const base=U.dsel[key]; if(base){mi=base.mi;yr=base.yr}
+    const off=U.dpm||0, t=new Date(yr,mi+off,1);
+    mi=t.getMonth(); yr=t.getFullYear();
+    const st=U.dsel[key];
+    sel=st&&st.mi===mi&&st.yr===yr
+      ? (st.b?Array.from({length:st.b-st.a+1},(_,i)=>st.a+i):[st.a])
+      : [];
+  }
   const lead=new Date(yr,mi,1).getDay(), days=new Date(yr,mi+1,0).getDate(), prev=new Date(yr,mi,0).getDate();
   const cells=[];
   for(let i=lead;i>0;i--)cells.push(`<span class="dp-d mut">${prev-i+1}</span>`);
-  for(let d=1;d<=days;d++)cells.push(`<span class="dp-d ${sel.includes(d)?'sel':''} ${d<min?'off':''}">${d}</span>`);
+  for(let d=1;d<=days;d++)cells.push(`<span class="dp-d ${sel.includes(d)?'sel':''} ${d<min?'off':''}"
+    ${key&&d>=min?`data-dpd="${mi}:${yr}:${d}"`:''}>${d}</span>`);
   for(let d=1;cells.length%7;d++)cells.push(`<span class="dp-d mut">${d}</span>`);
   return `<div class="pop dp">
-    <div class="dp-top"><button class="dp-nav">${I.cl}</button><b>${MONTHS[mi]} ${yr}</b><button class="dp-nav">${I.cv}</button></div>
+    <div class="dp-top"><button class="dp-nav" ${key?'data-dpm="-1"':''}>${I.cl}</button><b>${MONTHS[mi]} ${yr}</b>
+      <button class="dp-nav" ${key?'data-dpm="1"':''}>${I.cv}</button></div>
     <div class="dp-div"></div>
     <div class="dp-grid">${dows.map(d=>`<span class="dp-dow">${d}</span>`).join('')}${cells.join('')}</div>
   </div>`;
 }
+/* Подпись выбранного периода: «12.04.2026» или «05.04.2026 – 12.04.2026» */
+const dpLabel=(key,def)=>{const st=U.dsel[key]; if(!st)return def;
+  const f=d=>`${String(d).padStart(2,'0')}.${String(st.mi+1).padStart(2,'0')}.${st.yr}`;
+  return st.b?`${f(st.a)} – ${f(st.b)}`:f(st.a)};
 /* Status дизайн-системы: точка 8 + подпись 12 Bold. t: ok|err|warn|off. */
 /* Badge Dynamic из макета воркеров: 22 в высоту, r100, стрелка 16 и 14 SemiBold */
 const dyn=(kind,val)=>`<span class="dyn ${kind}">${I.sortUp}${val}</span>`;
@@ -457,6 +481,10 @@ function pager(id,total,def=10){
     <button data-page="${id}" data-p="${cur+1}" ${cur>=pages?'disabled':''}>${I.cv}</button></span></div>`;
 }
 
+/* Масштаб графика: обе кнопки живые, крайние состояния гасятся */
+const zoomBtns=()=>{const z=U.zoom||0;
+  return `<button class="ib" data-zoom="1" ${z>=3?'disabled':''} data-tip="Приблизить">${I.zi}</button>
+    <button class="ib" data-zoom="-1" ${z<=0?'disabled':''} data-tip="Отдалить">${I.zo}</button>`};
 function chart(m,opts={}){
   /* Геометрия макета: viewBox 1400×H с полями под подписи. Сами подписи
      живут в HTML, а svg рисует только поле графика — поэтому растягивание
@@ -465,7 +493,9 @@ function chart(m,opts={}){
      менялась с шириной ровно как раньше. */
   const W=1400,H=opts.h||290,PL=56,PR=opts.right===false?20:46,PT=12,PB=26;
   const PW=W-PL-PR, PH=H-PT-PB;
-  const N=120, r=rng(S.coin==='btc'?7:13);
+  /* Кнопки масштаба сужают окно графика: меньше точек — крупнее деталь */
+  const z=Math.max(0,Math.min(3,U.zoom||0));
+  const N=Math.round(120/(1+z*0.6)), r=rng(S.coin==='btc'?7:13);
   const smooth=opts.smooth;
   let p=[];
   for(let i=0;i<N;i++){
@@ -477,7 +507,8 @@ function chart(m,opts={}){
   const ln=p.map((v,i)=>`${i?'L':'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   const ar=`${ln} L${PW},${PH} L0,${PH} Z`;
   const ticks=opts.ticks||[0,150,300,450,600,750,900,1050,1200,1350,1500];
-  const hrs=opts.xs||['14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00','01:00','02:00','03:00','04:00','05:00','06:00'];
+  const hrs0=opts.xs||['14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00','01:00','02:00','03:00','04:00','05:00','06:00'];
+  const hrs=z?hrs0.slice(0,Math.max(3,hrs0.length-z*3)):hrs0;
   const right=opts.right!==false;
   const yl=opts.yl??('Хэшрейт, '+m.c.unit);
   const at=i=>(100-i/(ticks.length-1)*100).toFixed(3);
@@ -536,7 +567,7 @@ V.home=m=>{
 ${cards.length?`<div class="grid g3" style="gap:16px;margin:0">${cards.join('')}</div>`:''}
 ${p.workers?card(`<div class="ch"><h2>График изменения хэшрейта (${m.bal[0].s})</h2>
   <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],2)}
-  <span class="pop-wrap"><button class="pill ctl sq mono lg" data-pop="date">29.01.2026 – 30.01.2026 ${I.cal}</button>${pop==='date'?datePicker():''}</span>
+  <span class="pop-wrap"><button class="pill ctl sq mono lg" data-pop="date">${dpLabel('date','29.01.2026 – 30.01.2026')} ${I.cal}</button>${pop==='date'?datePicker([29,30],0,2026,0,'date'):''}</span>
   <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>${chart(m,{h:359,hover:true})}`,'chartcard'):''}
 ${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,0):`<h2>${tabs[0]}</h2>`}
   <div class="spacer"></div>${m.bal.length>1?`<span class="pill flat sq">${COIN_ICON.LTC} LTC ${I.cd}</span>`:''}
@@ -1019,7 +1050,7 @@ V.worker=m=>{
   <div class="wdmain">
     ${card(`<div class="ch"><h2>График изменения хэшрейта</h2><div class="spacer"></div>
       ${seg('wk-range',['5 мин','1 ч','24 ч'],2)}
-      <span class="pop-wrap"><button class="pill ctl sq mono lg wdcal" data-pop="wdate">05.04.2026 – 12.04.2026 ${I.cal}</button>${pop==='wdate'?datePicker():''}</span>
+      <span class="pop-wrap"><button class="pill ctl sq mono lg wdcal" data-pop="wdate">${dpLabel('wdate','05.04.2026 – 12.04.2026')} ${I.cal}</button>${pop==='wdate'?datePicker([5,12],3,2026,0,'wdate'):''}</span>
       <button class="ib ctl" data-tip="Приблизить">${I.zi}</button><button class="ib ctl" data-tip="Отдалить">${I.zo}</button></div>
       ${chart(m,{h:626,hover:true})}`)}
     <div class="wdside">
@@ -1164,8 +1195,11 @@ const fsel=(id,opts,ico)=>{const i=U.seg[id]??0; const pic=v=>ico?(ico(v)||''):'
   return `<span class="pop-wrap"><button class="fsel" data-pop="${id}">${pic(opts[i])}${opts[i]}<span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu">${opts.map((o,n)=>
     `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${pic(o)}${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
-/* Date Input 256x48 с плейсхолдером 16 SemiBold (15:19710) */
-const dateInput=()=>`<button class="dinput">Выберите дату${I.cal}</button>`;
+/* Date Input 256x48 с плейсхолдером 16 SemiBold (15:19710) — открывает календарь */
+const dateInput=(id='d')=>{const v=U.dsel['dp'+id];
+  return `<span class="pop-wrap"><button class="dinput ${v?'on':''}" data-pop="dp${id}">
+    ${dpLabel('dp'+id,'Выберите дату')}${I.cal}</button>
+    ${pop==='dp'+id?datePicker([],3,2026,0,'dp'+id):''}</span>`};
 /* Карточка дохода 540x176: подпись 20, значение 48, снизу пересчёт в валюты */
 const incCard=(label,val,coin,sub,opt={})=>`<div class="icard ${opt.acc?'acc':''}">
   <div class="ih"><span>${label}</span>${opt.go?`<button class="iarr" data-go="${opt.go}">${I.arr}</button>`:''}</div>
@@ -1179,11 +1213,11 @@ V.income=m=>`
   ${incCard('Доход за все время',dec(m.all[0].v),m.all[0].s,'14,71 $ • 1 157,16 ₽')}
 </div>
 ${card(`<div class="ch"><h2>График дохода (${m.bal[0].s})</h2><div class="spacer"></div>
-  ${dayChips('income-chart')}${dateInput()}
-  <button class="ib" data-tip="Приблизить">${I.zi}</button><button class="ib" data-tip="Отдалить">${I.zo}</button></div>
+  ${dayChips('income-chart')}${dateInput('inc1')}
+  ${zoomBtns()}</div>
   ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:['15.07','16.07','17.07','18.07','19.07','20.07','21.07']})}`)}
 ${card(`<div class="ch"><h2>История дохода</h2><div class="spacer"></div>
-  ${dayChips('income-hist')}${dateInput()}
+  ${dayChips('income-hist')}${dateInput('inc2')}
   <button class="ib" data-modal="export" data-ex="inc">${I.dl}</button></div>
   ${incomeTable(m,m.empty?0:48,'income')}`)}`;
 
@@ -1194,7 +1228,7 @@ function payoutsScreen(m,own){
   const type=PAY_TYPES[segi('pay-type',0)];
   return `${own?`<div class="prow"><button class="btn g" data-go="assets">Мои активы${I.arr}</button></div>`:''}
   ${card(`<div class="ch"><h2>${own?'История выплат':'Реферальные выплаты'}</h2><div class="spacer"></div>
-  ${N?`${fsel('pay-type',PAY_TYPES)}${dayChips('pay-range')}${dateInput()}
+  ${N?`${fsel('pay-type',PAY_TYPES)}${dayChips('pay-range')}${dateInput('pay')}
     <button class="ib" data-modal="export" data-ex="pay">${I.dl}</button>`:''}</div>
   ${payoutsTable(m,N,'payouts',type)}`)}`;
 }
@@ -1383,8 +1417,9 @@ V.summary=m=>`
   ${card(`<div class="ch"><h2>Воркеры (${ni(m.total)})</h2></div>${workerTiles(m)}`)}
 </div>
 ${card(`<div class="ch"><h2>График общего хэшрейта</h2><div class="spacer"></div>
-  <button class="ib sm">${I.zi}</button><button class="ib sm">${I.zo}</button></div>${chart(m)}`)}
-${card(`<div class="ch"><h2>Детализация хэшрейта (${m.bal[0].s})</h2><div class="spacer"></div><button class="ib sm">${I.dl}</button></div>
+  ${zoomBtns()}</div>${chart(m)}`)}
+${card(`<div class="ch"><h2>Детализация хэшрейта (${m.bal[0].s})</h2><div class="spacer"></div>
+  <button class="ib" data-modal="export" data-ex="hours">${I.dl}</button></div>
   <div class="tw"><table class="tbl">
   <thead><tr><th rowspan="2">Аккаунт</th><th colspan="3" style="text-align:center">Хэшрейт</th><th colspan="4" style="text-align:center">Воркеры</th><th rowspan="2">Реджект ${I.sortv}</th></tr>
   <tr><th>24 ч ${I.sortv}</th><th>1 ч ${I.sortv}</th><th>5 мин ${I.sortv}</th><th>Активные ${I.sortv}</th><th>Низкий хэш ${I.sortv}</th><th>Отключены ${I.sortv}</th><th>Оффлайн ${I.sortv}</th></tr></thead>
@@ -1419,7 +1454,7 @@ ${card(`<div class="hero"><div class="hval"><div class="l">Текущий общ
     <div class="v mono">${dec(m.bal[0].v)} ${m.bal[0].s}</div>
     <div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div></div>`)}
 ${card(`<div class="ch"><h2>График общего дохода</h2><div class="spacer"></div>
-  ${dayChips('sumincome-range')}${dateInput()}</div>
+  ${dayChips('sumincome-range')}${dateInput('sumi')}</div>
   ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:['15.07','16.07','17.07','18.07','19.07','20.07','21.07']})}`)}
 ${card(`<div class="ch"><h2>Общий доход</h2><div class="spacer"></div>
   <button class="ib" data-modal="export" data-ex="inc">${I.dl}</button></div>${totalIncomeTable(m)}`)}`;
@@ -1558,10 +1593,10 @@ V.ref=m=>{
       <p>Начните формировать свой пассивный доход, став партнером Promminer уже сегодня</p></div>
   </div></div>
 ${card(`<div class="ch"><h2>Настройка реферальных выплат</h2></div>
-  <div class="alert warn" style="margin-bottom:12px"><div><b>Если хотите выводить в рублях</b><br>
+  ${U.rwarn?'':`<div class="alert warn" style="margin-bottom:12px"><div><b>Если хотите выводить в рублях</b><br>
     <span class="mut">Заполните форму, как Юридическое лицо или Индивидуальный предприниматель в разделе
       <button class="lnk a" data-go="verification">Верификация и реквизиты</button></span></div>
-    <button class="spacer dim">${I.x}</button></div>
+    <button class="spacer dim" data-rwarn>${I.x}</button></div>`}
   <div class="tw"><table class="tbl atbl"><thead><tr><th>Монеты</th><th>Баланс</th>
     <th><span class="thico">${USD_ICON} Баланс, $</span></th><th><span class="thico">${I.rub} Баланс, ₽</span></th>
     <th>Реквизиты</th><th><span class="thico">Порог автовыплат<i class="tipi" data-tip="${ATIP.th}">${I.inf}</i></span></th>
@@ -1596,11 +1631,11 @@ function refListTable(m){
 }
 V.reflist=m=>card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
   <div class="spacer"></div>${fsel('reflist-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
-  ${fsel('reflist-act',['Активные','Все'])}${dateInput()}
+  ${fsel('reflist-act',['Активные','Все'])}${dateInput('rl')}
   <button class="ib" data-modal="export" data-ex="ref">${I.dl}</button></div>${refListTable(m)}`);
 V.refincome=m=>card(`<div class="ch"><h2>Доход (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
   <div class="spacer"></div>${fsel('refinc-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
-  ${dayChips('refincome-range')}${dateInput()}
+  ${dayChips('refincome-range')}${dateInput('ri')}
   <button class="ib" data-modal="export" data-ex="ref">${I.dl}</button></div>
   ${refIncomeTable(m,m.empty?0:32,'refincome')}`);
 V.refpayouts=m=>payoutsScreen(m,false);
@@ -2899,6 +2934,6 @@ export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   loadFail, nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
-  SUM_NAV, SUM_ROUTES, V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf, coinsOf,
+  SUM_NAV, SUM_ROUTES, SCREEN_NAMES, V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf, coinsOf,
   S, U, route, pop, modal, openGroups, mini,
 };
