@@ -255,7 +255,11 @@ body.mini .ni .spacer.lbl{display:none!important}
    схлопываются в кнопки-иконки 48 (макет 173:60139) */
 .card.tblcard>.ch.subhead{flex-wrap:nowrap}
 .ch .wsearch{flex:0 0 230px}
+/* Сегмент статусов: на узких окнах «Низкий хэшрейт» сокращается (173:60076) */
+.seg .ss{display:none}
 @media(max-width:1450px){
+  .seg .sl:has(+ .ss){display:none}
+  .seg .ss{display:inline}
   .ch .wfilt .lb,.ch .wexport .lb{display:none}
   .ch .wfilt,.ch .wexport{width:48px;padding:0;justify-content:center;gap:0}
   .ch .wsearch{flex:0 0 48px;width:48px;min-width:48px;padding:0;justify-content:center}
@@ -264,7 +268,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Таблица воркеров: строка 48, ячейки 12, чипы 32, кнопка действий 36 */
 /* Колонки поровну, как в макете: 36 под чекбокс, 68 под действия,
    остальные делят ширину; длинные модели обрезаются многоточием */
-.tbl.wtbl{table-layout:fixed}
+/* 36 + 10x145 + 68: уже этого таблица не сжимается, а уезжает вбок */
+.tbl.wtbl{table-layout:fixed;min-width:1554px}
 .tbl.wtbl th,.tbl.wtbl td{overflow:hidden;text-overflow:ellipsis}
 /* 47 + разделитель 1 = строка 48 из макета */
 .tbl.wtbl td{padding:12px;height:47px}
@@ -276,7 +281,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .tbl.wtbl th:first-child,.tbl.wtbl td:first-child{width:36px;padding-right:0}
 .tbl.wtbl th:last-child,.tbl.wtbl td:last-child{width:68px}
 /* Меню действий и его заблокированный пункт */
-.wkmenu{width:226px}
+/* Экшн-меню строки воркера — 169×192 из макета 173:59516 */
+.pop.menu.wkmenu{width:169px;min-width:169px;padding:10px 12px;gap:4px;align-items:stretch}
 .wkmenu .mi.off{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:40px;
   color:var(--c3);cursor:not-allowed;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 /* Список выбора в модалках тегов и групп */
@@ -1471,7 +1477,7 @@ button.scsect:hover{color:var(--accent)}
 .wdsub span{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
 .wdsub b{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600;margin-top:6px;display:block}
 .wdh{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:500;color:var(--c2)}
-.wdh2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;margin-bottom:16px}
+.card .wdh2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;margin-bottom:16px}
 .wdrows{margin-top:auto;display:flex;flex-direction:column;gap:12px}
 .wdkv{display:flex;align-items:center;gap:12px;min-height:24px}
 .wdkv .k{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2);flex:0 0 auto}

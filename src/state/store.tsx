@@ -406,6 +406,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (tf) { u.wfilter = tf.dataset.tilef!; u.page.workers = 1; go('workers'); return bump() }
     const cp = at('[data-copy]')
     if (cp) { navigator.clipboard?.writeText(cp.dataset.copy!); return toast('Скопировано') }
+    /* «Посмотреть» в экшн-меню строки — тот же переход, что и клик по строке */
+    const wko = at('[data-wkopen]')
+    if (wko) {
+      applyState(snapshot())
+      u.wk = workersList(M()).find((w: any) => w.id === +wko.dataset.wkopen!) || null
+      seedBind(u.wk)
+      pop.current = null
+      go('worker')
+      return bump()
+    }
     const wk = at('[data-wk]')
     /* по клику на строку — в деталку, но не когда жмут меню действий
        или чекбокс выбора (комментарий дизайнера в макете 177:122812) */

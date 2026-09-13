@@ -704,7 +704,7 @@ function workersList(m){
     :['Antminer S19 XP Hydro 257 TH/s','Antminer S21+ 235 TH/s','Avalon Q 90 TH/s','Antminer S21+ 225 TH/s'];
   /* У воркера один видимый тег и, если есть второй, чип «+1» с подсказкой */
   const tags=[['Разогнан','Собран'],['Готов','Завершен'],['Без прошивки','Подготовлен']];
-  const N=S.data==='few'?3:36, r=rng(S.coin==='btc'?11:23);
+  const N=S.data==='few'?5:36, r=rng(S.coin==='btc'?11:23);
   const share=[['ok',m.h.a],['low',m.h.l],['off',m.h.o],['fail',m.h.f]];
   const tot=share.reduce((s,x)=>s+x[1],0)||1, out=[];
   for(let i=0;i<N;i++){
@@ -753,6 +753,7 @@ const sortBy=(rows,tbl,val)=>{const s=U.sort[tbl]; if(!s) return rows;
 const wkMenu=w=>{const busy=w.st==='ok'||w.st==='low';
   return `<span class="pop-wrap"><button class="ibr act" data-pop="wk${w.id}">${I.dots}</button>
   ${pop==='wk'+w.id?`<div class="pop menu wkmenu">
+    <button data-wkopen="${w.id}">Посмотреть</button>
     <button data-modal="wgroups" data-wk2="${w.id}">Изменить группы</button>
     <button data-modal="wtags" data-wk2="${w.id}">Изменить теги</button>
     ${busy?`<span class="mi off" data-tip="Вы не сможете удалить воркер в статусе «Активен» или «Низкий хэшрейт»">Удалить</span>`
@@ -778,7 +779,9 @@ V.workers=m=>{
       <td><i class="dot" style="display:inline-block;background:${col};margin-right:8px"></i>${lbl}</td>
       <td class="mono">${nf(w.h5,2)} ${m.c.unit}</td><td class="mono">${nf(w.h1,2)} ${m.c.unit}</td><td class="mono">${nf(w.h24,2)} ${m.c.unit}</td>
       <td class="mono">${nf(w.rej,2)}%</td><td class="mono">${w.up}%</td><td class="mono mut">${shareAt(w.sh)}</td>
-      <td class="tags"><span class="tag ${w.tag==='Без прошивки'?'y':''}">${w.tag}</span>${w.extra?` <span class="tag n" data-tip="${w.tags.slice(1).join(', ')}">+1</span>`:''}</td>
+      <td class="tags">${tagsOf().length
+        ? `<span class="tag ${w.tag==='Без прошивки'?'y':''}">${w.tag}</span>${w.extra?` <span class="tag n" data-tip="${w.tags.slice(1).join(', ')}">+1</span>`:''}`
+        : '<span class="mut">—</span>'}</td>
       <td class="num wact">${wkMenu(w)}</td></tr>`}).join('');
   /* Сводка хэшрейта — одна карточка: акцентная плашка и сетка 2×2 (макет 173:59403) */
   const wst=(l,v,d='')=>`<div class="wst"><div class="l">${l}</div><div class="v mono">${v}${d}</div></div>`;
@@ -806,15 +809,16 @@ V.workers=m=>{
   ${card(`<div class="ch subhead">
     <div class="seg">
       ${[['all','Все',''],['ok','Активные','var(--pos)'],['low','Низкий хэшрейт','var(--warn)'],['off','Отключены','var(--neg)'],['fail','Оффлайн','var(--neu)']]
-        .map(([k,l,c])=>`<button class="${U.wfilter===k?'on':''}" data-wf="${k}">${c?`<i class="dot" style="background:${c}"></i>`:''}${l} <u>${ni(cnt(k))}</u></button>`).join('')}
+        .map(([k,l,c])=>`<button class="${U.wfilter===k?'on':''}" data-wf="${k}">${c?`<i class="dot" style="background:${c}"></i>`:''}<span class="sl">${l}</span>${k==='low'?'<span class="ss">Низкий хэш</span>':''} <u>${ni(cnt(k))}</u></button>`).join('')}
     </div>
+    ${all.length?`
     <button class="btn g wfilt" data-modal="filters">${I.flt}<span class="lb">Фильтры</span>${fcount()?`<i class="fbadge">${fcount()}</i>`:''}</button>
     <div class="spacer"></div>
     <label class="search wsearch">${I.srch}<input id="q" placeholder="Найти воркер" value="${U.q.replace(/"/g,'&quot;')}"></label>
     <span class="pop-wrap"><button class="btn g wexport" data-pop="exp">${I.dl}<span class="lb">Экспорт</span></button>
     ${pop==='exp'?`<div class="pop left menu expmenu">
       <button data-modal="export" data-ex="hours">Часы работы</button>
-      <button data-modal="export" data-ex="stat">Статистика воркеров</button></div>`:''}</span></div>
+      <button data-modal="export" data-ex="stat">Статистика воркеров</button></div>`:''}</span>`:''}</div>
   ${U.sel.size?(()=>{const busy=all.some(w=>U.sel.has(w.id)&&(w.st==='ok'||w.st==='low'));
     return `<div class="bulk">${cb(true,'data-selclear')}<b>Выбрано элементов: ${U.sel.size}</b>
     <div class="spacer"></div>
@@ -831,7 +835,9 @@ V.workers=m=>{
     :(fcount()?emptyBox('Ничего не найдено','Попробуйте изменить выбор или очистить фильтры',
         '<button class="btn link" data-fclear>Очистить фильтры</button>')
       :emptyBox('Ничего не найдено','Измените фильтр или поисковый запрос')))
-    :emptyBox('Воркеров пока нет','Подключите первый воркер, чтобы увидеть статистику по парку')}`,'tblcard')}</div>`;
+    :emptyBox('Подключите воркеры, чтобы начать майнить',
+        'Ваши устройства появятся в течение 10 минут после подключения',
+        S.role==='owner'?`<button class="btn" data-modal="connect">${I.pl}Подключить воркер</button>`:'')}`,'tblcard')}</div>`;
 };
 
 /* Серийные номера (макет 173:66711): отдельный экран с таблицей,

@@ -36,7 +36,8 @@ export function Coinbar({ m }: { m: Model }) {
       {route === 'workers' && S.role === 'owner' && (
         <>
           <div className="spacer" />
-          <button className="btn w" data-go="serials">Серийные номера<Ico html={I.cv} /></button>
+          {/* На пустом парке остаётся только подключение (макет 1228:149263) */}
+          {!m.empty && <button className="btn w" data-go="serials">Серийные номера<Ico html={I.cv} /></button>}
           <button className="btn" data-modal="connect"><Ico html={I.pl} />Подключить воркер</button>
         </>
       )}
