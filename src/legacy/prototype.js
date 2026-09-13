@@ -1307,7 +1307,7 @@ V.report=m=>{
       <td>${status(cls,lab,'caps')}</td>
       <td class="num">${noV&&!ro?`<span data-tip="${REP_TIP}">${gen}</span>`:gen}</td>
       <td class="num"><button class="btn out xs" ${st==='ok'?'':'disabled'} data-toast="Отчет скачан">${I.dl}Скачать</button></td></tr>`}).join('')}
-  </tbody></table></div>`)}`};
+  </tbody></table></div>`,'rcard')}`};
 
 /* --- Инструменты --- */
 /* Калькулятор доходности (макет 5:3779): акцентная плашка 268, слева белая

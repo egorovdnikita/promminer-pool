@@ -1878,6 +1878,10 @@ button.scsect:hover{color:var(--accent)}
 .rx{margin-left:auto;color:var(--c3);flex:0 0 auto}
 .rx svg{width:24px;height:24px}
 /* Строки отчёта 48 и карточка с паддингом 8, как в макете (109:19476) */
+/* Карточка отчёта в макете растянута на остаток высоты (Item 810 из Top 1012,
+   109:19436) — таблица прокручивается внутри неё */
+.card.rcard{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.card.rcard>.tw{flex:1 1 auto;min-height:0;overflow:auto}
 .card:has(.rtbl){padding:8px 8px 16px}
 .card:has(.rtbl)>.rnote{margin:0 0 16px}
 .rtbl th,.rtbl td{height:48px;padding:0 12px}
