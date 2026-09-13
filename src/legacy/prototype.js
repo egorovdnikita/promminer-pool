@@ -565,11 +565,12 @@ function incomeTable(m,n,pid){
   if(!n) return emptyBox('Дохода пока нет','Как только будет доход вы увидите здесь информацию');
   let from=0,to=n;
   if(pid){const per=perOf(pid,10),pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
+  const tip=t=>`<i class="tipi" data-tip="${t}">${I.inf}</i>`;
   return `<div class="tw"><table class="tbl"><thead><tr>
-    <th>Дата и время</th><th>Хэшрейт ${I.inf}</th>
+    <th>Дата и время</th><th>Хэшрейт ${tip('Средний хэшрейт по всем воркерам за 24 ч')}</th>
     <th class="num"><span class="thico paico">${COIN_ICON[u]}</span> Доход, ${u}</th><th class="num">Доход с 1 ${m.c.short}, ${u}</th>
-    <th class="num"><span class="thico paico">${PAY_ICON['$']}</span> Доход, $ ${I.inf}</th>
-    <th class="num"><span class="thico paico">${PAY_ICON['₽']}</span> Доход, ₽ ${I.inf}</th>
+    <th class="num"><span class="thico paico">${PAY_ICON['$']}</span> Доход, $ ${tip('Доход в $ рассчитывается исходя из курса валюты в этот день в 00:00 (UTC)')}</th>
+    <th class="num"><span class="thico paico">${PAY_ICON['₽']}</span> Доход, ₽ ${tip('Доход в ₽ рассчитывается исходя из курса валюты в этот день в 00:00 (UTC)')}</th>
     <th class="num">Баланс, ${u}</th><th class="num">Цена ${u}, ₽</th></tr></thead><tbody>
     ${Array.from({length:to-from},(_,j)=>{const i=from+j;return `<tr><td class="mono">${d[i%10]}</td><td class="mono">${hs[i%10]} ${m.c.unit}</td>
       <td class="num mono">${R.amount}</td><td class="num mono">${R.per}</td><td class="num mono">35,00 $</td>
@@ -580,27 +581,35 @@ function incomeTable(m,n,pid){
 /* Выплаты (макет 247:91194): дата, сумма со значком монеты, тип транзакции,
    кошелёк, статус-бейдж и кнопка «Скачать» — только у завершённых. */
 const PAYOUTS=[
-  ['09.12.2025 07:00','0,000329926','Автовыплата','1A1z****8uGT','work'],
-  ['08.12.2025 07:00','0,000235789','Ручной вывод','1A1z****8uGT','work'],
-  ['07.12.2025 17:34','0,000456789','Автовыплата','1A1z****8uGT','err'],
-  ['06.12.2025 10:45','0,000654321','Автовыплата','1A1z****8uGT','done'],
-  ['05.12.2025 07:00','0,000345678','Автовыплата','1A1z****8uGT','done']];
+  ['22.02.2026 11:07','0,000329926','Автовыплата','1A1z****8uGT','work'],
+  ['22.02.2026 12:07','0,000235789','Ручная выплата','1A1z****8uGT','work'],
+  ['11.02.2026 14:32','0,000456789','Ручная выплата','1A1z****8uGT','done'],
+  ['22.01.2026 11:07','0,000654321','Автовыплата','1A1z****8uGT','done'],
+  ['22.01.2026 11:07','0,000185087','Продажа','1234****9856','err'],
+  ['03.01.2026 09:15','0,000345678','Автовыплата','1A1z****8uGT','done']];
+const PAY_TYPES=['Все выплаты','Ручная выплата','Автовыплата','Продажа'];
 const PAY_ST={work:['warn','В работе'],err:['err','Ошибка'],done:['ok','Завершен']};
-function payoutsTable(m,n){
-  if(!n) return emptyBox('Выплат пока нет','Здесь появятся выплаты после первого вывода средств');
+function payoutsTable(m,n,pid,type){
+  if(!n) return emptyBox('Выплат пока не было','Как только будут выплаты, вы увидите здесь информацию');
   const u=m.bal[0].s;
+  /* фильтр «Тип операции» из шапки карточки (37:56063) */
+  const src=(!type||type===PAY_TYPES[0])?PAYOUTS:PAYOUTS.filter(r=>r[2]===type);
+  if(!src.length) return emptyBox('Ничего не найдено','Попробуйте изменить тип операции');
+  n=Math.min(n,type&&type!==PAY_TYPES[0]?src.length:n);
+  let from=0,to=n;
+  if(pid){const per=perOf(pid,10),pages=Math.max(1,Math.ceil(n/per)),cur=Math.min(U.page[pid]||1,pages);from=(cur-1)*per;to=Math.min(from+per,n)}
   return `<div class="tw"><table class="tbl paytbl"><thead><tr>
     <th>Дата и время</th>
     <th><span class="thico paico">${COIN_ICON[u]}</span> Сумма, ${u}</th>
     <th>Тип транзакции</th><th>Кошелек/Расчетный счет</th><th>Статус</th>
-    <th class="docs">Документы ${I.inf}</th></tr></thead><tbody>
-    ${Array.from({length:n},(_,i)=>{const [d,a,t,w,st]=PAYOUTS[i%PAYOUTS.length];
+    <th class="docs">Документы <i class="tipi" data-tip="При переходе транзакции «Продажа» в статус «Завершен» вам необходимо будет скачать документы">${I.inf}</i></th></tr></thead><tbody>
+    ${Array.from({length:to-from},(_,j)=>{const i=from+j; const [d,a,t,w,st]=src[i%src.length];
       const [cls,lab]=PAY_ST[st];
       return `<tr><td class="mono">${d}</td><td class="mono">${a} ${u}</td>
       <td>${t}</td><td class="mono">${w}</td>
       <td>${status(cls,lab,'caps')}</td>
-      <td class="docs">${st==='done'?`<button class="btn out xs" data-toast="Документ скачан">${I.dl} Скачать</button>`:''}</td></tr>`}).join('')}
-  </tbody></table></div>`;
+      <td class="docs">${st==='done'?`<button class="btn out xs" data-toast="Документ скачан">${I.dl} Скачать</button>`:st==='err'?'—':''}</td></tr>`}).join('')}
+  </tbody></table></div>${pid?pager(pid,n,10):''}`;
 }
 /* Реферальная программа (макет 185:105544): табличная карточка, внутри две
    колонки по 794 — слева медаль с дорожкой, справа панель «Общие данные». */
@@ -1132,48 +1141,51 @@ const walletFoot=(step,ok)=>step===2
 
 /* Доход — по макету: индиго-карточка баланса и две белые, периоды отдельными
    пилюлями (на этом экране в макете это не Segment Control), иконки валют в шапке. */
-const perPills=(id,opts,def=null)=>`<span class="row" style="gap:8px">${opts.map((o,i)=>
-  `<button class="pill flat sq ${(U.seg[id]??def)===i?'on':''}" style="height:36px;padding:0 14px;font-size:var(--fs-c);line-height:var(--lh-c)" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</span>`;
+/* Периоды на этом экране — Chips 48 из ДС, а не Segment Control; по умолчанию
+   период не выбран и показываются все данные (15:21011). */
+const dayChips=(id,def=null)=>`<span class="dchips">${['7 дн','30 дн','90 дн'].map((o,i)=>
+  `<button class="chip d ${(U.seg[id]??def)===i?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</span>`;
+/* Селект в шапке карточки: 48 высотой, радиус 16 (37:56063) */
+const fsel=(id,opts)=>{const i=U.seg[id]??0;
+  return `<span class="pop-wrap"><button class="fsel" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
+  ${pop===id?`<div class="pop menu xmenu">${opts.map((o,n)=>
+    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
+/* Date Input 256x48 с плейсхолдером 16 SemiBold (15:19710) */
+const dateInput=()=>`<button class="dinput">Выберите дату${I.cal}</button>`;
+/* Карточка дохода 540x176: подпись 20, значение 48, снизу пересчёт в валюты */
+const incCard=(label,val,coin,sub,opt={})=>`<div class="icard ${opt.acc?'acc':''}">
+  <div class="ih"><span>${label}</span>${opt.go?`<button class="iarr" data-go="${opt.go}">${I.arr}</button>`:''}</div>
+  <div class="iv"><b class="mono">${val}</b><span>${coin}</span></div>
+  <div class="is mono">≈ ${sub}</div></div>`;
+
 V.income=m=>`
-<div class="grid g3">
-  <section class="card hero" style="flex-direction:column;justify-content:center;min-height:132px">
-    <div class="row" style="width:100%;align-items:flex-start"><div>
-      <div class="l">Текущий баланс</div>
-      <div class="v mono" style="font-size:var(--fs-h3);line-height:var(--lh-h3)">${nf(m.bal[0].v,8)} ${m.bal[0].s}</div>
-      <div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div>
-      <span class="spacer cv">${I.cv}</span></div></section>
-  ${card(`<div class="cap dim" style="margin-bottom:8px">Доход за 24 часа</div>
-    <div class="mono" style="font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600">${nf(m.d24[0].v,8)} ${m.d24[0].s}</div>
-    <div class="cap dim mono" style="margin-top:6px">≈ 14,71 $ • 1 157,16 ₽</div>`)}
-  ${card(`<div class="cap dim" style="margin-bottom:8px">Доход за все время</div>
-    <div class="mono" style="font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600">${nf(m.all[0].v,8)} ${m.all[0].s}</div>
-    <div class="cap dim mono" style="margin-top:6px">≈ 14,71 $ • 1 157,16 ₽</div>`)}
+<div class="icards">
+  ${incCard('Текущий баланс',dec(m.bal[0].v),m.bal[0].s,`${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽`,{acc:true,go:'assets'})}
+  ${incCard('Доход за 24 часа',dec(m.d24[0].v),m.d24[0].s,'14,71 $ • 1 157,16 ₽')}
+  ${incCard('Доход за все время',dec(m.all[0].v),m.all[0].s,'14,71 $ • 1 157,16 ₽')}
 </div>
 ${card(`<div class="ch"><h2>График дохода (${m.bal[0].s})</h2><div class="spacer"></div>
-  ${perPills('income-chart',['7 дн','30 дн','90 дн'],0)}
-  <span class="pill flat sq" style="height:36px;font-size:var(--fs-c);line-height:var(--lh-c)">Выберите дату ${I.cal}</span>
-  <button class="ib sm">${I.zi}</button><button class="ib sm">${I.zo}</button></div>
+  ${dayChips('income-chart')}${dateInput()}
+  <button class="ib" data-tip="Приблизить">${I.zi}</button><button class="ib" data-tip="Отдалить">${I.zo}</button></div>
   ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:['15.07','16.07','17.07','18.07','19.07','20.07','21.07']})}`)}
 <div style="height:12px"></div>
 ${card(`<div class="ch"><h2>История дохода</h2><div class="spacer"></div>
-  ${perPills('income-hist',['7 дн','30 дн','90 дн'],0)}
-  <span class="pill flat sq" style="height:36px;font-size:var(--fs-c);line-height:var(--lh-c)">Выберите дату ${I.cal}</span><button class="ib sm">${I.dl}</button></div>
+  ${dayChips('income-hist')}${dateInput()}
+  <button class="ib" data-modal="export" data-ex="inc">${I.dl}</button></div>
   ${incomeTable(m,m.empty?0:48,'income')}`)}`;
 
-V.payouts=m=>{
-  const N=m.empty?0:(S.data==='few'?3:28), [pf,pt]=pageSlice('payouts',N);
-  return card(`<div class="ch"><h2>Выплаты</h2><div class="spacer"></div>
-  ${seg('payouts-range',['7 дн','30 дн','90 дн'],1)}
-  <span class="pill flat sq" style="font-size:var(--fs-c);line-height:var(--lh-c)">Выберите дату ${I.cal}</span>
-  <button class="ib sm" data-toast="Выгрузка выплат готовится">${I.dl}</button></div>
-  ${N?`<div class="tw"><table class="tbl"><thead><tr><th>Дата и время</th><th>Кошелек</th><th class="num">Сумма, ${m.bal[0].s}</th>
-    <th class="num">Сумма, $</th><th class="num">Сумма, ₽</th><th>Статус</th><th>TxID</th></tr></thead><tbody>
-    ${Array.from({length:pt-pf},(_,j)=>{const i=pf+j;return `<tr><td class="mono">0${(i%9)+1}.04.2026 11:0${i%9}</td>
-      <td class="mono mut">bc1q…${(4000+i*37).toString(16)}</td><td class="num mono">0,0125${i%9}</td>
-      <td class="num mono">1 012,${i%9}0 $</td><td class="num mono">74 8${i%9}0,00 ₽</td>
-      <td><span class="tag ${i%7===3?'y':'g'}">${i%7===3?'В обработке':'Выплачено'}</span></td>
-      <td class="mut mono"><button class="lnk" data-copy="0x8f${(i*911).toString(16)}">0x8f…${(i*911).toString(16)} ${I.ext}</button></td></tr>`}).join('')}
-  </tbody></table></div>${pager('payouts',N,10)}`:emptyBox('Выплат пока нет','Здесь появятся выплаты после первого вывода средств')}`)};
+/* Выплаты (макет 37:56063): ряд действий с переходом в «Мои активы»,
+   карточка «История выплат» с фильтром по типу, периодам и дате. */
+function payoutsScreen(m,own){
+  const N=m.empty?0:(S.data==='few'?1:28);
+  const type=PAY_TYPES[segi('pay-type',0)];
+  return `${own?`<div class="prow"><button class="btn g" data-go="assets">Мои активы${I.arr}</button></div>`:''}
+  ${card(`<div class="ch"><h2>${own?'История выплат':'Реферальные выплаты'}</h2><div class="spacer"></div>
+  ${N?`${fsel('pay-type',PAY_TYPES)}${dayChips('pay-range')}${dateInput()}
+    <button class="ib" data-modal="export" data-ex="pay">${I.dl}</button>`:''}</div>
+  ${payoutsTable(m,N,'payouts',type)}`)}`;
+}
+V.payouts=m=>payoutsScreen(m,true);
 
 /* --- Отчет о майнинге --- */
 V.report=m=>`
@@ -1340,7 +1352,7 @@ V.reflist=m=>card(`<div class="ch"><h2>Список рефералов</h2><div 
   <button class="btn g sm">${I.dl} Экспорт</button></div>${refListTable(m)}`);
 V.refincome=m=>card(`<div class="ch"><h2>Реферальный доход</h2><div class="spacer"></div>
   ${seg('refincome-range',['7 дн','30 дн','90 дн'],1)}<button class="ib sm">${I.dl}</button></div>${incomeTable(m,m.empty?0:32,'refincome')}`);
-V.refpayouts=m=>V.payouts(m);
+V.refpayouts=m=>payoutsScreen(m,false);
 
 /* --- Профиль --- */
 /* Порядок и подписи — как в выпадающем меню на проде */
@@ -2252,10 +2264,13 @@ const MODALS={
       <button class="btn danger" data-close data-selclear data-toast="Воркеры успешно удалены">Удалить</button>`},
   /* Экспорт истории (макет 173:66473): 400 в ширину, поля-селекты,
      у «часов работы» добавляется период */
+  /* Экспорт истории (37:53026 и 15:17655): у выплат есть «Тип операции» */
   export:{t:'Экспорт истории',size:'xs',acts:false,
-    s:()=>U.exk==='hours'?'часов работы воркеров':'статистики воркеров',
-    b:()=>`${xsel('Монета','exc',['BTC','LTC','ZEC'],v=>COIN_ICON[v]||'')}
-      ${U.exk==='hours'?xsel('Период','exp',['Май','Апрель','Март']):''}
+    s:()=>({hours:'часов работы воркеров',inc:'дохода',pay:'выплат'}[U.exk]||'статистики воркеров'),
+    b:()=>`${xsel('Монета','exc',['BTC','LTC','DOGE','ZEC'],v=>COIN_ICON[v]||'',true)}
+      ${U.exk==='pay'?xsel('Тип операции','ext',PAY_TYPES):''}
+      ${U.exk==='hours'?xsel('Период','exp',['Май','Апрель','Март'])
+        :xsel('Период','exp',['Весь период','7 д','30 д','90 д'])}
       ${xsel('Формат выгрузки','exf',['XLS','CSV'])}`,
     foot:()=>`<button class="btn" data-close data-toast="Файл готовится — пришлём ссылку на почту">Скачать</button>
       <button class="btn out" data-close>Отменить</button>`},

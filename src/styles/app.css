@@ -1807,3 +1807,35 @@ button.scsect:hover{color:var(--accent)}
 .card:has(.atbl)>.ch{padding:16px;margin:0;min-height:80px}
 .card:has(.atbl) .aver{margin:0 16px 12px}
 .atbl{table-layout:fixed}
+
+/* ============ Доход и Выплаты (макеты 15:19710, 37:56063) ============ */
+/* Три карточки 540×176: подпись 20, значение 48, снизу пересчёт */
+.icards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}
+.icard{background:var(--surface);border-radius:var(--r-l);padding:24px;display:flex;flex-direction:column;gap:12px;min-height:176px}
+.icard.acc{background:var(--accent);color:#fff}
+.ih{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;color:var(--c2)}
+.icard.acc .ih{color:#fff}
+.iarr{display:inline-flex;color:inherit}
+.iarr svg{width:24px;height:24px}
+.iv{display:flex;align-items:baseline;gap:8px;font-size:var(--fs-h1);line-height:var(--lh-h1);font-weight:600}
+.iv b,.iv span{font-weight:600}
+.is{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
+/* Чипы периода 48 и поле даты 256 — из ДС, а не пилюли 36 */
+.dchips{display:inline-flex;gap:4px}
+.chip.d{min-height:48px;min-width:66px;justify-content:center;padding:0 12px;border-radius:var(--r-m);
+  font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.dinput,.fsel{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 12px;border-radius:var(--r-m);
+  background:var(--ctrl);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
+.dinput{width:256px;color:var(--c2);justify-content:space-between}
+.fsel{min-width:150px}
+.dinput:hover,.fsel:hover{background:var(--ctrl-hover)}
+.dinput svg,.fsel svg{width:24px;height:24px;flex:0 0 auto}
+/* Ряд действий над карточкой выплат */
+.prow{display:flex;justify-content:flex-end;margin-bottom:16px}
+.prow .btn svg{width:24px;height:24px}
+/* На 1440 карточки дохода в макете ниже, а значение мельче (49:75121) */
+@media(max-width:1450px){
+  .icard{min-height:158px}
+  .iv{font-size:var(--fs-h3);line-height:var(--lh-h3)}
+}
