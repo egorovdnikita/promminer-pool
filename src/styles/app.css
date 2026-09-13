@@ -276,11 +276,13 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* 47 + разделитель 1 = строка 48 из макета */
 .tbl.wtbl td{padding:12px;height:47px}
 .tbl.wtbl td.tags{padding:8px 12px}
-.tbl.wtbl td.wact{padding:6px 16px}
+/* ячейка действий не обрезает меню строки — иначе оно не видно совсем */
+.tbl.wtbl td.wact{padding:6px 16px;overflow:visible}
 .tbl.wtbl .tag{height:32px;padding:0 12px}
-/* Кнопка действий в строке — Outline S(36): круг 36 с обводкой (173:59516) */
+/* Кнопка действий в строке — Outline S(36): круг 36 с обводкой и значком 16 */
 .tbl.wtbl .ibr.act{width:36px;height:36px;border-radius:var(--r-f);color:var(--c1);
   border:1px solid var(--ctrl-line)}
+.tbl.wtbl .ibr.act svg{width:16px;height:16px}
 .tbl.wtbl .ibr.act:hover{background:var(--ctrl2)}
 .tbl.wtbl .ibr.act:hover{background:var(--ctrl2)}
 .tbl.wtbl th:first-child,.tbl.wtbl td:first-child{width:36px;padding-right:0}
@@ -397,6 +399,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 
 /* tables */
 .tw{overflow-x:auto}
+/* пока открыто меню строки, таблица не обрезает его своим краем */
+.tw:has(.pop){overflow:visible}
 .tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 /* Шапка и ячейки таблиц в макетах — 14 SemiBold, строка 48 */
 .tbl th{background:var(--ctrl2);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c3);text-align:left;padding:12px;white-space:nowrap}
@@ -1477,8 +1481,12 @@ button.scsect:hover{color:var(--accent)}
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c3)}
 /* Прокручивается только список, форма сверху остаётся на месте (173:61671) */
 .tlist{display:flex;flex-direction:column;gap:4px;padding:8px 0;overflow-y:auto;min-height:0}
-/* тело не прокручивается — это делает список; фокус полей не обрезается */
-.modal.tx .mbody{display:flex;flex-direction:column;overflow:visible}
+/* тело не прокручивается — это делает список; фокус полей не обрезается,
+   и правый отступ снова 24, а не уменьшенный на жёлоб полосы */
+.modal.tx .mbody{display:flex;flex-direction:column;overflow:visible;
+  padding-right:24px;scrollbar-gutter:auto}
+/* полоса прокрутки списка уходит в правый отступ, строки остаются 502 */
+.modal.tx .tlist{margin-right:calc(-1 * var(--sbw))}
 .modal.tx .mbody>*{flex:0 0 auto}
 .modal.tx .mbody>.slot{display:contents}
 .tcard{display:flex;align-items:center;gap:12px;height:64px;padding:8px;border-radius:var(--r-m);
