@@ -372,11 +372,11 @@ const seg=(id,opts,def=0)=>{const c=U.seg[id]??def;
 const segv=(id,opts,def=0)=>opts[U.seg[id]??def];
 /* Поле-селект из макета экспорта (173:66473): подпись 14 над контролом 48,
    значение 16, список раскрывается на 18 */
-const xsel=(label,id,opts)=>{const i=U.seg[id]??0;
+const xsel=(label,id,opts,ico)=>{const i=U.seg[id]??0; const pic=v=>ico?(ico(v)||''):'';
   return `<div class="xf"><div class="k">${label}</div>
-    <span class="pop-wrap"><button class="xsel" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
+    <span class="pop-wrap"><button class="xsel" data-pop="${id}">${pic(opts[i])}${opts[i]}<span class="spacer"></span>${I.cd}</button>
     ${pop===id?`<div class="pop menu xmenu">${opts.map((o,j)=>
-      `<button class="${i===j?'on':''}" data-seg="${id}" data-i="${j}">${o}${i===j?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></div>`};
+      `${j?'<div class="mdiv"></div>':''}<button class="${i===j?'on':''}" data-seg="${id}" data-i="${j}">${pic(o)}${o}${i===j?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span></div>`};
 /* Segment Control Line — тот же контракт, что у seg(), но линейный вариант DS */
 const segLine=(id,opts,def=0,cls='')=>{const c=U.seg[id]??def;
   return `<div class="segl ${cls}">${opts.map((o,i)=>`<button class="${i===c?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</div>`};
@@ -870,19 +870,21 @@ const SER_MODELS=['Aisen A1 Pro 23 Th/s 2200 W','Antminer S19 XP Hydro 257 Th/s'
 V.serials=m=>{
   const all=workersList(m), errs=S.ser==='err'?25:0;
   const tab=U.seg['sertab']??0;
-  const rows=(tab?all.slice(0,Math.min(errs,all.length)):all).slice(0,12);
+  const rows=tab?all.slice(0,Math.min(errs,all.length)):all;
+  const per=perOf('serials',20), pages=Math.max(1,Math.ceil(rows.length/per));
+  const cur=Math.min(U.page.serials||1,pages);
+  const page=rows.slice((cur-1)*per,cur*per);
   const filled=S.ser!=='no';
-  const cell=(w,i)=>{
-    const bad=S.ser==='err'&&i<3;
+  const cell=w=>{
+    const bad=S.ser==='err'&&w.id%9===1;
     return `<tr>
-      <td class="mono">${String(7654+w.id*131).slice(0,4)}</td>
-      <td><b>${w.name}</b></td>
-      <td class="sercell">${filled
-        ? `<span class="serval ${bad?'bad':''}">OLTTG4BBEJDAJ062H</span>`
+      <td class="mono mut">${String(7654+w.id*131).slice(0,4)}</td>
+      <td class="mut">${w.name}</td>
+      <td class="sercell ${bad?'bad':''}">${filled
+        ? '<span class="mono">OLTTG4BBEJDAJ062H</span>'
         : '<span class="serph">Заводской номер</span>'}</td>
-      <td class="sercell">${filled
-        ? `<span class="serval ${bad?'bad':''}">${SER_MODELS[w.id%5]}</span>`
-        : '<span class="serph">Выберите модель</span>'}</td></tr>`};
+      <td class="sercell sermodel ${bad?'bad':''}">
+        <span class="serpick">${filled?SER_MODELS[w.id%5]:'<i class="serph">Выберите модель</i>'}${I.cd}</span></td></tr>`};
   return `
   <div class="wdtop">
     <button class="ib ctl" data-go="workers" data-tip="К списку воркеров">${I.arl}</button>
@@ -896,9 +898,10 @@ V.serials=m=>{
     <div class="spacer"></div>
     <button class="btn g" data-modal="export" data-ex="stat">${I.dl}Экспорт</button>
     <button class="btn" data-modal="upload">${I.upm}Загрузить файл</button></div>
-  ${rows.length?`<div class="tw"><table class="tbl sertbl"><thead><tr>
+  ${page.length?`<div class="tw"><table class="tbl sertbl"><thead><tr>
       <th>Идентификатор воркера</th><th>Наименование воркера</th><th>Заводской номер</th><th>Модель</th>
-    </tr></thead><tbody>${rows.map(cell).join('')}</tbody></table></div>`
+    </tr></thead><tbody>${page.map(cell).join('')}</tbody></table></div>
+    ${pager('serials',rows.length,20)}`
     :emptyBox('Ошибок нет','Все заводские номера и модели заполнены верно')}`,'tblcard')}`;
 };
 
@@ -2004,26 +2007,30 @@ const MODALS={
     </div>`;
   }},
 
-  /* Подключение воркера (макет 173:60724): 550x1000, вкладки монет,
-     три адреса с копированием, инструкция и контакты поддержки */
-  connect:{t:'Подключение воркера',s:'Новый воркер появится в списке в течение 10 минут',acts:false,
+  /* Подключение воркера (макет 173:60725): алерт вместо подзаголовка,
+     сегмент по всей ширине, адреса полями ДС с копированием,
+     инструкция таймлайном и три кнопки поддержки */
+  connect:{t:'Подключение воркера',acts:false,
     b:()=>{const c=['btc','ltc','zec'][U.seg['conn']??0];
-      return `${seg('conn',['BTC','LTC','ZEC'])}
-      <div style="height:16px"></div>
-      ${POOL_URLS[c].map((u,i)=>urlRow('URL '+(i+1),'stratum+tcp://'+u)).join('')}
-      ${urlRow('Воркер','natarusso.001')}${urlRow('Пароль','123')}
+      const row=(k,v)=>`<div class="inp cp"><span class="tx"><div class="k">${k}</div>
+        <div class="v mono">${v}</div></span>
+        <button class="ibr" data-copy="${v}" data-tip="Скопировать">${I.cp}</button></div>`;
+      return `<div class="alert info">${I.inf}Новый воркер появится в списке в течение 10 минут</div>
+      ${seg('conn',['BTC','LTC','ZEC'])}
+      <div class="inps">
+        ${POOL_URLS[c].map((u,i)=>row('URL '+(i+1),'stratum+tcp://'+u)).join('')}
+        ${row('Воркер','natarusso.001')}${row('Пароль','123')}</div>
       <ol class="steps">
         <li>Зайдите в веб-панель управления вашего Asic-майнера — введите в адресной строке браузера его IP-адрес.</li>
         <li>В панели управления Asic откройте вкладку Miner configuration (Конфигурация майнера) и выберите раздел Pool Settings (Настройка пулов).</li>
         <li>Заполните поля в соответствии с данными для подключения, которые указаны выше:
-          <p class="cap dim">Воркер = имя_аккаунта.имя_воркера. Имя_воркера является обязательным. Это произвольное наименование, которое вы должны задать самостоятельно на стороне устройства (может содержать строчные буквы, цифры и не должен превышать 64 символа).</p>
-          <p class="cap dim">Пароль: оставьте пустым или введите любое значение по желанию (на стороне устройства)</p></li>
+          <p class="mnote">Воркер = имя_аккаунта.имя_воркера. Имя_воркера является обязательным. Это произвольное наименование, которое вы должны задать самостоятельно на стороне устройства (может содержать строчные буквы, цифры и не должен превышать 64 символа).</p>
+          <p class="mnote">Пароль: оставьте пустым или введите любое значение по желанию (на стороне устройства)</p></li>
         <li>Новый воркер появится в списке в течение 10 минут, и вы сможете отслеживать основные показатели его работы (статус, хэшрейт и пр.)</li>
       </ol>
-      <div class="hr"></div>
       <b class="qst">Остались вопросы?</b>
       <div class="qlinks">${HOME_CONTACTS.slice(0,3).map(([ic,k,,u])=>
-        `<a class="btn out" href="${u}" target="_blank" rel="noopener"><span class="lico">${ic==='max'?MAX_LOGO:I[ic]}</span>${k}</a>`).join('')}</div>`}},
+        `<a class="btn g" href="${u}" target="_blank" rel="noopener"><span class="lico">${ic==='max'?MAX_LOGO:I[ic]}</span>${k}<span class="spacer"></span>${I.aru}</a>`).join('')}</div>`}},
   /* Группы (макеты 173:61615, 173:67159, 173:67419): одна модалка на
      создание, правку и удаление; список рисуется из U.grp */
   group:{t:'Создать группу',acts:false,size:'tx',b:()=>taxonBody('g',false)},
@@ -2135,7 +2142,7 @@ const MODALS={
      у «часов работы» добавляется период */
   export:{t:'Экспорт истории',size:'xs',acts:false,
     s:()=>U.exk==='hours'?'часов работы воркеров':'статистики воркеров',
-    b:()=>`${xsel('Монета','exc',['BTC','LTC','ZEC'])}
+    b:()=>`${xsel('Монета','exc',['BTC','LTC','ZEC'],v=>COIN_ICON[v]||'')}
       ${U.exk==='hours'?xsel('Период','exp',['Май','Апрель','Март']):''}
       ${xsel('Формат выгрузки','exf',['XLS','CSV'])}`,
     foot:()=>`<button class="btn" data-close data-toast="Файл готовится — пришлём ссылку на почту">Скачать</button>

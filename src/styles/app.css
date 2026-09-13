@@ -1381,10 +1381,12 @@ button.scsect:hover{color:var(--accent)}
 .mask.sheet{place-items:stretch;justify-items:end;padding:0}
 /* Шторка занимает всю высоту окна, а не 86vh, как обычная модалка */
 .modal.sheet{max-width:430px;width:430px;height:100%;max-height:none;border-radius:0;background:var(--bg)}
-.modal.sheet .mhead{height:88px;padding:24px;flex:0 0 auto;background:var(--surface)}
+.modal.sheet .mhead{height:88px;padding:24px;flex:0 0 auto;background:var(--surface);
+  border-radius:0 0 var(--r-m) var(--r-m)}
 .modal.sheet .mhead h2{font-size:var(--fs-h5);line-height:var(--lh-h5)}
 .modal.sheet .mbody{display:flex;flex-direction:column;gap:16px;padding-top:16px;padding-bottom:16px}
-.modal.sheet .mfoot{flex-direction:column;gap:8px;background:var(--surface)}
+.modal.sheet .mfoot{flex-direction:column;gap:8px;background:var(--surface);
+  border-radius:var(--r-m) var(--r-m) 0 0}
 .modal.sheet .mfoot .btn{flex:0 0 auto;width:100%;height:56px}
 .fcard{background:var(--surface);border-radius:var(--r-l);padding:16px;
   display:flex;flex-direction:column;gap:16px;flex:0 0 auto}
@@ -1393,7 +1395,9 @@ button.scsect:hover{color:var(--accent)}
 .fbtn{height:56px;justify-content:center;gap:8px}
 .fempty{font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c2)}
 .frow{display:flex;align-items:center;gap:12px}
-.frow .search{flex:1;min-width:0}
+/* Поиск моделей: лупа справа и основным цветом (173:65837) */
+.frow .search{flex:1;min-width:0;flex-direction:row-reverse;color:var(--c1)}
+.frow .search svg{color:var(--c1)}
 .flist{display:flex;flex-direction:column}
 .fdiv{height:1px;background:var(--border);margin:3.5px 0}
 .fitem{display:flex;align-items:center;gap:12px;height:48px;
@@ -1434,7 +1438,11 @@ button.scsect:hover{color:var(--accent)}
   background:var(--ctrl);border-radius:var(--r-m);color:var(--c1);
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .xsel:hover{background:var(--ctrl-hover)}
-.xmenu{width:100%;min-width:0}
+.pop.menu.xmenu{width:100%;min-width:0;padding:12px!important;gap:0;scrollbar-gutter:auto}
+.pop.menu.xmenu>button{padding:0!important;height:40px;min-height:40px;gap:8px;font-size:var(--fs-b1)!important}
+.xsel svg,.xmenu>button svg{width:24px;height:24px;flex:0 0 auto}
+.xmenu .ck{margin-left:auto}
+.xmenu .mdiv{margin:3.5px 0}
 .xmenu button{font-size:var(--fs-b1);line-height:var(--lh-b1)}
 /* Инструкция в модалке подключения (макет 173:60724) */
 .steps{margin:16px 0 0;padding:0;list-style:none;counter-reset:st}
@@ -1488,14 +1496,25 @@ button.scsect:hover{color:var(--accent)}
 .tbl.sertbl{table-layout:fixed}
 .tbl.sertbl th,.tbl.sertbl td{width:25%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tbl.sertbl td{padding:12px;height:47px}
+/* Колонки разделены вертикальными линиями (173:66808) */
+.tbl.sertbl th:not(:last-child),.tbl.sertbl td:not(:last-child){border-right:1px solid var(--border)}
+.tbl.sertbl td.mut{color:var(--c2)}
 .serph{color:var(--c3);font-weight:500}
-.serval{font-weight:500}
-.serval.bad{color:var(--neg)}
+/* Ошибочное значение подсвечивается подложкой ячейки */
+.tbl.sertbl td.bad{background:#ef44441f}
+/* Модель выбирают из списка: в ячейке стрелка выпадающего списка */
+.serpick{display:flex;align-items:center;gap:8px}
+.serpick svg{width:24px;height:24px;margin-left:auto;color:var(--c3);flex:0 0 auto}
+.sermodel{cursor:pointer}
+.sermodel:hover{background:var(--ctrl2)}
 /* Модалка загрузки файла */
 .drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:24px;min-height:166px;
   justify-content:center;border:1px dashed var(--focus);border-radius:var(--r-l);
   background:var(--accent-sub);color:var(--accent)}
-.drop.bad{border-color:var(--neg);background:#ef44441f;color:var(--neg)}
+/* Ошибка не красит зону в красный — меняется только текст ошибки под ней */
+.drop.bad{border-color:var(--focus);background:var(--accent-sub);color:var(--accent)}
+.drop>span:first-child,.drop>svg:first-child{background:var(--surface);border-radius:var(--r-f);
+  width:48px;height:48px;display:grid;place-items:center;padding:12px;box-sizing:border-box}
 .drop b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1);margin-top:8px}
 .drop span{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2)}
 .drop svg{width:24px;height:24px}
@@ -1572,6 +1591,11 @@ button.scsect:hover{color:var(--accent)}
 .wdedit svg{width:24px;height:24px}
 /* График слева, события и промо справа */
 .wdmain{display:grid;grid-template-columns:minmax(0,1fr) 404px;gap:16px}
+/* График занимает всю оставшуюся высоту карточки, а не долю по пропорции */
+.wdmain>.card{display:flex;flex-direction:column}
+.wdmain .cbody{flex:1;min-height:0}
+.wdmain .cplot{flex:1;min-height:0;grid-template-rows:minmax(0,1fr) auto}
+.wdmain .chartwrap{aspect-ratio:auto!important;height:100%}
 .wdcal{min-width:256px;justify-content:center}
 /* Контролы графика держатся в одну строку, переносится заголовок (230:5518) */
 .wdmain .ch{flex-wrap:nowrap}
@@ -1603,3 +1627,37 @@ button.scsect:hover{color:var(--accent)}
 /* на 1440 колонка событий ужимается до 275, но не переносится (230:5518) */
 @media(max-width:1600px){.wdmain{grid-template-columns:minmax(0,1fr) 275px}}
 @media(max-width:1100px){.wdmain{grid-template-columns:1fr}}
+
+/* --- Подключение воркера (макет 173:60725) --- */
+/* Алерт вместо подзаголовка: белая карточка с синей подложкой 16 % */
+.alert{display:flex;align-items:center;gap:8px;min-height:44px;padding:12px 16px;
+  border-radius:var(--r-m);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;color:var(--c1)}
+.alert.info{background:#3b82f629;color:var(--c1)}
+.alert svg{width:24px;height:24px;flex:0 0 auto;color:#3b82f6}
+.modal .seg{width:100%}
+.modal .seg button{flex:1;justify-content:center}
+.inps{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+/* Адрес пула — поле ДС с подписью сверху и кнопкой копирования */
+.inp.cp{flex-direction:row;align-items:center;gap:12px;margin:0}
+.inp.cp .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.inp.cp .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inp.cp .ibr{width:24px;height:24px;color:var(--c3);flex:0 0 auto}
+.inp.cp .ibr:hover{color:var(--accent)}
+.inp.cp .ibr svg{width:24px;height:24px}
+/* Инструкция: точки на таймлайне и линия между ними */
+.steps{margin:20px 0 0;padding:0;list-style:none;counter-reset:st;display:flex;flex-direction:column}
+.steps li{counter-increment:st;position:relative;padding:0 0 16px 24px;
+  font-size:var(--fs-s);line-height:22px;color:var(--c1)}
+.steps li::before{content:"";position:absolute;left:0;top:8px;width:8px;height:8px;
+  border-radius:var(--r-f);background:var(--accent)}
+.steps li:not(:last-child)::after{content:"";position:absolute;left:3.5px;top:20px;bottom:0;
+  width:1px;background:#6b728029}
+.steps .mnote{margin-top:8px}
+.qst{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;
+  color:var(--c3);margin:12px 0}
+.qlinks{display:flex;flex-wrap:nowrap;gap:8px;padding-bottom:8px}
+.qlinks .btn{flex:1 1 0;min-width:0;height:56px;gap:8px;padding:0 16px;
+  justify-content:flex-start;font-size:var(--fs-s);overflow:hidden}
+.qlinks .btn svg{width:24px;height:24px}
+.qlinks .lico{display:flex;flex:0 0 auto}
