@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { AXES, CHECK, COIN_ICON, I, type Model } from '@/legacy/prototype'
+import { AXES, CHECK, COIN_ICON, I, coinsOf, type Model } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico } from './Raw'
 
@@ -20,7 +20,8 @@ export function Coinbar({ m }: { m: Model }) {
         </button>
         {pop === 'coin' && (
           <div className="pop left menu coinmenu">
-            {AXES.coin.opts.map(([v], i) => {
+            {/* у наблюдателя в списке только монеты его ссылки (28:44088) */}
+            {AXES.coin.opts.filter(([v]) => !coinsOf() || coinsOf()!.has(v)).map(([v], i) => {
               /* в меню короткий символ монеты, как в макете (357:98871) */
               const sym = v === 'btc' ? 'BTC' : v === 'zec' ? 'ZEC' : 'LTC'
               return (

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import {
-  CHECK, I, NOTIF_N, PROF, TITLES, acctSummary, nf, notifications, profTabs, type Model,
+  CHECK, I, NOTIF_N, PROF, TITLES, acctSummary, nf, notifications, permsOf, profTabs, type Model,
 } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico, Raw } from './Raw'
@@ -14,6 +14,11 @@ export function Header({ m }: { m: Model }) {
   const { S, route, pop } = useApp()
   const n = NOTIF_N[S.notif]
   const acct = S.acct === 'main' ? 'natarusso' : 'alfred'
+  /* Наблюдателю баланс показываем, только если открыт раздел «Мои активы»,
+     а переключатель аккаунта не кликабельный: суб-аккаунты ему недоступны
+     (макеты 30:71549 и 39:111046 файла «Наблюдатель») */
+  const obs = S.role === 'observer'
+  const showBal = !obs || !!permsOf().assets
   /* На проде заголовок вкладки — «<Раздел> - Promminer» */
   useEffect(() => {
     document.title = TITLES[route] ? `${TITLES[route]} - Promminer` : 'Promminer Pool'
@@ -24,10 +29,12 @@ export function Header({ m }: { m: Model }) {
       <div className="toprow">
         <h1 className="h3">{TITLES[route] || ''}</h1>
         <div className="hgroup">
-          <button className="hbtn" data-go="assets">
-            <Ico html={I.rub} />
-            <span className="mono">{nf(m.pool)}</span>
-          </button>
+          {showBal && (
+            <button className="hbtn" data-go="assets">
+              <Ico html={I.rub} />
+              <span className="mono">{nf(m.pool)}</span>
+            </button>
+          )}
 
           <span className="pop-wrap">
             <button className="hbtn sq" data-pop="notif">
@@ -38,9 +45,10 @@ export function Header({ m }: { m: Model }) {
           </span>
 
           <span className="pop-wrap">
-            <button className={`hbtn ${pop === 'acct' ? 'open' : ''}`} data-pop="acct">
+            <button className={`hbtn ${pop === 'acct' ? 'open' : ''} ${obs ? 'flat' : ''}`}
+              data-pop={obs ? undefined : 'acct'} disabled={obs}>
               {route === 'monitor' ? 'Сводка по аккаунтам (46)' : acct}
-              <Ico html={I.cd} />
+              {!obs && <Ico html={I.cd} />}
             </button>
             {pop === 'acct' && <Raw html={acctSummary(m)} />}
           </span>

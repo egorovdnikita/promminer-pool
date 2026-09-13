@@ -29,6 +29,7 @@ const AXES={
   perm:{g:'Аккаунт',label:'Разрешения вотчера',opts:[['all','Все разделы'],['wi','Воркеры и доход'],
     ['wo','Только воркеры'],['fin','Только финансы'],['assets','Только мои активы'],
     ['pay','Только выплаты'],['none','Только рефералы — Главной нет']]},
+  ocoins:{g:'Аккаунт',label:'Монеты наблюдателя',opts:[['all','Все'],['btc','Только BTC'],['ltc','Только LTC + DOGE']]},
   acct:{g:'Аккаунт',label:'Аккаунт',opts:[['main','Основной'],['sub','Суб-аккаунт']]},
   name:{g:'Аккаунт',label:'Имя аккаунта',opts:[['yes','Задано'],['no','Не задано']]},
   verif:{g:'Верификация',label:'Данные',opts:[['no','Не заполнены'],['yes','Заполнены']]},
@@ -62,7 +63,7 @@ const PRESETS=[
   ['Крупный клиент','Большие значения и много записей',{data:'huge',subs:'many',obs:'many',tier:'4',verif:'yes',vdoc:'yes',vacc:'yes'}],
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
-const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',health:'degraded',role:'owner',perm:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
+const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',health:'degraded',role:'owner',perm:'all',ocoins:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no',rdata:'ok'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
@@ -122,6 +123,9 @@ const PERM_SETS={
   none:{refs:1}};
 const OWNER_PERMS={workers:1,assets:1,income:1,payouts:1};
 const permsOf=()=>S.role==='observer'?(PERM_SETS[S.perm]||PERM_SETS.all):OWNER_PERMS;
+/* У ссылки наблюдателя свой набор монет — в селекторе только они (28:44088) */
+const coinsOf=()=>S.role!=='observer'||S.ocoins==='all'?null
+  :S.ocoins==='btc'?new Set(['btc']):new Set(['ltc']);
 /* Разделы, доступные роли: у владельца null (все), у вотчера — набор */
 function allowed(){
   if(S.role!=='observer')return null;
@@ -799,12 +803,12 @@ const sortBy=(rows,tbl,val)=>{const s=U.sort[tbl]; if(!s) return rows;
    удаление недоступно у «Активен» и «Низкий хэшрейт» — с подсказкой. */
 const wkMenu=w=>{const busy=w.st==='ok'||w.st==='low';
   return `<span class="pop-wrap"><button class="ibr act" data-pop="wk${w.id}">${I.dots}</button>
-  ${pop==='wk'+w.id?`<div class="pop menu wkmenu">
-    <button data-wkopen="${w.id}">${I.eyed}Посмотреть</button><div class="mdiv"></div>
+  ${pop==='wk'+w.id?`<div class="pop menu wkmenu ${S.role==='observer'?'one':''}">
+    <button data-wkopen="${w.id}">${I.eyed}Посмотреть</button>${S.role==='observer'?'':`<div class="mdiv"></div>
     <button data-modal="wgroups" data-wk2="${w.id}">${I.folder}Изменить группы</button><div class="mdiv"></div>
     <button data-modal="wtags" data-wk2="${w.id}">${I.tagic}Изменить теги</button><div class="mdiv"></div>
     ${busy?`<span class="mi off" data-tip="Вы не сможете удалить воркер в статусе «Активен» или «Низкий хэшрейт»">${I.tr2}Удалить</span>`
-      :`<button class="del" data-modal="wkdel" data-wk2="${w.id}">${I.tr2}Удалить</button>`}
+      :`<button class="del" data-modal="wkdel" data-wk2="${w.id}">${I.tr2}Удалить</button>`}`}
   </div>`:''}</span>`};
 
 V.workers=m=>{
@@ -2791,6 +2795,6 @@ export {
   AXES, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
   loadFail, nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
-  V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf,
+  V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf, coinsOf,
   S, U, route, pop, modal, openGroups, mini,
 };

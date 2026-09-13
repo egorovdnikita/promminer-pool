@@ -1983,3 +1983,10 @@ button.scsect:hover{color:var(--accent)}
 .lvperks li{position:relative;padding-left:14px}
 .lvperks li::before{content:"";position:absolute;left:0;top:7px;width:4px;height:4px;border-radius:50%;background:var(--accent)}
 .lvq{text-align:center}
+
+/* ============ Наблюдатель (файл bYjDbs60AQbdejnK2Nkrpz) ============ */
+/* В меню строки воркера у наблюдателя один пункт — переход в деталку */
+.pop.menu.wkmenu.one{height:48px}
+/* Переключатель аккаунта не кликабелен: суб-аккаунты наблюдателю недоступны */
+.hbtn.flat,.hbtn.flat:hover{background:var(--surface);cursor:default;opacity:1}
+.hbtn:disabled{opacity:1}

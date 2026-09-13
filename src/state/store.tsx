@@ -3,7 +3,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, groups, tagsOf, applyState, workersList, workersRows, obsOf, subsOf } from '@/legacy/prototype'
+import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, groups, tagsOf, applyState, workersList, workersRows, obsOf, subsOf, coinsOf } from '@/legacy/prototype'
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
@@ -528,6 +528,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     /* Вотчер без разрешения на раздел не должен на нём стоять: уводим
        на первый доступный, а если Главной нет — на ближайший из разрешённых */
     function guardRoute() {
+      /* монета вне набора ссылки наблюдателя переключается на доступную (28:44088) */
+      const coins = coinsOf()
+      if (coins && !coins.has(S.current.coin)) S.current.coin = [...coins][0]
       const ok = allowed()
       if (!ok || ok.has(route)) return
       const next = ['home', 'workers', 'assets', 'income', 'payouts', 'ref'].find((r) => ok.has(r))
