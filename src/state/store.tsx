@@ -179,9 +179,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const wrap = (e.target as HTMLElement)?.closest?.('.chartwrap') as HTMLElement | null
       if (wrap) wrap.classList.remove('on')
     }
+    /* список событий: под шапкой появляется разделитель, когда список сдвинут */
+    const onScroll = (e: Event) => {
+      const el = e.target as HTMLElement
+      if (el?.classList?.contains('wdevents')) el.closest('.wdevcard')?.classList.toggle('scrolled', el.scrollTop > 0)
+    }
     addEventListener('mousemove', onMove)
     addEventListener('mouseout', onLeave)
-    return () => { removeEventListener('mousemove', onMove); removeEventListener('mouseout', onLeave) }
+    addEventListener('scroll', onScroll, true)
+    return () => {
+      removeEventListener('mousemove', onMove); removeEventListener('mouseout', onLeave)
+      removeEventListener('scroll', onScroll, true)
+    }
   }, [])
 
   const onInput = useCallback((e: React.FormEvent) => {

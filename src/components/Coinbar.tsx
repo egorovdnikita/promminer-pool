@@ -19,16 +19,20 @@ export function Coinbar({ m }: { m: Model }) {
         </button>
         {pop === 'coin' && (
           <div className="pop left menu coinmenu">
-            {AXES.coin.opts.map(([v, t], i) => (
-              <Fragment key={v}>
-                {i > 0 && <div className="hr" />}
-                <button className={S.coin === v ? 'on' : ''} data-axis="coin" data-val={v}>
-                  <Ico html={COIN_ICON[v === 'btc' ? 'BTC' : v === 'zec' ? 'ZEC' : 'LTC']} />
-                  {t}
-                  {S.coin === v && <Ico className="ck" html={CHECK} />}
-                </button>
-              </Fragment>
-            ))}
+            {AXES.coin.opts.map(([v], i) => {
+              /* в меню короткий символ монеты, как в макете (357:98871) */
+              const sym = v === 'btc' ? 'BTC' : v === 'zec' ? 'ZEC' : 'LTC'
+              return (
+                <Fragment key={v}>
+                  {i > 0 && <div className="mdiv" />}
+                  <button className={S.coin === v ? 'on' : ''} data-axis="coin" data-val={v}>
+                    <Ico html={COIN_ICON[sym]} />
+                    {sym}
+                    {S.coin === v && <Ico className="ck" html={CHECK} />}
+                  </button>
+                </Fragment>
+              )
+            })}
           </div>
         )}
       </span>

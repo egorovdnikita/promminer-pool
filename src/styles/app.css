@@ -277,8 +277,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 .tbl.wtbl td.tags{padding:8px 12px}
 .tbl.wtbl td.wact{padding:6px 16px}
 .tbl.wtbl .tag{height:32px;padding:0 12px}
-/* Кнопка действий в строке — круг 36 без подложки, значок Primary (173:59403) */
-.tbl.wtbl .ibr.act{width:36px;height:36px;border-radius:var(--r-f);color:var(--c1)}
+/* Кнопка действий в строке — Outline S(36): круг 36 с обводкой (173:59516) */
+.tbl.wtbl .ibr.act{width:36px;height:36px;border-radius:var(--r-f);color:var(--c1);
+  border:1px solid var(--ctrl-line)}
 .tbl.wtbl .ibr.act:hover{background:var(--ctrl2)}
 .tbl.wtbl .ibr.act:hover{background:var(--ctrl2)}
 .tbl.wtbl th:first-child,.tbl.wtbl td:first-child{width:36px;padding-right:0}
@@ -286,7 +287,15 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Меню действий и его заблокированный пункт */
 /* Экшн-меню строки воркера — 169×192 из макета 173:59516 */
 /* Размер из макета: четыре пункта по 40 с шагом 8 в поле 169×192 */
-.pop.menu.wkmenu{width:169px;min-width:169px;height:192px;padding:4px 12px;gap:8px;align-items:stretch;overflow:hidden}
+.pop.menu.wkmenu{width:169px;min-width:169px;height:192px;padding:4px 12px;gap:4px;align-items:stretch;overflow:hidden}
+.pop.menu.wkmenu>button,.pop.menu.wkmenu .mi{padding:0!important}
+/* меню не прокручивается, жёлоб под полосу не нужен */
+.pop.menu.wkmenu,.pop.menu.expmenu,.pop.menu.coinmenu{scrollbar-gutter:auto}
+/* Выбор монеты: 150×168, пункты 126×40 с разделителями и галочкой (357:98871) */
+.pop.menu.coinmenu{width:150px;min-width:150px;padding:8px 12px;gap:0}
+.pop.menu.coinmenu>button{height:40px;padding:0!important;gap:8px}
+.pop.menu.coinmenu .ck{margin-left:auto}
+.coinmenu .mdiv,.expmenu .mdiv{margin:8px 0}
 .pop.menu.wkmenu>button,.pop.menu.wkmenu .mi{font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
 .pop.menu.wkmenu .del{color:var(--neg)}
 .wkmenu .mi.off{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:40px;
@@ -364,7 +373,9 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Button: DS h48 / px24 / radius-m 16 / Body-S SemiBold */
 .btn{display:inline-flex;align-items:center;gap:8px;height:var(--h-btn);padding:0 24px;border-radius:var(--r-m);background:var(--accent);color:#fff;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;white-space:nowrap}
 .btn.g{background:var(--ctrl);color:var(--c1);box-shadow:none}
-.btn.w{background:var(--surface);color:var(--c1);box-shadow:var(--shadow)}
+/* Белая кнопка в макете без тени; ховер — серая подложка */
+.btn.w{background:var(--surface);color:var(--c1);box-shadow:none}
+.btn.w:hover{background:var(--ctrl2)}
 .btn.out{background:var(--surface);color:var(--c1);border:1px solid var(--ctrl-line);box-shadow:none}
 .btn.out:hover{background:var(--ctrl2)}
 .btn.sm{height:var(--h-btn-sm);padding:0 16px;border-radius:var(--r-s)}
@@ -750,7 +761,7 @@ img.hex{object-fit:contain}
 .phonefield:hover{background:var(--ctrl-hover)}
 .phonefield:focus-within{background:var(--surface);border-color:var(--border)}
 .phonefield .pre{color:var(--c2);font-weight:600}
-.modal p.s{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);margin-bottom:18px}
+.modal p.s{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c2);margin-bottom:18px}
 .mhead h2{align-self:center}
 .mhead:has(.s) h2{align-self:auto}
 .modal .acts{display:flex;gap:8px;margin-top:20px}
@@ -1406,7 +1417,7 @@ button.scsect:hover{color:var(--accent)}
 .bulk .off{color:var(--c3);cursor:default;height:28px;
   font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;display:inline-flex;align-items:center}
 .pop.menu.expmenu{width:200px;min-width:200px;padding:6px 12px;gap:0}
-.pop.menu.expmenu>button{gap:8px;height:40px;font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
+.pop.menu.expmenu>button{gap:8px;height:40px;padding:0!important;font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
 .pop.menu.expmenu button svg{width:24px;height:24px;flex:0 0 auto;color:var(--c1)}
 .mdiv{height:1px;background:var(--border);margin:4px 0}
 /* Модалка экспорта — 400 по макету 173:66473, кнопки друг под другом */
@@ -1568,17 +1579,21 @@ button.scsect:hover{color:var(--accent)}
 .wdmain .ch .seg,.wdmain .ch .pop-wrap,.wdmain .ch .ib{flex:0 0 auto}
 .wdside{display:flex;flex-direction:column;gap:16px}
 .card.wdevcard{max-height:529px;display:flex;flex-direction:column}
+/* При прокрутке списка под шапкой появляется разделитель (403:36950) */
+.wdevcard.scrolled .wdh2{border-bottom:1px solid var(--border);padding-bottom:24px;margin:0 -24px 16px;padding-left:24px;padding-right:24px}
 .wdevents{overflow-y:auto;margin-right:calc(-1 * var(--sbw))}
 /* Таймлайн: кружок статуса с соединительной линией вниз */
 .wdev{display:grid;grid-template-columns:28px 1fr;column-gap:20px;align-items:start;
-  grid-template-rows:auto auto;min-height:56px;position:relative}
+  align-content:start;grid-template-rows:auto auto;min-height:56px;position:relative}
+/* Маркер: полупрозрачный круг 28 и внутри залитая точка 10 (403:36950) */
 .wdmark{grid-row:1 / span 2;width:28px;height:28px;border-radius:var(--r-f);
-  display:grid;place-items:center;position:relative}
+  display:grid;place-items:center;position:relative;z-index:1}
 .wdmark i{width:10px;height:10px;border-radius:var(--r-f)}
-.wdev:not(.last) .wdmark::after{content:"";position:absolute;top:28px;left:50%;margin-left:-.5px;
-  width:1px;height:28px;background:var(--ctrl2)}
-.wdev b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;padding-top:4px}
-.wdtime{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500;padding-top:6px}
+/* Линия идёт от круга до низа строки, поэтому пустот между событиями нет */
+.wdev:not(.last)::after{content:"";position:absolute;top:28px;bottom:0;left:14px;
+  width:1px;background:#6b728014}
+.wdev b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.wdtime{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
 /* Баннер PromBox: картинка справа, текст и кнопка живые */
 .promo.pbox{background:#7086fc;min-height:160px;padding:20px 24px;justify-content:flex-start}
 .promo.pbox b{position:relative;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:#fff}

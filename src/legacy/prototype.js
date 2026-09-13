@@ -775,9 +775,9 @@ const sortBy=(rows,tbl,val)=>{const s=U.sort[tbl]; if(!s) return rows;
 const wkMenu=w=>{const busy=w.st==='ok'||w.st==='low';
   return `<span class="pop-wrap"><button class="ibr act" data-pop="wk${w.id}">${I.dots}</button>
   ${pop==='wk'+w.id?`<div class="pop menu wkmenu">
-    <button data-wkopen="${w.id}">Посмотреть</button>
-    <button data-modal="wgroups" data-wk2="${w.id}">Изменить группы</button>
-    <button data-modal="wtags" data-wk2="${w.id}">Изменить теги</button>
+    <button data-wkopen="${w.id}">Посмотреть</button><div class="mdiv"></div>
+    <button data-modal="wgroups" data-wk2="${w.id}">Изменить группы</button><div class="mdiv"></div>
+    <button data-modal="wtags" data-wk2="${w.id}">Изменить теги</button><div class="mdiv"></div>
     ${busy?`<span class="mi off" data-tip="Вы не сможете удалить воркер в статусе «Активен» или «Низкий хэшрейт»">Удалить</span>`
       :`<button class="del" data-modal="wkdel" data-wk2="${w.id}">Удалить</button>`}
   </div>`:''}</span>`};
@@ -2036,8 +2036,8 @@ const MODALS={
   wnotify:{t:'Настроить уведомления',s:'о хэшрейте ниже порогового значения',acts:false,
     b:m=>`<div class="inp" style="margin:0"><div class="k">Порог оповещения [${m.c.unit}]</div>
         <input value="${S.wnote==='yes'?'225':''}" placeholder="Порог оповещения [${m.c.unit}]"></div>
-      <p class="cap dim">Отправим уведомление, когда хэшрейт упадет ниже этого значения</p>
-      <p class="cap dim">Для включения / выключения уведомлений по хэшрейту по всем воркерам перейдите в
+      <p class="mnote" style="margin-top:8px">Отправим уведомление, когда хэшрейт упадет ниже этого значения</p>
+      <p class="mnote">Для включения / выключения уведомлений по хэшрейту по всем воркерам перейдите в
         <button class="btn link" data-close data-go="notifsettings">Настройки уведомлений</button></p>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn" data-close data-axis="wnote" data-val="yes" data-toast="Порог уведомлений сохранён">Сохранить</button>`},
@@ -2045,11 +2045,11 @@ const MODALS={
   wparams:{t:'Добавить',s:'заводской номер и модель воркера',acts:false,
     b:()=>`<div class="inp" style="margin:0"><div class="k">Заводской номер</div>
         <input placeholder="Заводской номер" value="${S.ser!=='no'?'OLTTG4BBEJDAJ062H':''}"></div>
-      <p class="cap dim">Не можете найти заводской номер?
+      <p class="mnote" style="margin-top:8px">Не можете найти заводской номер?
         <a class="btn link" href="${LINKS.kb}" target="_blank" rel="noopener">База знаний</a></p>
-      <p class="cap dim">Пожалуйста, не изменяйте название воркера после добавления заводского номера</p>
+      <p class="mnote">Пожалуйста, не изменяйте название воркера после добавления заводского номера</p>
       ${xsel('Модель','wpmodel',['Выберите модель'].concat(SER_MODELS))}
-      <p class="cap dim">Не нашли свою модель?
+      <p class="mnote" style="margin-top:8px">Не нашли свою модель?
         <a class="btn link" href="${LINKS.tgSupport}" target="_blank" rel="noopener">Напишите нам</a></p>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn" data-close data-axis="ser" data-val="ok" data-toast="Параметры воркера сохранены">Сохранить</button>`},
