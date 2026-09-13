@@ -1732,9 +1732,11 @@ button.scsect:hover{color:var(--accent)}
 /* Плашка баланса — отдельный блок над карточкой: 154, паддинг 24, радиус 24 */
 .abal{position:relative;overflow:hidden;background:var(--accent);color:#fff;border-radius:var(--r-l);
   padding:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;min-height:154px}
-.abal::before,.abal::after{content:"";position:absolute;border-radius:50%;background:#ffffff0f;pointer-events:none}
-.abal::before{width:318px;height:318px;right:18%;top:-120px}
-.abal::after{width:866px;height:238px;right:-180px;top:-40px}
+/* В макете это не фигуры, а два эллипса с размытием 100 и прозрачностью 0.4 */
+.abal::before,.abal::after{content:"";position:absolute;border-radius:50%;background:#fff;opacity:.4;
+  filter:blur(50px);pointer-events:none}
+.abal::before{width:318px;height:318px;left:1540px;top:-183px}
+.abal::after{width:866px;height:238px;left:215px;top:125px}
 .abal>*{position:relative}
 .abv{display:flex;flex-direction:column;gap:12px}
 .abv .l{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
@@ -1862,6 +1864,13 @@ button.scsect:hover{color:var(--accent)}
 .rnote ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
 .rx{margin-left:auto;color:var(--c3);flex:0 0 auto}
 .rx svg{width:24px;height:24px}
+/* Строки отчёта 48 и карточка с паддингом 8, как в макете (109:19476) */
+.card:has(.rtbl){padding:8px 8px 16px}
+.card:has(.rtbl)>.rnote{margin:8px 8px 16px}
+.rtbl th,.rtbl td{height:48px;padding:0 12px}
+.rtbl td{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
+.rtbl .btn.xs{height:36px;min-width:128px;padding:0 16px;gap:8px}
+.rtbl .btn.xs svg{width:16px;height:16px}
 .rtbl td.racc{max-width:420px}
 .rtbl td.racc span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--c2)}
 /* Модалка «Выберите аккаунты» */
@@ -1894,7 +1903,16 @@ button.scsect:hover{color:var(--accent)}
 .cin{display:flex;align-items:center;gap:8px}
 .cin input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:var(--fs-m);
   line-height:var(--lh-m);font-weight:500;color:var(--c1);outline:none}
-.cfield .fsel{height:32px;min-width:0;background:var(--surface)}
+.cpair{display:flex;gap:0;min-width:0}
+.cpair .cfield:first-child{flex:1;min-width:0;border-top-right-radius:0;border-bottom-right-radius:0}
+.cpair .cur{flex:0 0 100px}
+.csel2{width:100%;justify-content:flex-start;gap:4px}
+.csel2.lab{flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;position:relative}
+.csel2.lab .v{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
+.csel2.lab>svg{position:absolute;right:12px;top:50%;transform:translateY(-50%)}
+.cpair .csel2{border-top-left-radius:0;border-bottom-left-radius:0;box-shadow:inset 1px 0 0 var(--ctrl-line)}
+.csel2 svg{width:24px;height:24px;color:var(--c3)}
+.creset{color:var(--accent);font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;height:28px;padding:0}
 .msel{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 8px;border-radius:var(--r-s);
   background:var(--surface);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
 .msel svg{width:16px;height:16px}
@@ -1905,8 +1923,12 @@ button.scsect:hover{color:var(--accent)}
 .cres span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .cright .btn.w{margin-top:auto;height:var(--h-field);justify-content:center;border-radius:var(--r-m)}
 /* Налоговый: вкладки монет, две карточки */
+/* Вкладки монет — Segment Control Line из ДС: айтем 48 с паддингом 12,
+   зазор между вкладками 0, подпись 16 SemiBold (6:40886) */
 .txtabs{margin:0}
-.txtabs .segl button{gap:8px}
+.txtabs .segl{width:fit-content;gap:0}
+.txtabs .segl button{display:inline-flex;align-items:center;gap:8px;padding:0 12px;
+  font-size:var(--fs-m);line-height:var(--lh-m)}
 .txtabs .segl svg{width:24px;height:24px}
 .txwrap{display:flex;gap:16px;align-items:stretch}
 .txleft{flex:1;min-width:0;background:var(--surface);border-radius:var(--r-l);padding:32px 24px;
@@ -1922,7 +1944,7 @@ button.scsect:hover{color:var(--accent)}
 .txitem+.txitem::before{content:"";position:absolute;left:-12px;top:50%;transform:translateY(-50%);
   width:1px;height:28px;background:var(--ctrl-line)}
 .txitem span{display:flex;align-items:center;gap:4px;font-size:var(--fs-s);line-height:var(--lh-s);
-  color:var(--c2);font-weight:500}
+  color:var(--c2);font-weight:600}
 .txitem b{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
 .txright{width:496px;flex:0 0 auto;background:var(--accent);border-radius:var(--r-l);padding:24px;
   display:flex;flex-direction:column;gap:20px;color:#fff}
@@ -1930,10 +1952,10 @@ button.scsect:hover{color:var(--accent)}
 .txchip{display:inline-flex;align-items:center;gap:12px;font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
 .txchip svg{width:24px;height:24px;margin-right:-8px}
 .txinfo{background:#1a1a1a;border-radius:var(--r-s);padding:24px;display:flex;flex-direction:column;gap:20px}
-.txinfo .l{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+.txinfo .l{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:500}
 .txinfo b{font-size:var(--fs-h1);line-height:var(--lh-h1);font-weight:600}
 .txinfo .n{display:flex;align-items:center;gap:12px;font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
-.txinfo .n i{font-style:normal;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;opacity:.8}
+.txinfo .n i{font-style:normal;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
 .txrows{display:flex;flex-direction:column;gap:4px}
 .txrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .txrow span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}

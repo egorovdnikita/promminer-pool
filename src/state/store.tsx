@@ -17,7 +17,7 @@ const freshUi = (): Ui => ({
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
   grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null, selq: '',
-  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false, lvl: null, dsel: {}, dpm: 0, zoom: 0, rwarn: false,
+  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false, lvl: null, dsel: {}, dpm: 0, zoom: 0, rwarn: false, togs: {},
 })
 
 /** Свои сценарии живут в localStorage отдельно от текущего состояния. */
@@ -651,7 +651,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const tr = at('[data-thr]')
     if (tr) { u.thr = tr.dataset.thr!; return bump() }
     const tg = at('[data-tog]')
-    if (tg) { tg.classList.toggle('on'); return }
+    if (tg) {
+      /* переключатели таблиц запоминают состояние: раньше класс слетал на перерисовке */
+      const k = tg.dataset.tog
+      if (k) { u.togs[k] = !tg.classList.contains('on'); return bump() }
+      tg.classList.toggle('on'); return
+    }
     if (at('[data-mini]')) { mini.current = !mini.current; document.body.classList.toggle('mini', mini.current); return bump() }
     if (at('[data-panel]')) { panel.current = !panel.current; return bump() }
     const pr = at('[data-preset]')

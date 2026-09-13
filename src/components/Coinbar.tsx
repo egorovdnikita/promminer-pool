@@ -39,6 +39,13 @@ export function Coinbar({ m }: { m: Model }) {
         )}
       </span>
 
+      {/* На выплатах монета и «Мои активы» стоят в одном ряду (37:56063) */}
+      {route === 'payouts' && (
+        <>
+          <div className="spacer" />
+          <button className="btn" data-go="assets">Мои активы<Ico html={I.arr} /></button>
+        </>
+      )}
       {route === 'workers' && S.role === 'owner' && (
         <>
           <div className="spacer" />

@@ -67,7 +67,7 @@ const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',healt
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no',rdata:'ok'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false,sfin:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null,dsel:{},dpm:0,zoom:0,rwarn:false};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null,dsel:{},dpm:0,zoom:0,rwarn:false,togs:{}};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -462,6 +462,8 @@ const dpLabel=(key,def)=>{const st=U.dsel[key]; if(!st)return def;
 /* Status дизайн-системы: точка 8 + подпись 12 Bold. t: ok|err|warn|off. */
 /* Badge Dynamic из макета воркеров: 22 в высоту, r100, стрелка 16 и 14 SemiBold */
 const dyn=(kind,val)=>`<span class="dyn ${kind}">${I.sortUp}${val}</span>`;
+/* Переключатели в таблицах помнят состояние между перерисовками */
+const togOn=(k,def)=>U.togs[k]===undefined?def:U.togs[k];
 const status=(t,label,cls='')=>`<span class="status ${t} ${cls}"><i class="dot"></i>${label}</span>`;
 const rd=(on,attr='',cls='')=>`<span class="rd ${on?'on':''} ${cls}" ${attr}></span>`;
 /* Пагинация — кликабельная */
@@ -818,6 +820,9 @@ function workersList(m){
 function workersRows(m){
   let rows=workersList(m);
   if(U.wfilter!=='all') rows=rows.filter(w=>w.st===U.wfilter);
+  /* Лента площадок над таблицей — это фильтр по группе, а не просто подсветка */
+  if(U.geo&&U.geo!=='Все'){const gi=groups().findIndex(g=>g.n===U.geo);
+    if(gi>=0) rows=rows.filter(w=>w.grp.includes(gi));}
   /* Выборка из шторки фильтров: теги по названию, модели по производителю */
   const f=U.fapp;
   if(f&&f.t.length) rows=rows.filter(w=>w.tags.some(t=>f.t.includes(t)));
@@ -1125,7 +1130,7 @@ V.assets=m=>{
             :addChip(sell?'vaccm':'wallet',a.s)}</td>
       <td>${sell?`<span class="athr">${SELL_THR}</span>`
             :chip(a.th,I.edit,`data-modal="athr" data-coin="${a.s}"`)}</td>
-      <td><span class="tog ${!m.empty&&(sell?!need:autoOf(i))?'on':''}" data-tog></span></td>
+      <td><span class="tog ${togOn('a'+a.s,!m.empty&&(sell?!need:autoOf(i)))?'on':''}" data-tog="a${a.s}"></span></td>
       <td class="num"><button class="btn sm" ${dis?'disabled':''} data-modal="${sell?'sell':'withdraw'}" data-coin="${a.s}">${sell?'Продать':'Вывести'}</button></td></tr>`}).join('');
   return hero+card(`<div class="ch">${seg('assets-tab',['Вывести','Продать'],0)}</div>
     ${sell&&need?`<div class="alert info aver">${I.inf}<div><b>Для продажи цифровой валюты</b>
@@ -1186,6 +1191,22 @@ const walletFoot=(step,ok)=>step===2
 
 /* Доход — по макету: индиго-карточка баланса и две белые, периоды отдельными
    пилюлями (на этом экране в макете это не Segment Control), иконки валют в шапке. */
+/* Период и выбранная дата действительно сокращают выборку:
+   7 дн даёт меньше строк, чем 90, а диапазон в календаре режет ещё сильнее */
+const PERIOD_K=[0.25,0.6,1];
+const periodN=(segId,dateKey,base)=>{
+  const i=U.seg[segId];
+  let n=i===undefined?base:Math.max(1,Math.round(base*PERIOD_K[i]));
+  const d=dateKey&&U.dsel['dp'+dateKey];
+  if(d){const days=d.b?d.b-d.a+1:1; n=Math.max(1,Math.round(n*Math.min(1,days/30)))}
+  return n};
+/* Подписи оси X подстраиваются под выбранный период */
+const periodXs=segId=>{const i=U.seg[segId];
+  const days=i===undefined?7:[7,30,90][i];
+  const step=Math.max(1,Math.round(days/6));
+  const out=[];for(let d=0;d<days;d+=step){const t=new Date(2026,6,15+d);
+    out.push(String(t.getDate()).padStart(2,'0')+'.'+String(t.getMonth()+1).padStart(2,'0'))}
+  return out};
 /* Периоды на этом экране — Chips 48 из ДС, а не Segment Control; по умолчанию
    период не выбран и показываются все данные (15:21011). */
 const dayChips=(id,def=null)=>`<span class="dchips">${['7 дн','30 дн','90 дн'].map((o,i)=>
@@ -1215,19 +1236,18 @@ V.income=m=>`
 ${card(`<div class="ch"><h2>График дохода (${m.bal[0].s})</h2><div class="spacer"></div>
   ${dayChips('income-chart')}${dateInput('inc1')}
   ${zoomBtns()}</div>
-  ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:['15.07','16.07','17.07','18.07','19.07','20.07','21.07']})}`)}
+  ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:periodXs('income-chart')})}`)}
 ${card(`<div class="ch"><h2>История дохода</h2><div class="spacer"></div>
   ${dayChips('income-hist')}${dateInput('inc2')}
   <button class="ib" data-modal="export" data-ex="inc">${I.dl}</button></div>
-  ${incomeTable(m,m.empty?0:48,'income')}`)}`;
+  ${incomeTable(m,m.empty?0:periodN('income-hist','inc2',48),'income')}`)}`;
 
 /* Выплаты (макет 37:56063): ряд действий с переходом в «Мои активы»,
    карточка «История выплат» с фильтром по типу, периодам и дате. */
 function payoutsScreen(m,own){
-  const N=m.empty?0:(S.data==='few'?1:28);
+  const N=m.empty?0:periodN('pay-range','pay',S.data==='few'?1:28);
   const type=PAY_TYPES[segi('pay-type',0)];
-  return `${own?`<div class="prow"><button class="btn g" data-go="assets">Мои активы${I.arr}</button></div>`:''}
-  ${card(`<div class="ch"><h2>${own?'История выплат':'Реферальные выплаты'}</h2><div class="spacer"></div>
+  return `${card(`<div class="ch"><h2>${own?'История выплат':'Реферальные выплаты'}</h2><div class="spacer"></div>
   ${N?`${fsel('pay-type',PAY_TYPES)}${dayChips('pay-range')}${dateInput('pay')}
     <button class="ib" data-modal="export" data-ex="pay">${I.dl}</button>`:''}</div>
   ${payoutsTable(m,N,'payouts',type)}`)}`;
@@ -1267,7 +1287,7 @@ V.report=m=>{
   <div class="racts">
     <button class="btn w" data-modal="export" data-ex="hours">${I.dl}Часы работы воркеров</button>
     <button class="btn w" data-modal="export" data-ex="inc">${I.dl}Доход за период</button>
-    <button class="btn w" data-modal="poolw">${I.dl}Кошельки пула</button>
+    <button class="btn w" data-modal="poolw">${I.wallet}Кошельки пула</button>
   </div></div>
   ${card(`${U.rnote?'':`<div class="rnote">
     <div><b>Для генерации корректного отчета</b>
@@ -1280,13 +1300,13 @@ V.report=m=>{
     <th>Дата генерации</th><th>Статус</th><th></th><th></th></tr></thead><tbody>
   ${REPORTS.map(([mo,y,a,d,st])=>{const [cls,lab]=REP_ST[st];
     const off=ro||noV||st==='none';
-    const gen=`<button class="btn sm" ${off?'disabled':''} data-modal="${repModal()}">Сгенерировать</button>`;
+    const gen=`<button class="btn xs" ${off?'disabled':''} data-modal="${repModal()}">Сгенерировать</button>`;
     return `<tr><td>${mo}</td><td class="mono">${y}</td>
       <td class="racc">${m.empty?'':`<span data-tip="${a}">${a}</span>`}</td>
       <td class="mono mut">${m.empty?'':d}</td>
       <td>${status(cls,lab,'caps')}</td>
       <td class="num">${noV&&!ro?`<span data-tip="${REP_TIP}">${gen}</span>`:gen}</td>
-      <td class="num"><button class="btn g sm" ${st==='ok'?'':'disabled'} data-toast="Отчет скачан">${I.dl}Скачать</button></td></tr>`}).join('')}
+      <td class="num"><button class="btn out xs" ${st==='ok'?'':'disabled'} data-toast="Отчет скачан">${I.dl}Скачать</button></td></tr>`}).join('')}
   </tbody></table></div>${pager('report',REPORTS.length,10)}`)}`};
 
 /* --- Инструменты --- */
@@ -1299,6 +1319,17 @@ const TAXES=['Не выбран','13 — Физ.лица / ИП (доход до
 const cfield=(label,val,extra='')=>`<div class="cfield">
   <span class="k">${label}</span>
   <div class="cin"><input value="${val}">${extra}</div></div>`;
+/* Валюта курса — отдельное поле 100×56 рядом с суммой (3:37133) */
+const curSel=(id,opts)=>{const i=U.seg[id]??0;
+  return `<span class="pop-wrap cur"><button class="cfield csel2" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
+  ${pop===id?`<div class="pop menu xmenu msmenu">${opts.map((o,n)=>
+    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
+/* Поле-селект: выглядит как Input 56 с подписью и шевроном (3:37133) */
+const cselField=(label,id,opts)=>{const i=U.seg[id]??0;
+  return `<span class="pop-wrap full"><button class="cfield csel2 lab" data-pop="${id}">
+    <span class="k">${label}</span><span class="v">${opts[i]}</span><span class="spacer"></span>${I.cd}</button>
+  ${pop===id?`<div class="pop menu xmenu" style="min-width:348px">${opts.map((o,n)=>
+    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 /* Компактный выпадающий список внутри поля (валюта курса, 3:37127) */
 const minisel=(id,opts)=>{const i=U.seg[id]??0;
   return `<span class="pop-wrap"><button class="msel" data-pop="${id}">${opts[i]}${I.cd}</button>
@@ -1311,15 +1342,14 @@ V.calc=m=>{
   return `<div class="cwrap">
   <div class="cleft">
     <div class="ctop">${fsel('calc-coin',['BTC','LTC'],v=>COIN_ICON[v])}<div class="spacer"></div>
-      <button class="btn xs g" data-creset>Сбросить</button></div>
+      <button class="btn link creset" data-creset>Сбросить</button></div>
     <div class="cgrid">
-      ${cfield('Курс '+cc,'3 071 428,57',minisel('calc-cur',['₽','$']))}
+      <div class="cpair">${cfield('Курс '+cc,'3 071 428,57')}${curSel('calc-cur',['₽','$'])}</div>
       ${cfield('Хэшрейт, '+m.c.unit,'100')}
       ${cfield('Комиссия пула, %','0,0')}
       ${cfield('Потребление, кВт·ч','0,00')}
       ${cfield('Стоимость, ₽/кВт·ч с НДС','3,57')}
-      <div class="cfield"><span class="k">Налог, %</span>
-        ${fsel('calc-tax',TAXES)}</div>
+      ${cselField('Налог, %','calc-tax',TAXES)}
     </div>
   </div>
   <div class="cright">
@@ -1347,7 +1377,7 @@ V.tax=m=>{
   <div class="txwrap">
     <div class="txleft">
       <div class="txtop">${seg('tax-form',['Физическое лицо и ИП','Юридическое лицо'],0)}
-        <div class="spacer"></div><button class="btn xs g" data-creset>Сбросить</button></div>
+        <div class="spacer"></div><button class="btn link creset" data-creset>Сбросить</button></div>
       <div class="txlist">
         <div class="txgroup"><span class="gk">Доходы</span>
           <div class="txrowin">${cfield('Доход*',v.inc)}${cfield('Курс на момент вывода, ₽*',v.rate)}</div></div>
@@ -1454,8 +1484,8 @@ ${card(`<div class="hero"><div class="hval"><div class="l">Текущий общ
     <div class="v mono">${dec(m.bal[0].v)} ${m.bal[0].s}</div>
     <div class="s mono">≈ ${nf(m.bal[0].usd)} $ • ${nf(m.bal[0].rub)} ₽</div></div></div>`)}
 ${card(`<div class="ch"><h2>График общего дохода</h2><div class="spacer"></div>
-  ${dayChips('sumincome-range')}${dateInput('sumi')}</div>
-  ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:['15.07','16.07','17.07','18.07','19.07','20.07','21.07']})}`)}
+  ${dayChips('sumincome-range')}${dateInput('sumi')}${zoomBtns()}</div>
+  ${chart(m,{smooth:true,right:false,yl:'',ticks:[0,1,2,3,4,5,6,7,8,9,10],xs:periodXs('sumincome-range')})}`)}
 ${card(`<div class="ch"><h2>Общий доход</h2><div class="spacer"></div>
   <button class="ib" data-modal="export" data-ex="inc">${I.dl}</button></div>${totalIncomeTable(m)}`)}`;
 
@@ -1606,7 +1636,7 @@ ${card(`<div class="ch"><h2>Настройка реферальных выпла
     <td class="mono">0 ${a.s}</td><td class="mono">0 $</td><td class="mono">0 ₽</td>
     <td><button class="acell add" data-modal="wallet" data-coin="${a.s}">${I.pl}Добавить</button></td>
     <td><button class="acell" data-modal="athr" data-coin="${a.s}">${a.th}<i>${I.edit}</i></button></td>
-    <td><span class="tog" data-tog></span></td>
+    <td><span class="tog ${togOn('r'+a.s,false)?'on':''}" data-tog="r${a.s}"></span></td>
     <td class="num"><button class="btn sm" disabled>Вывести</button></td></tr>`).join('')}
   </tbody></table></div>`)}
 ${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
@@ -1637,7 +1667,7 @@ V.refincome=m=>card(`<div class="ch"><h2>Доход (${m.bal[0].s})</h2><span cl
   <div class="spacer"></div>${fsel('refinc-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
   ${dayChips('refincome-range')}${dateInput('ri')}
   <button class="ib" data-modal="export" data-ex="ref">${I.dl}</button></div>
-  ${refIncomeTable(m,m.empty?0:32,'refincome')}`);
+  ${refIncomeTable(m,m.empty?0:periodN('refincome-range','ri',32),'refincome')}`);
 V.refpayouts=m=>payoutsScreen(m,false);
 
 /* --- Профиль --- */

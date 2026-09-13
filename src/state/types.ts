@@ -126,6 +126,8 @@ export interface Ui {
   zoom: number
   /** предупреждение о рублёвых выплатах закрыто */
   rwarn: boolean
+  /** состояния переключателей в таблицах */
+  togs: Record<string, boolean>
 }
 
 export interface AppSnapshot {
