@@ -1441,3 +1441,50 @@ button.scsect:hover{color:var(--accent)}
 .mbody .cap.dim{margin-top:16px}
 .mbody .cap.dim .btn.link{height:auto;font-size:var(--fs-s);line-height:var(--lh-s);vertical-align:baseline}
 .btn.dis{background:var(--ctrl2);color:var(--c3);box-shadow:none;cursor:default}
+
+/* --- Деталка воркера (макет 223:98541) --- */
+/* Шапка: назад, имя, статус, справа связи воркера */
+.wdtop{display:flex;align-items:center;gap:12px;min-height:64px;flex-wrap:wrap}
+.wdname{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
+.wdinfo{display:flex;align-items:center;height:48px;padding:0 12px;border-radius:var(--r-m);color:var(--c1)}
+.wdinfo:hover{background:var(--ctrl2)}
+.wdlink{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.wdlink i{font-style:normal;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
+.wdlink b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+/* Три карточки 208: сводка, показатели, параметры */
+.card.wdcard{min-height:208px;display:flex;flex-direction:column;padding:24px}
+.wdhero{display:flex;flex-direction:column;height:100%}
+.wdhero .l{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c2)}
+.wdhero .v{font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600;margin-top:6px}
+.wdsub{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:auto}
+.wdsub span{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
+.wdsub b{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600;margin-top:6px;display:block}
+.wdh{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:500;color:var(--c1)}
+.wdh2{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;margin-bottom:16px}
+.wdrows{margin-top:auto;display:flex;flex-direction:column;gap:16px}
+.wdkv{display:flex;align-items:baseline;gap:12px}
+.wdkv .k{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2);flex:0 0 auto}
+.wdkv .v{margin-left:auto;text-align:right;font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.wdhead{display:flex;align-items:center;gap:8px}
+.wdedit{width:24px;height:24px;color:var(--c3);flex:0 0 auto}
+.wdedit:hover{color:var(--accent)}
+.wdedit svg{width:24px;height:24px}
+/* График слева, события и промо справа */
+.wdmain{display:grid;grid-template-columns:minmax(0,1fr) 404px;gap:16px}
+.wdside{display:flex;flex-direction:column;gap:16px}
+.card.wdevcard{max-height:529px;display:flex;flex-direction:column}
+.wdevents{overflow-y:auto;display:flex;flex-direction:column;gap:12px;margin-right:calc(-1 * var(--sbw))}
+.wdev{display:grid;grid-template-columns:8px 1fr;column-gap:12px;align-items:center}
+.wdev i{width:8px;height:8px;border-radius:var(--r-f);grid-row:1 / span 2}
+.wdev b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.wdev span{grid-column:2;font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
+/* Баннер PromBox: картинка справа, текст и кнопка живые */
+.promo.pbox{background:#7086fc;min-height:160px;padding:20px 24px;justify-content:flex-start}
+.promo.pbox b{position:relative;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:#fff}
+.promo.pbox p{position:relative;font-size:var(--fs-s);line-height:var(--lh-s);color:#fff;margin-top:4px;max-width:60%}
+.promo.pbox .btn{background:#fff;color:#111827;box-shadow:none;height:40px;margin-top:16px}
+.promo.pbox .btn:hover{background:#f3f4f6}
+/* на 1440 колонка событий ужимается до 275, но не переносится (230:5518) */
+@media(max-width:1600px){.wdmain{grid-template-columns:minmax(0,1fr) 275px}}
+@media(max-width:1100px){.wdmain{grid-template-columns:1fr}}

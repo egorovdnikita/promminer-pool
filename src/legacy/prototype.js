@@ -13,6 +13,7 @@ import { ICONS } from './icons.js';
 const AXES={
   coin:{g:'Данные',label:'Монета',opts:[['btc','BTC'],['ltc','LTC + DOGE'],['zec','ZEC']]},
   wf:{g:'Данные',label:'Теги и модели',opts:[['yes','Заведены'],['none','Ничего не заведено']]},
+  wnote:{g:'Воркеры',label:'Порог уведомлений',opts:[['yes','Задан'],['no','Не настроен']]},
   ser:{g:'Воркеры',label:'Серийные номера',opts:[['no','Не заполнены'],['ok','Заполнены'],['err','Есть ошибки']]},
   upl:{g:'Воркеры',label:'Файл серийников',opts:[['no','Не выбран'],['ok','Выбран'],
     ['big','Больше 10 Мб'],['bad','Нет листа «Данные»']]},
@@ -56,7 +57,7 @@ const PRESETS=[
   ['Крупный клиент','Большие значения и много записей',{data:'huge',subs:'many',obs:'many',tier:'4',verif:'yes',vdoc:'yes',vacc:'yes'}],
   ['Скелетон','Экран во время загрузки',{load:'yes'}],
 ];
-const DEF={coin:'btc',wf:'yes',ser:'no',upl:'no',data:'normal',health:'degraded',role:'owner',perm:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
+const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',health:'degraded',role:'owner',perm:'all',tier:'0',verif:'no',notif:'many',subs:'many',obs:'many',name:'yes',load:'no',acct:'main',
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
@@ -443,7 +444,9 @@ function chart(m,opts={}){
   const ar=`${ln} L${x(N-1).toFixed(1)},${PT+ih} L${PL},${PT+ih} Z`;
   /* svg тянется по ширине (1400 → ~1593 на 1920), поэтому кегль делений
      задаём с поправкой, чтобы на экране получилось 12 */
-  const TS=(opts.ts||12)/1.138;
+  /* svg тянется по ширине контейнера, поэтому кегль делений пересчитываем
+     из ширины блока: cw — сколько пикселей занимает график на экране */
+  const TS=(opts.ts||12)*(1400/(opts.cw||1593));
   const ticks=opts.ticks||[0,150,300,450,600,750,900,1050,1200,1350,1500];
   const hrs=opts.xs||['14:00','15:00','16:00','17:00','18:00','19:00','20:00','21:00','22:00','23:00','00:00','01:00','02:00','03:00','04:00','05:00','06:00'];
   /* Подписи осей в макете живут вне графика строкой 20 (16 Medium), иначе их
@@ -682,8 +685,10 @@ function taxonBody(k,bind){
    в public/logo-*.svg. По ним же группирует фильтр моделей в шторке. */
 const MODELS=[['bitmain','Bitmain'],['canaan','Canaan Avalon'],['whatsminer','Whatsminer'],
   ['iceriver','IceRiver'],['bitdeer','Bitdeer']];
-const VENDORS={'S19':'bitmain','S21':'bitmain','Q':'canaan'};
-const vendorOf=model=>VENDORS[String(model).split(/[\s+]/)[0]]||'bitmain';
+const VENDORS=[[/avalon/i,'canaan'],[/whatsminer|^M\d/i,'whatsminer'],[/ice|^KS/i,'iceriver'],
+  [/antminer|^S\d|^L\d/i,'bitmain']];
+const vendorOf=model=>(VENDORS.find(([re])=>re.test(String(model)))||[0,'bitmain'])[1];
+const vendorName=k=>(MODELS.find(x=>x[0]===k)||[0,''])[1];
 const vlogo=k=>`<span class="vlogo"><img src="/logo-${k}.svg" alt="" width="24" height="24"></span>`;
 /* Сколько фильтров применено — счётчик на кнопке «Фильтры» (612:100188) */
 const fcount=()=>U.fapp?U.fapp.t.length+U.fapp.m.length:0;
@@ -693,7 +698,10 @@ const shareAt=off=>{const t=7*60+32-off, h=Math.floor((t+1440)%1440/60), mi=(t+1
 const WST={ok:['Активен','var(--pos)'],low:['Низкий хэшрейт','var(--warn)'],off:['Отключен','var(--neg)'],fail:['Оффлайн','var(--neu)']};
 function workersList(m){
   if(m.empty) return [];
-  const models=['S19 XP Hydro 2…','S21+ 235 TH/s','Q 90 TH/s','S21+ 225 TH/s'];
+  /* Полные названия моделей: в таблице их режет колонка, а деталка
+     показывает целиком вместе с производителем (макет 223:98556) */
+  const models=S.coin==='ltc'?['Antminer L9 17 GH/s','Antminer L7 9.5 GH/s','Avalon A1566 12 GH/s','Antminer L9 16 GH/s']
+    :['Antminer S19 XP Hydro 257 TH/s','Antminer S21+ 235 TH/s','Avalon Q 90 TH/s','Antminer S21+ 225 TH/s'];
   /* У воркера один видимый тег и, если есть второй, чип «+1» с подсказкой */
   const tags=[['Разогнан','Собран'],['Готов','Завершен'],['Без прошивки','Подготовлен']];
   const N=S.data==='few'?3:36, r=rng(S.coin==='btc'?11:23);
@@ -704,12 +712,15 @@ function workersList(m){
     for(const [k,v] of share){acc+=v; if(p<=acc){st=k;break}}
     const base=225+r()*15;
     const tg=tags[i%3], extra=i%2;
-    out.push({id:i+1,name:'Ant'+String(i+1).padStart(2,'0'),model:models[i%4],st,
+    /* правки привязок из модалок живут в U.wov и переживают перерисовку */
+    out.push(Object.assign({id:i+1,name:'Ant'+String(i+1).padStart(2,'0'),model:models[i%4],st,
       h5:base+5,h1:base+12,h24:base+8,rej:((i%8)+1)/100,up:99+(i%2),
       tag:tg[0],tags:extra?tg:[tg[0]],extra,
+      /* площадки воркера — их показывает деталка и правит «Изменить группы» */
+      grp:[i%3,(i+2)%7,(i+5)%9].filter((v,j,a)=>a.indexOf(v)===j),
       /* время последней шары разное — по нему список сортируется по умолчанию
          (заметка дизайнера 290:157360) */
-      sh:(i*7+i%5)%143});
+      sh:(i*7+i%5)%143},(U.wov||{})[i+1]||{}));
   }
   return out;
 }
@@ -861,23 +872,81 @@ V.serials=m=>{
     :emptyBox('Ошибок нет','Все заводские номера и модели заполнены верно')}`,'tblcard')}`;
 };
 
+/* Деталка воркера (макет 223:98541): шапка со статусом и связями,
+   три карточки показателей, график с событиями справа */
+const EVENTS=[['ok','04:50:23, 14.04.2025'],['low','03:40:12, 13.04.2025'],
+  ['ok','01:20:45, 11.04.2025'],['fail','06:43:12, 10.04.2025'],
+  ['ok','01:20:45, 09.04.2025'],['off','03:40:12, 08.04.2025'],
+  ['low','03:40:12, 07.04.2025'],['ok','01:20:45, 06.04.2025'],
+  ['low','03:40:12, 05.04.2025'],['ok','07:12:03, 04.04.2025']];
+/* Связи воркера в шапке: два первых значения строкой, остальное — в «+N» */
+const linkRow=(label,items,cls='')=>{
+  const head=items.slice(0,2), rest=items.slice(2);
+  return `<span class="wdlink"><i>${label}</i>${items.length
+    ? (cls
+        ? head.map(t=>`<span class="tag">${t}</span>`).join('')
+        : `<b>${head.join(', ')}</b>`) +
+      (rest.length?`<span class="tag n" data-tip="${rest.join(', ')}">+${rest.length}</span>`:'')
+    : '<b>—</b>'}</span>`};
 V.worker=m=>{
-  const w=U.wk||workersList(m)[0]||{name:'Ant01',model:'S19 XP Hydro',st:'ok',h5:231.16,h1:239.21,h24:235.76,rej:.04,up:100};
-  const [lbl,col]=WST[w.st]||WST.ok;
-  const tone=w.st==='ok'?'g':w.st==='low'?'y':w.st==='off'?'r':'n';
+  const w=U.wk||workersList(m)[0]||{id:1,name:'Ant01',model:'S19 XP Hydro 257 TH/s',st:'ok',
+    h5:231.16,h1:239.21,h24:235.76,rej:.04,up:100,tags:['Разогнан'],grp:[0,1]};
+  const st=m.empty?'fail':w.st, [lbl,col]=WST[st]||WST.ok;
+  const gl=groups();
+  /* связи берём у самого воркера: «Изменить группы» и «Изменить теги»
+     пишут их обратно, поэтому шапка и модалка всегда согласованы */
+  const gn=(w.grp||[]).map(i=>gl[i]&&gl[i].n).filter(Boolean);
+  const tn=(w.tags||[]).filter(t=>tagsOf().some(x=>x.n===t));
+  const ser=S.ser!=='no'&&!m.empty;
+  const thr=S.wnote==='yes'&&!m.empty;
+  const v=(x,d)=>m.empty?d:x;
+  /* строка «подпись — значение» в карточках показателей и параметров */
+  const kv=(k,val)=>`<div class="wdkv"><span class="k">${k}</span><b class="v">${val}</b></div>`;
   return `
-${card(`<div class="ch"><button class="ib sm" data-go="workers">${I.cl}</button><h2>${w.name}</h2>
-  <span class="tag ${tone}">${lbl}</span><div class="spacer"></div>
-  <button class="btn g sm" data-toast="Введите новое имя воркера">${I.edit} Переименовать</button>
-  <button class="btn g sm" data-toast="Экспорт по воркеру ${w.name} готовится">${I.dl} Экспорт</button></div>
-  <div class="grid g4" style="margin:0">
-    ${[['Хэшрейт, 5 мин',nf(w.h5,2)+' '+m.c.unit],['Хэшрейт, 1 ч',nf(w.h1,2)+' '+m.c.unit],['Хэшрейт, 24 ч',nf(w.h24,2)+' '+m.c.unit],
-       ['Реджект, 24 ч',nf(w.rej,2)+'%'],['Uptime',w.up+'%'],['Модель',w.model],['Заводской номер','—'],['Последняя шара','9 Апреля, 07:32']]
-      .map(([k,v])=>`<div class="field"><div class="k">${k}</div><div class="v mono">${v}</div></div>`).join('')}
-  </div>`)}
-<div style="height:12px"></div>
-${card(`<div class="ch"><h2>График хэшрейта воркера</h2><div class="spacer"></div>
-  ${seg('wk-range',['1 ч','24 ч','7 дн'],1)}</div>${chart(m,{smooth:true})}`)}`};
+  <div class="wdtop">
+    <button class="ib sm" data-go="workers">${I.cl}</button>
+    <h2 class="wdname">${w.name}</h2>
+    <span class="tag" style="background:${col}1f;color:${col}">${lbl}</span>
+    <div class="spacer"></div>
+    <button class="wdinfo" data-modal="wgroups" data-wk2="${w.id}">${linkRow('Группы:',gn)}</button>
+    <button class="wdinfo" data-modal="wtags" data-wk2="${w.id}">${linkRow('Теги:',tn,'tag')}</button>
+    <button class="wdinfo" data-modal="wnotify">
+      <span class="wdlink"><i>Порог уведомлений:</i><b>${thr?`225 ${m.c.unit}`:'Не настроено'}</b></span></button>
+  </div>
+  <div class="grid g3" style="gap:16px;margin:0">
+    ${card(`<div class="wdhero">
+      <span class="l">Средний хэшрейт за 24 ч</span>
+      <b class="v mono">${m.empty?0:nf(w.h24,2)} ${m.c.unit}</b>
+      <div class="wdsub">
+        <div><span>За 5 мин</span><b class="mono">${m.empty?0:nf(w.h5,2)} ${m.c.unit}</b></div>
+        <div><span>За 1 ч</span><b class="mono">${m.empty?0:nf(w.h1,2)} ${m.c.unit}</b></div>
+      </div></div>`,'wdcard')}
+    ${card(`<h3 class="wdh">Показатели воркера</h3><div class="wdrows">
+      ${kv('Цифровая валюта',m.bal[0].s)}
+      ${kv('Последняя шара',m.empty?'—':(w.sh?shareAt(w.sh):'10 сек назад'))}
+      ${kv('Реджект, 24 ч',m.empty?'0%':nf(w.rej,2)+'%')}</div>`,'wdcard')}
+    ${card(`<div class="wdhead"><h3 class="wdh">Параметры воркера</h3><div class="spacer"></div>
+      <button class="ibr wdedit" data-modal="wparams" data-tip="${ser?'Изменить параметры':'Добавить параметры'}">${I.edit}</button></div>
+    <div class="wdrows">
+      ${kv('Завод. номер',ser?'<span class="mono">OLTTG4BBEJDAJ062H</span>':'—')}
+      ${kv('Модель',ser?`${vendorName(vendorOf(w.model))} ${w.model}`:'—')}</div>`,'wdcard')}
+  </div>
+  <div class="wdmain">
+    ${card(`<div class="ch"><h2>График изменения хэшрейта</h2><div class="spacer"></div>
+      ${seg('wk-range',['5 мин','1 ч','24 ч'],2)}
+      <span class="pop-wrap"><button class="pill ctl sq mono lg" data-pop="wdate">05.04.2026 – 12.04.2026 ${I.cal}</button>${pop==='wdate'?datePicker():''}</span></div>
+      ${chart(m,{h:638,cw:1173,axisHtml:true,hover:true})}`)}
+    <div class="wdside">
+      ${card(`<h2 class="wdh2">События</h2>
+        ${m.empty?'<p class="fempty">Событий пока нет</p>'
+          :`<div class="wdevents">${EVENTS.map(([k,t])=>{const[el,ec]=WST[k];
+            return `<div class="wdev"><i style="background:${ec}"></i><b>${el}</b><span>${t}</span></div>`}).join('')}</div>`}`,'wdevcard')}
+      <section class="promo pbox"><img class="art" src="/promo-prombox.png" alt="">
+        <b>PromBox</b><p>Расширенная статистика<br>по устройствам</p>
+        <button class="btn w" data-toast="Откроем страницу PromBox">Узнать больше</button></section>
+    </div>
+  </div>`;
+};
 
 /* --- Финансы --- */
 /* Мои активы — по проду: герой с двумя плитками-действиями, вкладки
@@ -1925,6 +1994,27 @@ const MODALS={
   wgroups:{t:'Изменить группы',acts:false,size:'tx',b:()=>taxonBody('g',true),
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn" data-tbind="g">Сохранить</button>`},
+  /* Порог уведомлений по хэшрейту (макет 223:100366) */
+  wnotify:{t:'Настроить уведомления',s:'о хэшрейте ниже порогового значения',acts:false,
+    b:m=>`<div class="inp" style="margin:0"><div class="k">Порог оповещения [${m.c.unit}]</div>
+        <input value="${S.wnote==='yes'?'225':''}" placeholder="Порог оповещения [${m.c.unit}]"></div>
+      <p class="cap dim">Отправим уведомление, когда хэшрейт упадет ниже этого значения</p>
+      <p class="cap dim">Для включения / выключения уведомлений по хэшрейту по всем воркерам перейдите в
+        <button class="btn link" data-close data-go="notifsettings">Настройки уведомлений</button></p>`,
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-axis="wnote" data-val="yes" data-toast="Порог уведомлений сохранён">Сохранить</button>`},
+  /* Заводской номер и модель воркера (макет 223:100377) */
+  wparams:{t:'Добавить',s:'заводской номер и модель воркера',acts:false,
+    b:()=>`<div class="inp" style="margin:0"><div class="k">Заводской номер</div>
+        <input placeholder="Заводской номер" value="${S.ser!=='no'?'OLTTG4BBEJDAJ062H':''}"></div>
+      <p class="cap dim">Не можете найти заводской номер?
+        <a class="btn link" href="${LINKS.kb}" target="_blank" rel="noopener">База знаний</a></p>
+      <p class="cap dim">Пожалуйста, не изменяйте название воркера после добавления заводского номера</p>
+      ${xsel('Модель','wpmodel',['Выберите модель'].concat(SER_MODELS))}
+      <p class="cap dim">Не нашли свою модель?
+        <a class="btn link" href="${LINKS.tgSupport}" target="_blank" rel="noopener">Напишите нам</a></p>`,
+    foot:()=>`<button class="btn out" data-close>Отменить</button>
+      <button class="btn" data-close data-axis="ser" data-val="ok" data-toast="Параметры воркера сохранены">Сохранить</button>`},
   /* Загрузка файла серийников (макет 173:66711): состояния «выбран»,
      «больше 10 Мб» и «нет листа Данные» приходят из сценария */
   upload:{t:'Загрузить файл',s:'При каждой загрузке данные будут перезаписаны',acts:false,

@@ -16,7 +16,7 @@ const freshUi = (): Ui => ({
   q: '', wfilter: 'all', geo: '',
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
-  grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '',
+  grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null,
   qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0,
 })
 
@@ -212,6 +212,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     /* Группы и теги: создание, правка, удаление и привязка в одной модалке */
     const bindMode = () => modal.current === 'wgroups' || modal.current === 'wtags'
     const listOf = (k: string) => (k === 'g' ? groups() : tagsOf())
+    /* привязки воркера в U — их читает деталка и правят модалки */
+    const seedBind = (w: { tags?: string[]; grp?: number[] } | null) => {
+      if (!w) return
+      u.wgrp = new Set(w.grp || [])
+      const tl = tagsOf()
+      u.wtag = new Set((w.tags || []).map((t) => tl.findIndex((x) => x.n === t)).filter((i) => i >= 0))
+    }
     const markOf = (k: string) =>
       bindMode() ? (k === 'g' ? u.wgrp : u.wtag) : (k === 'g' ? u.gsel : u.tsel)
     const tcol = at('[data-tcol]')
@@ -270,6 +277,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const k = tbind.dataset.tbind!, set = k === 'g' ? u.wgrp : u.wtag
       const now = [...set].sort().join()
       if (now === (u.tbase ?? '')) return toast('Выбор не изменился')
+      /* пишем привязку обратно в воркера — она переживает перерисовку списка */
+      if (u.wk) {
+        const tl = tagsOf()
+        const patch = k === 'g'
+          ? { grp: [...u.wgrp] }
+          : { tags: [...u.wtag].map((i) => tl[i] && tl[i].n).filter(Boolean) }
+        u.wov = { ...(u.wov || {}), [u.wk.id]: { ...(u.wov?.[u.wk.id] || {}), ...patch } }
+        Object.assign(u.wk, patch)
+      }
       modal.current = null; bump()
       return toast(k === 'g' ? 'Группы обновлены' : 'Теги обновлены')
     }
@@ -396,6 +412,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (wk && !at('[data-pop]') && !at('[data-sel]') && !at('.wact') && !at('.pop')) {
       applyState(snapshot())
       u.wk = workersList(M()).find((w: any) => w.id === +wk.dataset.wk!) || null
+      seedBind(u.wk)
       go('worker')
       return bump()
     }
@@ -407,6 +424,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (md.dataset.obs) u.obs = +md.dataset.obs
       if (md.dataset.sess) u.sess = md.dataset.sess
       if (md.dataset.ex) u.exk = md.dataset.ex
+      if (md.dataset.wk2) {
+        const w2 = workersList(M()).find((w: any) => w.id === +md.dataset.wk2!)
+        if (w2) { u.wk = w2; seedBind(w2) }
+      }
       /* форма групп и тегов открывается пустой, а привязка помнит исходный выбор */
       if (['group', 'tagnew', 'wgroups', 'wtags'].includes(md.dataset.modal!)) {
         u.ted = null; u.tname = ''; u.tdesc = ''
