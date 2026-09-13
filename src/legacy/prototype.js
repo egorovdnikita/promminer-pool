@@ -782,11 +782,11 @@ const sortBy=(rows,tbl,val)=>{const s=U.sort[tbl]; if(!s) return rows;
 const wkMenu=w=>{const busy=w.st==='ok'||w.st==='low';
   return `<span class="pop-wrap"><button class="ibr act" data-pop="wk${w.id}">${I.dots}</button>
   ${pop==='wk'+w.id?`<div class="pop menu wkmenu">
-    <button data-wkopen="${w.id}">Посмотреть</button><div class="mdiv"></div>
-    <button data-modal="wgroups" data-wk2="${w.id}">Изменить группы</button><div class="mdiv"></div>
-    <button data-modal="wtags" data-wk2="${w.id}">Изменить теги</button><div class="mdiv"></div>
-    ${busy?`<span class="mi off" data-tip="Вы не сможете удалить воркер в статусе «Активен» или «Низкий хэшрейт»">Удалить</span>`
-      :`<button class="del" data-modal="wkdel" data-wk2="${w.id}">Удалить</button>`}
+    <button data-wkopen="${w.id}">${I.eyed}Посмотреть</button><div class="mdiv"></div>
+    <button data-modal="wgroups" data-wk2="${w.id}">${I.folder}Изменить группы</button><div class="mdiv"></div>
+    <button data-modal="wtags" data-wk2="${w.id}">${I.tagic}Изменить теги</button><div class="mdiv"></div>
+    ${busy?`<span class="mi off" data-tip="Вы не сможете удалить воркер в статусе «Активен» или «Низкий хэшрейт»">${I.tr2}Удалить</span>`
+      :`<button class="del" data-modal="wkdel" data-wk2="${w.id}">${I.tr2}Удалить</button>`}
   </div>`:''}</span>`};
 
 V.workers=m=>{

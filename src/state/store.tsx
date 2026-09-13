@@ -117,6 +117,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   })
 
   useEffect(() => { document.body.classList.toggle('mini', mini.current) })
+  /* Меню строки таблицы висит фиксированно — ставим его под кнопкой,
+     иначе прокрутка таблицы его обрезает, а снятая обрезка ломает вёрстку */
+  useEffect(() => {
+    const menu = document.querySelector('.pop.menu.wkmenu') as HTMLElement | null
+    if (!menu) return
+    const btn = menu.parentElement?.querySelector('[data-pop]') as HTMLElement | null
+    if (!btn) return
+    const r = btn.getBoundingClientRect()
+    const w = menu.offsetWidth, h = menu.offsetHeight
+    const top = r.bottom + 8 + h > innerHeight ? r.top - 8 - h : r.bottom + 8
+    menu.style.top = Math.max(8, top) + 'px'
+    menu.style.left = Math.max(8, Math.min(r.right - w, innerWidth - w - 8)) + 'px'
+  })
   useEffect(() => {
     const t = U.current.theme
     const eff = t === 'system'

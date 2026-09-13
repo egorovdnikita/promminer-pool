@@ -276,8 +276,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* 47 + разделитель 1 = строка 48 из макета */
 .tbl.wtbl td{padding:12px;height:47px}
 .tbl.wtbl td.tags{padding:8px 12px}
-/* ячейка действий не обрезает меню строки — иначе оно не видно совсем */
-.tbl.wtbl td.wact{padding:6px 16px;overflow:visible}
+.tbl.wtbl td.wact{padding:6px 16px}
 .tbl.wtbl .tag{height:32px;padding:0 12px}
 /* Кнопка действий в строке — Outline S(36): круг 36 с обводкой и значком 16 */
 .tbl.wtbl .ibr.act{width:36px;height:36px;border-radius:var(--r-f);color:var(--c1);
@@ -292,8 +291,13 @@ body.mini .ni .spacer.lbl{display:none!important}
 /* Размер из макета: четыре пункта по 40 с шагом 8 в поле 169×192 */
 /* Пункты 40 с шагом 48: разделитель несёт зазор сам, поэтому gap нулевой,
    иначе строки расходятся и последний пункт обрезается высотой меню */
-.pop.menu.wkmenu{width:169px;min-width:169px;height:192px;padding:4px 12px;gap:0;
-  align-items:stretch;overflow:visible}
+/* Меню строки висит фиксированно: иначе его режет прокрутка таблицы,
+   а снятая обрезка расширяла таблицу за край страницы */
+.pop.menu.wkmenu{position:fixed;top:0;left:0;width:169px;min-width:169px;height:192px;
+  padding:4px 12px;gap:0;align-items:stretch;overflow:visible}
+.pop.menu.wkmenu>button,.pop.menu.wkmenu>.mi{gap:8px}
+.pop.menu.wkmenu svg{width:24px;height:24px;flex:0 0 auto;color:var(--c3)}
+.pop.menu.wkmenu .del svg,.pop.menu.wkmenu .off svg{color:inherit}
 .pop.menu.wkmenu>button,.pop.menu.wkmenu>.mi{flex:0 0 40px}
 .pop.menu.wkmenu .mdiv{flex:0 0 1px;margin:3.5px 0}
 .pop.menu.wkmenu>button,.pop.menu.wkmenu .mi{padding:0!important}
@@ -404,8 +408,6 @@ body.mini .ni .spacer.lbl{display:none!important}
 
 /* tables */
 .tw{overflow-x:auto}
-/* пока открыто меню строки, таблица не обрезает его своим краем */
-.tw:has(.pop){overflow:visible}
 .tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 /* Шапка и ячейки таблиц в макетах — 14 SemiBold, строка 48 */
 .tbl th{background:var(--ctrl2);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c3);text-align:left;padding:12px;white-space:nowrap}
