@@ -2733,10 +2733,8 @@ const MODALS={
     b:m=>`<div class="lv">
       <div class="lvblock">
         <div class="lvhero">
-          <span class="g1"></span><span class="g2"></span><span class="g3"></span>
+          <img src="/levels-hero.png" alt="">
           <button class="lvx" data-close>${I.x}</button>
-          <div class="lvmed">${[0,1,4,3,2].map(i=>
-            `<img src="/tier-${TIERS[i].k}.png" alt="">`).join('')}</div>
         </div>
         <div class="lvtop">
           <div class="lvtitle"><h2>Уровни комиссии</h2>${refCoinSel(m,'lvcoin')}</div>

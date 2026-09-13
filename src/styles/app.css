@@ -1454,8 +1454,10 @@ button.scsect:hover{color:var(--accent)}
 .pop.menu.expmenu{width:200px;min-width:200px;padding:6px 12px;gap:0}
 .pop.menu.expmenu>button{gap:8px;height:40px;padding:0!important;font-size:var(--fs-s)!important;line-height:var(--lh-s)!important}
 .pop.menu.expmenu button svg{width:24px;height:24px;flex:0 0 auto;color:var(--c1)}
-/* Разделитель пункта списка — обводка #6b7280 16 %, как в компоненте ДС (514:79122) */
-.mdiv{height:1px;flex:0 0 1px;background:var(--ctrl-line);margin:4px 0}
+/* Разделитель пункта списка — обводка #6b7280 16 %, как в компоненте ДС (514:79122).
+   Меню выравнивают пункты по центру, поэтому линию тянем на всю ширину явно —
+   иначе у неё нет собственной ширины и она схлопывается в ноль. */
+.mdiv{height:1px;flex:0 0 1px;width:100%;align-self:stretch;background:var(--ctrl-line);margin:4px 0}
 /* Модалка экспорта — 400 по макету 173:66473, кнопки друг под другом */
 /* Модалка экспорта в макете фиксированные 400×820: подвал прижат к низу */
 .modal.xs{max-width:400px;height:820px}
@@ -2077,22 +2079,16 @@ button.scsect:hover{color:var(--accent)}
 .modal.lv .mbody{padding:8px 8px 24px;overflow:visible}
 .lv{display:flex;flex-direction:column;gap:24px}
 .lvblock{display:flex;flex-direction:column;gap:16px}
-/* Герой 484x144: чёрная подложка r20, белые пятна, медали свисают за нижний край */
+/* Герой 484x144 — выгрузка из макета (467:41577): чёрная подложка со светом
+   и пять медалей 80/100/140/100/80. Крестик рисуем поверх своего места
+   в картинке, чтобы он остался живой кнопкой. */
 .lvhero{position:relative;overflow:hidden;height:144px;border-radius:20px;background:#000}
-.lvhero>span{position:absolute;border-radius:50%;background:#fff}
-.lvhero .g1{width:271px;height:271px;left:-138px;top:-94px;opacity:.07}
-.lvhero .g2{width:271px;height:271px;left:623px;top:-94px;opacity:.07}
-.lvhero .g3{width:191px;height:192px;left:130px;top:15px;opacity:.14;filter:blur(40px)}
-/* Крестик 32 белым кругом в углу героя, как Button 32 в макете */
+.lvhero>img{display:block;width:100%;height:100%;object-fit:cover}
 .lvx{position:absolute;top:8px;right:8px;z-index:2;display:grid;place-items:center;
-  width:32px;height:32px;border-radius:var(--r-f);background:#fff;color:var(--c1)}
+  width:32px;height:32px;border-radius:var(--r-f);background:#fff;color:var(--c1);
+  box-shadow:0 0 0 1px #fff}
 .lvx svg{width:20px;height:20px}
-.lvx:hover{background:var(--bg)}
-/* Пять медалей 80/100/140/100/80 с нахлёстом, крупная в центре */
-.lvmed{position:relative;display:flex;align-items:flex-start;justify-content:center;padding-top:10px}
-.lvmed img{position:relative;flex:0 0 auto;object-fit:contain;width:80px;height:80px;margin:0 -16px;z-index:1}
-.lvmed img:nth-child(2),.lvmed img:nth-child(4){width:100px;height:100px;margin-top:6px;z-index:2}
-.lvmed img:nth-child(3){width:140px;height:140px;margin-top:17px;z-index:3}
+.lvx:hover{background:var(--bg);box-shadow:0 0 0 1px var(--bg)}
 .lvtop{display:flex;flex-direction:column;gap:16px;padding:0 16px}
 .lvtitle{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .lvtitle h2{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600}
