@@ -1876,3 +1876,60 @@ button.scsect:hover{color:var(--accent)}
 .mbody.tall17{height:248px}
 /* в «Кошельках пула» последний адрес без нижнего отступа: тело ровно 248 */
 .mbody.tall17 .urlrow:last-of-type{margin-bottom:0}
+
+/* ============ Калькуляторы (макеты 5:3779, 6:40886) ============ */
+/* Доходность: акцентная плашка 268, белая панель слева, результат справа */
+.cwrap{display:flex;gap:32px;background:var(--accent);border-radius:var(--r-l);padding:16px;min-height:268px}
+.cleft{flex:1;min-width:0;background:var(--surface);border-radius:var(--r-m);padding:16px;
+  display:flex;flex-direction:column;gap:16px}
+.ctop{display:flex;align-items:center;gap:24px;padding-bottom:16px}
+.cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cfield{display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:var(--h-field);
+  background:var(--ctrl);border-radius:var(--r-m);padding:0 12px}
+.cfield .k{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c2);font-weight:500}
+.cin{display:flex;align-items:center;gap:8px}
+.cin input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:var(--fs-m);
+  line-height:var(--lh-m);font-weight:500;color:var(--c1);outline:none}
+.cfield .fsel{height:32px;min-width:0;background:var(--surface)}
+.msel{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 8px;border-radius:var(--r-s);
+  background:var(--surface);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
+.msel svg{width:16px;height:16px}
+.msmenu{min-width:100px}
+.cright{width:487px;flex:0 0 auto;display:flex;flex-direction:column;gap:16px;color:#fff}
+.cres{display:flex;flex-direction:column;gap:12px}
+.cres b{font-size:var(--fs-h2);line-height:var(--lh-h2);font-weight:600}
+.cres span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.cright .btn.w{margin-top:auto;height:var(--h-field);justify-content:center;border-radius:var(--r-m)}
+/* Налоговый: вкладки монет, две карточки */
+.txtabs{margin-bottom:16px}
+.txtabs .segl button{gap:8px}
+.txtabs .segl svg{width:24px;height:24px}
+.txwrap{display:flex;gap:16px;align-items:stretch}
+.txleft{flex:1;min-width:0;background:var(--surface);border-radius:var(--r-l);padding:32px 24px;
+  display:flex;flex-direction:column;gap:32px}
+.txtop{display:flex;align-items:center;gap:24px}
+.txlist{display:flex;flex-direction:column;gap:24px}
+.txgroup{display:flex;flex-direction:column;gap:16px}
+.gk{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
+.txrowin{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:16px}
+.txitems{display:flex;align-items:center;gap:24px;background:#f7f7fa;border-radius:var(--r-s);padding:24px}
+.txitem{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;position:relative}
+.txitem+.txitem::before{content:"";position:absolute;left:-12px;top:50%;transform:translateY(-50%);
+  width:1px;height:28px;background:var(--ctrl-line)}
+.txitem span{display:flex;align-items:center;gap:4px;font-size:var(--fs-s);line-height:var(--lh-s);
+  color:var(--c2);font-weight:500}
+.txitem b{font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600}
+.txright{width:496px;flex:0 0 auto;background:var(--accent);border-radius:var(--r-l);padding:24px;
+  display:flex;flex-direction:column;gap:20px;color:#fff}
+.txchips{display:flex;gap:32px}
+.txchip{display:inline-flex;align-items:center;gap:12px;font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+.txchip svg{width:24px;height:24px;margin-right:-8px}
+.txinfo{background:#1a1a1a;border-radius:var(--r-s);padding:24px;display:flex;flex-direction:column;gap:20px}
+.txinfo .l{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+.txinfo b{font-size:var(--fs-h1);line-height:var(--lh-h1);font-weight:600}
+.txinfo .n{display:flex;align-items:center;gap:12px;font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}
+.txinfo .n i{font-style:normal;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500;opacity:.8}
+.txrows{display:flex;flex-direction:column;gap:4px}
+.txrow{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.txrow span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}
+.txrow b{font-size:var(--fs-b1);line-height:var(--lh-b1);font-weight:600}

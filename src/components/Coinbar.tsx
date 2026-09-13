@@ -3,7 +3,8 @@ import { AXES, CHECK, COIN_ICON, I, type Model } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico } from './Raw'
 
-const WITH_COIN = ['home', 'workers', 'income', 'payouts', 'calc', 'monitor', 'ref']
+/* у калькулятора доходности монета выбирается внутри панели (макет 5:3779) */
+const WITH_COIN = ['home', 'workers', 'income', 'payouts', 'monitor', 'ref']
 
 export function Coinbar({ m }: { m: Model }) {
   const { S, route, pop } = useApp()

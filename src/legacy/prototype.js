@@ -1147,10 +1147,10 @@ const walletFoot=(step,ok)=>step===2
 const dayChips=(id,def=null)=>`<span class="dchips">${['7 дн','30 дн','90 дн'].map((o,i)=>
   `<button class="chip d ${(U.seg[id]??def)===i?'on':''}" data-seg="${id}" data-i="${i}">${o}</button>`).join('')}</span>`;
 /* Селект в шапке карточки: 48 высотой, радиус 16 (37:56063) */
-const fsel=(id,opts)=>{const i=U.seg[id]??0;
-  return `<span class="pop-wrap"><button class="fsel" data-pop="${id}">${opts[i]}<span class="spacer"></span>${I.cd}</button>
+const fsel=(id,opts,ico)=>{const i=U.seg[id]??0; const pic=v=>ico?(ico(v)||''):'';
+  return `<span class="pop-wrap"><button class="fsel" data-pop="${id}">${pic(opts[i])}${opts[i]}<span class="spacer"></span>${I.cd}</button>
   ${pop===id?`<div class="pop menu xmenu">${opts.map((o,n)=>
-    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
+    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${pic(o)}${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 /* Date Input 256x48 с плейсхолдером 16 SemiBold (15:19710) */
 const dateInput=()=>`<button class="dinput">Выберите дату${I.cal}</button>`;
 /* Карточка дохода 540x176: подпись 20, значение 48, снизу пересчёт в валюты */
@@ -1244,48 +1244,96 @@ V.report=m=>{
   </tbody></table></div>${pager('report',REPORTS.length,10)}`)}`};
 
 /* --- Инструменты --- */
-V.calc=m=>card(`
-  <div style="display:flex;gap:0;border-radius:var(--r-s);overflow:hidden;background:var(--accent)">
-    <div style="flex:1;background:var(--surface);padding:16px;border-radius:var(--r-s) 0 0 var(--r-s)">
-      <div class="ch"><span class="pill flat sq">${COIN_ICON[m.bal[0].s]} ${m.bal[0].s} ${I.cd}</span>
-        <div class="spacer"></div><a href="#">Сбросить</a></div>
-      <div class="grid g3" style="margin:0;gap:10px">
-        <div class="field" style="display:flex;align-items:center"><div style="flex:1"><div class="k">Курс ${S.coin==='btc'?'BTC':'LTC'}</div><div class="v mono">3 071 428,57</div></div>
-          <span class="pill flat sq" style="height:28px;font-size:var(--fs-c);line-height:var(--lh-c)">₽ ${I.cd}</span></div>
-        <div class="field"><div class="k">Хэшрейт, ${m.c.unit}</div><div class="v mono">100</div></div>
-        <div class="field"><div class="k">Комиссия пула, %</div><div class="v mono">0,0</div></div>
-        <div class="field"><div class="k">Потребление, кВтч</div><div class="v mono">0,00</div></div>
-        <div class="field"><div class="k">Стоимость, ₽/кВтч с НДС</div><div class="v mono">3,57</div></div>
-        <div class="field" style="display:flex;align-items:center"><div style="flex:1"><div class="k">Налог, %</div><div class="v">Не выбран</div></div><span class="dim">${I.cd}</span></div>
-      </div>
-    </div>
-    <div style="width:300px;padding:16px;color:#fff;display:flex;flex-direction:column">
-      ${segLine('calc-period',['Доход за 1 день','Доход за 30 дней'],1,'inv fill')}
-      <div class="mono" style="font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;margin-top:18px">≈ ${segi('calc-period',1)?'0,00048469':'0,00001616'} ${m.bal[0].s}</div>
-      <div class="mono" style="font-size:var(--fs-c);line-height:var(--lh-c);opacity:.85;margin-top:4px">≈ ${segi('calc-period',1)?'20,84 $ / 1 488,7 ₽':'0,69 $ / 49,62 ₽'}</div>
-      <button class="btn w" style="margin-top:auto;justify-content:center" data-modal="connect">Начать добывать</button>
-    </div>
-  </div>`);
+/* Калькулятор доходности (макет 5:3779): акцентная плашка 268, слева белая
+   панель с шестью полями, справа результат и кнопка. */
+const TAXES=['Не выбран','13 — Физ.лица / ИП (доход до 2,4 млн)','15 — Физ.лица / ИП (доход 2,4–5 млн)',
+  '18 — Физ.лица / ИП (доход 5–20 млн)','20 — Физ.лица / ИП (доход 20–50 млн)',
+  '22 — Физ.лица / ИП (доход свыше 50 млн)','25 — Юр.лица (по ОСН)'];
+/* Поле калькулятора: DS Input 56 с подписью сверху и необязательным довеском */
+const cfield=(label,val,extra='')=>`<div class="cfield">
+  <span class="k">${label}</span>
+  <div class="cin"><input value="${val}">${extra}</div></div>`;
+/* Компактный выпадающий список внутри поля (валюта курса, 3:37127) */
+const minisel=(id,opts)=>{const i=U.seg[id]??0;
+  return `<span class="pop-wrap"><button class="msel" data-pop="${id}">${opts[i]}${I.cd}</button>
+  ${pop===id?`<div class="pop menu xmenu msmenu">${opts.map((o,n)=>
+    `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${CHECK}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 
-V.tax=m=>card(`
-  <div class="grid g2" style="margin:0">
-    <div>
-      <div class="ch"><h2>Параметры расчета</h2></div>
-      <div class="grid g2" style="margin:0;gap:10px">
-        <div class="field"><div class="k">Доход за период, ₽</div><div class="v mono">1 488 700,00</div></div>
-        <div class="field"><div class="k">Расходы, ₽</div><div class="v mono">420 000,00</div></div>
-        <div class="field" style="display:flex;align-items:center"><div style="flex:1"><div class="k">Статус</div><div class="v">ИП (УСН 6%)</div></div><span class="dim">${I.cd}</span></div>
-        <div class="field"><div class="k">Период</div><div class="v">2026, I квартал</div></div>
+V.calc=m=>{
+  const d30=segi('calc-period',1);
+  const cc=['BTC','LTC'][segi('calc-coin',0)];
+  return `<div class="cwrap">
+  <div class="cleft">
+    <div class="ctop">${fsel('calc-coin',['BTC','LTC'],v=>COIN_ICON[v])}<div class="spacer"></div>
+      <button class="btn xs g" data-creset>Сбросить</button></div>
+    <div class="cgrid">
+      ${cfield('Курс '+cc,'3 071 428,57',minisel('calc-cur',['₽','$']))}
+      ${cfield('Хэшрейт, '+m.c.unit,'100')}
+      ${cfield('Комиссия пула, %','0,0')}
+      ${cfield('Потребление, кВт·ч','0,00')}
+      ${cfield('Стоимость, ₽/кВт·ч с НДС','3,57')}
+      <div class="cfield"><span class="k">Налог, %</span>
+        ${fsel('calc-tax',TAXES)}</div>
+    </div>
+  </div>
+  <div class="cright">
+    ${segLine('calc-period',['Доход за 1 день','Доход за 30 дней'],1,'inv fill')}
+    <div class="cres">
+      <b class="mono">≈ ${d30?'0,00048469':'0,00001616'} ${cc}</b>
+      <span class="mono">≈ ${d30?'20,84 $ / 1 488,7 ₽':'0,69 $ / 49,62 ₽'}</span>
+    </div>
+    <button class="btn w" data-modal="connect">Начать добывать</button>
+  </div></div>`;
+};
+
+/* Налоговый калькулятор (макет 6:40886): вкладки монет, слева поля
+   и промежуточные итоги, справа сумма налогов и годовые цифры. */
+const TAX_VALS=m=>m.empty?{inc:'0',rate:'4 647 685,61',kwt:'0',price:'0,00',eq:'0,00',life:'24',
+    mon:'0,00',net:'0,00',year:'0,00',base:'0,00',el:'0,00',am:'0,00',c1:'0,00',c2:'0,00'}
+  :{inc:'0.1',rate:'4 647 685,61',kwt:'140',price:'4',eq:'7 400 000',life:'24',
+    mon:'39 270',net:'249 197',year:'471 241',base:'3 461 604',el:'4 838 400',am:'3 699 996',
+    c1:'39 270',c2:'0,00'};
+V.tax=m=>{
+  const v=TAX_VALS(m), ltc=segi('tax-coin',0)===1;
+  const row=(l,x)=>`<div class="txrow"><span>${l}</span><b>${x} ₽</b></div>`;
+  return `<div class="txtabs">${segLine('tax-coin',
+    [`${COIN_ICON.BTC}BTC`,`${COIN_ICON.LTC}${ltc?'LTC':'+ LTC'}`],0)}</div>
+  <div class="txwrap">
+    <div class="txleft">
+      <div class="txtop">${seg('tax-form',['Физическое лицо и ИП','Юридическое лицо'],0)}
+        <div class="spacer"></div><button class="btn xs g" data-creset>Сбросить</button></div>
+      <div class="txlist">
+        <div class="txgroup"><span class="gk">Доходы</span>
+          <div class="txrowin">${cfield('Доход*',v.inc)}${cfield('Курс на момент вывода, ₽*',v.rate)}</div></div>
+        <div class="txgroup"><span class="gk">Расходы</span>
+          <div class="txrowin">${cfield('Потребление, кВт·ч',v.kwt)}${cfield('Стоимость, ₽/кВт·ч (с НДС)',v.price)}
+            ${cfield('Цена оборудования, ₽ (с НДС)',v.eq)}${cfield('Срок службы оборудования, мес.',v.life)}</div></div>
       </div>
-      <div class="alert warn" style="margin-top:12px">⚠ Расчет предварительный и не является налоговой консультацией</div>
+      <div class="txitems">
+        <div class="txitem"><span>Доход до вычета налогов <i class="tipi" data-tip="Доход по курсу на момент вывода, до удержания налогов">${I.inf}</i></span><b>0.00 ₽</b></div>
+        <div class="txitem"><span>Налоговая база на вывод</span><b>0.00 ₽</b></div>
+        <div class="txitem"><span>Налоговая база на продажу</span><b>0.00 ₽</b></div>
+      </div>
     </div>
-    <div class="hero" style="flex-direction:column;align-items:stretch;min-height:200px">
-      <div class="l">Налог к уплате</div>
-      <div class="v mono" style="font-size:var(--fs-h3);line-height:var(--lh-h3)">64 122,00 ₽</div>
-      <div class="s">Налоговая база: 1 068 700,00 ₽ · ставка 6%</div>
-      <button class="btn w" style="margin-top:auto;justify-content:center" data-toast="Расчёт выгружен в XLSX">${I.dl} Выгрузить расчет</button>
+    <div class="txright">
+      <div class="txchips">
+        <span class="txchip">${COIN_ICON.BTC}≈ ${v.c1} ₽</span>
+        <span class="txchip">${COIN_ICON.LTC}${COIN_ICON.DOGE}≈ ${v.c2} ₽</span>
+      </div>
+      <div class="txinfo">
+        <span class="l">Сумма налогов за 1 мес.</span>
+        <b class="mono">≈ ${v.mon} ₽</b>
+        <span class="n">≈ ${v.net} ₽<i>Доход за вычетом налогов</i></span>
+      </div>
+      <div class="txrows">
+        ${row('Сумма налогов за 1 год',v.year)}
+        ${row('Налогооблагаемая база за 1 год',v.base)}
+        ${row('Электроэнергия за 1 год',v.el)}
+        ${row('Амортизация за 1 год',v.am)}
+      </div>
     </div>
-  </div>`);
+  </div>`;
+};
 
 /* --- Мониторинг --- */
 V.monitor=m=>`

@@ -625,6 +625,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     if (at('[data-rdel]')) { u.rdel = !u.rdel; return bump() }
     if (at('[data-rnote]')) { u.rnote = true; return bump() }
+    /* «Сбросить» в калькуляторах возвращает поля к состоянию по умолчанию */
+    if (at('[data-creset]')) {
+      for (const k of Object.keys(u.seg)) if (k.startsWith('calc-') || k.startsWith('tax-')) delete u.seg[k]
+      toast('Значения сброшены'); return bump()
+    }
     const c2 = at('[data-coin2]')
     if (c2) { u.coin2 = c2.dataset.coin2!; u.thr = null; pop.current = null; return bump() }
     const tr = at('[data-thr]')
