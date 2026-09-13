@@ -67,7 +67,7 @@ const DEF={coin:'btc',wf:'yes',wnote:'yes',ser:'no',upl:'no',data:'normal',healt
   phone:'no',mail:'yes',tg:'no',cerr:'no',fa:'no',sess:'many',del:'no',vdoc:'no',vacc:'no',verr:'no',saerr:'no',oerr:'no',awal:'some',apay:'btc',aerr:'no',rdata:'ok'};
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false,sfin:false}, mini=false;
 /* U — эфемерное состояние интерфейса (не попадает в URL сценария) */
-let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null,dsel:{},dpm:0,zoom:0,rwarn:false,togs:{},ronly:false};
+let U={seg:{},sort:{},page:{},per:{},sel:new Set(),osel:new Set(),ochk:new Set(),phide:new Set(),nch:{},oval:false,q:'',wfilter:'all',geo:'',wk:null,wtag:new Set(),wgrp:new Set(),ftag:new Set(),fmod:new Set(),fq:'',fapp:null,fback:false,qfocus:false,auth:'login',consent:new Set(),theme:'light',step:0,coin2:'BTC',thr:null,rsel:null,rdel:false,rnote:false,lvl:null,dsel:{},dpm:0,zoom:0,rwarn:false,togs:{},ronly:false,exact:false};
 
 /* ============================================================
    2. ДАННЫЕ
@@ -1416,7 +1416,8 @@ const TOTAL_INC=[['30.04.2026',10,'499 320','0,09','0,08096645','6 561,93','488 
 const totalIncomeTable=m=>`<div class="tw"><table class="tbl"><thead><tr><th>Дата</th>
   <th>Количество аккаунтов</th>
   <th>Хэшрейт, 24 ч <i class="tipi" data-tip="Средний хэшрейт по всем аккаунтам за 24 ч">${I.inf}</i></th>
-  <th class="num">Доход с 1 ${m.c.short}, ${m.bal[0].s}</th><th class="num">Доход, ${m.bal[0].s}</th>
+  <th class="num">Доход с 1 ${m.c.short}, ${m.bal[0].s}</th>
+  <th class="num"><span class="thico paico">${COIN_ICON[m.bal[0].s]}</span> Доход, ${m.bal[0].s}</th>
   <th class="num">Доход, $ <i class="tipi" data-tip="Доход в $ рассчитывается исходя из курса валюты в этот день в 00:00 (UTC)">${I.inf}</i></th>
   <th class="num">Доход, ₽ <i class="tipi" data-tip="Доход в ₽ рассчитывается исходя из курса валюты в этот день в 00:00 (UTC)">${I.inf}</i></th>
   <th></th></tr></thead><tbody>
@@ -1679,8 +1680,12 @@ function refListTable(m){
     <img src="/empty-state.svg" alt="" width="221" height="175">
     <b>Рефералов пока нет</b><p>Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение</p>
     <div class="reflink">${urlRow('',LINKS.ref(49282838))}</div></div>`;
+  const u=m.bal[0].s;
   return `<div class="tw"><table class="tbl"><thead><tr><th>Регистрация</th><th>Рефералы</th><th>Комиссия реферала</th>
-    <th>Хэшрейт, 24 ч</th><th class="num">Доход, ${m.bal[0].s}, 24 ч</th><th class="num">Доход, $, 24 ч</th><th class="num">Доход, ₽, 24 ч</th></tr></thead><tbody>
+    <th>Хэшрейт, 24 ч</th>
+    <th class="num"><span class="thico paico">${COIN_ICON[u]}</span> Доход, ${u}, 24 ч</th>
+    <th class="num"><span class="thico paico">${PAY_ICON['$']}</span> Доход, $, 24 ч</th>
+    <th class="num"><span class="thico paico">${PAY_ICON['₽']}</span> Доход, ₽, 24 ч</th></tr></thead><tbody>
   ${(()=>{const base=S.data==='few'?3:24;
     /* чип «Активные» оставляет только активных рефералов (752:99372) */
     const N=U.ronly?Math.max(1,Math.round(base*0.4)):base;
@@ -1695,14 +1700,14 @@ V.reflist=m=>`${refStats([['Средний хэшрейт за 24 часа',m.em
   ${card(`<div class="ch"><h2>Рефералы (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
   <div class="spacer"></div>${fsel('reflist-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
   <button class="chip d ${U.ronly?'on':''}" data-ronly>Активные</button>${dateInput('rl')}
-  <button class="ib" data-modal="export" data-ex="ref">${I.dl}</button></div>${refListTable(m)}`)}`;
+  <button class="ib" data-modal="export" data-ex="rlist">${I.dl}</button></div>${refListTable(m)}`)}`;
 V.refincome=m=>`${refStats([['Текущий баланс',m.empty?'0':'7 500,56','₽','payouts'],
     ['Доход за 24 часа',m.empty?'0':'3 324,12','₽'],['Доход за 30 дней',m.empty?'0':'45 873,08','₽'],
     ['Доход за все время',m.empty?'0':'9 000 000,99','₽']])}
   ${card(`<div class="ch"><h2>Доход (${m.bal[0].s})</h2><span class="cnt g">${refCount(m)}</span>
   <div class="spacer"></div>${fsel('refinc-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
   ${dayChips('refincome-range')}${dateInput('ri')}
-  <button class="ib" data-modal="export" data-ex="ref">${I.dl}</button></div>
+  <button class="ib" data-modal="export" data-ex="rinc">${I.dl}</button></div>
   ${refIncomeTable(m,m.empty?0:periodN('refincome-range','ri',32))}`)}`;
 V.refpayouts=m=>{
   const N=m.empty?0:periodN('pay-range','pay',S.data==='few'?1:28);
@@ -1713,7 +1718,7 @@ V.refpayouts=m=>{
   ${card(`<div class="ch"><h2>История выплат</h2><span class="cnt g">${refCount(m)}</span>
     <div class="spacer"></div>${N?`${fsel('rpay-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
     ${fsel('pay-type',PAY_TYPES)}${dayChips('pay-range')}${dateInput('rp')}
-    <button class="ib" data-modal="export" data-ex="pay">${I.dl}</button>`:''}</div>
+    <button class="ib" data-modal="export" data-ex="rpay">${I.dl}</button>`:''}</div>
     ${refPayoutsTable(m,N,'refpayouts',type)}`)}`};
 
 /* --- Профиль --- */
@@ -2628,12 +2633,15 @@ const MODALS={
      у «часов работы» добавляется период */
   /* Экспорт истории (37:53026 и 15:17655): у выплат есть «Тип операции» */
   export:{t:'Экспорт истории',size:'xs',acts:false,
-    s:()=>({hours:'часов работы воркеров',inc:'дохода',pay:'выплат'}[U.exk]||'статистики воркеров'),
+    s:()=>({hours:'часов работы воркеров',inc:'дохода',pay:'выплат',
+      rlist:'по рефералам',rinc:'реферального дохода',rpay:'реферальных выплат'}[U.exk]||'статистики воркеров'),
     b:()=>`${xsel('Монета','exc',['BTC','LTC','DOGE','ZEC'],v=>COIN_ICON[v]||'',true)}
-      ${U.exk==='pay'?xsel('Тип операции','ext',PAY_TYPES):''}
+      ${U.exk==='pay'||U.exk==='rpay'?xsel('Тип операции','ext',PAY_TYPES):''}
       ${U.exk==='hours'?xsel('Период','exp',['Май','Апрель','Март'])
-        :xsel('Период','exp',['Весь период','7 д','30 д','90 д'])}
-      ${xsel('Формат выгрузки','exf',['XLS','CSV'])}`,
+        :xsel(U.exk==='rlist'?'Дата регистрации':'Период','exp',['Весь период','7 д','30 д','90 д'])}
+      ${xsel('Формат выгрузки','exf',['XLS','CSV'])}
+      ${U.exk==='rlist'?`<div class="exsw"><span class="tog ${U.exact?'on':''}" data-exact></span>
+        <span>Только активных</span></div>`:''}`,
     foot:()=>`<button class="btn" data-close data-toast="Файл готовится — пришлём ссылку на почту">Скачать</button>
       <button class="btn out" data-close>Отменить</button>`},
   /* Вывод средств (226:124696): три шага, ошибки растят окно до 580 */

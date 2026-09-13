@@ -17,7 +17,7 @@ const freshUi = (): Ui => ({
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
   grp: null, tg: null, gsel: new Set(), tsel: new Set(), ted: null, tname: '', tdesc: '', tcol: '#ef4444', tbase: '', wov: null, selq: '',
-  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false, lvl: null, dsel: {}, dpm: 0, zoom: 0, rwarn: false, togs: {}, ronly: false,
+  qfocus: false, auth: 'login', consent: new Set(), arch: false, sub: '', theme: 'light', step: 0, coin2: 'BTC', thr: null, rsel: null, rdel: false, rnote: false, lvl: null, dsel: {}, dpm: 0, zoom: 0, rwarn: false, togs: {}, ronly: false, exact: false,
 })
 
 /** Свои сценарии живут в localStorage отдельно от текущего состояния. */
@@ -627,6 +627,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (zm) { u.zoom = Math.max(0, Math.min(3, (u.zoom || 0) + Number(zm.dataset.zoom))); return bump() }
     if (at('[data-rwarn]')) { u.rwarn = true; return bump() }
     if (at('[data-ronly]')) { u.ronly = !u.ronly; return bump() }
+    if (at('[data-exact]')) { u.exact = !u.exact; return bump() }
     /* Календарь: стрелки листают месяц, клики набирают диапазон */
     const dm = at('[data-dpm]')
     if (dm) { u.dpm = (u.dpm || 0) + Number(dm.dataset.dpm); return bump() }

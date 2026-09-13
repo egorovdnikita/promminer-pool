@@ -2082,3 +2082,5 @@ button.scsect:hover{color:var(--accent)}
 .rstat2 .v i{font-style:normal;font-weight:600}
 .rstat2 .iarr{margin-left:auto;color:inherit}
 .rstat2 .iarr svg{width:24px;height:24px}
+/* Переключатель «Только активных» в экспорте списка рефералов (514:123737) */
+.exsw{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:500}

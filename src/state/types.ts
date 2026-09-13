@@ -130,6 +130,8 @@ export interface Ui {
   togs: Record<string, boolean>
   /** чип «Активные» в списке рефералов */
   ronly: boolean
+  /** «Только активных» в экспорте списка рефералов */
+  exact: boolean
 }
 
 export interface AppSnapshot {
