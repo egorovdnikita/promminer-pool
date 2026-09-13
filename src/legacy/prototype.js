@@ -2058,16 +2058,14 @@ const MODALS={
         <span class="fnm"><b>fns_devices_template_2026-05-21_0</b><i>${st==='big'?'10.2 Мб':'53.0 КБ'}</i></span>
         <div class="spacer"></div><button class="btn link del" data-axis="upl" data-val="no">Удалить</button></div>`:''}
       ${err?`<p class="ferr">${err}</p>`:''}
-      <p class="note">Допускаются только файлы, созданные на основе актуальной таблицы</p>
+      <p class="mnote">Допускаются только файлы, созданные на основе актуальной таблицы</p>
       <button class="btn link" data-toast="Файл готовится — пришлём ссылку на почту">Экспорт таблицы</button>`},
     foot:()=>{const ok=S.upl==='ok';
       return `<button class="btn out" data-close>Отменить</button>
         <button class="btn ${ok?'':'dis'}" ${ok?'data-close data-toast="Файл загружен — данные обновлены"':'disabled'}>Сохранить</button>`}},
-  gdel:{t:()=>U.gsel.size>1?'Удалить группы?':'Удалить группу?',size:'sm',danger:true,
-    s:()=>U.gsel.size>1
-      ?'Это действие навсегда удалит все данные, связанные с этими группами. Подтвердите, если уверены.'
-      :'Это действие навсегда удалит все данные, связанные с этой группой. Подтвердите, если уверены.',
-    b:()=>'',
+  gdel:{t:()=>U.gsel.size>1?'Удалить группы?':'Удалить группу?',img:'/modal-delete.png',acts:false,
+    b:()=>`<p class="mtext">Это действие навсегда удалит все данные, связанные
+      с ${U.gsel.size>1?'этими группами':'этой группой'}. Подтвердите, если уверены.</p>`,
     foot:()=>`<button class="btn out" data-modal="group">Отменить</button>
       <button class="btn danger" data-tdel="g" data-modal="group">Удалить</button>`},
   /* Шторка фильтров (макет 173:65425): панель 430 у правого края.
@@ -2107,24 +2105,22 @@ const MODALS={
   wtags:{t:'Изменить теги',acts:false,size:'tx',b:()=>taxonBody('t',true),
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn" data-tbind="t">Сохранить</button>`},
-  tdel:{t:()=>U.tsel.size>1?'Удалить теги?':'Удалить тег?',size:'sm',danger:true,
-    s:()=>U.tsel.size>1
-      ?'Это действие навсегда удалит все данные, связанные с этими тегами. Подтвердите, если уверены.'
-      :'Это действие навсегда удалит все данные, связанные с этим тегом. Подтвердите, если уверены.',
-    b:()=>'',
+  tdel:{t:()=>U.tsel.size>1?'Удалить теги?':'Удалить тег?',img:'/modal-delete.png',acts:false,
+    b:()=>`<p class="mtext">Это действие навсегда удалит все данные, связанные
+      с ${U.tsel.size>1?'этими тегами':'этим тегом'}. Подтвердите, если уверены.</p>`,
     foot:()=>`<button class="btn out" data-modal="tagnew">Отменить</button>
       <button class="btn danger" data-tdel="t" data-modal="tagnew">Удалить</button>`},
   /* Удаление воркера (макет 173:65944): только неактивные */
-  wkdel:{t:'Удалить воркер?',size:'sm',danger:true,
-    s:'Если воркер был активен в этом месяце, и вы хотите подать отчёт о майнинге, добавьте модель и серийный номер устройства.',
-    b:()=>'',
+  wkdel:{t:'Удалить воркер?',img:'/modal-delete.png',acts:false,
+    b:()=>`<p class="mtext">Если воркер был активен в этом месяце, и вы хотите подать отчёт
+      о майнинге, добавьте модель и серийный номер устройства.</p>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Воркер успешно удален">Удалить</button>`},
   /* Массовое удаление (макет 173:65944): доступно, только если среди
      выбранных нет «Активен» и «Низкий хэшрейт» */
-  wkdels:{t:'Удалить воркеры?',size:'sm',danger:true,
-    s:'Если вы хотите подать отчёт о майнинге за месяц с активными воркерами, добавьте модели и серийные номера устройств.',
-    b:()=>'',
+  wkdels:{t:'Удалить воркеры?',img:'/modal-delete.png',acts:false,
+    b:()=>`<p class="mtext">Если вы хотите подать отчёт о майнинге за месяц с активными
+      воркерами, добавьте модели и серийные номера устройств.</p>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-selclear data-toast="Воркеры успешно удалены">Удалить</button>`},
   /* Экспорт истории (макет 173:66473): 400 в ширину, поля-селекты,

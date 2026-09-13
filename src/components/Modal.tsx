@@ -27,7 +27,14 @@ export function Modal({ m }: { m: Model }) {
             {title && <h2 className={d.center ? 'c' : ''}>{title}</h2>}
           </div>
         ) : (
-          <div className="mhead"><h2>{title}</h2>{close}</div>
+          // Modal HeaderA из ДС: подзаголовок живёт в шапке под заголовком
+          <div className="mhead">
+            <div className="mtitle">
+              <h2>{title}</h2>
+              {sub && <p className="s">{sub}</p>}
+            </div>
+            {close}
+          </div>
         )}
         {/* Пока открыто меню контакта, тело не прокручивается: иначе
             выпадающий список обрезается краем прокручиваемой области. */}
@@ -37,7 +44,8 @@ export function Modal({ m }: { m: Model }) {
               {Array.from({ length: steps }, (_, i) => <i className={i <= step ? 'on' : ''} key={i} />)}
             </div>
           )}
-          {sub && <p className="s">{sub}</p>}
+          {/* у модалок с иллюстрацией подпись остаётся в теле — так в макете */}
+          {sub && d.img && <p className="s">{sub}</p>}
           <Raw html={d.b(m, step)} />
         </div>
         {foot && <div className="mfoot"><Raw html={foot} /></div>}

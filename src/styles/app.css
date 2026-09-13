@@ -533,11 +533,16 @@ img.hex{object-fit:contain}
 .tabs2 button.on{background:var(--surface);color:var(--c1);box-shadow:0 1px 2px #1a1a1a14}
 
 /* modal */
-.mask{position:fixed;inset:0;background:#1a1a1aa3;backdrop-filter:blur(2px);z-index:70;display:grid;place-items:center;padding:24px}
+/* Отступ маски 35 — из заметки в макетах (173:61614): модалка не выше
+   высоты окна минус 35 сверху и 35 снизу */
+.mask{position:fixed;inset:0;background:#1a1a1aa3;backdrop-filter:blur(2px);z-index:70;display:grid;place-items:center;padding:35px}
 /* Modal Base из макета: 550, шапка 80, прокручивается только тело, футер прижат */
 .modal{background:var(--surface);border-radius:var(--r-l);width:100%;max-width:550px;box-shadow:0 24px 70px #1a1a1a3d;
-  max-height:86vh;overflow:hidden;display:flex;flex-direction:column}
-.mhead{display:flex;align-items:center;gap:12px;min-height:40px;padding:24px 24px 16px;flex:0 0 auto}
+  max-height:calc(100vh - 70px);overflow:hidden;display:flex;flex-direction:column}
+/* Шапка ДС: заголовок и под ним подзаголовок, крестик справа сверху */
+.mhead{display:flex;align-items:flex-start;gap:12px;min-height:40px;padding:24px 24px 16px;flex:0 0 auto}
+.mtitle{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.modal .mhead p.s{margin:0}
 /* Полоса прокрутки живёт в зарезервированном жёлобе, поэтому ширина
    контента одинакова и со скроллом, и без него. */
 .mbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:0 calc(24px - var(--sbw)) 0 24px}
@@ -742,6 +747,8 @@ img.hex{object-fit:contain}
 .phonefield:focus-within{background:var(--surface);border-color:var(--border)}
 .phonefield .pre{color:var(--c2);font-weight:600}
 .modal p.s{font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);margin-bottom:18px}
+.mhead h2{align-self:center}
+.mhead:has(.s) h2{align-self:auto}
 .modal .acts{display:flex;gap:8px;margin-top:20px}
 .mstack{display:flex;flex-direction:column;gap:20px}
 /* Assets Items — карточка «ключ сверху, значение снизу» из модалки аккаунта */
@@ -1474,8 +1481,10 @@ button.scsect:hover{color:var(--accent)}
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fileline .fnm i{font-size:var(--fs-c);line-height:var(--lh-c);font-style:normal;color:var(--c2)}
 .ferr{margin-top:8px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--neg)}
-.note{margin-top:24px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500}
-.note + .btn.link{margin-top:2px}
+/* Заметка и ссылка под зоной перетаскивания: 20 от зоны, строки по 18 (173:67092).
+   Класс .note уже занят карточкой уведомления, поэтому здесь .mnote */
+.mnote{margin-top:20px;font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c3);font-weight:500}
+.mnote + .btn.link{margin-top:0;height:18px}
 .mbody .cap.dim{margin-top:16px}
 .mbody .cap.dim .btn.link{height:auto;font-size:var(--fs-s);line-height:var(--lh-s);vertical-align:baseline}
 /* Дизейбл в ДС — та же кнопка с прозрачностью 40 % */
