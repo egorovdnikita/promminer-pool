@@ -1719,7 +1719,10 @@ html{scrollbar-gutter:stable}
 .alert.aver .mut{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
 .alert.aver .lnk.a{align-self:flex-start;padding:0;display:flex;align-items:center;min-height:24px;
   font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--accent)}
-.alert.aver>svg{flex:0 0 auto;width:24px;height:24px;margin:0;color:var(--c3)}
+.alert.aver>.rx{flex:0 0 auto;display:grid;place-items:center;width:24px;height:24px;margin:0;color:var(--c3)}
+/* .alert svg красит значок напрямую — цвет крестику задаём на нём же */
+.alert.aver>.rx svg{width:24px;height:24px;color:var(--c3)}
+.alert.aver>.rx:hover svg{color:var(--c1)}
 .empty.fail b{font-size:var(--fs-h4);line-height:var(--lh-h4)}
 .empty.fail .btn{margin-top:12px}
 /* Поле суммы в модалках вывода и продажи (226:124696) */

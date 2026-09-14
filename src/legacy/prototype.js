@@ -1457,10 +1457,11 @@ V.assets=m=>{
       <td><span class="tog ${togOn('a'+a.s,!m.empty&&(sell?!need:autoOf(i)))?'on':''}" data-tog="a${a.s}"></span></td>
       <td class="num"><button class="btn sm" ${dis?'disabled':''} data-modal="${sell?'sell':'withdraw'}" data-coin="${a.s}">${sell?'Продать':'Вывести'}</button></td></tr>`}).join('');
   return hero+card(`<div class="ch">${seg('assets-tab',canSell()?['Вывести','Продать']:['Вывести'],0)}</div>
-    ${sell&&need?`<div class="alert aver"><div><b>Для продажи цифровой валюты</b>
+    ${sell&&need&&!U.awarn?`<div class="alert aver"><div><b>Для продажи цифровой валюты</b>
       <span class="mut">Добавьте ФИО/Наименование организации и загрузите выписку из реестра
         майнеров в разделе</span>
-      <button class="lnk a" data-go="verification">Верификация</button></div>${I.inf}</div>`:''}
+      <button class="lnk a" data-go="verification">Верификация</button></div>
+      <button class="rx" data-awarn>${I.xo}</button></div>`:''}
     <div class="tw"><table class="tbl atbl"><thead>${head}</thead><tbody>${rows}</tbody></table></div>`)};
 
 /* Курс монеты к рублю в модалке продажи (242:57978) */
@@ -1996,7 +1997,7 @@ ${card(`<div class="ch"><h2>Настройка реферальных выпла
   ${U.rwarn||S.refrub==='hide'?'':`<div class="alert info rinfo2"><div><b>Если хотите выводить в рублях</b><br>
     <span class="mut">Заполните форму, как Юридическое лицо или Индивидуальный предприниматель в разделе
       <button class="lnk a" data-go="verification">Верификация и реквизиты</button></span></div>
-    <button class="rx spacer" data-rwarn>${I.x}</button></div>`}
+    <button class="rx spacer" data-rwarn>${I.xo}</button></div>`}
   <div class="tw"><table class="tbl atbl"><thead><tr><th>Монеты</th><th>Баланс</th>
     <th><span class="thico paico">${PAY_ICON['$']}</span> Баланс, $</th>
     <th><span class="thico paico">${PAY_ICON['₽']}</span> Баланс, ₽</th>
