@@ -7,6 +7,11 @@
  */
 import { ICONS } from './icons.js';
 
+/* Базовый путь сайта. Vite подставляет префикс только в пути из HTML и CSS,
+   а у движка картинки записаны строками — им нужен свой. При раздаче
+   с корня домена это «/», на GitHub Pages — «/promminer-pool/». */
+const A=(typeof import.meta!=='undefined'&&import.meta.env&&import.meta.env.BASE_URL)||'/';
+
 /* ============================================================
    1. СЦЕНАРИИ — правится только здесь
    ============================================================ */
@@ -558,7 +563,7 @@ const BANKS={
 };
 /* Логотип мессенджера Max — не иконка дизайн-системы: в макете это собственный
    градиентный знак (185:105632), выгружен картинкой в public/max.png */
-const MAX_LOGO='<img src="/max.png" alt="" width="24" height="24">';
+const MAX_LOGO=`<img src="${A}max.png" alt="" width="24" height="24">`;
 /* Блок «Связаться с нами» на главной (макет 185:105625).
    Ключ иконки, а не сама иконка: icons.js перекрывает I уже после этого модуля */
 /* Адреса пула по монетам (макет подключения 173:60724) — одни и те же
@@ -626,16 +631,16 @@ const skeleton=()=>`<div class="grid cols2" style="grid-template-columns:1.9fr 1
 const RO=()=>S.role==='observer'?'disabled':'';
 const card=(inner,cls='')=>`<section class="card ${cls}">${inner}</section>`;
 /* Пустая таблица — иллюстрация «not found» из макета (1018:112400) */
-const emptyBox=(t,p,act='')=>`<div class="empty"><img src="/empty-state.svg" alt="" width="221" height="175">
+const emptyBox=(t,p,act='')=>`<div class="empty"><img src="${A}empty-state.svg" alt="" width="221" height="175">
   <b>${t}</b><p>${p}</p>${act}</div>`;
 /* Экран не загрузился (223:33637): заголовок 24, подпись 16 и «Обновить» */
 /* Ось «Ошибка сети» на значении «В таблице»: вместо строк — сообщение
    о сбое с кнопкой повтора. Общая для всех таблиц прототипа. */
-const tblFail=()=>`<div class="empty fail"><img src="/empty-state.svg" alt="" width="221" height="175">
+const tblFail=()=>`<div class="empty fail"><img src="${A}empty-state.svg" alt="" width="221" height="175">
   <b>Не удалось загрузить данные</b><p>Сервер не ответил на запрос. Попробуйте ещё раз</p>
   <button class="btn out" data-toast="Повторяем запрос">Повторить</button></div>`;
 const netFail=()=>S.neterr==='tbl';
-const loadFail=()=>`<div class="empty fail"><img src="/empty-state.svg" alt="" width="221" height="175">
+const loadFail=()=>`<div class="empty fail"><img src="${A}empty-state.svg" alt="" width="221" height="175">
   <b>Не загрузилось</b><p>Попробуйте обновить</p>
   <button class="btn" data-axis="load" data-val="no">Обновить</button></div>`;
 /* Сегментированный контрол — кликабельный, состояние в U.seg[id] */
@@ -849,7 +854,7 @@ ${obs?'':`${card(refBlock(m),'tblcard')}
   ${card(`<div class="ch"><h2>Связаться с нами</h2></div>
     ${HOME_CONTACTS.map(([ic,k,v,u])=>`<a class="linkrow" href="${u}" target="_blank" rel="noopener">
       <span class="lico">${ic==='max'?MAX_LOGO:I[ic]}</span>${k}<span class="spacer mut">${v} ${I.ext}</span></a>`).join('')}`)}
-  <section class="promo plain"><img class="art" src="/promo-sell.png" alt="">
+  <section class="promo plain"><img class="art" src="${A}promo-sell.png" alt="">
     <h2>Снизили порог<br>для продажи ЦВ<br>до 10 000 ₽</h2>
     <button class="btn" data-go="assets">Продать</button></section>
 </div>`}</div>`;
@@ -947,7 +952,7 @@ function refBlock(m){
   <div class="refrow">
     <div class="refmain">
       ${e?'<div class="hex none">0%</div>'
-        :`<img class="hex" src="/tier-${t.k}.png" alt="${t.p}" width="152" height="152">`}
+        :`<img class="hex" src="${A}tier-${t.k}.png" alt="${t.p}" width="152" height="152">`}
       <div class="refinfo">
         <div class="refstats">
           <div class="rstrow">${st('Ваша комиссия',e?'0%':`${t.p} (${t.n})`)}
@@ -972,7 +977,7 @@ function refBlock(m){
 const tierTrack=m=>`<div class="rprog track">
   <div class="rbar"><i style="width:${m.empty?0:refFill()}%"></i>
     <div class="rstars">${TIERS.map((t,i)=>
-      `<img src="/tier-${t.k}-s.png" alt="">`).join('')}</div></div>
+      `<img src="${A}tier-${t.k}-s.png" alt="">`).join('')}</div></div>
   <div class="rpct">${TIERS.map(t=>`<span>${t.p}</span>`).join('')}</div></div>`;
 
 /* --- Воркеры --- */
@@ -1068,7 +1073,7 @@ const VENDORS=[[/avalon/i,'canaan'],[/whatsminer|^M\d/i,'whatsminer'],[/ice\s?ri
   [/antminer|^S\d|^L\d/i,'bitmain']];
 const vendorOf=model=>(VENDORS.find(([re])=>re.test(String(model)))||[0,'bitmain'])[1];
 const vendorName=k=>VENDOR_NAMES[k]||'';
-const vlogo=k=>`<span class="vlogo"><img src="/logo-${k}.svg" alt="" width="24" height="24"></span>`;
+const vlogo=k=>`<span class="vlogo"><img src="${A}logo-${k}.svg" alt="" width="24" height="24"></span>`;
 /* Сколько фильтров применено — счётчик на кнопке «Фильтры» (612:100188) */
 const fcount=()=>U.fapp?U.fapp.t.length+U.fapp.m.length:0;
 /* Время последней шары: отсчитываем назад от 9 апреля, 07:32 */
@@ -1377,7 +1382,7 @@ V.worker=m=>{
             return `<div class="wdev ${i===EVENTS.length-1?'last':''}">
               <span class="wdmark" style="background:${ec}29"><i style="background:${ec}"></i></span>
               <b>${el}</b><span class="wdtime">${t}</span></div>`}).join('')}</div>`}`,'wdevcard')}
-      <section class="promo pbox"><img class="art" src="/promo-prombox.png" alt="">
+      <section class="promo pbox"><img class="art" src="${A}promo-prombox.png" alt="">
         <b>PromBox</b><p>Расширенная статистика<br>по устройствам</p>
         <button class="btn w" data-toast="Откроем страницу PromBox">Узнать больше</button></section>
     </div>
@@ -1889,7 +1894,7 @@ ${card(`<div class="monhero">
   <p>Раздел личного кабинета, где вы в реальном времени отслеживаете состояние оборудования
     и доходность. Все ключевые данные собраны в одном месте, без сложных настроек</p>
   <button class="btn" data-toast="Заявка отправлена — мы свяжемся с вами">Получить предложение</button>
-  <img class="monart" src="/monitoring-hero.webp" alt="" width="2000" height="656">
+  <img class="monart" src="${A}monitoring-hero.webp" alt="" width="2000" height="656">
 </div>`)}
 ${card(MON_SECS.map(([t,xs],i)=>`${i?'<div class="hr"></div>':''}
   <div class="monsec"><h3>${t}</h3>
@@ -1956,7 +1961,7 @@ V.ref=m=>{
   <div class="rcard rlvcard">
     <div class="rlvtop">
       ${m.empty?'<span class="rhex off">0%</span>'
-        :`<span class="rhex"><img src="/tier-${TIERS[+S.tier].k}.png" alt=""></span>`}
+        :`<span class="rhex"><img src="${A}tier-${TIERS[+S.tier].k}.png" alt=""></span>`}
       <div class="rlvinfo">
         <div class="rlvrow"><div class="rlvk"><span class="k">Ваша комиссия</span>
           <b>${m.empty?'0%':m.tier.p}</b></div>${refCoinSel(m,'refcoin')}</div>
@@ -1969,7 +1974,7 @@ V.ref=m=>{
         <span class="rnext">До первого уровня: <b>${refNext(m)}</b></span>
         <div class="rbar"><i style="width:${m.empty?0:TIERS[+S.tier].f}%"></i>
           <div class="rstars">${TIERS.map((t,i)=>
-            `<img src="/tier-${t.k}-s.png" alt="">`).join('')}</div></div>
+            `<img src="${A}tier-${t.k}-s.png" alt="">`).join('')}</div></div>
         <div class="rpct">${TIERS.map(t=>`<span>${t.p}</span>`).join('')}</div>
       </div>
       <button class="lnk a" data-modal="levels">Все об уровнях${I.cv}</button>
@@ -1988,9 +1993,9 @@ V.ref=m=>{
       <div class="rlinp"><span>${refUrl()}</span>
         <button class="lnk" data-copy="${refUrl()}">${I.cp}</button></div>
     </div>
-    ${S.refban==='hide'?'':`<div class="rbanner"><img class="sh" src="/ref-banner-shape.svg" alt="">
+    ${S.refban==='hide'?'':`<div class="rbanner"><img class="sh" src="${A}ref-banner-shape.svg" alt="">
       <p>Начните формировать свой<br>пассивный доход, став партнером<br>Promminer уже сегодня</p>
-      <img class="coin" src="/ref-coin.png" alt="">
+      <img class="coin" src="${A}ref-coin.png" alt="">
     </div>`}
   </div></div>
 ${card(`<div class="ch"><h2>Настройка реферальных выплат</h2></div>
@@ -2067,7 +2072,7 @@ const refActive=m=>{const a=refAll(m);
 function refListTable(m){
   if(netFail()) return tblFail();
   if(!refAll(m)) return `<div class="empty">
-    <img src="/empty-state.svg" alt="" width="221" height="175">
+    <img src="${A}empty-state.svg" alt="" width="221" height="175">
     <b>Рефералов пока нет</b><p>Поделитесь реферальной ссылкой, чтобы начать получать вознаграждение</p>
     <div class="reflink">${urlRow('',refUrl())}</div></div>`;
   const u=m.bal[0].s;
@@ -2287,8 +2292,8 @@ function obsTile(o,i){
   </div>`;
 }
 /* Промо-баннеры внизу сводки — оба есть в макете */
-const PROMOS=[['Снизили порог для<br>продажи ЦВ до 10 000 ₽','Продать','/banner-sell.png','assets'],
-              ['Начните формировать свой<br>пассивный доход, став<br>партнером Promminer','Узнать больше','/banner-referral.png','ref']];
+const PROMOS=[['Снизили порог для<br>продажи ЦВ до 10 000 ₽','Продать',A+'banner-sell.png','assets'],
+              ['Начните формировать свой<br>пассивный доход, став<br>партнером Promminer','Узнать больше',A+'banner-referral.png','ref']];
 V.profile=m=>{
   const acct=S.acct==='main'?'natarusso':'alfred';
   const n=NOTIF_N[S.notif];
@@ -2447,7 +2452,7 @@ V.subaccounts=m=>{
   /* Ось «Лимит суб-аккаунтов»: при исчерпанном лимите кнопка гаснет */
   const limit=S.sublim==='full';
   if(S.name==='no') return card(`<div class="ch subhead"><h2>Центр суб-аккаунтов</h2></div>
-    <div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
+    <div class="subempty"><img src="${A}empty-subaccounts.png" alt="" width="210" height="167">
       <p>Чтобы начать добывать цифровую валюту<br>необходимо добавить имя аккаунта</p>
       <button class="btn" data-modal="subacct">Добавить имя аккаунта</button></div>`,'tblcard');
   /* колонки: 0 имя, 1 баланс, 2–5 воркеры, 6–8 хэшрейт, 9–12 доход */
@@ -2500,14 +2505,14 @@ V.observers=m=>{
     ? o.changed.slice(6,10)+o.changed.slice(3,5)+o.changed.slice(0,2)+o.changed.slice(11)
     : (o.term==='Бессрочно'?'9999':o.term.replace(/\D/g,'')));
   if(S.name==='no') return card(`<div class="ch subhead"><h2>Мои наблюдатели</h2></div>
-    <div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
+    <div class="subempty"><img src="${A}empty-subaccounts.png" alt="" width="210" height="167">
       <p>Чтобы начать добывать цифровую валюту<br>необходимо добавить имя аккаунта</p>
       <button class="btn" data-modal="subacct">Добавить имя аккаунта</button></div>`,'tblcard');
   if(!rows.length) return card(`${head}
     <div class="tw"><table class="tbl obstbl"><thead><tr>
       <th class="cbc">${cb(false)}</th>${cols.map(c=>`<th>${c}</th>`).join('')}<th></th>
     </tr></thead></table></div>
-    <div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
+    <div class="subempty"><img src="${A}empty-subaccounts.png" alt="" width="210" height="167">
       <b>Наблюдателей пока нет</b>
       <p>У вас еще нет созданных ссылок<br>наблюдателей</p></div>`,'tblcard');
   return card(`${head}
@@ -2620,7 +2625,7 @@ V.notifsettings=m=>{
       `<button class="${segi('nfilter')===i?'on':''}" data-seg="nfilter" data-i="${i}">${o}${segi('nfilter')===i?`<span class="ck">${I.okc}</span>`:''}</button>`).join('')}</div>`:''}</span>`:''}
   <button class="btn g" data-go="notifconfig">${I.tune} Настройка</button></div>
   ${rows.length?`<div class="tw"><table class="tbl notbl"><tbody>${rows.map(noteRow).join('')}</tbody></table></div>`
-    :`<div class="subempty"><img src="/empty-subaccounts.png" alt="" width="210" height="167">
+    :`<div class="subempty"><img src="${A}empty-subaccounts.png" alt="" width="210" height="167">
         <b>${n?'Ничего не найдено':'Уведомлений пока не было'}</b>
         <p>${n?'В этом фильтре уведомлений нет — попробуйте другой'
              :'Как только у вас появятся уведомления,<br>вы увидите их здесь'}</p></div>`}
@@ -2794,11 +2799,11 @@ function contactModals(){
           <a class="lnk" style="color:var(--accent)" href="${LINKS.tgBot}" target="_blank" rel="noopener">${v?'перейдите в бота':'подключите бота'}</a>
           ${v?'и измените свой аккаунт ниже':'и добавьте свой аккаунт ниже'}</p>
         <div class="cfield">${c.field(v,!!cerrText(k))}${err()}</div></div>`;
-      out.tgadd={t:c.add,img:'/modal-tg.png',acts:false,b:()=>body(''),
+      out.tgadd={t:c.add,img:A+'modal-tg.png',acts:false,b:()=>body(''),
         foot:()=>foot('Отменить','Сохранить',`data-close data-axis="tg" data-val="yes" data-toast="${c.okAdd}"`)};
-      out.tgedit={t:c.edit,img:'/modal-tg.png',acts:false,b:()=>body(c.val),
+      out.tgedit={t:c.edit,img:A+'modal-tg.png',acts:false,b:()=>body(c.val),
         foot:()=>foot('Отменить','Сохранить',`data-close data-axis="tg" data-val="yes" data-toast="${c.okEdit}"`)};
-      out.tgunlink={t:c.ask,img:'/modal-delete.png',size:'sm',acts:false,
+      out.tgunlink={t:c.ask,img:A+'modal-delete.png',size:'sm',acts:false,
         b:()=>`<div class="mstack"><p class="mtext">${c.askText}</p></div>`,
         foot:()=>`<button class="btn out" data-close>Отменить</button>
           <button class="btn danger" data-close data-axis="tg" data-val="no" data-toast="${c.okDel}">Отвязать</button>`};
@@ -2819,7 +2824,7 @@ function contactModals(){
     out[k+'add']=four(c.add,c.okAdd,'Добавить');
     out[k+'edit']=four(c.edit,c.okEdit,'Изменить');
     /* Отвязка: красное подтверждение и три шага */
-    out[k+'unlink']={t:c.ask,img:'/modal-delete.png',size:'sm',acts:false,
+    out[k+'unlink']={t:c.ask,img:A+'modal-delete.png',size:'sm',acts:false,
       b:()=>`<div class="mstack"><p class="mtext">${c.askText}</p></div>`,
       foot:()=>`<button class="btn out" data-close>Отменить</button>
         <button class="btn danger" data-modal="${k}code">Отвязать</button>`};
@@ -2864,19 +2869,19 @@ const MODALS={
       <button class="btn" data-close data-toast="Настройки сохранены">Сохранить</button>`},
 
   /* Подтверждение выхода (макет 1037:55175): баннер, заголовок по центру, две кнопки */
-  logout:{t:'Вы действительно хотите выйти?',img:'/modal-logout.png',center:true,acts:false,b:()=>'',
+  logout:{t:'Вы действительно хотите выйти?',img:A+'modal-logout.png',center:true,acts:false,b:()=>'',
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-go="auth" data-close>Выйти</button>`},
 
   /* Удаление ссылки наблюдателя (макет 1444:163287) */
-  obsdel:{t:'Удалить ссылку наблюдателя?',img:'/modal-delete.png',acts:false,
+  obsdel:{t:'Удалить ссылку наблюдателя?',img:A+'modal-delete.png',acts:false,
     b:m=>`<div class="mstack"><p class="mtext">Ссылка «${obsCur(m).label}» будет удалена,
       и пользователи потеряют доступ к данным вашего аккаунта</p></div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Ссылка наблюдателя удалена">Удалить</button>`},
 
   /* Карточка уведомления (макет 531:69489): баннер, дата-чип, заголовок и текст */
-  noteinfo:{t:'',img:'/modal-notify.png',acts:false,
+  noteinfo:{t:'',img:A+'modal-notify.png',acts:false,
     b:()=>{const n=NOTES[U.note??0]||NOTES[0];
       return `<div class="mstack" style="gap:20px;padding:16px 0 0">
         <span class="datechip">${I.clock}${n[2]}</span>
@@ -2886,7 +2891,7 @@ const MODALS={
 
   /* QR-код ссылки наблюдателя (макет 1445:172568) */
   qr:{t:'Отсканируйте QR-код или скачайте',acts:false,
-    b:m=>`<div class="mstack" style="align-items:center"><p class="mtext mut">${obsCur(m).label}</p><img class="qrbox" src="/qr-watcher.png" alt="QR-код ссылки наблюдателя" width="290" height="290"></div>`,
+    b:m=>`<div class="mstack" style="align-items:center"><p class="mtext mut">${obsCur(m).label}</p><img class="qrbox" src="${A}qr-watcher.png" alt="QR-код ссылки наблюдателя" width="290" height="290"></div>`,
     foot:m=>{const url=LINKS.watcher(obsCur(m).token);
       return `<button class="btn out" data-copy="${url}">${I.cp} Ссылка на наблюдателя</button>
         <button class="btn" data-toast="QR-код скачан">${I.dl} Скачать QR-код</button>`}},
@@ -2992,7 +2997,7 @@ const MODALS={
     foot:()=>{const ok=S.upl==='ok';
       return `<button class="btn out" data-close>Отменить</button>
         <button class="btn ${ok?'':'dis'}" ${ok?'data-close data-toast="Файл загружен — данные обновлены"':'disabled'}>Сохранить</button>`}},
-  gdel:{t:()=>U.gsel.size>1?'Удалить группы?':'Удалить группу?',img:'/modal-delete.png',acts:false,
+  gdel:{t:()=>U.gsel.size>1?'Удалить группы?':'Удалить группу?',img:A+'modal-delete.png',acts:false,
     b:()=>`<p class="mtext">Это действие навсегда удалит все данные, связанные
       с ${U.gsel.size>1?'этими группами':'этой группой'}. Подтвердите, если уверены.</p>`,
     foot:()=>`<button class="btn out" data-modal="group">Отменить</button>
@@ -3034,20 +3039,20 @@ const MODALS={
   wtags:{t:'Изменить теги',acts:false,size:'tx',b:()=>taxonBody('t',true),
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn" data-tbind="t">Сохранить</button>`},
-  tdel:{t:()=>U.tsel.size>1?'Удалить теги?':'Удалить тег?',img:'/modal-delete.png',acts:false,
+  tdel:{t:()=>U.tsel.size>1?'Удалить теги?':'Удалить тег?',img:A+'modal-delete.png',acts:false,
     b:()=>`<p class="mtext">Это действие навсегда удалит все данные, связанные
       с ${U.tsel.size>1?'этими тегами':'этим тегом'}. Подтвердите, если уверены.</p>`,
     foot:()=>`<button class="btn out" data-modal="tagnew">Отменить</button>
       <button class="btn danger" data-tdel="t" data-modal="tagnew">Удалить</button>`},
   /* Удаление воркера (макет 173:65944): только неактивные */
-  wkdel:{t:'Удалить воркер?',img:'/modal-delete.png',acts:false,
+  wkdel:{t:'Удалить воркер?',img:A+'modal-delete.png',acts:false,
     b:()=>`<p class="mtext">Если воркер был активен в этом месяце, и вы хотите подать отчёт
       о майнинге, добавьте модель и серийный номер устройства.</p>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Воркер успешно удален">Удалить</button>`},
   /* Массовое удаление (макет 173:65944): доступно, только если среди
      выбранных нет «Активен» и «Низкий хэшрейт» */
-  wkdels:{t:'Удалить воркеры?',img:'/modal-delete.png',acts:false,
+  wkdels:{t:'Удалить воркеры?',img:A+'modal-delete.png',acts:false,
     b:()=>`<p class="mtext">Если вы хотите подать отчёт о майнинге за месяц с активными
       воркерами, добавьте модели и серийные номера устройств.</p>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
@@ -3145,7 +3150,7 @@ const MODALS={
     b:m=>`<div class="lv">
       <div class="lvblock">
         <div class="lvhero">
-          <img src="/levels-hero.png" alt="">
+          <img src="${A}levels-hero.png" alt="">
           <button class="lvx" data-close>${I.x}</button>
         </div>
         <div class="lvtop">
@@ -3156,7 +3161,7 @@ const MODALS={
       </div>
       <div class="lvlist">${TIERS.map((t,i)=>`<div class="lvitem ${U.lvl===i?'on':''}">
         <button class="lvhead" data-lvl="${i}">
-          <img src="/tier-${t.k}-s.png" alt="" width="40" height="40">
+          <img src="${A}tier-${t.k}-s.png" alt="" width="40" height="40">
           <span class="t"><b>${t.p} (${t.n})</b><i>Хэшрейт рефералов ${TIER_RANGE[S.coin][i]}</i></span>
           ${I.cd}</button>
         ${U.lvl===i?`<ul class="lvperks">${TIER_PERKS[i].map(x=>`<li>${x}</li>`).join('')}</ul>`:''}
@@ -3229,7 +3234,7 @@ const MODALS={
         : `<button class="btn out" data-close>Отменить</button><button class="btn" data-step="1">Добавить</button>`)
       : `<button class="btn" style="flex:1" data-close data-toast="Суб-аккаунт успешно создан">Отлично</button>`},
   /* Архивирование и активация суб-аккаунта (1482:83662) */
-  subarch:{t:'Вы действительно хотите добавить суб-аккаунт в архив?',img:'/modal-archive.png',acts:false,
+  subarch:{t:'Вы действительно хотите добавить суб-аккаунт в архив?',img:A+'modal-archive.png',acts:false,
     b:()=>`<div class="mstack"><p class="mtext">Вы можете отобразить его, нажав «Показать аккаунты в архиве»</p></div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Суб-аккаунт добавлен в архив">Архивировать</button>`},
@@ -3277,7 +3282,7 @@ Object.assign(MODALS,{
     b:(m,step)=>step===0?`<div class="cstep g32">${prog(0,3)}
         <div class="gacont">
           <b class="ctitle">Отсканируйте QR-код</b>
-          <img class="qrbox" src="/qr-watcher.png" alt="QR-код для Google Authenticator" width="290" height="290">
+          <img class="qrbox" src="${A}qr-watcher.png" alt="QR-код для Google Authenticator" width="290" height="290">
           <div class="gacode">
             <div class="gakey"><span class="tx"><i>Код для ручного ввода</i><b class="mono">MAU4958DJOS9SW8JX</b></span>
               <button class="lnk spacer" style="color:var(--accent)" data-copy="MAU4958DJOS9SW8JX">${I.cp}</button></div>
@@ -3326,17 +3331,17 @@ Object.assign(MODALS,{
         ${sessGroup('НЕ Активные',off,1)}
       </div>`},
     foot:()=>`<button class="btn out" data-close>Закрыть</button>`},
-  sessend:{t:'Завершить эту сессию?',img:'/modal-delete.png',acts:false,
+  sessend:{t:'Завершить эту сессию?',img:A+'modal-delete.png',acts:false,
     b:()=>`<div class="mstack"><p class="mtext">${U.sess||'Устройство'} выйдет из аккаунта —
       чтобы вернуться, понадобится войти заново</p></div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Сессия завершена">Завершить</button>`},
-  sessall:{t:'Вы точно хотите завершить все сессии?',img:'/modal-delete.png',acts:false,
+  sessall:{t:'Вы точно хотите завершить все сессии?',img:A+'modal-delete.png',acts:false,
     b:()=>`<div class="mstack"><p class="mtext">Все устройства, кроме текущего, выйдут из аккаунта</p></div>`,
     foot:()=>`<button class="btn out" data-close>Отменить</button>
       <button class="btn danger" data-close data-toast="Все сессии завершены">Завершить</button>`},
   /* Удаление аккаунта (1008:52491) */
-  acctdel:{t:'',img:'/modal-delete.png',acts:false,
+  acctdel:{t:'',img:A+'modal-delete.png',acts:false,
     b:()=>`<div class="mstack" style="padding-top:16px">
       <div class="alert info">${I.inf}<div>Это приведет к безвозвратному удалению данных и всего, что связано с аккаунтом</div></div>
       <h3 class="mh3">Перед удалением необходимо:</h3>
@@ -3423,7 +3428,7 @@ function notifications(){
       <button class="ra ${n?'':'off'}" ${n?'data-readall data-toast="Все уведомления отмечены как прочитанные"':'disabled'}>${I.checkall}Прочитать все</button></div>
     ${n?`<div class="nplist">${list.slice(0,Math.min(n,5)).map(([t,d,dt],i)=>`<div class="nitem" data-note="${i}"><i class="dot"></i>
         <div><div class="nb"><span class="nt">${t}</span><span class="nd">${dt}</span></div><p>${d}</p></div></div>`).join('')}</div>`
-      :`<div class="empty nempty"><img src="/empty-state.svg" alt="" width="120" height="95">
+      :`<div class="empty nempty"><img src="${A}empty-state.svg" alt="" width="120" height="95">
          <b class="dim">Уведомлений пока нет</b></div>`}
     <button class="btn xl" data-go="notifsettings">Посмотреть все</button></div>`;
 }

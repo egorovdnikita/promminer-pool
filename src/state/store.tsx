@@ -7,8 +7,15 @@ import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, groups, tagsOf, apply
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
+/* База сайта: «/» при раздаче с корня, «/promminer-pool/» на GitHub Pages.
+   Роутеру её отдаёт basepath, а здесь она нужна, чтобы вычислить раздел
+   из адреса и обратно. */
+const BASE = import.meta.env.BASE_URL || '/'
 export const pathOf = (route: string) => (route === HOME ? '/' : '/' + route)
-export const routeOf = (pathname: string) => pathname.replace(/^\/+|\/+$/g, '') || HOME
+export const routeOf = (pathname: string) => {
+  const p = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname
+  return p.replace(/^\/+|\/+$/g, '') || HOME
+}
 
 const freshUi = (): Ui => ({
   seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {}, oval: false, obs: 0, sess: '',

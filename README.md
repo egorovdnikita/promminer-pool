@@ -95,7 +95,24 @@ src/
   абсолютно (`/tier-5.png`, `url('/fonts/…')`) прямо в строках движка,
   Vite их не переписывает, поэтому раздача из подпапки их сломает.
 
-Настройки для Vercel лежат в `vercel.json`. Разовая публикация:
+### GitHub Pages
+
+Ничего, кроме самого GitHub, не нужно. В репозитории есть workflow
+`.github/workflows/pages.yml`: на каждый пуш в `main` он собирает проект
+с `BASE_PATH=/promminer-pool/`, кладёт рядом `404.html` (копию
+`index.html` — под фолбэк) и публикует.
+
+Разово включить: **Settings → Pages → Source: GitHub Actions**. Дальше
+пуш в `main` или запуск workflow вручную. Адрес —
+`https://<логин>.github.io/promminer-pool/`.
+
+Подпапка учтена: `vite.config.ts` берёт базу из `BASE_PATH`, роутер
+получает её через `basepath`, а пути к картинкам в движке собираются
+от константы `A` (`import.meta.env.BASE_URL`).
+
+### Vercel
+
+Настройки лежат в `vercel.json`. Разовая публикация:
 
 ```
 vercel login      # один раз, откроет браузер
