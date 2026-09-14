@@ -2165,17 +2165,19 @@ html{scrollbar-gutter:stable}
 .schead h3{flex:1}
 .scbadge{font-size:10px;line-height:16px;font-weight:700;color:var(--accent);
   background:var(--accent-ghost);border-radius:var(--r-f);padding:0 8px;margin-right:4px}
-.scx{color:var(--c3);font-size:16px;width:26px;height:26px;border-radius:var(--r-f);flex:0 0 auto}
+.scx{display:grid;place-items:center;color:var(--c3);font-size:16px;width:26px;height:26px;
+  border-radius:var(--r-f);flex:0 0 auto}
 .scx:last-child{font-size:22px}
 .scx:hover{background:var(--ctrl);color:var(--c1)}
-.scw{width:22px;height:22px;border-radius:var(--r-2xs);color:var(--c3);
-  font-size:10px;line-height:22px;font-weight:700;flex:0 0 auto}
+.scw{display:grid;place-items:center;width:22px;height:22px;border-radius:var(--r-2xs);
+  color:var(--c3);font-size:10px;font-weight:700;flex:0 0 auto}
 .scw:hover{background:var(--ctrl);color:var(--c1)}
 .scw.on{background:var(--accent);color:#fff}
 
 /* вкладки: оси, наборы, переходы */
 .sctabs{display:flex;gap:4px;padding:10px 16px 0}
-.sctabs button{flex:1;height:30px;border-radius:var(--r-2xs);background:var(--bg);
+.sctabs button{flex:1;display:grid;place-items:center;height:30px;padding:0 10px;
+  border-radius:var(--r-2xs);background:var(--bg);
   font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--c2)}
 .sctabs button:hover{background:var(--ctrl)}
 .sctabs button.on{background:var(--inv-bg);color:var(--inv-fg)}
@@ -2210,8 +2212,8 @@ button.scsect:hover{color:var(--accent)}
 .scsect .scqty{color:var(--c3);font-weight:600;letter-spacing:0}
 .scsect .scnum{min-width:18px;height:18px;padding:0 5px;border-radius:var(--r-f);
   background:var(--accent);color:#fff;font-size:10px;line-height:18px;text-align:center;font-weight:700}
-.scmini{width:22px;height:22px;border-radius:var(--r-2xs);background:var(--bg);color:var(--c3);
-  font-size:11px;line-height:22px;flex:0 0 auto}
+.scmini{display:grid;place-items:center;width:22px;height:22px;border-radius:var(--r-2xs);
+  background:var(--bg);color:var(--c3);font-size:11px;flex:0 0 auto}
 .scmini:hover{background:var(--ctrl);color:var(--c1)}
 .scmini:disabled{opacity:.35;cursor:default}
 
@@ -2224,8 +2226,8 @@ button.scsect:hover{color:var(--accent)}
 .scg.dirty>label .scl::after{content:'';display:inline-block;width:6px;height:6px;margin-left:6px;
   border-radius:50%;background:var(--accent);vertical-align:middle}
 .scdesc{margin:0 0 6px;font-size:10px;line-height:14px;color:var(--c3);font-weight:500}
-.scundo,.scpin{width:18px;height:18px;border-radius:var(--r-f);background:var(--ctrl);color:var(--c2);
-  font-size:11px;line-height:18px;flex:0 0 auto}
+.scundo,.scpin{display:grid;place-items:center;width:18px;height:18px;border-radius:var(--r-f);
+  background:var(--ctrl);color:var(--c2);font-size:11px;flex:0 0 auto}
 .scundo:hover,.scpin:hover{background:var(--accent);color:#fff}
 .scpin{background:transparent;color:var(--c3);opacity:.4}
 .scpin:hover{background:transparent;color:var(--warn);opacity:1}
@@ -2246,17 +2248,18 @@ button.scsect:hover{color:var(--accent)}
 .scrow>button:first-child:hover{background:var(--ctrl)}
 .scrow b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .scrow i{display:block;font-style:normal;font-size:10px;line-height:14px;color:var(--c3);font-weight:500}
-.scadd{width:26px;border-radius:var(--r-s);background:var(--bg);color:var(--c2);
-  font-size:15px;font-weight:600;flex:0 0 auto}
+.scadd{display:grid;place-items:center;width:26px;border-radius:var(--r-s);background:var(--bg);
+  color:var(--c2);font-size:15px;font-weight:600;flex:0 0 auto}
 .scadd:hover{background:var(--accent);color:#fff}
-.scdel{width:26px;border-radius:var(--r-s);background:var(--bg);color:var(--c3);font-size:16px;flex:0 0 auto}
+.scdel{display:grid;place-items:center;width:26px;border-radius:var(--r-s);background:var(--bg);
+  color:var(--c3);font-size:16px;flex:0 0 auto}
 .scdel:hover{background:#ef444429;color:var(--neg)}
 .scsave{display:flex;gap:6px;margin-bottom:8px}
 .scsave input{flex:1;min-width:0;height:32px;padding:0 10px;border-radius:var(--r-2xs);
   background:var(--ctrl);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--c1)}
 .scsave input:focus{box-shadow:0 0 0 3px var(--focus)}
-.scsave button{padding:0 12px;border-radius:var(--r-2xs);background:var(--bg);
-  font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;flex:0 0 auto}
+.scsave button{display:grid;place-items:center;padding:0 12px;border-radius:var(--r-2xs);
+  background:var(--bg);font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;flex:0 0 auto}
 .scsave button:hover{background:var(--ctrl)}
 .scsave button:disabled{opacity:.45;cursor:default}
 .scnote{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
