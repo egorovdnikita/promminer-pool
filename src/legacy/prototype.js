@@ -1457,9 +1457,10 @@ V.assets=m=>{
       <td><span class="tog ${togOn('a'+a.s,!m.empty&&(sell?!need:autoOf(i)))?'on':''}" data-tog="a${a.s}"></span></td>
       <td class="num"><button class="btn sm" ${dis?'disabled':''} data-modal="${sell?'sell':'withdraw'}" data-coin="${a.s}">${sell?'Продать':'Вывести'}</button></td></tr>`}).join('');
   return hero+card(`<div class="ch">${seg('assets-tab',canSell()?['Вывести','Продать']:['Вывести'],0)}</div>
-    ${sell&&need?`<div class="alert info aver">${I.inf}<div><b>Для продажи цифровой валюты</b>
-      <span>Добавьте ФИО/Наименование организации и загрузите выписку из реестра майнеров в разделе
-      <button class="lnk" data-go="verification">Верификация</button></span></div></div>`:''}
+    ${sell&&need?`<div class="alert aver"><div><b>Для продажи цифровой валюты</b>
+      <span class="mut">Добавьте ФИО/Наименование организации и загрузите выписку из реестра
+        майнеров в разделе</span>
+      <button class="lnk a" data-go="verification">Верификация</button></div>${I.inf}</div>`:''}
     <div class="tw"><table class="tbl atbl"><thead>${head}</thead><tbody>${rows}</tbody></table></div>`)};
 
 /* Курс монеты к рублю в модалке продажи (242:57978) */

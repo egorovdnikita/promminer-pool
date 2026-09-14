@@ -801,12 +801,17 @@ img.hex{object-fit:contain}
 .mhead:has(.s) h2{align-self:auto}
 .modal .acts{display:flex;gap:8px;margin-top:20px}
 .mstack{display:flex;flex-direction:column;gap:20px}
-/* Assets Items — карточка «ключ сверху, значение снизу» из модалки аккаунта */
+/* Assets Items — карточка «ключ сверху, значение снизу» из модалки аккаунта.
+   Имена .acell и .arow заняты чипами и строками «Моих активов», поэтому
+   карточки модалки описаны только внутри .acells — иначе их подменяли
+   чипы 26 в высоту и модалка разъезжалась. */
 .acells{display:flex;flex-direction:column;gap:8px}
-.arow{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0}
-.acell{background:var(--surface);border-radius:var(--r-l);padding:16px;box-shadow:var(--shadow);min-width:0}
-.acell .k{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
-.acell .v{margin-top:8px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1);
+.acells .arow{display:grid;grid-template-columns:1fr 1fr;gap:8px;min-width:0;align-items:stretch;min-height:0}
+.acells .acell{display:block;height:auto;white-space:normal;
+  background:var(--surface);border-radius:var(--r-l);padding:16px;box-shadow:var(--shadow);min-width:0}
+.acells .acell:hover{background:var(--surface)}
+.acells .acell .k{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c3)}
+.acells .acell .v{margin-top:8px;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wgrid{display:grid;grid-template-columns:repeat(4,1fr);margin-top:8px}
 .wgrid>span{display:flex;flex-direction:column;align-items:center;gap:2px}
@@ -1704,10 +1709,17 @@ html{scrollbar-gutter:stable}
 .athr{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;padding-left:8px}
 .tipi{display:inline-flex;color:var(--c3)}
 .tipi svg{width:16px;height:16px}
-.aver{margin-bottom:12px;align-items:flex-start}
-.aver b{color:#3b82f6}
-.aver span{display:block;color:var(--c2);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500}
-.aver .lnk{color:var(--accent);font-weight:600}
+/* Уведомление в карточке активов — тот же Notification, что и в рефералке:
+   серая подложка #f3f4f6, тёмный заголовок, значок справа, во всю ширину
+   карточки без боковых отступов (1309:380351) */
+.alert.aver{display:flex;align-items:flex-start;gap:8px;margin:0 0 16px;padding:16px;
+  min-height:0;border-radius:var(--r-m);background:var(--bg);color:var(--c1)}
+.alert.aver>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.alert.aver b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
+.alert.aver .mut{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:500;color:var(--c2)}
+.alert.aver .lnk.a{align-self:flex-start;padding:0;display:flex;align-items:center;min-height:24px;
+  font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--accent)}
+.alert.aver>svg{flex:0 0 auto;width:24px;height:24px;margin:0;color:var(--c3)}
 .empty.fail b{font-size:var(--fs-h4);line-height:var(--lh-h4)}
 .empty.fail .btn{margin-top:12px}
 /* Поле суммы в модалках вывода и продажи (226:124696) */
@@ -1753,7 +1765,9 @@ html{scrollbar-gutter:stable}
 /* Карточка активов: паддинг 8, шапка со своим 16, таблица во всю ширину */
 .card:has(.atbl){padding:8px}
 .card:has(.atbl)>.ch{padding:16px;margin:0;min-height:80px}
-.card:has(.atbl) .aver{margin:0 16px 12px}
+/* Уведомление идёт во всю ширину карточки: в макете оно шире заголовка
+   и упирается в паддинг 8 самой карточки (1309:380351) */
+.card:has(.atbl) .aver{margin:0 0 16px}
 .atbl{table-layout:fixed}
 
 /* ============ Доход и Выплаты (макеты 15:19710, 37:56063) ============ */
