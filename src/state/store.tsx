@@ -133,6 +133,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   /* Свёрнутый сайдбар — тоже ось: кнопка в сайдбаре её переключает */
   useEffect(() => { document.body.classList.toggle('mini', S.current.side === 'mini') })
+  /* Пока панель открыта, модалки центруются по свободной части экрана:
+     иначе окно уезжает под панель — она лежит выше маски. */
+  useEffect(() => {
+    const b = document.body
+    b.classList.toggle('scopen', panel.current)
+    b.classList.toggle('scleft', U.current.scside === 'left')
+    b.style.setProperty('--scpad', panel.current ? (U.current.scw || 420) + 'px' : '0px')
+  })
   /* Меню строки таблицы висит фиксированно — ставим его под кнопкой,
      иначе прокрутка таблицы его обрезает, а снятая обрезка ломает вёрстку */
   useEffect(() => {

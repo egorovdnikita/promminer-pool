@@ -2307,3 +2307,10 @@ button.scsect:hover{color:var(--accent)}
 :root[data-outline="on"] .btn,:root[data-outline="on"] .pop{outline:1px dashed #ef444466}
 /* Ось «Скругления»: прямые углы показывают, где они вообще есть */
 :root[data-radius="none"] *{border-radius:0!important}
+
+/* Открытая панель сценариев отжимает модалки в свободную часть экрана —
+   маска лежит ниже панели, и без этого окно уезжало бы под неё */
+body.scopen .mask{padding-right:calc(35px + var(--scpad,0px))}
+body.scopen.scleft .mask{padding-right:35px;padding-left:calc(35px + var(--scpad,0px))}
+body.scopen .mask.sheet{padding:0 var(--scpad,0px) 0 0}
+body.scopen.scleft .mask.sheet{padding:0 0 0 var(--scpad,0px)}

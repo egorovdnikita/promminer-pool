@@ -7,7 +7,9 @@ type Key = keyof Scenario
 const TABS: [NonNullable<ReturnType<() => 'ax' | 'sets' | 'go'>>, string][] = [
   ['ax', 'Оси'], ['sets', 'Наборы'], ['go', 'Переходы'],
 ]
-const WIDTHS = [380, 520, 720]
+/* Ширины панели. Первая — значение по умолчанию из freshUi: иначе ни одна
+   кнопка не подсвечена, пока её не нажали. */
+const WIDTHS = [420, 560, 760]
 
 /** У пяти окон заголовок пустой или считается от строки таблицы — им нужны свои подписи. */
 const MODAL_NAMES: Record<string, string> = {
@@ -110,14 +112,16 @@ export function ScenarioPanel() {
         <div className="schead">
           <h3>Сценарии</h3>
           {changed.length > 0 && <span className="scbadge">{changed.length} из {keys.length}</span>}
-          <button className="scx" data-scside title="Перенести панель на другую сторону">⇄</button>
-          {WIDTHS.map((w) => (
+          {/* В шапке подсказок по наведению нет: они раскрывались вниз
+              и закрывали вкладки. Смысл кнопок несёт их состояние. */}
+          <button className="scx" data-scside aria-label="Перенести панель на другую сторону">⇄</button>
+          {WIDTHS.map((w, i) => (
             <button
               key={w}
               className={`scw ${width === w ? 'on' : ''}`}
               data-scw={w}
-              title={`Ширина ${w}`}
-            >{w === 380 ? 'S' : w === 520 ? 'M' : 'L'}</button>
+              aria-label={`Ширина ${w}`}
+            >{'SML'[i]}</button>
           ))}
           <button className="scx" data-panel aria-label="Закрыть">×</button>
         </div>

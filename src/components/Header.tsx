@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import {
-  I, NOTIF_N, PROF, SUM_ROUTES, TITLES, acctSummary, nf, notifications, permsOf, profTabs, type Model,
+  I, notifCount, PROF, SUM_ROUTES, TITLES, acctSummary, nf, notifications, permsOf, profTabs, type Model,
 } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico, Raw } from './Raw'
@@ -12,7 +12,7 @@ const PROFILE_ROUTES = [...PROF.map(([id]) => id), 'notifconfig']
 
 export function Header({ m }: { m: Model }) {
   const { S, route, pop } = useApp()
-  const n = NOTIF_N[S.notif]
+  const n = notifCount()
   const acct = S.acct === 'main' ? 'natarusso' : 'alfred'
   /* Наблюдателю баланс показываем, только если открыт раздел «Мои активы»,
      а переключатель аккаунта не кликабельный: суб-аккаунты ему недоступны

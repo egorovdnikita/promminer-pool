@@ -16,6 +16,8 @@ export declare const COINS: Record<string, any>
 export declare const HEALTH: Record<string, { a: number; l: number; o: number; f: number }>
 export declare const TIERS: { p: string; n: string; c: string }[]
 export declare const NOTIF_N: Record<string, number>
+/** Сколько уведомлений показывает колокольчик с учётом оси «Типы уведомлений». */
+export declare function notifCount(): number
 export declare const ACCOUNTS: string[]
 export declare function M(): Model
 

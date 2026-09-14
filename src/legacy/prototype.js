@@ -1414,7 +1414,10 @@ const thrOf=a=>S.athr==='none'?'Не задан':S.athr==='edit'?(THR_EDIT[a.s]|
 /* Ось «Продажа ЦВ»: без неё вкладки «Продать» в активах нет вовсе */
 const canSell=()=>S.asell!=='no';
 const assetOf=s=>ASSETS.find(a=>a.s===s)||ASSETS[0];
-const curAsset=()=>assetOf(U.coin2||'BTC');
+/* Ось «Монеты в активах» может убрать монету, выбранную в мастере:
+   тогда откатываемся на первую доступную */
+const curAsset=()=>{const list=assetsOf();
+  return list.find(a=>a.s===(U.coin2||'BTC'))||list[0]};
 
 V.assets=m=>{
   const k=m.empty?0:(m.huge?1e6:1);
@@ -2151,6 +2154,9 @@ const NOTES=[
 /* Ось «Типы уведомлений»: важные — деньги и безопасность, остальные гасим */
 const NOTES_IMP=[0,1,4];
 const notesOf=()=>S.notift==='off'?[]:S.notift==='imp'?NOTES_IMP.map(i=>NOTES[i]):NOTES;
+/* Счётчик колокольчика считается там же, где список: иначе значок обещает
+   двенадцать уведомлений, а в попоувере пусто */
+const notifCount=()=>notesOf().length?NOTIF_N[S.notif]:0;
 /* Разрешения и монеты наблюдателя — списки из макета 2219:32420 */
 const OBS_PERMS=['Воркеры','Мои активы','Начисления','Выплаты','Продажи',
   'Список рефералов','Реферальный доход','Реферальные выплаты'];
@@ -3409,7 +3415,7 @@ Object.assign(MODALS, contactModals());
    внизу кнопка «Посмотреть все» во всю ширину. */
 function notifications(){
   const list=notesOf();
-  const n=Math.min(NOTIF_N[S.notif],list.length?NOTIF_N[S.notif]:0);
+  const n=notifCount();
   return `<div class="pop wide">
     <div class="nhead"><b>Новые уведомления</b>${n?`<span class="cnt">${n>99?'99+':n}</span>`:''}
       <button class="ra ${n?'':'off'}" ${n?'data-readall data-toast="Все уведомления отмечены как прочитанные"':'disabled'}>${I.checkall}Прочитать все</button></div>
@@ -3455,7 +3461,7 @@ export function applyState(next){
   pop = next.pop; modal = next.modal; openGroups = next.openGroups; mini = next.mini;
 }
 export {
-  AXES, AXCAT, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, ACCOUNTS, M,
+  AXES, AXCAT, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, notifCount, ACCOUNTS, M,
   loadFail, nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   SUM_NAV, SUM_ROUTES, SCREEN_NAMES, V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf, coinsOf,
