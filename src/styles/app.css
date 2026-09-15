@@ -25,6 +25,12 @@
   /* семантика */
   /* акцентные подложки берём от #7086fc из ДС, а не от indigo (audit-tokens A2–A4) */
   --accent:var(--indigo-400); --accent-sub:#7086fc1f; --accent-ghost:#7086fc1f;
+  /* Подложка наведения на акцентной кнопке-иконке — тот же цвет 16% */
+  --accent-tint:#7086fc29;
+  /* Наведение и нажатие — следующие шаги шкалы indigo из DS. Ось «Акцентный
+     цвет» подменяет их вместе с --accent (store.tsx): иначе кнопка красится
+     новым цветом, а под курсором снова становится индиговой. */
+  --accent-h:var(--indigo-500); --accent-a:var(--indigo-600);
   --bg:var(--n100); --surface:#fff; --bg3:var(--n200);
   --c1:var(--n900); --c2:var(--n500); --c3:#9ca3af;
   --pos:#22c55e; --warn:#f59e0b; --neg:#ef4444; --neu:#6b7280;
@@ -61,6 +67,8 @@
 /* тёмная тема — переопределения из .dark прод-сборки */
 :root[data-theme="dark"]{
   --accent:var(--indigo-500);
+  /* в тёмной теме акцент уже на шаг темнее, поэтому состояния сдвинуты дальше */
+  --accent-h:var(--indigo-600); --accent-a:#4338ca;
   --bg:var(--n950); --surface:var(--n900); --bg3:var(--n800);
   --c1:var(--n50); --c2:var(--n400); --c3:var(--n500);
   --ctrl:#6b728029; --ctrl2:#6b72801f; --ctrl-hover:#6b72803d;
@@ -149,7 +157,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .top .h3{flex:1;min-width:0}
 .hgroup{display:flex;align-items:center;gap:var(--sp4)}
 .hbtn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 var(--sp5);border:1px solid var(--border);border-radius:var(--r-m);background:transparent;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1);white-space:nowrap;position:relative}
-.hbtn:hover{background:transparent;border-color:#7086fc7a}
+.hbtn:hover{background:transparent;border-color:var(--focus)}
 .hbtn:hover .i3{color:var(--accent)}
 .hbtn.sq{width:48px;padding:0}
 .hbtn.tight{padding:0 var(--sp3);gap:4px}
@@ -420,7 +428,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .tog.off{opacity:.5;pointer-events:none;cursor:default}
 .tog:hover{background:var(--ctrl-hover)}
 .tog::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}
-.tog.on{background:var(--accent)}.tog.on:hover{background:var(--brand)}.tog.on::after{transform:translateX(16px)}
+.tog.on{background:var(--accent)}.tog.on:hover{background:var(--accent-h)}.tog.on::after{transform:translateX(16px)}
 .tog:active{opacity:.8}
 .tog.dis{opacity:.4;pointer-events:none}
 
@@ -437,7 +445,7 @@ body.mini .ni .spacer.lbl{display:none!important}
 .tbl .num{text-align:right}
 .tbl th svg,.tbl td svg{display:inline-block;vertical-align:middle;margin-left:4px}
 /* Tags (💙 DS): высота 32, radius 12, 14/18 SemiBold, заливка цвета с альфой 29. */
-.tag{display:inline-flex;align-items:center;gap:2px;height:28px;padding:0 var(--sp3);border-radius:var(--r-xs);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;background:#7086fc1f;color:var(--accent);white-space:nowrap}
+.tag{display:inline-flex;align-items:center;gap:2px;height:28px;padding:0 var(--sp3);border-radius:var(--r-xs);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;background:var(--accent-sub);color:var(--accent);white-space:nowrap}
 .tag:hover{opacity:.8}
 .tag.y{background:#f59e0b29;color:#f59e0b}
 .tag.g{background:#22c55e29;color:#22c55e}
@@ -685,7 +693,7 @@ img.hex{object-fit:contain}
 /* Код для ручного ввода в подключении 2FA */
 .gacont{display:flex;flex-direction:column;align-items:center;gap:var(--sp4)}
 .gacode{display:flex;flex-direction:column;gap:var(--sp3);width:100%}
-.gakey{display:flex;align-items:center;gap:var(--sp3);padding:var(--sp3) var(--sp4);border-radius:var(--r-m);background:#7086fc1f}
+.gakey{display:flex;align-items:center;gap:var(--sp3);padding:var(--sp3) var(--sp4);border-radius:var(--r-m);background:var(--accent-sub)}
 .gakey .tx{display:flex;flex-direction:column;min-width:0}
 .gakey i{font-style:normal;font-size:var(--fs-c2);line-height:var(--lh-c2);font-weight:500;color:var(--c2)}
 .gakey b{font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
@@ -775,9 +783,9 @@ img.hex{object-fit:contain}
 .mrow .tx{min-width:0;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 .mrow .tx i{display:flex;align-items:center;gap:8px;font-style:normal;font-size:var(--fs-m);line-height:var(--lh-m);color:var(--c3);font-weight:500}
 .mrow .tx b{display:flex;align-items:center;gap:8px;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
-.mrow .act{width:48px;height:48px;border-radius:var(--r-m);background:#7086fc1f;
+.mrow .act{width:48px;height:48px;border-radius:var(--r-m);background:var(--accent-sub);
   color:var(--accent);display:grid;place-items:center;flex:0 0 auto}
-.mrow .act:hover{background:#7086fc29}
+.mrow .act:hover{background:var(--accent-tint)}
 .mrow .act.danger{background:#ef44441f;color:var(--neg)}
 .mrow .act.danger:hover{background:#ef44442e}
 /* Пара действий справа: отвязать и изменить */
@@ -830,14 +838,14 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .afield:focus-within,.inp:focus-within,.phonefield:focus-within,.search:focus-within,
 .selbox:focus-within,.linkfield:focus-within,.marea .box:focus-within{box-shadow:0 0 0 3px var(--focus)}
 .otpc:focus-visible{outline:none;box-shadow:0 0 0 3px var(--focus)}
-.btn:hover{background:var(--indigo-500)}
-.btn:active{background:var(--indigo-600)}
+.btn:hover{background:var(--accent-h)}
+.btn:active{background:var(--accent-a)}
 .btn.g:hover{background:var(--ctrl-hover)}
 .btn.g:active{background:#7373733d}
 .btn.w:hover{background:var(--ctrl2)}
 .btn.w:active{background:var(--ctrl)}
 .btn.link{transition:color .15s}
-.btn.link:hover,.btn.link:active{background:none;color:var(--indigo-500)}
+.btn.link:hover,.btn.link:active{background:none;color:var(--accent-h)}
 .chip:not(.on):hover{background:var(--ctrl);box-shadow:inset 0 0 0 1px var(--ctrl-line)}
 .chip.on:hover{opacity:.8}
 .seg button:not(.on):hover{background:var(--ctrl2)}
@@ -858,7 +866,7 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .cb{width:18px;height:18px;border-radius:var(--r-1xs);border:1px solid var(--ctrl-line);display:inline-grid;place-items:center;background:var(--ctrl);cursor:pointer;color:#fff;flex:0 0 auto}
 .cb:hover{background:var(--ctrl-hover)}
 .cb.on,.cb.ind{background:var(--accent);border-color:transparent}
-.cb.on:hover,.cb.ind:hover{background:var(--brand)}
+.cb.on:hover,.cb.ind:hover{background:var(--accent-h)}
 .cb:active{opacity:.8}
 .cb.err{border-color:var(--neg)}
 .cb.dis{opacity:.4;pointer-events:none}
@@ -868,7 +876,7 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .rd{width:18px;height:18px;border-radius:var(--r-f);border:1px solid var(--ctrl-line);display:inline-grid;place-items:center;background:var(--ctrl);cursor:pointer;flex:0 0 auto}
 .rd:hover{background:var(--ctrl-hover)}
 .rd.on{background:var(--accent);border-color:transparent}
-.rd.on:hover{background:var(--brand)}
+.rd.on:hover{background:var(--accent-h)}
 .rd:active{opacity:.8}
 .rd.dis{opacity:.4;pointer-events:none}
 .rd.on::after{content:"";width:10px;height:10px;border-radius:var(--r-f);background:#fff}
@@ -928,8 +936,8 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .linkfield{display:flex;align-items:center;gap:8px;background:var(--surface);border-radius:var(--r-m);padding:0 var(--sp3);height:48px;font-size:var(--fs-s);color:var(--c2);min-width:0}
 .linkfield span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .badge.sm{height:24px;padding:0 var(--sp3);font-size:var(--fs-c);line-height:var(--lh-c)}
-.badge.acc{height:24px;padding:0 8px;border-radius:var(--r-xs);background:#7086fc1f;
-  border:1px solid #7086fc7a;color:var(--accent);font-size:var(--fs-c);line-height:var(--lh-c)}
+.badge.acc{height:24px;padding:0 8px;border-radius:var(--r-xs);background:var(--accent-sub);
+  border:1px solid var(--focus);color:var(--accent);font-size:var(--fs-c);line-height:var(--lh-c)}
 .acc{color:var(--accent);font-weight:600}
 .badge{display:inline-flex;align-items:center;height:28px;padding:0 var(--sp3);border-radius:var(--r-xs);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;background:var(--warn);color:#fff}
 /* строка «иконка — текст — шеврон» в карточке профиля */
@@ -1007,7 +1015,7 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .dp-dow{height:34px;display:grid;place-items:center;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:600;color:var(--c3)}
 .dp-d{height:34px;display:grid;place-items:center;border-radius:var(--r-s);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1)}
 .dp-d:hover{background:var(--ctrl)}
-.dp-d.sel{background:#7086fc1f;color:var(--accent)}
+.dp-d.sel{background:var(--accent-sub);color:var(--accent)}
 .dp-d.off{opacity:.35;pointer-events:none}
 .dp-d.mut{color:var(--c3);pointer-events:none}
 
@@ -1273,7 +1281,7 @@ html{scrollbar-gutter:stable}
 .refcoin svg{width:32px;height:32px}
 .refcoin b{display:block;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600}
 .refcoin i{display:block;font-style:normal;font-size:var(--fs-c);line-height:var(--lh-c);font-weight:500;color:var(--c3)}
-.reftot{background:#7086fc1f;border-radius:var(--r-m);padding:var(--sp5);min-width:0}
+.reftot{background:var(--accent-sub);border-radius:var(--r-m);padding:var(--sp5);min-width:0}
 .reftot h3{font-size:var(--fs-h4);line-height:var(--lh-h4);font-weight:600;margin-bottom:24px}
 .rtgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp4)}
 .card.tblcard{padding:8px}
@@ -1299,7 +1307,7 @@ html{scrollbar-gutter:stable}
 .subtbl .subname b{font-weight:500}
 .subtbl .thico{display:inline-flex;vertical-align:middle;margin-right:4px}
 .subtbl .thico svg{width:20px;height:20px;margin:0}
-.subtbl tfoot tr.total td{height:74px;background:#7086fc1f;border-bottom:0;font-weight:500}
+.subtbl tfoot tr.total td{height:74px;background:var(--accent-sub);border-bottom:0;font-weight:500}
 .subtbl tfoot tr.total td:first-child{border-radius:var(--r-m) 0 0 var(--r-m)}
 .subtbl tfoot tr.total td:last-child{border-radius:0 var(--r-m) var(--r-m) 0}
 .subtbl tbody tr:last-child td{border-bottom:1px solid var(--border)}
@@ -2319,10 +2327,10 @@ button.scsect:hover{color:var(--accent)}
 :root[data-grid="px8"] body::after,:root[data-grid="col"] body::after{
   content:"";position:fixed;inset:0;z-index:200;pointer-events:none}
 :root[data-grid="px8"] body::after{
-  background:repeating-linear-gradient(to right,#7086fc1f 0 1px,transparent 1px 8px),
-             repeating-linear-gradient(to bottom,#7086fc1f 0 1px,transparent 1px 8px)}
+  background:repeating-linear-gradient(to right,var(--accent-sub) 0 1px,transparent 1px 8px),
+             repeating-linear-gradient(to bottom,var(--accent-sub) 0 1px,transparent 1px 8px)}
 :root[data-grid="col"] body::after{
-  background:repeating-linear-gradient(to right,#7086fc1f 0 72px,transparent 72px 88px)}
+  background:repeating-linear-gradient(to right,var(--accent-sub) 0 72px,transparent 72px 88px)}
 /* Ось «Границы блоков»: подсветка карточек, таблиц и кнопок при отладке */
 :root[data-outline="on"] .card,:root[data-outline="on"] .tbl,
 :root[data-outline="on"] .btn,:root[data-outline="on"] .pop{outline:1px dashed #ef444466}

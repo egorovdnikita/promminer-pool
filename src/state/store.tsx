@@ -17,6 +17,15 @@ export const routeOf = (pathname: string) => {
   return p.replace(/^\/+|\/+$/g, '') || HOME
 }
 
+/* Затемнение акцента для состояний: в дизайн-системе ховер и нажатие —
+   следующие шаги шкалы, а у произвольного цвета шкалы нет, поэтому берём
+   тот же цвет темнее на 12 и 24 процента. */
+const shade = (hex: string, k: number) => {
+  const n = parseInt(hex, 16)
+  return '#' + [(n >> 16) & 255, (n >> 8) & 255, n & 255]
+    .map((v) => Math.round(v * k).toString(16).padStart(2, '0')).join('')
+}
+
 /* Гарнитуры Google Fonts подключаются одной ссылкой и только когда нужны:
    выбран не-Gilroy или открыта вкладка «Стиль», где шрифты показаны образцами. */
 let fontsLinked = false
@@ -197,9 +206,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
       el.style.setProperty('--accent', '#' + acc)
       el.style.setProperty('--accent-sub', '#' + acc + '1f')
       el.style.setProperty('--accent-ghost', '#' + acc + '1f')
+      el.style.setProperty('--accent-tint', '#' + acc + '29')
       el.style.setProperty('--focus', '#' + acc + '7a')
+      /* без этих двух кнопка красится новым цветом, а под курсором
+         возвращается к индиговому из дизайн-системы */
+      el.style.setProperty('--accent-h', shade(acc, 0.88))
+      el.style.setProperty('--accent-a', shade(acc, 0.76))
     } else {
-      for (const v of ['--accent', '--accent-sub', '--accent-ghost', '--focus']) el.style.removeProperty(v)
+      for (const v of ['--accent', '--accent-sub', '--accent-ghost', '--accent-tint',
+        '--focus', '--accent-h', '--accent-a']) el.style.removeProperty(v)
     }
     /* Поле HEX в панели не управляемое (иначе теряется курсор при вводе) —
        подтягиваем его значение, когда цвет сменили образцом или пипеткой */
