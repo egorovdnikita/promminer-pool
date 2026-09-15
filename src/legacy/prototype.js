@@ -162,7 +162,8 @@ const AXES={
   perm:{g:'Аккаунт',label:'Разрешения вотчера',opts:[['all','Все разделы'],['wi','Воркеры и доход'],
     ['wo','Только воркеры'],['fin','Только финансы'],['assets','Только мои активы'],
     ['pay','Только выплаты'],['none','Только рефералы — Главной нет']]},
-  ocoins:{g:'Аккаунт',label:'Монеты наблюдателя',opts:[['all','Все'],['btc','Только BTC'],['ltc','Только LTC + DOGE']]},
+  ocoins:{g:'Аккаунт',label:'Монеты наблюдателя',
+    opts:[['all','Все'],['btc','Только BTC'],['ltc','Только LTC + DOGE'],['zec','Только ZEC']]},
   acct:{g:'Аккаунт',label:'Аккаунт',opts:[['main','Основной'],['sub','Суб-аккаунт']]},
   name:{g:'Аккаунт',label:'Имя аккаунта',opts:[['yes','Задано'],['no','Не задано']]},
   fa:{g:'Аккаунт',label:'Двухфакторная защита',opts:[['no','Выключена'],['yes','Включена']]},
@@ -421,7 +422,11 @@ const OWNER_PERMS={workers:1,assets:1,income:1,payouts:1};
 const permsOf=()=>S.role==='observer'?(PERM_SETS[S.perm]||PERM_SETS.all):OWNER_PERMS;
 /* У ссылки наблюдателя свой набор монет — в селекторе только они (28:44088) */
 const coinsOf=()=>S.role!=='observer'||S.ocoins==='all'?null
-  :S.ocoins==='btc'?new Set(['btc']):new Set(['ltc']);
+  :S.ocoins==='btc'?new Set(['btc']):S.ocoins==='zec'?new Set(['zec']):new Set(['ltc']);
+/* Монета, по которой собираются данные. У наблюдателя в ссылке бывает одна
+   монета — тогда берём её, а не выбранную в сценарии: иначе в шапке ZEC,
+   а на экране цифры BTC. */
+const coinNow=()=>{const set=coinsOf();return set&&!set.has(S.coin)?[...set][0]:S.coin};
 /* Разделы, доступные роли: у владельца null (все), у вотчера — набор */
 function allowed(){
   if(S.role!=='observer')return null;
@@ -464,8 +469,8 @@ const ACCOUNTS=['natarusso','alfred','ivanivanov','loricarson'];
 const FULLNAME='Иванов Иван';
 
 function M(){
-  const c=COINS[S.coin], empty=S.data==='empty', huge=S.data==='huge', k=huge?1e6:1;
-  const h=empty?{a:0,l:0,o:0,f:0}:(HEALTH_OF[S.coin]||HEALTH)[S.health];
+  const c=COINS[coinNow()], empty=S.data==='empty', huge=S.data==='huge', k=huge?1e6:1;
+  const h=empty?{a:0,l:0,o:0,f:0}:(HEALTH_OF[coinNow()]||HEALTH)[S.health];
   const rows=empty?0:S.data==='few'?3:20;
   return {c,empty,huge,h,rows,
     total:empty?0:h.a+h.l+h.o+h.f,
@@ -702,7 +707,8 @@ const MAX_LOGO=`<img src="${A}max.png" alt="" width="24" height="24">`;
    на Главной и в модалке подключения */
 const POOL_URLS={btc:['btc1.pmpool.ru:1314','btc2.pmpool.ru:1314','btc3.pmpool.ru:3333'],
   ltc:['ltc1.pmpool.ru:8888','ltc2.pmpool.ru:8888','ltc3.pmpool.ru:3335'],
-  zec:['zec1.pmpool.ru:2222','zec2.pmpool.ru:2222','zec3.pmpool.ru:3337']};
+  /* ZEC-адреса взяты с кадра главной с выбранным ZEC (2695:72829) */
+  zec:['ss.promminer.ru:3333','ss.promminer.ru:4444','ss.promminer.ru:5555']};
 const urlRow=(k,v)=>`<div class="urlrow"><div><div class="k">${k}</div><div class="v mono">${v}</div></div>
   <button class="spacer lnk" style="color:var(--accent)" data-copy="${v}">${I.cp}</button></div>`;
 const HOME_CONTACTS=[
@@ -879,7 +885,7 @@ function chart(m,opts={}){
   const PW=W-PL-PR, PH=H-PT-PB;
   /* Кнопки масштаба сужают окно графика: меньше точек — крупнее деталь */
   const z=Math.max(0,Math.min(3,U.zoom||0));
-  const N=Math.round(120/(1+z*0.6)), r=rng(S.coin==='btc'?7:13);
+  const N=Math.round(120/(1+z*0.6)), r=rng(coinNow()==='btc'?7:13);
   const smooth=opts.smooth;
   /* Оси графика: «Разброс точек» растягивает амплитуду, «Тренд хэшрейта»
      наклоняет ряд, «Пропуски в данных» рвут линию — пул не получал шары. */
@@ -981,7 +987,7 @@ ${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,
 ${obs?'':`${card(refBlock(m),'tblcard')}
 <div class="grid g3" style="gap:var(--sp4);margin:0">
   ${card(`<div class="ch"><h2>Адреса майнинга</h2></div>
-    ${(POOL_URLS[S.coin]||POOL_URLS.btc).slice(0,+S.wlink||3).map((u,i)=>urlRow('URL '+(i+1),'stratum+tcp://'+u)).join('')}
+    ${(POOL_URLS[coinNow()]||POOL_URLS.btc).slice(0,+S.wlink||3).map((u,i)=>urlRow('URL '+(i+1),'stratum+tcp://'+u)).join('')}
     <button class="btn" data-modal="connect">${I.pl} Подключить воркер</button>`)}
   ${card(`<div class="ch"><h2>Связаться с нами</h2></div>
     ${HOME_CONTACTS.map(([ic,k,v,u])=>`<a class="linkrow" href="${u}" target="_blank" rel="noopener">
@@ -1224,14 +1230,14 @@ function workersList(m){
   /* Полные названия моделей: в таблице их режет колонка, а деталка
      показывает целиком вместе с производителем (макет 223:98556) */
   const models=S.wvend==='one'
-    ? (S.coin==='ltc'?['Antminer L9 17 GH/s','Antminer L7 9.5 GH/s','Antminer L9 16 GH/s','Antminer L7 8.8 GH/s']
+    ? (coinNow()==='ltc'?['Antminer L9 17 GH/s','Antminer L7 9.5 GH/s','Antminer L9 16 GH/s','Antminer L7 8.8 GH/s']
       :['Antminer S19 XP Hydro 257 TH/s','Antminer S21+ 235 TH/s','Antminer S21 200 TH/s','Antminer S19j Pro 104 TH/s'])
-    : (S.coin==='ltc'?['Antminer L9 17 GH/s','Antminer L7 9.5 GH/s','Avalon A1566 12 GH/s','Antminer L9 16 GH/s']
+    : (coinNow()==='ltc'?['Antminer L9 17 GH/s','Antminer L7 9.5 GH/s','Avalon A1566 12 GH/s','Antminer L9 16 GH/s']
       :['Antminer S19 XP Hydro 257 TH/s','Antminer S21+ 235 TH/s','Avalon Q 90 TH/s','Antminer S21+ 225 TH/s']);
   /* У воркера один видимый тег и, если есть второй, чип «+1» с подсказкой */
   const tags=[['Разогнан','Собран'],['Готов','Завершен'],['Без прошивки','Подготовлен']];
   /* Ось «Размер парка» задаёт длину списка; «Мало записей» всё равно режет до пяти */
-  const N=S.data==='few'?5:(+S.wn||36), r=rng(S.coin==='btc'?11:23);
+  const N=S.data==='few'?5:(+S.wn||36), r=rng(coinNow()==='btc'?11:23);
   /* Оси «Реджект», «Аптайм» и «Последняя шара» правят три колонки таблицы */
   const rejK={low:.3,mid:1,high:4}[S.rej]??1;
   const upB={high:99,mid:94,low:78}[S.wup]??99;
@@ -1813,18 +1819,24 @@ const minisel=(id,opts)=>{const i=U.seg[id]??0;
   ${pop===id?`<div class="pop menu xmenu msmenu">${opts.map((o,n)=>
     `${n?'<div class="mdiv"></div>':''}<button class="${i===n?'on':''}" data-seg="${id}" data-i="${n}">${o}${i===n?`<span class="ck">${I.okc}</span>`:''}</button>`).join('')}</div>`:''}</span>`};
 
+/* Калькулятор считает по своей монете, а не по выбранной в шапке: за ней
+   идут и единица хэшрейта, и подпись курса (кадр 2697:109600). */
+const CALC_COINS=['BTC','LTC','ZEC'];
+const CKEY={BTC:'btc',LTC:'ltc',ZEC:'zec'};
+/* Курс BTC — с кадра калькулятора, LTC и ZEC — из таблицы курсов продажи */
+const CALC_RATE={BTC:'3 071 428,57',LTC:RATE.LTC,ZEC:RATE.ZEC};
 V.calc=m=>{
   const d30=segi('calc-period',1);
-  const cc=['BTC','LTC'][segi('calc-coin',0)];
+  const cc=CALC_COINS[segi('calc-coin',0)];
   /* Ось «Оборудование в расчёте»: без него поля пустые и результат нулевой */
   const hw=S.calchw!=='no';
   return `<div class="cwrap">
   <div class="cleft">
-    <div class="ctop hr1">${fsel('calc-coin',['BTC','LTC'],v=>COIN_ICON[v])}<div class="spacer"></div>
+    <div class="ctop hr1">${fsel('calc-coin',CALC_COINS,v=>COIN_ICON[v])}<div class="spacer"></div>
       <button class="btn link creset" data-creset>Сбросить</button></div>
     <div class="cgrid">
-      <div class="cpair">${cfield('Курс '+cc,'3 071 428,57')}${curSel('calc-cur',['₽','$'])}</div>
-      ${cfield('Хэшрейт, '+m.c.unit,hw?'100':'')}
+      <div class="cpair">${cfield('Курс '+cc,CALC_RATE[cc])}${curSel('calc-cur',['₽','$'])}</div>
+      ${cfield('Хэшрейт, '+COINS[CKEY[cc]].unit,hw?'100':'')}
       ${cfield('Комиссия пула, %',hw?'0,0':'')}
       ${cfield('Потребление, кВт·ч',hw?'0,00':'')}
       ${cfield('Стоимость, ₽/кВт·ч с НДС',hw?'3,57':'')}
@@ -1850,10 +1862,10 @@ const taxNum=v=>Number(String(v).replace(/\s/g,'').replace(',','.'));
 const taxMul=(v,k)=>{const n=taxNum(v);return Number.isFinite(n)?ni(Math.round(n*k)):v};
 const TAX_VALS=m=>{
   if(m.empty) return {inc:'0',rate:'4 647 685,61',kwt:'0',price:'0,00',eq:'0,00',life:'24',
-    mon:'0,00',net:'0,00',year:'0,00',base:'0,00',el:'0,00',am:'0,00',c1:'0,00',c2:'0,00'};
+    mon:'0,00',net:'0,00',year:'0,00',base:'0,00',el:'0,00',am:'0,00',c1:'0,00',c2:'0,00',c3:'0,00'};
   const k=TAX_K(), base={inc:'0.1',rate:'4 647 685,61',kwt:'140',price:'4',eq:'7 400 000',life:'24',
     mon:'39 270',net:'249 197',year:'471 241',base:'3 461 604',el:'4 838 400',am:'3 699 996',
-    c1:'39 270',c2:'0,00'};
+    c1:'39 270',c2:'0,00',c3:'0,00'};
   if(k===1) return base;
   const dm=taxNum(base.mon)*(k-1);
   return {...base,mon:taxMul(base.mon,k),year:taxMul(base.year,k),c1:taxMul(base.c1,k),
@@ -1863,7 +1875,7 @@ V.tax=m=>{
   const v=TAX_VALS(m);
   const row=(l,x)=>`<div class="txrow"><span>${l}</span><b>${x} ₽</b></div>`;
   return `<div class="txtabs">${segLine('tax-coin',
-    [`${COIN_ICON.BTC}BTC`,`${COIN_ICON.LTC}+ LTC`],0)}</div>
+    [`${COIN_ICON.BTC}BTC`,`${COIN_ICON.LTC}+ LTC`,`${COIN_ICON.ZEC}ZEC`],0)}</div>
   <div class="txwrap">
     <div class="txleft">
       <div class="txtop hr1">${seg('tax-form',['Физическое лицо и ИП','Юридическое лицо'],S.taxface==='ul'?1:0)}
@@ -1880,6 +1892,7 @@ V.tax=m=>{
       <div class="txchips">
         <span class="txchip">${COIN_ICON.BTC}≈ ${v.c1} ₽</span>
         <span class="txchip">${COIN_ICON.LTC}${COIN_ICON.DOGE}≈ ${v.c2} ₽</span>
+        <span class="txchip">${COIN_ICON.ZEC}≈ ${v.c3} ₽</span>
       </div>
       <div class="txinfo">
         <span class="l">Сумма налогов за 1 мес.</span>
@@ -2063,7 +2076,7 @@ const TIER_PERKS=[
 const refCoinSel=(m,id)=>`<span class="pop-wrap"><button class="rcoin ${pop===id?'open':''}" data-pop="${id}">
   <span class="t"><b>${m.c.refCoin[0]}</b><i>${m.c.refCoin[1]}</i></span>
   <span class="ic">${COIN_ICON[m.bal[0].s]}</span>${I.cd}</button>
-  ${pop===id?`<div class="pop menu rcmenu">${AXES.coin.opts.map(([v],n)=>{
+  ${pop===id?`<div class="pop menu rcmenu">${AXES.coin.opts.filter(([v])=>!coinsOf()||coinsOf().has(v)).map(([v],n)=>{
     const c=COINS[v], ic=v==='ltc'?COIN_ICON.LTC+COIN_ICON.DOGE:COIN_ICON[v.toUpperCase()];
     return `${n?'<div class="mdiv"></div>':''}<button class="${S.coin===v?'on':''}" data-axis="coin" data-val="${v}">
       <span class="t"><b>${c.refCoin[0]}</b><i>${c.refCoin[1]}</i></span>
@@ -2239,7 +2252,7 @@ V.refpayouts=m=>{
   const type=PAY_TYPES()[segi('pay-type',0)];
   return `${refStats([['Сумма всех выплат',m.empty?'0':'10 278,45','₽','assets'],
     ['Выплаты, BTC',m.empty?'0':'8 000','₽'],['Выплаты, LTC',m.empty?'0':'2 000','₽'],
-    ['Выплаты, DOGE',m.empty?'0':'278,45','₽']])}
+    ['Выплаты, DOGE',m.empty?'0':'278,45','₽'],['Выплаты, ZEC',m.empty?'0':'1 500','₽']])}
   ${card(`<div class="ch"><h2>История выплат</h2><div class="spacer"></div>${N?`${fsel('rpay-coin',['BTC','LTC','ZEC'],v=>COIN_ICON[v])}
     ${fsel('pay-type',PAY_TYPES())}${dayChips('pay-range')}${dateInput('rp')}
     <button class="ib" data-modal="export" data-ex="rpay">${I.dlm}</button>`:''}</div>
@@ -3343,7 +3356,7 @@ const MODALS={
       <div class="lvlist">${TIERS.map((t,i)=>`<div class="lvitem ${U.lvl===i?'on':''}">
         <button class="lvhead" data-lvl="${i}">
           <img src="${A}tier-${t.k}-s.png" alt="" width="40" height="40">
-          <span class="t"><b>${t.p} (${t.n})</b><i>Хэшрейт рефералов ${TIER_RANGE[S.coin][i]}</i></span>
+          <span class="t"><b>${t.p} (${t.n})</b><i>Хэшрейт рефералов ${TIER_RANGE[coinNow()][i]}</i></span>
           ${I.cd}</button>
         ${U.lvl===i?`<ul class="lvperks">${TIER_PERKS[i].map(x=>`<li>${x}</li>`).join('')}</ul>`:''}
       </div>`).join('')}</div>
@@ -3635,7 +3648,8 @@ function acctSummary(m){
       <b class="t">${r.name}<span class="tag ${r.main?'sel':''} spacer">${r.main?'Основной':'Суб-аккаунт'}</span></b>
       <div class="kv">Общий баланс<span class="mono">${nf(r.bal)} $</span></div>
       <div class="kv">Хэшрейт, BTC<span class="mono">${ni(r.h[0])} TH/s</span></div>
-      <div class="kv">Хэшрейт, LTC<span class="mono">${ni(r.h[1])} GH/s</span></div></div>`).join('')}</div>
+      <div class="kv">Хэшрейт, LTC<span class="mono">${ni(r.h[1])} GH/s</span></div>
+      <div class="kv">Хэшрейт, ZEC<span class="mono">${ni(r.h[2])} KSol/s</span></div></div>`).join('')}</div>
     <button class="btn out" style="width:100%;justify-content:center" data-modal="subacct">${I.pl} Добавить суб-аккаунт</button></div>`;
 }
 
@@ -3651,6 +3665,7 @@ export function applyState(next){
   pop = next.pop; modal = next.modal; openGroups = next.openGroups; mini = next.mini;
 }
 export {
+  coinNow,
   AXES, AX_OWN, AX_STYLE, AXCAT, PRESETS, DEF, ICON_PACKS, iconSample, FONTS, fontStack, fontsHref, COINS, HEALTH, TIERS, NOTIF_N, notifCount, ACCOUNTS, M,
   loadFail, nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,

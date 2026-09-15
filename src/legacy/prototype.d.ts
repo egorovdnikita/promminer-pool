@@ -139,3 +139,4 @@ export declare const TAGS: [string, string][]
 export declare function vendorOf(model: string): string
 export declare function groups(): { n: string; c?: string }[]
 export declare function tagsOf(): { n: string; d?: string; c?: string }[]
+export declare function coinNow(): string

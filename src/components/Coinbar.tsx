@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { AXES, COIN_ICON, I, coinsOf, type Model } from '@/legacy/prototype'
+import { AXES, COIN_ICON, I, coinsOf, coinNow, type Model } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import { Ico, Raw } from './Raw'
 
@@ -28,10 +28,10 @@ export function Coinbar({ m }: { m: Model }) {
               return (
                 <Fragment key={v}>
                   {i > 0 && <div className="mdiv" />}
-                  <button className={S.coin === v ? 'on' : ''} data-axis="coin" data-val={v}>
+                  <button className={coinNow() === v ? 'on' : ''} data-axis="coin" data-val={v}>
                     <Ico html={COIN_ICON[sym]} />
                     {sym}
-                    {S.coin === v && <Ico className="ck" html={I.okc} />}
+                    {coinNow() === v && <Ico className="ck" html={I.okc} />}
                   </button>
                 </Fragment>
               )
