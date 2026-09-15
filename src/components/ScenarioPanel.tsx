@@ -1,12 +1,14 @@
-import { AXES, AX_OWN, AXCAT, PRESETS, DEF, SCREEN_NAMES, TITLES, MODALS } from '@/legacy/prototype'
+import { AXES, AX_OWN, AX_STYLE, AXCAT, PRESETS, DEF, SCREEN_NAMES, TITLES, MODALS, ICON_PACKS, iconSample, FONTS } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import type { Scenario } from '@/state/types'
 
 type Key = keyof Scenario
 
-const TABS: [NonNullable<ReturnType<() => 'ax' | 'sets' | 'go'>>, string][] = [
-  ['ax', 'Оси'], ['sets', 'Наборы'], ['go', 'Переходы'],
+const TABS: [NonNullable<ReturnType<() => 'ax' | 'sty' | 'sets' | 'go'>>, string][] = [
+  ['ax', 'Оси'], ['sty', 'Стиль'], ['sets', 'Наборы'], ['go', 'Переходы'],
 ]
+/* Оси оформления живут на своей вкладке — в списке состояний продукта им не место */
+const STY = (k: string) => AX_STYLE.has(k)
 /* Ширины панели. Первая — значение по умолчанию из freshUi: иначе ни одна
    кнопка не подсвечена, пока её не нажали. */
 const WIDTHS = [420, 560, 760]
@@ -47,6 +49,7 @@ export function ScenarioPanel() {
 
   /* Ось попадает в список, если подходит под поиск и под активные фильтры */
   const visible = (k: Key) =>
+    !STY(k) &&
     (!onlyDirty || S[k] !== DEF[k]) &&
     (!onlyPin || pins.includes(k)) &&
     (!onlyFigma || !AX_OWN.has(k)) &&
@@ -64,12 +67,16 @@ export function ScenarioPanel() {
     <div className={`scg ${S[k] !== DEF[k] ? 'dirty' : ''}`} key={k}>
       <label>
         <span className="scl">{AXES[k].label}</span>
-        {AX_OWN.has(k) && <i className="scown" title="Оси нет в макетах — придумана при сборке панели">своё</i>}
-        <button
-          className={`scpin ${pins.includes(k) ? 'on' : ''}`}
-          data-scpin={k}
-          title={pins.includes(k) ? 'Открепить' : 'Закрепить наверху'}
-        >★</button>
+        {AX_OWN.has(k) && !STY(k) && (
+          <i className="scown" title="Оси нет в макетах — придумана при сборке панели">своё</i>
+        )}
+        {!STY(k) && (
+          <button
+            className={`scpin ${pins.includes(k) ? 'on' : ''}`}
+            data-scpin={k}
+            title={pins.includes(k) ? 'Открепить' : 'Закрепить наверху'}
+          >★</button>
+        )}
         {S[k] !== DEF[k] && (
           <button className="scundo" data-axreset={k} title="Вернуть значение по умолчанию">↺</button>
         )}
@@ -183,6 +190,75 @@ export function ScenarioPanel() {
             {!keys.filter(visible).length && (
               <p className="scnote">Ничего не нашлось. Сбросьте поиск или фильтры.</p>
             )}
+          </>
+        )}
+
+        {tab === 'sty' && (
+          <>
+            <div className="scg">
+              <label><span className="scl">Оформление</span></label>
+              <p className="scdesc">
+                Не состояния продукта, а эксперимент с внешним видом: шрифт, акцент, скругления,
+                отступы и набор иконок. Применяется сразу — перезагружать ничего не нужно,
+                и всё уезжает в ссылку вместе со сценарием.
+              </p>
+            </div>
+
+            <section className="scsec">
+              <div className="scshead"><div className="scsect plain">Шрифт<span className="scqty">{AXES.font.opts.length}</span></div></div>
+              <p className="scdesc">Gilroy — как в продукте, остальные из Google Fonts. Каждая кнопка набрана своей гарнитурой.</p>
+              <div className="scfont">
+                {AXES.font.opts.map(([v, t]) => (
+                  <button
+                    key={v} data-axis="font" data-val={v}
+                    className={S.font === v ? 'on' : ''}
+                    style={{ fontFamily: `'${FONTS[v].name}', sans-serif` }}
+                  >{t}<i>Агрегатор 128</i></button>
+                ))}
+              </div>
+            </section>
+
+            <section className="scsec">
+              <div className="scshead"><div className="scsect plain">Акцентный цвет</div></div>
+              <p className="scdesc">Кнопки, ссылки, активные пункты меню и обводка фокуса.</p>
+              <div className="scsw">
+                {AXES.accent.opts.map(([v, t]) => (
+                  <button
+                    key={v} data-axis="accent" data-val={v} title={t}
+                    className={`${S.accent === v ? 'on' : ''} ${v === 'ds' ? 'dsw' : ''}`}
+                    style={v === 'ds' ? undefined : { background: '#' + v }}
+                  >{v === 'ds' ? 'ДС' : ''}</button>
+                ))}
+              </div>
+              <div className="scpick">
+                <input type="color" id="scacc" value={'#' + (/^[0-9a-f]{6}$/i.test(S.accent) ? S.accent : '7086fc')} readOnly />
+                <input id="schex" placeholder="7086fc" maxLength={7}
+                  defaultValue={/^[0-9a-f]{6}$/i.test(S.accent) ? S.accent : ''} />
+                <button className="scchip" data-eyedrop>Пипетка с экрана</button>
+              </div>
+            </section>
+
+            <section className="scsec">
+              <div className="scshead"><div className="scsect plain">Скругления и отступы</div></div>
+              {(['radius', 'space'] as Key[]).map(axisRow)}
+            </section>
+
+            <section className="scsec">
+              <div className="scshead"><div className="scsect plain">Иконки<span className="scqty">{ICON_PACKS.length}</span></div></div>
+              <p className="scdesc">Набор дизайн-системы и четыре открытых: Material Sharp, Lucide, Phosphor Thin, Material Design.</p>
+              <div className="scpack">
+                {ICON_PACKS.map(([id, name, note]: [string, string, string]) => (
+                  <button key={id} data-axis="icons" data-val={id} className={S.icons === id ? 'on' : ''}>
+                    <span className="scico" dangerouslySetInnerHTML={{ __html: iconSample(id) }} />
+                    <b>{name}</b><i>{note}</i>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <div className="scbar">
+              <button className="scchip" data-styreset>Сбросить оформление</button>
+            </div>
           </>
         )}
 

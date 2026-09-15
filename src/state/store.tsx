@@ -3,7 +3,7 @@ import {
   type ReactNode,
 } from 'react'
 import { useNavigate, useRouterState } from '@tanstack/react-router'
-import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, groups, tagsOf, applyState, workersList, workersRows, obsOf, subsOf, coinsOf, SUM_ROUTES } from '@/legacy/prototype'
+import { AXES, DEF, MODELS, PRESETS, GROUP_OF, M, allowed, groups, tagsOf, applyState, workersList, workersRows, obsOf, subsOf, coinsOf, SUM_ROUTES, AX_STYLE, FONTS, fontStack, fontsHref } from '@/legacy/prototype'
 import type { AppSnapshot, Scenario, Ui } from './types'
 
 const HOME = 'home'
@@ -15,6 +15,18 @@ export const pathOf = (route: string) => (route === HOME ? '/' : '/' + route)
 export const routeOf = (pathname: string) => {
   const p = pathname.startsWith(BASE) ? pathname.slice(BASE.length) : pathname
   return p.replace(/^\/+|\/+$/g, '') || HOME
+}
+
+/* Гарнитуры Google Fonts подключаются одной ссылкой и только когда нужны:
+   выбран не-Gilroy или открыта вкладка «Стиль», где шрифты показаны образцами. */
+let fontsLinked = false
+function ensureFonts() {
+  if (fontsLinked) return
+  fontsLinked = true
+  const l = document.createElement('link')
+  l.rel = 'stylesheet'
+  l.href = fontsHref()
+  document.head.appendChild(l)
 }
 
 const freshUi = (): Ui => ({
@@ -176,6 +188,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
     el.setAttribute('data-grid', S.current.grid)
     el.setAttribute('data-outline', S.current.outline)
     el.setAttribute('data-radius', S.current.radius)
+    el.setAttribute('data-space', S.current.space)
+    el.setAttribute('data-icons', S.current.icons)
+    /* Акцент: «ds» — цвет дизайн-системы из app.css, иначе цвет из пипетки.
+       Подложки и фокус — тот же цвет с прозрачностью 12% и 48%. */
+    const acc = S.current.accent
+    if (/^[0-9a-f]{6}$/i.test(acc)) {
+      el.style.setProperty('--accent', '#' + acc)
+      el.style.setProperty('--accent-sub', '#' + acc + '1f')
+      el.style.setProperty('--accent-ghost', '#' + acc + '1f')
+      el.style.setProperty('--focus', '#' + acc + '7a')
+    } else {
+      for (const v of ['--accent', '--accent-sub', '--accent-ghost', '--focus']) el.style.removeProperty(v)
+    }
+    /* Поле HEX в панели не управляемое (иначе теряется курсор при вводе) —
+       подтягиваем его значение, когда цвет сменили образцом или пипеткой */
+    const hx = document.getElementById('schex') as HTMLInputElement | null
+    if (hx && document.activeElement !== hx) hx.value = /^[0-9a-f]{6}$/i.test(acc) ? acc : ''
+    const f = S.current.font
+    el.style.setProperty('--font', fontStack(f))
+    if (FONTS[f]?.g || U.current.sctab === 'sty') ensureFonts()
   })
 
   useEffect(() => {
@@ -264,6 +296,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (fq) { U.current.fq = fq.value; bump() }
     const sq2 = (e.target as HTMLElement).closest('#selq') as HTMLInputElement | null
     if (sq2) { U.current.selq = sq2.value; bump() }
+    /* Пипетка браузера и поле HEX в панели стиля — акцент меняется на лету */
+    const ac = (e.target as HTMLElement).closest('#scacc') as HTMLInputElement | null
+    if (ac) { S.current.accent = ac.value.replace('#', '').toLowerCase(); bump() }
+    const hx = (e.target as HTMLElement).closest('#schex') as HTMLInputElement | null
+    if (hx) {
+      const v = hx.value.trim().replace('#', '').toLowerCase()
+      if (/^[0-9a-f]{6}$/.test(v)) { S.current.accent = v; bump() }
+    }
     const tn = (e.target as HTMLElement).closest('#tname') as HTMLInputElement | null
     if (tn) { U.current.tname = tn.value; bump() }
     const td = (e.target as HTMLElement).closest('#tdesc') as HTMLInputElement | null
@@ -726,6 +766,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (at('[data-onlydirty]')) { u.scdirty = !u.scdirty; return bump() }
     if (at('[data-onlypin]')) { u.sconly = !u.sconly; return bump() }
     if (at('[data-onlyfigma]')) { u.scfig = !u.scfig; return bump() }
+    /* Пипетка: берёт цвет с любой точки экрана. Есть не во всех браузерах —
+       в остальных остаются образцы и системный выбор цвета. */
+    if (at('[data-eyedrop]')) {
+      const ED = (window as unknown as { EyeDropper?: new () => { open: () => Promise<{ sRGBHex: string }> } }).EyeDropper
+      if (!ED) return toast('Пипетка есть в Chrome и Edge — здесь выберите цвет в поле рядом')
+      new ED().open().then((r) => {
+        pushHist()
+        S.current.accent = r.sRGBHex.replace('#', '').toLowerCase()
+        bump()
+      }).catch(() => { /* закрыли пипетку клавишей Esc */ })
+      return
+    }
+    /* Сброс только оформления: остальной сценарий остаётся как был */
+    if (at('[data-styreset]')) {
+      pushHist()
+      for (const k of AX_STYLE) (S.current as unknown as Record<string, string>)[k] = (DEF as unknown as Record<string, string>)[k]
+      return bump()
+    }
     const tab = at('[data-sctab]')
     if (tab) { u.sctab = tab.dataset.sctab as Ui['sctab']; return bump() }
     /* Закреплённые оси всплывают наверх списка и переживают перезагрузку */

@@ -1,7 +1,7 @@
 /** Типы для движка прототипа (src/legacy/prototype.js). */
 import type { AppSnapshot, Scenario, Ui } from '@/state/types'
 
-export interface Axis { label: string; g: string; note?: string; opts: [string, string][] }
+export interface Axis { label: string; g: string; note?: string; free?: string; opts: [string, string][] }
 export interface NavItem { id?: string; t: string; ic: string; g?: string; kids?: [string, string][] }
 /** Модель текущего сценария: балансы, хэшрейт, здоровье парка, строки таблиц. */
 export type Model = any
@@ -9,6 +9,18 @@ export type Model = any
 export declare const AXES: Record<keyof Scenario, Axis>
 /** Оси, которых нет в макетах — придуманы при сборке панели. */
 export declare const AX_OWN: Set<string>
+/** Оси оформления: шрифт, акцент, скругления, отступы, иконки. */
+export declare const AX_STYLE: Set<string>
+/** Наборы иконок: ключ, название, словесная характеристика. */
+export declare const ICON_PACKS: [string, string, string][]
+/** Несколько иконок набора подряд — образец для панели. */
+export declare function iconSample(pack: string): string
+/** Гарнитуры для оси «Шрифт»: ключ → имя и семейство в Google Fonts. */
+export declare const FONTS: Record<string, { name: string; g?: string }>
+/** Стек шрифтов для токена --font. */
+export declare function fontStack(key: string): string
+/** Адрес css2 со всеми гарнитурами оси. */
+export declare function fontsHref(): string
 /** Готовые связки состояний для панели: имя, пояснение, набор осей, раздел. */
 export declare const PRESETS: [string, string, Partial<Scenario>, string][]
 /** Категории групп осей: заголовок и входящие в него группы. */

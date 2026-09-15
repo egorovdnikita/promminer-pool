@@ -6,6 +6,10 @@
  * Экраны переводятся в TSX по одному; отсюда они постепенно уезжают.
  */
 import { ICONS } from './icons.js';
+import * as PK_LINE from './icon-packs/line.js';
+import * as PK_SHARP from './icon-packs/sharp.js';
+import * as PK_THIN from './icon-packs/thin.js';
+import * as PK_FILL from './icon-packs/fill.js';
 
 /* Базовый путь сайта. Vite подставляет префикс только в пути из HTML и CSS,
    а у движка картинки записаны строками — им нужен свой. При раздаче
@@ -21,7 +25,7 @@ const AXCAT=[
   ['Данные и графики',['Данные','График','Курсы']],
   ['Разделы',['Воркеры','Мои активы','Выплаты','Отчет','Рефералы','Калькуляторы']],
   ['Аккаунт и доступ',['Вход','Аккаунт','Профиль','Контакты','Верификация','Наблюдатели','Суб-аккаунты']],
-  ['Интерфейс',['Интерфейс','Загрузка и ошибки']],
+  ['Интерфейс',['Стиль','Интерфейс','Загрузка и ошибки']],
 ];
 /* Оси, которых нет в макетах: их придумал я, когда набирал панель.
    Панель помечает их, чтобы не путать с настоящими состояниями, а новые
@@ -31,7 +35,12 @@ const AX_OWN=new Set(['numfmt','tzview','prec','fiat','trend','noise','gap','rej
   'athr','asell','astep','aconf','acoins','afee','incn','incper','payn',
   'repn','repacc','repdl','repw','refn','refact','refpn','refhash','refban','reflink',
   'calchw','taxres','fam','pwdage','sesgeo','notift','sublim','avatar','vstat',
-  'dens','fsz','grid','outline','radius','toast','motion','neterr']);
+  'dens','fsz','grid','outline','radius','toast','motion','neterr',
+  'font','accent','space','icons']);
+/* Оси оформления: это не состояния продукта, а эксперимент с внешним видом —
+   шрифт, акцент, скругления, отступы и набор иконок. В списке осей их нет,
+   у них своя вкладка «Стиль»; в AX_OWN они тоже, кадра в макетах у них нет. */
+const AX_STYLE=new Set(['font','accent','radius','space','icons']);
 const AXES={
   /* ---- Данные ---- */
   coin:{g:'Данные',label:'Монета',note:'Меняет парк, балансы и единицы хэшрейта',
@@ -207,9 +216,26 @@ const AXES={
     opts:[['off','Выключена'],['px8','Шаг 8'],['col','Колонки']]},
   outline:{g:'Интерфейс',label:'Границы блоков',note:'Подсветка карточек и таблиц при отладке',
     opts:[['off','Выключены'],['on','Включены']]},
-  radius:{g:'Интерфейс',label:'Скругления',opts:[['ds','Как в дизайн-системе'],['none','Прямые углы']]},
   toast:{g:'Интерфейс',label:'Всплывающие подсказки',opts:[['on','Показывать'],['off','Не показывать']]},
   motion:{g:'Интерфейс',label:'Анимации',opts:[['on','Включены'],['off','Выключены']]},
+
+  /* ---- Стиль: оформление, а не состояние продукта ---- */
+  font:{g:'Стиль',label:'Шрифт',note:'Gilroy как в продукте или гарнитура из Google Fonts',
+    opts:[['gilroy','Gilroy'],['inter','Inter'],['onest','Onest'],['golos','Golos Text'],
+      ['manrope','Manrope'],['montserrat','Montserrat'],['roboto','Roboto'],['opensans','Open Sans'],
+      ['nunito','Nunito'],['rubik','Rubik'],['plex','IBM Plex Sans'],['jet','JetBrains Mono'],
+      ['playfair','Playfair Display'],['unbounded','Unbounded']]},
+  accent:{g:'Стиль',label:'Акцентный цвет',note:'Кнопки, ссылки, активные пункты и фокус',free:'color',
+    opts:[['ds','Как в ДС'],['4f46e5','Индиго'],['2563eb','Синий'],['0ea5e9','Голубой'],
+      ['0d9488','Бирюзовый'],['16a34a','Зелёный'],['ca8a04','Горчичный'],['ea580c','Оранжевый'],
+      ['dc2626','Красный'],['db2777','Розовый'],['7c3aed','Фиолетовый'],['334155','Графитовый']]},
+  radius:{g:'Стиль',label:'Скругления',note:'Шкала радиусов целиком: от прямых углов до капсул',
+    opts:[['none','Нет'],['min','Минимальные'],['mid','Средние'],['ds','Высокие — как в ДС'],['max','Максимальные']]},
+  space:{g:'Стиль',label:'Отступы',note:'Поля страницы, карточек и таблиц',
+    opts:[['none','Нет'],['min','Минимальные'],['mid','Средние'],['ds','Высокие — как в ДС'],['max','Максимальные']]},
+  icons:{g:'Стиль',label:'Иконки',note:'Пять наборов: дизайн-система и четыре открытых',
+    opts:[['ds','Дизайн-система'],['sharp','Material Sharp'],['line','Lucide'],
+      ['thin','Phosphor Thin'],['fill','Material Design']]},
 
   /* ---- Вход ---- */
   achan:{g:'Вход',label:'Канал входа',note:'Страницы «пароль и почта» и «пароль и телефон»',
@@ -286,6 +312,19 @@ const PRESETS=[
   ['Без скруглений','Видно, где радиусы вообще есть',{radius:'none',outline:'on'},'Интерфейс'],
   ['Английские числа','Разделители как в en-US',{numfmt:'en',fiat:'usd',tzview:'utc'},'Интерфейс'],
 
+  ['Дружелюбный','Круглый шрифт, капсулы и двухцветные иконки',
+    {font:'nunito',accent:'0d9488',radius:'max',space:'ds',icons:'ds'},'Стиль'],
+  ['Деловой','Прямые углы, графитовый акцент, острые иконки',
+    {font:'plex',accent:'334155',radius:'none',space:'mid',icons:'sharp'},'Стиль'],
+  ['Воздушный','Тонкие иконки и широкие поля',
+    {font:'onest',accent:'2563eb',radius:'ds',space:'max',icons:'thin'},'Стиль'],
+  ['Плотный','Минимум воздуха, компактные строки',
+    {font:'inter',accent:'4f46e5',radius:'min',space:'min',icons:'line',dens:'comp',fsz:'sm'},'Стиль'],
+  ['Терминал','Моноширинный шрифт и прямые углы',
+    {font:'jet',accent:'16a34a',radius:'none',space:'mid',icons:'line',theme:'dark'},'Стиль'],
+  ['Журнальный','Антиква в заголовках и мягкие скругления',
+    {font:'playfair',accent:'db2777',radius:'mid',space:'max',icons:'fill'},'Стиль'],
+
   ['Анкета отклонена','Верификация не прошла проверку',
     {verif:'yes',vstat:'err',verr:'inn',vform:'ul',vdoc:'no',vacc:'no'},'Финансы'],
   ['Лимиты исчерпаны','Некуда расти: суб-аккаунты и ссылки кончились',
@@ -313,7 +352,8 @@ const DEF={
   verif:'no',vdoc:'no',vacc:'no',verr:'no',vform:'pf',vstat:'none',
   oerr:'no',saerr:'no',
   achan:'mail',lerr:'no',rerr:'no',pwv:'no',a2fa:'no',otperr:'ok',
-  theme:'light',dens:'norm',fsz:'norm',side:'full',motion:'on',grid:'off',outline:'off',radius:'ds',toast:'on',
+  theme:'light',dens:'norm',fsz:'norm',side:'full',motion:'on',grid:'off',outline:'off',toast:'on',
+  font:'gilroy',accent:'ds',radius:'ds',space:'ds',icons:'ds',
   load:'no',neterr:'no',
 };
 let S={...DEF}, route='home', pop=null, modal=null, openGroups={fin:false,tools:false,ref:false,sfin:false}, mini=false;
@@ -531,6 +571,73 @@ for (const [k, v] of Object.entries(ICONS)) I[k] = sv(v);
 /* указатели сортировки в шапке таблицы — те же стрелки, но 16px */
 I.sortUp = sv(ICONS.sortUp, 16);
 I.sortDn = sv(ICONS.cd, 16);
+
+/* ---- Наборы иконок (ось «Иконки») ----
+   Дизайн-система — набор по умолчанию, остальные четыре собраны с Iconify
+   скриптом scripts/icon-packs.mjs. Размер берём у ДС-версии каждой иконки:
+   часть из них рисуется в 16, 18 или 20, и общий 24 сломал бы кнопки.
+   Чего в наборе нет (рубль, телеграм, кирка у Phosphor) — остаётся от ДС. */
+const I_DS={...I};
+const I_SZ={};
+for(const [k,v] of Object.entries(I_DS)){ const m=/width="(\d+)"/.exec(v); I_SZ[k]=m?+m[1]:24; }
+const PACKS={ds:null,line:PK_LINE,sharp:PK_SHARP,thin:PK_THIN,fill:PK_FILL};
+/* Ключ, название и словесная характеристика — панель показывает их рядом с образцом */
+const ICON_PACKS=[
+  ['ds','Дизайн-система','Закруглённый, двухцветный'],
+  ['sharp','Material Sharp','Прямые углы, деловой'],
+  ['line','Lucide','Ровный контур, инженерный'],
+  ['thin','Phosphor Thin','Тонкий, воздушный'],
+  ['fill','Material Design','Плотная заливка, классика'],
+];
+const iconSet=(p)=>{
+  const pack=PACKS[p]||null;
+  const o={};
+  for(const k of Object.keys(I_DS)){
+    const b=pack&&pack.ICONS[k];
+    o[k]=b?`<svg width="${I_SZ[k]}" height="${I_SZ[k]}" viewBox="${pack.VB}" fill="currentColor">${b}</svg>`:I_DS[k];
+  }
+  /* указатель сортировки «вниз» — та же шевронка, что и в свёрнутых списках */
+  if(pack&&pack.ICONS.cd) o.sortDn=`<svg width="16" height="16" viewBox="${pack.VB}" fill="currentColor">${pack.ICONS.cd}</svg>`;
+  return o;
+};
+let iconsNow='ds';
+/* Смена набора меняет тот же объект I: экраны собираются строками и читают
+   его во время отрисовки, так что перерисовки React достаточно. */
+function setIcons(p){
+  if(!(p in PACKS)) p='ds';
+  if(p===iconsNow) return;
+  iconsNow=p;
+  Object.assign(I,iconSet(p));
+}
+/* Образец набора для панели стиля */
+const iconSample=(p)=>{const s=iconSet(p);return ['home','pick2','wallet','bell','gear'].map(k=>s[k]).join('')};
+
+/* ---- Шрифты (ось «Шрифт») ----
+   Gilroy лежит в public/fonts, остальные подтягиваются с Google Fonts —
+   все с кириллицей, иначе интерфейс рассыпется на латиницу. */
+const FONTS={
+  gilroy:{name:'Gilroy'},
+  inter:{name:'Inter',g:'Inter'},
+  onest:{name:'Onest',g:'Onest'},
+  golos:{name:'Golos Text',g:'Golos Text'},
+  manrope:{name:'Manrope',g:'Manrope'},
+  montserrat:{name:'Montserrat',g:'Montserrat'},
+  roboto:{name:'Roboto',g:'Roboto'},
+  opensans:{name:'Open Sans',g:'Open Sans'},
+  nunito:{name:'Nunito',g:'Nunito'},
+  rubik:{name:'Rubik',g:'Rubik'},
+  plex:{name:'IBM Plex Sans',g:'IBM Plex Sans'},
+  jet:{name:'JetBrains Mono',g:'JetBrains Mono'},
+  playfair:{name:'Playfair Display',g:'Playfair Display'},
+  unbounded:{name:'Unbounded',g:'Unbounded'},
+};
+/* Запасная часть стека — как в токене --font дизайн-системы */
+const FONT_FB="-apple-system,'Segoe UI',Roboto,sans-serif";
+const fontStack=(k)=>`'${(FONTS[k]||FONTS.gilroy).name}',${FONT_FB}`;
+/* Один запрос на все гарнитуры: браузер скачает только использованные */
+const fontsHref=()=>'https://fonts.googleapis.com/css2?'
+  +Object.values(FONTS).filter(f=>f.g).map(f=>'family='+f.g.replace(/ /g,'+')+':wght@400;500;600;700').join('&')
+  +'&display=swap';
 
 const D='https://files.promminer.ru/docs/';
 const DOCS={
@@ -861,7 +968,7 @@ V.home=m=>{
   if(obs&&!cards.length&&!tabs.length) return card(emptyBox('Главная недоступна',
     'У этой ссылки наблюдателя не открыт ни один из разделов: воркеры, доход, выплаты или мои активы'));
   return `<div class="hcol">
-${cards.length?`<div class="grid g3" style="gap:16px;margin:0">${cards.join('')}</div>`:''}
+${cards.length?`<div class="grid g3" style="gap:var(--sp4);margin:0">${cards.join('')}</div>`:''}
 ${p.workers?card(`<div class="ch"><h2>График изменения хэшрейта (${m.bal[0].s})</h2>
   <div class="spacer"></div>${seg('hash-range',['5 мин','1 ч','24 ч'],periodI())}
   <span class="pop-wrap"><button class="pill ctl sq mono lg" data-pop="date">${dpLabel('date','29.01.2026 – 30.01.2026')} ${I.cal}</button>${pop==='date'?datePicker([29,30],0,2026,0,'date'):''}</span>
@@ -872,7 +979,7 @@ ${tabs.length?card(`<div class="ch subhead">${tabs.length>1?seg('home-tab',tabs,
   ${inc?incomeTable(m,Math.min(m.rows,5)):payoutsTable(m,Math.min(m.rows,5))}
   ${m.rows?`<div class="tfoot"><button class="btn link" data-go="${inc?'income':'payouts'}">${inc?'Весь доход':'Все выплаты'}</button></div>`:''}`,'tblcard'):''}
 ${obs?'':`${card(refBlock(m),'tblcard')}
-<div class="grid g3" style="gap:16px;margin:0">
+<div class="grid g3" style="gap:var(--sp4);margin:0">
   ${card(`<div class="ch"><h2>Адреса майнинга</h2></div>
     ${(POOL_URLS[S.coin]||POOL_URLS.btc).slice(0,+S.wlink||3).map((u,i)=>urlRow('URL '+(i+1),'stratum+tcp://'+u)).join('')}
     <button class="btn" data-modal="connect">${I.pl} Подключить воркер</button>`)}
@@ -1232,7 +1339,7 @@ V.workers=m=>{
       ${wst('Средний хэшрейт за 1 ч',`${m.h1} ${m.c.unit}`)}
       ${wst('Uptime за 24 ч',m.empty?'0%':m.c.up,dyn('ok','10%'))}
     </div>`,'wcard')}
-  <div class="grid g4" style="gap:16px;margin:0">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap">${l}</div><div class="n mono">${ni(n)}</div></div>
+  <div class="grid g4" style="gap:var(--sp4);margin:0">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap">${l}</div><div class="n mono">${ni(n)}</div></div>
     <div class="ic" style="background:${c}29;color:${c}">${g}</div></div>`).join('')}</div>
   <!-- Лента групп — Segment Control Line из макета: текстовые вкладки со счётчиками -->
   <div class="wlist">
@@ -1374,7 +1481,7 @@ V.worker=m=>{
       <span class="wdlink"><i>Порог уведомлений:</i><b>${thr?`225 ${m.c.unit}`:'Не настроено'}</b>
         <span class="wdpen">${I.edit}</span></span></button>
   </div>
-  <div class="grid g3 wdgrid" style="gap:16px;margin:0">
+  <div class="grid g3 wdgrid" style="gap:var(--sp4);margin:0">
     ${card(`<div class="wdplate">
       <span class="l">Средний хэшрейт за 24 ч</span>
       <b class="v mono">${m.empty?0:nf(w.h24,2)} ${m.c.unit}</b></div>
@@ -1890,7 +1997,7 @@ V.sumworkers=m=>{
       ${wst('Средний хэшрейт за 1 ч',`${m.h1} ${m.c.unit}`)}
       ${wst('Uptime за 24 ч',m.empty?'0%':m.c.up,dyn('ok','10%'))}
     </div>`,'wcard')}
-  <div class="grid g4" style="gap:16px;margin:0">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap">${l}</div><div class="n mono">${ni(n)}</div></div>
+  <div class="grid g4" style="gap:var(--sp4);margin:0">${st.map(([l,n,c,g])=>`<div class="statcard"><div><div class="cap">${l}</div><div class="n mono">${ni(n)}</div></div>
     <div class="ic" style="background:${c}29;color:${c}">${g}</div></div>`).join('')}</div>
   ${card(`<div class="ch"><h2>Воркеры (${ni(m.total)})</h2><div class="spacer"></div>
     <span class="search">${I.srch} Найти воркер</span>
@@ -2326,7 +2433,7 @@ V.profile=m=>{
   const subs=subsOf(m).filter(x=>!x.arch), obs=obsOf(m).slice(0,3);
   const noname=S.name==='no';
   const notes=NOTES;
-  return `<div class="grid cols2" style="grid-template-columns:1176fr 460fr;gap:16px;align-items:start">
+  return `<div class="grid cols2" style="grid-template-columns:1176fr 460fr;gap:var(--sp4);align-items:start">
   <div class="pcol">
     ${card(`<div class="ch"><h2>Мои суб-аккаунты</h2><button class="btn link spacer" data-go="subaccounts">Смотреть все</button></div>
       ${noname?`<div class="empty" style="padding:28px 0"><p style="max-width:372px">Чтобы начать добывать цифровую валюту необходимо добавить имя аккаунта</p>
@@ -2347,9 +2454,9 @@ V.profile=m=>{
   </div>
   <div class="pcol">
     ${card(`<div class="ch"><h2>Мой профиль</h2></div>
-      ${noname?`<div class="row" style="gap:16px;margin-bottom:20px"><span class="avat lg" style="width:64px;height:64px;font-size:var(--fs-h3);line-height:var(--lh-h3)">?</span>
+      ${noname?`<div class="row" style="gap:var(--sp4);margin-bottom:20px"><span class="avat lg" style="width:64px;height:64px;font-size:var(--fs-h3);line-height:var(--lh-h3)">?</span>
         <button class="btn out sm" data-modal="subacct">${I.pl} Добавить имя аккаунта</button></div>`
-      :`<div class="row" style="gap:16px;margin-bottom:20px"><span class="avat lg">${acct[0].toUpperCase()}</span>
+      :`<div class="row" style="gap:var(--sp4);margin-bottom:20px"><span class="avat lg">${acct[0].toUpperCase()}</span>
         <span style="min-width:0"><span class="row" style="gap:2px"><b style="font-size:var(--fs-h5);line-height:var(--lh-h5);font-weight:600">${acct}</b>
           <button class="ibr" style="color:var(--accent)" data-copy="${acct}">${I.cp}</button></span>
           <div style="font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c3)">${FULLNAME}</div></span>
@@ -2427,7 +2534,7 @@ V.verification=m=>{
   const full=form!=='fiz';
   const doc=S.vdoc==='yes', acc=S.vacc==='yes';
   const head=(t,d)=>`<div class="vhead"><h2>${t}</h2><p>${d}</p></div>`;
-  return `<div class="grid" style="grid-template-columns:460fr 1176fr;gap:16px;margin:0;align-items:start">
+  return `<div class="grid" style="grid-template-columns:460fr 1176fr;gap:var(--sp4);margin:0;align-items:start">
   <div class="vcol">
     ${card(`<div class="vform">
       <span class="vico">${I.uid}</span>
@@ -2595,8 +2702,8 @@ const FA_DESC=()=>S.fam==='sms'?'2FA через код из сообщения �
   :'2FA через код из приложения Google';
 V.security=m=>{
   const rows=sessOf(m), cur=rows[0], fa=S.fa==='yes';
-  return `<div class="grid cols2" style="grid-template-columns:1176fr 460fr;align-items:start;gap:16px">
-  <div style="display:flex;flex-direction:column;gap:16px">
+  return `<div class="grid cols2" style="grid-template-columns:1176fr 460fr;align-items:start;gap:var(--sp4)">
+  <div style="display:flex;flex-direction:column;gap:var(--sp4)">
     ${card(`<div class="stitle"><h2>Двухфакторная аутентификация</h2>
       <p>Защитите свой аккаунт, вывод средств, изменение настроек безопасности и подтверждение с помощью 2FA</p></div>
       ${secRow(FA_ICON(),FA_NAME(),FA_DESC(),
@@ -3438,7 +3545,7 @@ Object.assign(MODALS,{
   /* Добавить выписку: зона загрузки, карточка файла и требования */
   vdocm:{t:'Добавить выписку',acts:false,
     b:()=>{const file=U.vfile, big=file&&S.verr==='file';
-      return `<div class="mstack" style="gap:16px">
+      return `<div class="mstack" style="gap:var(--sp4)">
       <button class="vdrop" data-vfile>
         <span class="vdi">${I.up}</span>
         <span class="vdt"><b><em>Выберите файл</em> или перетащите</b>
@@ -3539,10 +3646,12 @@ function acctSummary(m){
    ============================================================ */
 export function applyState(next){
   S = next.S; U = next.U; route = next.route;
+  /* Набор иконок — часть сценария: подменяем до того, как экраны соберутся */
+  setIcons(S.icons);
   pop = next.pop; modal = next.modal; openGroups = next.openGroups; mini = next.mini;
 }
 export {
-  AXES, AX_OWN, AXCAT, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, notifCount, ACCOUNTS, M,
+  AXES, AX_OWN, AX_STYLE, AXCAT, PRESETS, DEF, ICON_PACKS, iconSample, FONTS, fontStack, fontsHref, COINS, HEALTH, TIERS, NOTIF_N, notifCount, ACCOUNTS, M,
   loadFail, nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   SUM_NAV, SUM_ROUTES, SCREEN_NAMES, V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf, coinsOf,

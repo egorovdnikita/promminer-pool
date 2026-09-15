@@ -105,8 +105,13 @@ export interface Scenario {
   motion: string
   grid: string
   outline: string
-  radius: string
   toast: string
+  /* Оформление: шрифт, акцент, скругления, отступы и набор иконок */
+  font: string
+  accent: string
+  radius: string
+  space: string
+  icons: string
   load: string
   neterr: string
 }
@@ -130,7 +135,7 @@ export interface Ui {
   /** Фильтр в панели сценариев. */
   scq?: string
   /** Вкладка панели: оси, наборы или переходы. */
-  sctab?: 'ax' | 'sets' | 'go'
+  sctab?: 'ax' | 'sty' | 'sets' | 'go'
   /** Закреплённые оси — всплывают наверх списка (живут в localStorage). */
   scpin?: string[]
   /** Показывать только закреплённые оси. */
