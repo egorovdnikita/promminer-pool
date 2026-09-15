@@ -6,7 +6,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "audit": "node scripts/audit.mjs",
-    "sweep": "node scripts/sweep.mjs"
+    "sweep": "node scripts/sweep.mjs",
+    "gate": "node scripts/gate-password.mjs"
   },
   "type": "module",
   "private": true,

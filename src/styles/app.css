@@ -2334,3 +2334,11 @@ body.scopen .mask{padding-right:calc(35px + var(--scpad,0px))}
 body.scopen.scleft .mask{padding-right:35px;padding-left:calc(35px + var(--scpad,0px))}
 body.scopen .mask.sheet{padding:0 var(--scpad,0px) 0 0}
 body.scopen.scleft .mask.sheet{padding:0 0 0 var(--scpad,0px)}
+
+/* Экран пароля повторяет страницу входа: те же .auth/.acol/.afield.
+   Свои только логотип по центру и строка «Забыли пароль?» справа. */
+.gatelogo{padding:0;height:auto;justify-content:center;margin-bottom:24px}
+.gateforgot{display:flex;align-items:center;gap:12px;margin-top:-4px}
+.gateforgot .errmsg{flex:1;min-width:0;font-size:var(--fs-c);line-height:var(--lh-c);margin-left:12px}
+.gateforgot .lnk{margin-left:auto;color:var(--accent)}
+.auth .afield input{flex:1;min-width:0;border:0;background:none;outline:none;color:var(--c1)}

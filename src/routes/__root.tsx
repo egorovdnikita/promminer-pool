@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { AppProvider, useApp, useModel } from '@/state/store'
+import { Gate } from '@/components/Gate'
+import { unlocked } from '@/gate'
 import { Sidebar } from '@/components/Sidebar'
 import { Header } from '@/components/Header'
 import { Coinbar } from '@/components/Coinbar'
@@ -12,6 +15,10 @@ import { Screen } from '@/components/Screen'
 export const Route = createRootRoute({ component: RootLayout })
 
 function RootLayout() {
+  /* Пароль спрашиваем один раз на устройство: дальше ключ лежит
+     в localStorage и прототип открывается сразу. */
+  const [open, setOpen] = useState(unlocked)
+  if (!open) return <Gate onPass={() => setOpen(true)} />
   return (
     <AppProvider>
       <Layout />

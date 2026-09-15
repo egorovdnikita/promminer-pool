@@ -58,6 +58,9 @@ src/
   раздаваться из подпапки (GitHub Pages). Новую картинку вставлять как
   `src="${A}name.png"`, иначе она отвалится на Pages. Подробности
   о публикации — в README.
+- Вход в прототип закрыт паролем (`src/gate.ts`, экран `components/Gate.tsx`).
+  Это щеколда от случайного посетителя, а не защита: проверка идёт в браузере.
+  Смена пароля — `npm run gate`, подробности в README.
 - Прод для сверки данных и формулировок: https://pool.promminer.ru/
 - Список страниц Figma с их `node-id` — в `docs/figma-pages.md`. Получить заново:
   `use_figma` со скриптом `return figma.root.children.map(p=>({id:p.id,name:p.name}))`
