@@ -1,4 +1,4 @@
-import { AXES, AXCAT, PRESETS, DEF, SCREEN_NAMES, TITLES, MODALS } from '@/legacy/prototype'
+import { AXES, AX_OWN, AXCAT, PRESETS, DEF, SCREEN_NAMES, TITLES, MODALS } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import type { Scenario } from '@/state/types'
 
@@ -37,6 +37,9 @@ export function ScenarioPanel() {
   const tab = U.sctab || 'ax'
   const onlyDirty = !!U.scdirty
   const onlyPin = !!U.sconly
+  /* Оси без кадра в макетах помечаем: их придумали при сборке панели */
+  const onlyFigma = !!U.scfig
+  const own = keys.filter((k) => AX_OWN.has(k))
   const saved = U.saved || []
   const hist = U.schist || []
   const width = U.scw || 420
@@ -46,6 +49,7 @@ export function ScenarioPanel() {
   const visible = (k: Key) =>
     (!onlyDirty || S[k] !== DEF[k]) &&
     (!onlyPin || pins.includes(k)) &&
+    (!onlyFigma || !AX_OWN.has(k)) &&
     (hit(AXES[k].label) || hit(AXES[k].g) || hit(AXES[k].note || '') ||
       AXES[k].opts.some(([, t]) => hit(t)))
 
@@ -60,6 +64,7 @@ export function ScenarioPanel() {
     <div className={`scg ${S[k] !== DEF[k] ? 'dirty' : ''}`} key={k}>
       <label>
         <span className="scl">{AXES[k].label}</span>
+        {AX_OWN.has(k) && <i className="scown" title="Оси нет в макетах — придумана при сборке панели">своё</i>}
         <button
           className={`scpin ${pins.includes(k) ? 'on' : ''}`}
           data-scpin={k}
@@ -142,6 +147,9 @@ export function ScenarioPanel() {
               <button className={`scchip ${onlyPin ? 'on' : ''}`} data-onlypin title="Только закреплённые оси">
                 ★{pins.length > 0 && ` ${pins.length}`}
               </button>
+              <button className={`scchip ${onlyFigma ? 'on' : ''}`} data-onlyfigma title="Только оси, у которых есть кадр в макетах">
+                Из макетов {keys.length - own.length}
+              </button>
               <button className="scchip" data-sccol="all" title="Свернуть все группы">Свернуть</button>
               <button className="scchip" data-sccol="none" title="Развернуть все группы">Развернуть</button>
               <button className="scchip" data-rand title="Случайные значения всех осей">Случайный</button>
@@ -158,16 +166,20 @@ export function ScenarioPanel() {
                 {pins.filter(visible).map(axisRow)}
               </section>
             )}
-            {AXCAT.map(([cat, gs]) => {
-              const body = gs.map(groupSection).filter(Boolean)
-              if (!body.length) return null
-              return (
-                <div className="sccat" key={cat}>
-                  <div className="sccath">{cat}</div>
-                  {body}
-                </div>
-              )
-            })}
+            {/* Группа, забытая в AXCAT, всё равно рисуется — иначе её оси
+                молча пропадают из панели */}
+            {[...AXCAT, ['Прочее', [...new Set(keys.map((k) => AXES[k].g))]
+              .filter((g) => !AXCAT.some(([, gs]) => gs.includes(g)))] as [string, string[]]]
+              .map(([cat, gs]) => {
+                const body = gs.map(groupSection).filter(Boolean)
+                if (!body.length) return null
+                return (
+                  <div className="sccat" key={cat}>
+                    <div className="sccath">{cat}</div>
+                    {body}
+                  </div>
+                )
+              })}
             {!keys.filter(visible).length && (
               <p className="scnote">Ничего не нашлось. Сбросьте поиск или фильтры.</p>
             )}

@@ -35,6 +35,18 @@ axes.forEach(a=>{
   if(!real) out.push('  ! '+a+' — S.'+a+' не читается в разметке');
 });
 out.push('  всего осей: '+axes.length);
+/* B2. группа осей, забытая в AXCAT: её оси не попадают в панель */
+H('B2. группы осей вне категорий AXCAT');
+{
+  const cat=proto.slice(proto.indexOf('const AXCAT=['),proto.indexOf('const AXES={'));
+  const inCat=new Set([...cat.matchAll(/'([^']+)'/g)].map(m=>m[1]));
+  /* только блок AXES: {g:'…'} встречается ещё и у пунктов сайдбара */
+  const block=proto.slice(proto.indexOf('const AXES={'),proto.indexOf('/* Готовые связки состояний'));
+  const groups=new Set([...block.matchAll(/\{g:'([^']+)'/g)].map(m=>m[1]));
+  const lost=[...groups].filter(g=>!inCat.has(g));
+  lost.forEach(g=>out.push('  ! «'+g+'» — нет в AXCAT, оси не видны в панели'));
+  if(!lost.length) out.push('  все группы на месте');
+}
 
 /* C. экраны: есть V.x, но никуда не ведёт data-go / NAV */
 const screens=[...proto.matchAll(/^V\.([a-zA-Z0-9]+)=/gm)].map(m=>m[1]);

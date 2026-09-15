@@ -20,9 +20,18 @@ const A=(typeof import.meta!=='undefined'&&import.meta.env&&import.meta.env.BASE
 const AXCAT=[
   ['Данные и графики',['Данные','График','Курсы']],
   ['Разделы',['Воркеры','Мои активы','Выплаты','Отчет','Рефералы','Калькуляторы']],
-  ['Аккаунт и доступ',['Аккаунт','Профиль','Контакты','Верификация','Наблюдатели','Суб-аккаунты']],
+  ['Аккаунт и доступ',['Вход','Аккаунт','Профиль','Контакты','Верификация','Наблюдатели','Суб-аккаунты']],
   ['Интерфейс',['Интерфейс','Загрузка и ошибки']],
 ];
+/* Оси, которых нет в макетах: их придумал я, когда набирал панель.
+   Панель помечает их, чтобы не путать с настоящими состояниями, а новые
+   заводятся только по кадрам Figma. Список — не для кода, а для честности. */
+const AX_OWN=new Set(['numfmt','tzview','prec','fiat','trend','noise','gap','rej',
+  'rate','ratesrc','wn','wfilt','wpage','wsort','wname','wtagn','wvend','wup','wshare','wlink',
+  'athr','asell','astep','aconf','acoins','afee','incn','incper','payn',
+  'repn','repacc','repdl','repw','refn','refact','refpn','refhash','refban','reflink',
+  'calchw','taxres','fam','pwdage','sesgeo','notift','sublim','avatar','vstat',
+  'dens','fsz','grid','outline','radius','toast','motion','neterr']);
 const AXES={
   /* ---- Данные ---- */
   coin:{g:'Данные',label:'Монета',note:'Меняет парк, балансы и единицы хэшрейта',
@@ -202,6 +211,21 @@ const AXES={
   toast:{g:'Интерфейс',label:'Всплывающие подсказки',opts:[['on','Показывать'],['off','Не показывать']]},
   motion:{g:'Интерфейс',label:'Анимации',opts:[['on','Включены'],['off','Выключены']]},
 
+  /* ---- Вход ---- */
+  achan:{g:'Вход',label:'Канал входа',note:'Страницы «пароль и почта» и «пароль и телефон»',
+    opts:[['mail','Почта'],['phone','Телефон']]},
+  lerr:{g:'Вход',label:'Ошибка входа',
+    opts:[['no','Нет'],['req','Поле обязательно'],['fmt','Некорректный email'],['pair','Неверный email или пароль']]},
+  rerr:{g:'Вход',label:'Ошибка регистрации',
+    opts:[['no','Нет'],['req','Поле обязательно'],['fmt','Некорректный email'],
+      ['pw','Некорректный пароль'],['pair','Пароли не совпадают']]},
+  pwv:{g:'Вход',label:'Проверка пароля',note:'Список правил под полем',
+    opts:[['no','Скрыта'],['show','Не выполнена'],['ok','Всё учтено']]},
+  a2fa:{g:'Вход',label:'Второй фактор при входе',
+    opts:[['no','Нет'],['code','Код на почту'],['ga','Google Authenticator']]},
+  otperr:{g:'Вход',label:'Код подтверждения',
+    opts:[['ok','Введён'],['no','Пусто'],['bad','Введен неверный код']]},
+
   /* ---- Загрузка и ошибки ---- */
   load:{g:'Загрузка и ошибки',label:'Загрузка',opts:[['no','Загружено'],['yes','Скелетон'],['err','Ошибка загрузки']]},
   neterr:{g:'Загрузка и ошибки',label:'Ошибка сети',note:'Где падает запрос',
@@ -288,6 +312,7 @@ const DEF={
   phone:'no',mail:'yes',tg:'no',cerr:'no',
   verif:'no',vdoc:'no',vacc:'no',verr:'no',vform:'pf',vstat:'none',
   oerr:'no',saerr:'no',
+  achan:'mail',lerr:'no',rerr:'no',pwv:'no',a2fa:'no',otperr:'ok',
   theme:'light',dens:'norm',fsz:'norm',side:'full',motion:'on',grid:'off',outline:'off',radius:'ds',toast:'on',
   load:'no',neterr:'no',
 };
@@ -2660,37 +2685,86 @@ V.notifconfig=m=>`${card(`<div class="ch"><button class="ib sm" data-go="notifse
   <p class="cap dim" style="margin-top:16px">Promminer Pool вправе присылать системные уведомления пользователю, без возможности отписаться от них.</p>`)}`;
 
 /* --- Авторизация: /login, /register, /restore + шаг с кодом ---
-   Экраны собраны по проду: белый лист, колонка 358, поля h56 r16,
-   кнопка xl h56, три чекбокса согласий с настоящими PDF-ссылками. */
+   Экраны собраны по файлу «Группа входа»: страницы «пароль и почта»
+   (2:33), «пароль и телефон» (11:2617) и «Forgot password» (40:2136).
+   Белый лист, колонка 358, поля h56 r16, кнопка xl h56, три чекбокса
+   согласий с настоящими PDF-ссылками. */
 const AUTH_TABS={login:'Вход',register:'Регистрация',restore:'Восстановление',otp:'Код'};
-const authField=(ph,type,eye)=>`<div class="afield"><input placeholder="${ph}" ${type?`type="${type}"`:''}>${eye?`<button class="aeye" data-eye>${I.eyeoff}<span class="off">${I.eye}</span></button>`:''}</div>`;
+/* Правила пароля из кадра 3:2163: серые, пока не выполнены, зелёные — когда всё учтено */
+const PW_RULES=['Не менее 10 символов','Заглавные и строчные буквы (A–Z, a–z)',
+  'Минимум одна цифра (0–9) и спецсимвол (!#$&^)'];
+/* Тексты ошибок — дословно из кадров входа и регистрации */
+const LERR={req:'Поле обязательно для заполнения',fmt:'Введите корректный email',
+  pair:'Неверный email или пароль'};
+const RERR={req:'Поле обязательно для заполнения',fmt:'Введите корректный email',
+  pw:'Введите корректный пароль',pair:'Пароли не совпадают'};
+/* Канал входа: на странице «пароль и телефон» те же экраны, но с телефоном */
+const achMail=()=>S.achan!=='phone';
+const authVal=()=>achMail()?'Kate1234@gmail.com':'+7 (999) 999-99-99';
+const authPh=()=>achMail()?'Телефон или email':'Телефон';
+const authField=(ph,type,eye,val,err)=>`<div class="afield ${err?'err':''}">
+  <input placeholder="${ph}" ${type?`type="${type}"`:''} ${val?`value="${val}"`:''}>
+  ${eye?`<button class="aeye" data-eye>${I.eyeoff}<span class="off">${I.eye}</span></button>`:''}</div>
+  ${err?`<span class="errmsg">${err}</span>`:''}`;
 const consent=(i,html)=>`<label class="acheck" data-acheck="${i}">${cb(U.consent.has(i))}<span>${html}</span></label>`;
+/* Экран кода: канал в подписи, ссылка «Изменить», вставка и таймер (4:1648) */
+const otpBox=(title,cta)=>{
+  const bad=S.otperr==='bad';
+  return `<h1 class="ah">${title}</h1>
+    <p class="asub">Мы отправили код подтверждения<br>на указанный вами ${achMail()?'email':'номер'}</p>
+    <p class="asub aval">${authVal()}<button class="lnk a" data-auth="${cta}">Изменить</button></p>
+    ${authField('Код подтверждения','',0,S.otperr==='no'?'':'123_RGFdndkkvl8732',bad?'Введен неверный код':'')}
+    <div class="arow2">${achMail()?`<button class="lnk a" data-toast="Код вставлен">Вставить код</button>`:'<span></span>'}
+      <button class="lnk a" data-toast="Код отправлен повторно">Запросить новый код через 00:59</button></div>`;
+};
+/* Экран кода из приложения (11:2294) — второй фактор при входе */
+const gaBox=()=>`<h1 class="ah">Введите код<br>из Google Authenticator</h1>
+  ${authField('Введите 6-тизначный код','',0,S.otperr==='no'?'':'482913',S.otperr==='bad'?'Поле обязательно для заполнения':'')}
+  <button class="lnk a" data-toast="Код вставлен">Вставить код</button>`;
 V.auth=()=>{
   const step=U.auth||'login';
   const ok=step==='register'?U.consent.size===3:step==='login'?U.consent.size===3:true;
+  /* Валидация пароля показывается при вводе и зеленеет, когда всё учтено (3:2163, 3:2740) */
+  const rules=S.pwv==='no'?'':`<ul class="apw ${S.pwv==='ok'?'ok':''}">${PW_RULES.map(r=>`<li>${r}</li>`).join('')}</ul>`;
+  /* Куда ведёт «Продолжить» со входа: код на канал, код приложения или сразу кабинет */
+  const afterLogin=S.a2fa==='ga'?'ga':S.a2fa==='code'?'otp':'';
   const body={
     login:`<h1 class="ah">Войти в аккаунт</h1>
       <p class="asub">Еще нет аккаунта? <button class="lnk" style="color:var(--accent)" data-auth="register">Создать</button></p>
-      ${authField('Телефон или email')}${authField('Пароль','password',1)}
+      ${authField(authPh(),'',0,S.lerr==='req'?'':authVal(),LERR[S.lerr]||'')}
+      ${authField('Пароль','password',1,'',S.lerr==='pair'?' ':'')}
       <div style="text-align:right;margin-top:-4px"><button class="lnk bs" style="color:var(--accent)" data-auth="restore">Забыли пароль?</button></div>
       ${CONSENTS.map((c,i)=>consent(i,c)).join('')}`,
     register:`<h1 class="ah">Создать аккаунт</h1>
       <p class="asub">Уже есть аккаунт? <button class="lnk" style="color:var(--accent)" data-auth="login">Войти</button></p>
-      ${authField('Телефон или email')}${authField('Пароль','password',1)}${authField('Подтвердите пароль','password',1)}
+      ${authField(authPh(),'',0,S.rerr==='req'?'':authVal(),RERR[S.rerr]&&S.rerr!=='pw'&&S.rerr!=='pair'?RERR[S.rerr]:'')}
+      ${authField('Пароль','password',1,'',S.rerr==='pw'?RERR.pw:'')}${rules}
+      ${authField('Подтвердите пароль','password',1,'',S.rerr==='pair'?RERR.pair:'')}
       ${CONSENTS.map((c,i)=>consent(i,c)).join('')}`,
     restore:`<h1 class="ah">Восстановление пароля</h1>
-      <p class="asub mut">Введите номер телефона или email к которому привязан аккаунт</p>
-      ${authField('Телефон или email')}`,
-    otp:`<h1 class="ah">Введите код</h1>
-      <p class="asub mut">Отправили код на na***so@mail.ru</p>
-      <div class="otp">${[2,4,7,'','',''].map((d,i)=>`<span class="otpc ${i===3?'cur':''}">${d}</span>`).join('')}</div>
-      <p class="asub mut" style="margin-top:4px">Отправить повторно через 00:42</p>`,
+      <p class="asub mut">Введите ${achMail()?'номер телефона или email':'номер телефона'} к которому привязан аккаунт</p>
+      ${authField(authPh(),'',0,'',LERR[S.lerr]||'')}`,
+    otp:otpBox('Введите код подтверждения','login'),
+    ga:gaBox(),
+    /* Новый пароль после восстановления (40:11855, 55:11242) */
+    newpw:`<h1 class="ah">Придумайте новый пароль</h1>
+      <p class="asub mut">Введите ${achMail()?'номер телефона или email':'номер телефона'} к которому привязан аккаунт</p>
+      ${authField('Новый пароль','password',1,'',S.rerr==='pw'?RERR.pw:'')}${rules}
+      ${authField('Подтвердите пароль','password',1,'',S.rerr==='pair'?RERR.pair:'')}`,
+    /* Экран успеха (40:12344) */
+    done:`<h1 class="ah">Пароль успешно изменен</h1>
+      <p class="asub mut">Войдите в систему с новым паролем</p>`,
   }[step];
+  /* Подпись кнопки и следующий шаг — по кадрам каждого флоу */
+  const CTA={login:['Продолжить',afterLogin],register:['Продолжить','otp'],
+    restore:['Продолжить','otp'],otp:['Продолжить',''],ga:['Войти',''],
+    newpw:['Изменить пароль','done'],done:['Войти','']};
+  const [cta,next]=CTA[step]||['Продолжить',''];
   return `<div class="auth"><div class="acol">
     <div class="logo" style="padding:0;height:auto;justify-content:center;margin-bottom:24px">${LOGO.replace(' lbl','')}</div>
     ${body}
-    <button class="btn xl" ${ok?'':'disabled'} ${step==='login'?'data-go="home"':`data-auth2="${step==='otp'?'done':'otp'}"`}>Продолжить</button>
-    ${step!=='login'?`<button class="lnk bs" style="color:var(--c3);text-align:center;margin-top:4px" data-auth="login">Вернуться ко входу</button>`:''}
+    <button class="btn xl" ${ok?'':'disabled'} ${next?`data-auth2="${next}"`:'data-go="home"'}>${cta}</button>
+    ${step!=='login'&&step!=='done'?`<button class="lnk bs" style="color:var(--c3);text-align:center;margin-top:4px" data-auth="login">Вернуться ко входу</button>`:''}
   </div><div class="afoot">© 2026 Promminer Pool. Все права защищены</div></div>`;
 };
 
@@ -3468,7 +3542,7 @@ export function applyState(next){
   pop = next.pop; modal = next.modal; openGroups = next.openGroups; mini = next.mini;
 }
 export {
-  AXES, AXCAT, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, notifCount, ACCOUNTS, M,
+  AXES, AX_OWN, AXCAT, PRESETS, DEF, COINS, HEALTH, TIERS, NOTIF_N, notifCount, ACCOUNTS, M,
   loadFail, nf, ni, rng, sv, I, D, DOCS, LINKS, CONSENTS, LOGO, COIN_ICON, GOOGLE, USD_ICON, PAY_ICON,
   NAV, TITLES, GROUP_OF, MODELS, TAGS, vendorOf, groups, tagsOf, allowed, permsOf, card, emptyBox, seg, segv, segLine, segi, pageSlice, cb, rd, status, CHECK, pager, chart, datePicker, profTabs, skeleton,
   SUM_NAV, SUM_ROUTES, SCREEN_NAMES, V, MODALS, notifications, acctSummary, workersList, workersRows, PROF, SUBS, OBSERVERS, SESSIONS, VFIELDS, VFORMS, BANKS, obsOf, subsOf, coinsOf,

@@ -7,6 +7,8 @@ export interface NavItem { id?: string; t: string; ic: string; g?: string; kids?
 export type Model = any
 
 export declare const AXES: Record<keyof Scenario, Axis>
+/** Оси, которых нет в макетах — придуманы при сборке панели. */
+export declare const AX_OWN: Set<string>
 /** Готовые связки состояний для панели: имя, пояснение, набор осей, раздел. */
 export declare const PRESETS: [string, string, Partial<Scenario>, string][]
 /** Категории групп осей: заголовок и входящие в него группы. */

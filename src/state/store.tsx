@@ -725,6 +725,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     /* ==== Панель сценариев ==== */
     if (at('[data-onlydirty]')) { u.scdirty = !u.scdirty; return bump() }
     if (at('[data-onlypin]')) { u.sconly = !u.sconly; return bump() }
+    if (at('[data-onlyfigma]')) { u.scfig = !u.scfig; return bump() }
     const tab = at('[data-sctab]')
     if (tab) { u.sctab = tab.dataset.sctab as Ui['sctab']; return bump() }
     /* Закреплённые оси всплывают наверх списка и переживают перезагрузку */

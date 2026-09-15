@@ -2342,3 +2342,18 @@ body.scopen.scleft .mask.sheet{padding:0 0 0 var(--scpad,0px)}
 .gateforgot .errmsg{flex:1;min-width:0;font-size:var(--fs-c);line-height:var(--lh-c);margin-left:12px}
 .gateforgot .lnk{margin-left:auto;color:var(--accent)}
 .auth .afield input{flex:1;min-width:0;border:0;background:none;outline:none;color:var(--c1)}
+/* Пометка оси, которой нет в макетах */
+.scown{font-style:normal;font-size:9px;line-height:14px;font-weight:700;letter-spacing:0;
+  padding:0 5px;border-radius:var(--r-f);background:var(--ctrl);color:var(--c3);flex:0 0 auto}
+
+/* Экраны входа: подпись с каналом, правила пароля и ряд ссылок под кодом.
+   Всё по файлу «Группа входа» (кадры 3:2163, 3:2740, 4:1648, 11:2294). */
+.asub.aval{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:0}
+.apw{list-style:none;margin:-4px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;
+  font-size:var(--fs-s);line-height:var(--lh-s);color:var(--c2);font-weight:500}
+.apw li{position:relative;padding-left:14px}
+.apw li::before{content:"";position:absolute;left:0;top:7px;width:4px;height:4px;
+  border-radius:50%;background:currentColor}
+.apw.ok{color:var(--pos)}
+.arow2{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:-4px}
+.arow2 .lnk{color:var(--accent)}

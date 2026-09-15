@@ -92,6 +92,12 @@ export interface Scenario {
   vstat: string
   oerr: string
   saerr: string
+  achan: string
+  lerr: string
+  rerr: string
+  pwv: string
+  a2fa: string
+  otperr: string
   theme: string
   dens: string
   fsz: string
@@ -129,6 +135,8 @@ export interface Ui {
   scpin?: string[]
   /** Показывать только закреплённые оси. */
   sconly?: boolean
+  /** Показывать только оси, у которых есть кадр в макетах. */
+  scfig?: boolean
   /** История сценариев для кнопки «Отменить». */
   schist?: Scenario[]
   /** Ширина панели: 380 / 520 / 720. */
