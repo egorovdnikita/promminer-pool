@@ -111,10 +111,13 @@ body.mini .ni .spacer.lbl{display:none!important}
 .logo .lw{display:flex;flex-direction:column;align-items:flex-end}
 /* Полоса прокрутки съедала 11px ширины пунктов: в макете пункт 228,
    а до контента от него ровно 12 (109:19431) */
+/* Список прокручивается, а пункты не ужимаются: без flex:0 0 auto высота 48
+   у .ni «сдавливалась» до 24, когда раскрыты все группы разом (у .kid спасал
+   min-height, поэтому косо вставал только верхний уровень). */
 .nav{display:flex;flex-direction:column;gap:0;overflow-y:auto;padding:var(--sp3) var(--sp3) 0;
   scrollbar-width:none;-ms-overflow-style:none}
 .nav::-webkit-scrollbar{display:none}
-.ni{display:flex;align-items:center;gap:8px;padding:0 var(--sp3);height:var(--h-ctrl);border-radius:var(--r-m);color:var(--c1);background:transparent;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;position:relative;width:100%}
+.ni{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding:0 var(--sp3);height:var(--h-ctrl);border-radius:var(--r-m);color:var(--c1);background:transparent;font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;position:relative;width:100%}
 .nic{color:var(--c3);display:flex;flex:0 0 auto}
 .ni.on .nic,.ni.act .nic{color:var(--accent)}
 .ni:hover{background:var(--surface)}
@@ -122,8 +125,8 @@ body.mini .ni .spacer.lbl{display:none!important}
 .ni.on::after,.ni.act::after{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);width:3px;height:20px;border-radius:4px 0 0 4px;background:var(--accent)}
 .ni .chev{margin-left:auto;color:var(--c1);display:flex;transition:transform .15s}
 .ni.open .chev{transform:rotate(180deg)}
-.kids{display:flex;flex-direction:column;gap:1px;padding:2px 0 4px}
-.kid{display:flex;align-items:center;min-height:var(--h-ctrl);padding:0 var(--sp3) 0 44px;border-radius:var(--r-m);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1);position:relative}
+.kids{display:flex;flex-direction:column;flex:0 0 auto;gap:1px;padding:2px 0 4px}
+.kid{display:flex;align-items:center;flex:0 0 auto;min-height:var(--h-ctrl);padding:0 var(--sp3) 0 44px;border-radius:var(--r-m);font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;color:var(--c1);position:relative}
 .kid:hover{opacity:.8}
 .kid.on{color:var(--accent)}
 .sep{height:1px;background:var(--border);margin:12px 24px}
