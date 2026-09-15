@@ -1617,7 +1617,8 @@ html{scrollbar-gutter:stable}
 .wdev b{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 .wdtime{font-size:var(--fs-c);line-height:var(--lh-c);color:var(--c3);font-weight:500}
 /* Баннер PromBox: картинка справа, текст и кнопка живые */
-.promo.pbox{background:#7086fc;min-height:160px;padding:calc(20px*var(--spk)) var(--sp5);justify-content:flex-start}
+/* Плитка PromBox: фон — системный акцент, а не залитая в картинку плашка */
+.promo.pbox{background:var(--accent);min-height:160px;padding:calc(20px*var(--spk)) var(--sp5);justify-content:flex-start}
 .promo.pbox b{position:relative;font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:#fff}
 .promo.pbox p{position:relative;font-size:var(--fs-s);line-height:var(--lh-s);color:#fff;margin-top:4px;max-width:60%}
 .promo.pbox .btn{background:#fff;color:#111827;box-shadow:none;height:36px;border-radius:var(--r-s);margin-top:16px}
