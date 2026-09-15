@@ -514,25 +514,13 @@ body.mini .ni .spacer.lbl{display:none!important}
 img.hex{object-fit:contain}
 .hex.none{background:url('/tier-0.svg') center/130px 146px no-repeat;
   font-size:var(--fs-h2);line-height:22px;font-weight:500;color:var(--c3)}
-/* дорожка 590 из 642: справа ещё 24, отсюда просвет до панели */
-/* дорожка уровней использует стили .rprog из раздела рефералов */
+/* дорожка 590 из 642: справа ещё 24, отсюда просвет до панели.
+   Сама дорожка рисуется стилями .rprog из раздела рефералов — своя вёрстка
+   (.tbar/.tpts/.pt) ушла вместе с прежней разметкой.
+   Медали не режем шестиугольником: исходники от дизайнера уже с прозрачным
+   фоном, а обрезка спрямляла края и срезала боковые грани — на тёмной теме
+   они читались белыми полосками по бокам. */
 .track{padding:0 var(--sp5) 0 0}
-/* полоса заходит под крайние медали: их шестиугольник начинается на 8 % от
-   края картинки, поэтому без отступа 3 она торчит слева от первой звезды */
-.tbar{height:20px;margin:0 3px;border-radius:var(--r-f);background:#6b728014;overflow:hidden}
-.tfill{height:100%;background:var(--accent);border-radius:var(--r-f);transition:width .25s}
-.tpts{display:flex;justify-content:space-between;margin-top:-30px;position:relative}
-/* подпись идёт через 12 от полосы, а медаль свисает на 10 — отсюда зазор 2 */
-.pt{display:flex;flex-direction:column;align-items:center;gap:2px;width:40px;position:relative}
-/* полоса под медалями непрерывна (макет 185:99697), поэтому медали режем
-   по силуэту шестиугольника — иначе белые углы выгрузки рвут её */
-.pt img{position:relative}
-.pt img{width:40px;height:40px;display:block}
-.pt span{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600;color:var(--c1)}
-/* медали выгружены на белой подложке; на светлой карточке её не видно,
-   на тёмной теме обрезаем по силуэту шестиугольника (ценой мягкой тени) */
-.pt img,:root[data-theme="dark"] img.hex{
-  clip-path:polygon(50% 2%,92.8% 29.6%,92.8% 69.7%,50% 98%,7.2% 69.7%,7.2% 29.6%)}
 .alert.mb{margin-bottom:12px}
 .foot{margin-top:auto;display:flex;gap:var(--sp5);padding:var(--sp1) 0 var(--sp5);font-size:var(--fs-s);line-height:var(--lh-s);color:#9ca3af;font-weight:600;flex-wrap:wrap}
 .foot .l{margin-left:auto;display:flex;gap:var(--sp5);flex-wrap:wrap}
