@@ -8,8 +8,7 @@
  * Сменить пароль: `npm run gate` — скрипт спросит его в терминале
  * и перезапишет хэш ниже. Сам пароль никуда не записывается.
  */
-/* Временный пароль — «promminer». Смените своим: `npm run gate`. */
-export const GATE_HASH = '5588a4f85b5a02fa8e11645a8bd09ccd2440d0471d8ce7a69a2396c0c181207e'
+export const GATE_HASH = '064fabced60fc9acd36626d3962e0ba6d01fa94c1d15179c113948b7eb0e5bff'
 
 /** Ключ в localStorage: один раз ввёл — больше не спрашиваем на этом устройстве. */
 const KEY = 'pm.gate'
