@@ -212,9 +212,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
          возвращается к индиговому из дизайн-системы */
       el.style.setProperty('--accent-h', shade(acc, 0.88))
       el.style.setProperty('--accent-a', shade(acc, 0.76))
+      /* знак логотипа живёт на своём фирменном токене — уводим и его */
+      el.style.setProperty('--brand', '#' + acc)
     } else {
       for (const v of ['--accent', '--accent-sub', '--accent-ghost', '--accent-tint',
-        '--focus', '--accent-h', '--accent-a']) el.style.removeProperty(v)
+        '--focus', '--accent-h', '--accent-a', '--brand']) el.style.removeProperty(v)
     }
     /* Поле HEX в панели не управляемое (иначе теряется курсор при вводе) —
        подтягиваем его значение, когда цвет сменили образцом или пипеткой */
