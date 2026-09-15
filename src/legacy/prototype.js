@@ -2039,7 +2039,7 @@ ${card(`<div class="monhero">
   <p>Раздел личного кабинета, где вы в реальном времени отслеживаете состояние оборудования
     и доходность. Все ключевые данные собраны в одном месте, без сложных настроек</p>
   <button class="btn" data-toast="Заявка отправлена — мы свяжемся с вами">Получить предложение</button>
-  <img class="monart" src="${A}monitoring-hero.webp" alt="" width="2000" height="656">
+  <img class="monart" src="${A}monitoring-hero.png" alt="" width="1536" height="480">
 </div>`)}
 ${card(MON_SECS.map(([t,xs],i)=>`${i?'<div class="hr"></div>':''}
   <div class="monsec"><h3>${t}</h3>

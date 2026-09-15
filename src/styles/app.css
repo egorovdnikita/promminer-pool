@@ -974,7 +974,10 @@ input:focus,input:focus-visible,select:focus,select:focus-visible,textarea:focus
 .tbl th .paico{margin-right:4px;max-height:none;line-height:0}
 .tbl th .paico svg{width:24px;height:24px}
 /* тёмная тема: точечные доводки блоков с собственной заливкой */
-:root[data-theme="dark"] .promo{background:linear-gradient(135deg,#312e81,#1e1b4b)}
+/* Тёмная подложка — только у баннеров с картинкой-фоном. Промо «Снизили
+   порог» и плитка Промбокса красят фон сами: у первого это цвет секции,
+   у второй — фирменный синий. */
+:root[data-theme="dark"] .promo:not(.plain):not(.pbox){background:linear-gradient(135deg,#312e81,#1e1b4b)}
 :root[data-theme="dark"] .tag.g{color:#4ade80}
 :root[data-theme="dark"] .tag.r{color:#f87171}
 :root[data-theme="dark"] .tag.y{color:#fbbf24}
