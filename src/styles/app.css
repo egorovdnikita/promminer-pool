@@ -2171,11 +2171,18 @@ html{scrollbar-gutter:stable}
    Служебный инструмент, а не продуктовый экран: размеры здесь свои,
    мельче шкалы дизайн-системы — иначе восемьдесят осей не помещаются.
    ============================================================ */
-.sct{position:fixed;right:18px;bottom:18px;z-index:80;height:44px;padding:0 18px;
+.sct{position:fixed;right:18px;bottom:18px;z-index:82;height:44px;padding:0 18px;
   border-radius:var(--r-f);background:var(--inv-bg);color:var(--inv-fg);
   font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;
   box-shadow:0 8px 28px #1a1a1a3d;display:flex;align-items:center;gap:8px}
 .sct .bdg{margin-left:2px;background:var(--accent)}
+/* Затемнение под панелью — она ведёт себя как выдвижной ящик: клик по фону
+   закрывает. Маска модалки лежит ниже (70), поэтому при открытом окне эту
+   не рисуем совсем, иначе окно тоже ушло бы в тень. */
+.scmask{position:fixed;inset:0;z-index:80;background:#1a1a1a52;backdrop-filter:blur(1px);
+  opacity:0;pointer-events:none;transition:opacity .22s}
+.scmask.on{opacity:1;pointer-events:auto}
+:root[data-motion="off"] .scmask{transition:none}
 .sc{position:fixed;right:0;top:0;bottom:0;width:420px;max-width:100vw;z-index:81;
   background:var(--surface);box-shadow:-8px 0 40px #1a1a1a29;
   display:flex;flex-direction:column;overflow:hidden;
@@ -2184,6 +2191,14 @@ html{scrollbar-gutter:stable}
 /* Панель швартуется к любому краю — кнопкой ⇄ в шапке */
 .sc.dockl{right:auto;left:0;box-shadow:8px 0 40px #1a1a1a29;transform:translateX(-100%)}
 .sc.dockl.open{transform:none}
+/* Край панели тянется мышью: полоска 8 с засечкой по наведению */
+.scgrip{position:absolute;top:0;bottom:0;left:0;width:8px;z-index:3;
+  cursor:col-resize;touch-action:none}
+.sc.dockl .scgrip{left:auto;right:0}
+.scgrip::after{content:"";position:absolute;top:50%;left:2px;width:3px;height:40px;
+  transform:translateY(-50%);border-radius:var(--r-f);background:var(--ctrl-line-h);
+  opacity:0;transition:opacity .15s}
+.scgrip:hover::after{opacity:1}
 .sc>*{flex:0 0 auto}
 .sc h3{font-size:var(--fs-m);line-height:var(--lh-m);font-weight:600}
 

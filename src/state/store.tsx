@@ -41,6 +41,7 @@ function ensureFonts() {
 const freshUi = (): Ui => ({
   seg: {}, sort: {}, page: {}, per: {}, sel: new Set(), osel: new Set(), ochk: new Set(), phide: new Set(), nch: {}, oval: false, obs: 0, sess: '',
   scgrp: [], saved: loadSaved(), sctab: 'ax', scpin: loadPins(), schist: [], scw: 420, scside: 'right',
+  ...loadPanel(),
   q: '', wfilter: null, geo: '',
   wk: null, wtag: new Set(), wgrp: new Set(),
   ftag: new Set(), fmod: new Set(), fq: '', fapp: null, fback: false, exk: 'stat',
@@ -51,6 +52,17 @@ const freshUi = (): Ui => ({
 /** Свои сценарии живут в localStorage отдельно от текущего состояния. */
 const SAVED_KEY = 'pm.saved'
 const PIN_KEY = 'pm.pins'
+/** Геометрия панели: ширина, сторона и открытая вкладка — тоже переживают перезагрузку */
+const PANEL_KEY = 'pm.panel'
+type PanelGeom = Pick<Ui, 'scw' | 'scside' | 'sctab'>
+function loadPanel(): PanelGeom {
+  try { return JSON.parse(localStorage.getItem(PANEL_KEY) || '{}') } catch { return {} }
+}
+function storePanel(u: Ui) {
+  try {
+    localStorage.setItem(PANEL_KEY, JSON.stringify({ scw: u.scw, scside: u.scside, sctab: u.sctab }))
+  } catch { /* приватный режим */ }
+}
 function loadPins(): string[] {
   try { return JSON.parse(localStorage.getItem(PIN_KEY) || '[]') } catch { return [] }
 }
@@ -92,6 +104,9 @@ interface Ctx {
   onInput: (e: React.FormEvent) => void
   toast: (msg: string) => void
   go: (route: string) => void
+  /** Правка эфемерного состояния из React-компонентов: делегированным
+      обработчиком не выразить то, что тянут мышью. */
+  patchUi: (p: Partial<Ui>) => void
   /** Копия состояния для движка прототипа. */
   snapshot: AppSnapshot
 }
@@ -802,7 +817,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return bump()
     }
     const tab = at('[data-sctab]')
-    if (tab) { u.sctab = tab.dataset.sctab as Ui['sctab']; return bump() }
+    if (tab) { u.sctab = tab.dataset.sctab as Ui['sctab']; storePanel(u); return bump() }
     /* Закреплённые оси всплывают наверх списка и переживают перезагрузку */
     const pin = at('[data-scpin]')
     if (pin) {
@@ -847,8 +862,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
     /* Ширина панели и сторона швартовки */
     const sw = at('[data-scw]')
-    if (sw) { u.scw = Number(sw.dataset.scw); return bump() }
-    if (at('[data-scside]')) { u.scside = u.scside === 'left' ? 'right' : 'left'; return bump() }
+    if (sw) { u.scw = Number(sw.dataset.scw); storePanel(u); return bump() }
+    if (at('[data-scside]')) { u.scside = u.scside === 'left' ? 'right' : 'left'; storePanel(u); return bump() }
     if (at('[data-copyjson]')) {
       const diff: Record<string, string> = {}
       for (const k of Object.keys(DEF) as (keyof typeof DEF)[]) if (S.current[k] !== DEF[k]) diff[k] = S.current[k]
@@ -923,13 +938,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (pop.current && !at('.pop-wrap')) { pop.current = null; bump() }
   }, [go, toast, snapshot])
 
+  const patchUi = useCallback((p: Partial<Ui>) => {
+    Object.assign(U.current, p)
+    if ('scw' in p || 'scside' in p || 'sctab' in p) storePanel(U.current)
+    bump()
+  }, [])
+
   const snap = snapshot()
   applyState(snap)
   const value: Ctx = {
     ...snap,
     panel: panel.current,
     toasts: toasts.current,
-    onClick, onInput, toast, go,
+    onClick, onInput, toast, go, patchUi,
     snapshot: snap,
   }
 

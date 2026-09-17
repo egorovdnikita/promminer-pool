@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { AXES, AX_OWN, AX_STYLE, AXCAT, PRESETS, DEF, SCREEN_NAMES, TITLES, MODALS, ICON_PACKS, iconSample, FONTS } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import type { Scenario } from '@/state/types'
@@ -9,9 +10,13 @@ const TABS: [NonNullable<ReturnType<() => 'ax' | 'sty' | 'sets' | 'go'>>, string
 ]
 /* Оси оформления живут на своей вкладке — в списке состояний продукта им не место */
 const STY = (k: string) => AX_STYLE.has(k)
-/* Ширины панели. Первая — значение по умолчанию из freshUi: иначе ни одна
-   кнопка не подсвечена, пока её не нажали. */
+/* Ширины панели кнопками. Первая — значение по умолчанию из freshUi: иначе
+   ни одна кнопка не подсвечена, пока её не нажали. Между ними ширина тянется
+   за край мышью, поэтому кнопка может быть не подсвечена ни одна. */
 const WIDTHS = [420, 560, 760]
+/* Меньше 360 панель не читается, шире 900 закрывает прототип целиком */
+const fitWidth = (w: number) =>
+  Math.round(Math.max(360, Math.min(w, Math.min(900, window.innerWidth - 80))))
 
 /** У пяти окон заголовок пустой или считается от строки таблицы — им нужны свои подписи. */
 const MODAL_NAMES: Record<string, string> = {
@@ -28,7 +33,10 @@ const modalList = () => Object.keys(MODALS)
 
 /** Панель сценариев: состояние прототипа в ссылке. Клавиша S открывает и закрывает. */
 export function ScenarioPanel() {
-  const { S, U, route, panel } = useApp()
+  const { S, U, route, panel, modal, patchUi } = useApp()
+  /* Ширина тянется за край: запоминаем, откуда начали, и считаем от этого —
+     иначе на быстром движении курсор убегает от края панели. */
+  const drag = useRef<{ x: number; w: number } | null>(null)
   const q = (U.scq || '').trim().toLowerCase()
   const hit = (s: string) => !q || s.toLowerCase().includes(q)
 
@@ -112,15 +120,42 @@ export function ScenarioPanel() {
     )
   }
 
+  const grab = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    drag.current = { x: e.clientX, w: width }
+  }
+  const move = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!drag.current) return
+    const dx = e.clientX - drag.current.x
+    patchUi({ scw: fitWidth(drag.current.w + (U.scside === 'left' ? dx : -dx)) })
+  }
+  const drop = (e: React.PointerEvent<HTMLDivElement>) => {
+    drag.current = null
+    e.currentTarget.releasePointerCapture(e.pointerId)
+  }
+
   return (
     <>
       <button className="sct" data-panel>
         ⚙ Сценарии{changed.length > 0 && <span className="bdg">{changed.length}</span>}
       </button>
+      {/* Затемнение под панелью: клик по нему закрывает. При открытой модалке
+          не рисуем — у неё своя маска, и вторая только гасила бы окно. */}
+      <div className={`scmask ${panel && !modal ? 'on' : ''}`} data-panel aria-hidden="true" />
       <aside
         className={`sc ${panel ? 'open' : ''} ${U.scside === 'left' ? 'dockl' : ''}`}
         style={{ width }}
       >
+        <div
+          className="scgrip"
+          onPointerDown={grab}
+          onPointerMove={move}
+          onPointerUp={drop}
+          onPointerCancel={drop}
+          onDoubleClick={() => patchUi({ scw: WIDTHS[0] })}
+          title="Потяните, чтобы изменить ширину. Двойной клик — вернуть 420"
+        />
         <div className="schead">
           <h3>Сценарии</h3>
           {changed.length > 0 && <span className="scbadge">{changed.length} из {keys.length}</span>}
