@@ -51,7 +51,8 @@
   --sp1:calc(4px*var(--spk)); --sp2:calc(8px*var(--spk)); --sp3:calc(12px*var(--spk));
   --sp4:calc(16px*var(--spk)); --sp5:calc(24px*var(--spk)); --sp6:calc(32px*var(--spk));
   --shadow:0 4px 24px 0 #CBD0E966;
-  --font:'Gilroy',-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font-ds:'Gilroy',-apple-system,'Segoe UI',Roboto,sans-serif;
+  --font:var(--font-ds);
   --sb:252px;
   /* размеры контролов по DS (size-base: 24 28 32 36 40 44 48 56 64) */
   --h-btn:48px; --h-btn-sm:40px; --h-field:56px; --h-ctrl:48px;
@@ -2176,6 +2177,15 @@ html{scrollbar-gutter:stable}
   font-size:var(--fs-s);line-height:var(--lh-s);font-weight:600;
   box-shadow:0 8px 28px #1a1a1a3d;display:flex;align-items:center;gap:8px}
 .sct .bdg{margin-left:2px;background:var(--accent)}
+/* Панель — инструмент, а не часть прототипа: оси оформления её не трогают.
+   Шрифт и скругления держим свои (отступы уже исключены выборкой правил),
+   акцентный цвет оставляем — по нему видно выбранный цвет. Радиусы
+   перечисляем явно: --r-* считаются от --rk на :root, и локальный --rk
+   их бы не изменил. */
+.sc,.sct,.scmask{font-family:var(--font-ds);
+  --r-3xs:2px;--r-2xs:4px;--r-1xs:6px;--r-xs:8px;--r-s:12px;
+  --r-m:16px;--r-l:24px;--r-xl:32px;--r-2xl:48px;--r-f:999px}
+
 /* Затемнение под панелью — она ведёт себя как выдвижной ящик: клик по фону
    закрывает. Маска модалки лежит ниже (70), поэтому при открытом окне эту
    не рисуем совсем, иначе окно тоже ушло бы в тень. */
@@ -2355,8 +2365,10 @@ button.scsect:hover{color:var(--accent)}
 :root[data-radius="min"]{--rk:.35}
 :root[data-radius="mid"]{--rk:.65}
 :root[data-radius="max"]{--rk:1.8}
-/* Прямые углы должны дойти и до того, что скруглено мимо токенов */
-:root[data-radius="none"] *{border-radius:0!important}
+/* Прямые углы должны дойти и до того, что скруглено мимо токенов — но
+   только в прототипе: панель сценариев остаётся собой */
+:root[data-radius="none"] .app *,:root[data-radius="none"] .mask *,
+:root[data-radius="none"] #toasts *,:root[data-radius="none"] .auth *{border-radius:0!important}
 :root[data-space="none"]{--spk:0}
 :root[data-space="min"]{--spk:.4}
 :root[data-space="mid"]{--spk:.7}

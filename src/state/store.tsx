@@ -76,6 +76,16 @@ function storeSaved(list: Ui['saved']) {
   try { localStorage.setItem(SAVED_KEY, JSON.stringify(list)) } catch { /* приватный режим */ }
 }
 
+/** Значение из ссылки должно быть среди значений оси: чужая или старая
+    ссылка иначе роняет прототип (COINS['zzz'] — undefined, и экран падает).
+    Исключение — акцентный цвет: у него свободное значение, шесть цифр. */
+export function okValue(k: keyof Scenario, v: string) {
+  const ax = AXES[k]
+  if (!ax) return false
+  if (ax.opts.some(([o]: [string, string]) => o === v)) return true
+  return ax.free === 'color' && /^[0-9a-f]{6}$/i.test(v)
+}
+
 /** Сценарий из хэша ссылки, иначе из localStorage, иначе дефолт. */
 function loadScenario(): Scenario {
   let s = location.hash.slice(1)
@@ -84,7 +94,7 @@ function loadScenario(): Scenario {
   const out = { ...DEF }
   for (const k of Object.keys(DEF) as (keyof Scenario)[]) {
     const v = q.get(k)
-    if (v) out[k] = v
+    if (v && okValue(k, v)) out[k] = v
   }
   return out
 }
@@ -143,6 +153,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   /* Стопка предыдущих сценариев — «Отменить» в панели откатывает по одному шагу.
      Глубину держим небольшой: это инструмент отладки, а не редактор. */
+  /* Оформление (шрифт, акцент, скругления, отступы, иконки) — не состояние
+     продукта: связки, сброс и «Случайный» его не трогают, иначе выбранный
+     стиль слетал от любого клика по готовому набору. Свой сброс у него
+     на вкладке «Стиль». */
+  const keepStyle = (from: Scenario) => {
+    const out: Partial<Scenario> = {}
+    for (const k of AX_STYLE) (out as Record<string, string>)[k] = (from as unknown as Record<string, string>)[k]
+    return out
+  }
+
   const pushHist = useCallback(() => {
     const h = U.current.schist || []
     U.current.schist = [...h, { ...S.current }].slice(-30)
@@ -166,6 +186,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     bump()
     setTimeout(() => { toasts.current = toasts.current.filter((t) => t.id !== id); bump() }, 2600)
   }, [])
+
+  /* Буфер обмена отдаёт промис и умеет отказать (нет фокуса, нет прав) —
+     без catch мы врали «Скопировано» и роняли необработанный отказ. */
+  const copy = useCallback((text: string, ok: string) => {
+    const c = navigator.clipboard
+    if (!c) return toast('Браузер не дал доступ к буферу обмена')
+    c.writeText(text).then(() => toast(ok), () => toast('Не удалось скопировать — выделите текст вручную'))
+  }, [toast])
 
   /* Сценарий живёт в хэше — ссылку можно отправить команде. */
   useEffect(() => {
@@ -550,7 +578,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const tf = at('[data-tilef]')
     if (tf) { u.wfilter = tf.dataset.tilef!; u.page.workers = 1; go('workers'); return bump() }
     const cp = at('[data-copy]')
-    if (cp) { navigator.clipboard?.writeText(cp.dataset.copy!); return toast('Скопировано') }
+    if (cp) { copy(cp.dataset.copy!, 'Скопировано'); return }
     /* «Посмотреть» в экшн-меню строки — тот же переход, что и клик по строке */
     const wko = at('[data-wkopen]')
     if (wko) {
@@ -788,12 +816,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const found = PRESETS.find(([n]) => n === pr.dataset.preset)
       if (found) {
         pushHist()
-        S.current = pr.hasAttribute('data-over') ? { ...S.current, ...found[2] } : { ...DEF, ...found[2] }
+        S.current = pr.hasAttribute('data-over')
+          ? { ...S.current, ...found[2] }
+          : { ...DEF, ...keepStyle(S.current), ...found[2] }
         modal.current = null; toast(`Сценарий «${found[0]}»`)
       }
       return bump()
     }
-    if (at('[data-reset]')) { pushHist(); S.current = { ...DEF }; modal.current = null; go(HOME); return bump() }
+    if (at('[data-reset]')) {
+      pushHist()
+      S.current = { ...DEF, ...keepStyle(S.current) }
+      modal.current = null; go(HOME); return bump()
+    }
     /* ==== Панель сценариев ==== */
     if (at('[data-onlydirty]')) { u.scdirty = !u.scdirty; return bump() }
     if (at('[data-onlypin]')) { u.sconly = !u.sconly; return bump() }
@@ -847,7 +881,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (gx) {
       pushHist()
       const g = gx.dataset.grprand!
-      for (const k of Object.keys(AXES) as (keyof typeof DEF)[]) if (AXES[k].g === g) {
+      for (const k of Object.keys(AXES) as (keyof typeof DEF)[]) if (AXES[k].g === g && !AX_STYLE.has(k)) {
         const opts = AXES[k].opts.map(([v]: [string, string]) => v)
         S.current[k] = opts[Math.floor(Math.random() * opts.length)]
       }
@@ -867,8 +901,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (at('[data-copyjson]')) {
       const diff: Record<string, string> = {}
       for (const k of Object.keys(DEF) as (keyof typeof DEF)[]) if (S.current[k] !== DEF[k]) diff[k] = S.current[k]
-      navigator.clipboard?.writeText(JSON.stringify(diff, null, 2))
-      return toast('Сценарий скопирован как JSON')
+      copy(JSON.stringify(diff, null, 2), 'Сценарий скопирован как JSON')
+      return
     }
     const grp = at('[data-scgrp]')
     if (grp) {
@@ -882,8 +916,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (at('[data-rand]')) {
       pushHist()
       const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)]
-      for (const k of Object.keys(AXES) as (keyof typeof DEF)[])
+      for (const k of Object.keys(AXES) as (keyof typeof DEF)[]) {
+        if (AX_STYLE.has(k)) continue
         S.current[k] = pick(AXES[k].opts.map(([v]: [string, string]) => v))
+      }
       toast('Случайный сценарий')
       return bump()
     }
@@ -905,7 +941,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (found) {
         pushHist()
         /* «Поверх текущего» не сбрасывает остальные оси — так наборы складываются */
-        S.current = ap.hasAttribute('data-over') ? { ...S.current, ...found.axes } : { ...DEF, ...found.axes }
+        S.current = ap.hasAttribute('data-over')
+          ? { ...S.current, ...found.axes }
+          : { ...DEF, ...keepStyle(S.current), ...found.axes }
         modal.current = null; toast(`Сценарий «${found.name}»`)
       }
       return bump()
@@ -923,18 +961,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (!hash) return toast('Вставьте ссылку со сценарием')
       const p = new URLSearchParams(hash)
       const next = { ...DEF }
-      let n = 0
+      let n = 0, bad = 0
       for (const k of Object.keys(DEF) as (keyof typeof DEF)[]) {
         const v = p.get(k)
-        if (v) { next[k] = v; n++ }
+        if (!v) continue
+        if (okValue(k, v)) { next[k] = v; n++ } else bad++
       }
-      if (!n) return toast('В ссылке нет сценария')
+      if (!n) return toast(bad ? 'В ссылке нет знакомых значений' : 'В ссылке нет сценария')
       S.current = next; modal.current = null
       if (inp) inp.value = ''
-      toast('Сценарий из ссылки применён')
+      toast(bad ? `Сценарий применён, ${bad} незнакомых значений пропущено` : 'Сценарий из ссылки применён')
       return bump()
     }
-    if (at('[data-copylink]')) { navigator.clipboard?.writeText(location.href); return toast('Ссылка скопирована') }
+    if (at('[data-copylink]')) { copy(location.href, 'Ссылка скопирована'); return }
     if (pop.current && !at('.pop-wrap')) { pop.current = null; bump() }
   }, [go, toast, snapshot])
 

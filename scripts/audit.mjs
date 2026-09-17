@@ -83,4 +83,39 @@ const seen=new Map();
 for(const m of css.matchAll(/#[0-9a-fA-F]{3,8}/g)){const c=m[0].toLowerCase();
   if(pal.has(c)||c.length>7)continue; seen.set(c,(seen.get(c)||0)+1);}
 [...seen].sort((a,b)=>b[1]-a[1]).slice(0,25).forEach(([c,n])=>out.push('  '+c+' ×'+n));
+/* F. связность панели сценариев: оси ↔ DEF ↔ Scenario, значения связок */
+H('F. панель сценариев: связность осей');
+{
+  const types=fs.readFileSync(P+'src/state/types.ts','utf8');
+  const cut=(a,b)=>proto.slice(proto.indexOf(a),proto.indexOf(b));
+  const axBlock=cut('const AXES={','/* Готовые связки состояний');
+  const AX={};
+  for(const m of axBlock.matchAll(/^\s{2}([a-z0-9]+):\{g:'([^']+)',label:'([^']+)'([\s\S]*?)(?=\n\s{2}[a-z0-9]+:\{g:'|\n};)/gm))
+    AX[m[1]]={opts:[...m[4].matchAll(/\['([^']*)','([^']*)'\]/g)].map(o=>o[1]),free:/free:'/.test(m[4])};
+  const DEFK={};
+  for(const m of cut('const DEF={','let S={...DEF}').matchAll(/([a-z0-9]+):'([^']*)'/g)) DEFK[m[1]]=m[2];
+  const tkeys=[...types.slice(types.indexOf('export interface Scenario'),types.indexOf('export interface Ui'))
+    .matchAll(/^\s{2}([a-z0-9]+):\s*string/gm)].map(m=>m[1]);
+  const ax=Object.keys(AX);
+  ax.forEach(k=>{ if(!(k in DEFK)) out.push('  ! '+k+' — нет значения в DEF'); });
+  Object.keys(DEFK).forEach(k=>{ if(!AX[k]) out.push('  ! DEF.'+k+' — нет такой оси'); });
+  ax.forEach(k=>{ if(!tkeys.includes(k)) out.push('  ! '+k+' — нет в интерфейсе Scenario'); });
+  tkeys.forEach(k=>{ if(!AX[k]) out.push('  ! Scenario.'+k+' — нет такой оси'); });
+  ax.forEach(k=>{ const d=DEFK[k];
+    if(d!==undefined&&!AX[k].opts.includes(d)&&!AX[k].free) out.push('  ! '+k+" — DEF='"+d+"' мимо значений оси"); });
+  ax.forEach(k=>{ const o=AX[k].opts, dup=o.filter((v,i)=>o.indexOf(v)!==i);
+    if(dup.length) out.push('  ! '+k+' — повтор значения '+[...new Set(dup)].join(',')); });
+  for(const m of cut('const PRESETS=[','const DEF={').matchAll(/\['([^']+)','([^']*)',\s*\{([\s\S]*?)\},'([^']+)'\]/g))
+    for(const pp of m[3].matchAll(/([a-z0-9]+):'([^']*)'/g)){
+      if(!AX[pp[1]]) { out.push('  ! связка «'+m[1]+'» — оси '+pp[1]+' нет'); continue; }
+      if(!AX[pp[1]].opts.includes(pp[2])&&!AX[pp[1]].free)
+        out.push('  ! связка «'+m[1]+'» — у '+pp[1]+" нет значения '"+pp[2]+"'");
+    }
+  for(const [name,blockEnd] of [['AX_OWN','const AX_STYLE'],['AX_STYLE','const AXES={']])
+    for(const m of cut('const '+name+'=new Set(',blockEnd).matchAll(/'([a-z0-9]+)'/g))
+      if(!AX[m[1]]) out.push('  ! '+name+'.'+m[1]+' — оси нет');
+  out.push('  осей '+ax.length+', из них оформление 5, придуманных '
+    +[...cut('const AX_OWN=new Set(','const AX_STYLE').matchAll(/'[a-z0-9]+'/g)].length);
+}
+
 console.log(out.join('\n'));

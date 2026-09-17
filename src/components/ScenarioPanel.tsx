@@ -41,8 +41,12 @@ export function ScenarioPanel() {
   const hit = (s: string) => !q || s.toLowerCase().includes(q)
 
   const keys = Object.keys(AXES) as Key[]
-  /* Оси, уведённые от значения по умолчанию — их подсвечиваем и считаем */
+  /* Оси, уведённые от значения по умолчанию — их подсвечиваем и считаем.
+     Считаем отдельно: список «Осей» оформление не показывает, и фильтр
+     «Изменённые» с общим счётчиком приводил в пустой список. */
   const changed = keys.filter((k) => S[k] !== DEF[k])
+  const changedAx = changed.filter((k) => !STY(k))
+  const changedSty = changed.filter(STY)
   const pins = (U.scpin || []).filter((k) => k in AXES) as Key[]
   const tab = U.sctab || 'ax'
   const onlyDirty = !!U.scdirty
@@ -175,7 +179,11 @@ export function ScenarioPanel() {
 
         <div className="sctabs">
           {TABS.map(([id, t]) => (
-            <button key={id} className={tab === id ? 'on' : ''} data-sctab={id}>{t}</button>
+            <button key={id} className={tab === id ? 'on' : ''} data-sctab={id}>
+              {t}
+              {id === 'ax' && changedAx.length > 0 && <i className="scnum">{changedAx.length}</i>}
+              {id === 'sty' && changedSty.length > 0 && <i className="scnum">{changedSty.length}</i>}
+            </button>
           ))}
         </div>
 
@@ -184,7 +192,7 @@ export function ScenarioPanel() {
           {tab === 'ax' && (
             <>
               <button className={`scchip ${onlyDirty ? 'on' : ''}`} data-onlydirty title="Только изменённые оси">
-                Изменённые{changed.length > 0 && ` ${changed.length}`}
+                Изменённые{changedAx.length > 0 && ` ${changedAx.length}`}
               </button>
               <button className={`scchip ${onlyPin ? 'on' : ''}`} data-onlypin title="Только закреплённые оси">
                 ★{pins.length > 0 && ` ${pins.length}`}
@@ -407,8 +415,9 @@ export function ScenarioPanel() {
           <button data-scback disabled={!hist.length} title="Шаг назад по истории">
             ↩ Отменить{hist.length > 0 && ` (${hist.length})`}
           </button>
-          <button data-reset disabled={!changed.length}>
-            Сбросить{changed.length > 0 && ` (${changed.length})`}
+          <button data-reset disabled={!changedAx.length}
+            title="Вернуть состояния продукта к умолчанию — оформление останется, его сброс на вкладке «Стиль»">
+            Сбросить{changedAx.length > 0 && ` (${changedAx.length})`}
           </button>
           <button data-copylink>Ссылка</button>
           <span className="schint"><b>S</b> — панель, <b>/</b> — поиск, <b>Esc</b> — закрыть</span>
