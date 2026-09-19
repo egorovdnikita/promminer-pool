@@ -54,13 +54,14 @@ const SAVED_KEY = 'pm.saved'
 const PIN_KEY = 'pm.pins'
 /** Геометрия панели: ширина, сторона и открытая вкладка — тоже переживают перезагрузку */
 const PANEL_KEY = 'pm.panel'
-type PanelGeom = Pick<Ui, 'scw' | 'scside' | 'sctab'>
+type PanelGeom = Pick<Ui, 'scw' | 'scside' | 'sctab' | 'scgrp'>
 function loadPanel(): PanelGeom {
   try { return JSON.parse(localStorage.getItem(PANEL_KEY) || '{}') } catch { return {} }
 }
 function storePanel(u: Ui) {
   try {
-    localStorage.setItem(PANEL_KEY, JSON.stringify({ scw: u.scw, scside: u.scside, sctab: u.sctab }))
+    localStorage.setItem(PANEL_KEY,
+      JSON.stringify({ scw: u.scw, scside: u.scside, sctab: u.sctab, scgrp: u.scgrp }))
   } catch { /* приватный режим */ }
 }
 function loadPins(): string[] {
@@ -826,7 +827,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (at('[data-reset]')) {
       pushHist()
       S.current = { ...DEF, ...keepStyle(S.current) }
-      modal.current = null; go(HOME); return bump()
+      /* Раньше сброс заодно уводил на Главную, хотя из названия это не следует.
+         Экран остаётся тот же — уходим с него, только если он стал недоступен. */
+      modal.current = null; guardRoute(); return bump()
     }
     /* ==== Панель сценариев ==== */
     if (at('[data-onlydirty]')) { u.scdirty = !u.scdirty; return bump() }
@@ -892,6 +895,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (col) {
       const all = [...new Set(Object.keys(AXES).map((k) => AXES[k as keyof typeof AXES].g))]
       u.scgrp = col.dataset.sccol === 'all' ? all : []
+      storePanel(u)
       return bump()
     }
     /* Ширина панели и сторона швартовки */
@@ -909,6 +913,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const g = grp.dataset.scgrp!
       const list = u.scgrp || []
       u.scgrp = list.includes(g) ? list.filter((x) => x !== g) : [...list, g]
+      storePanel(u)
       return bump()
     }
     const axr = at('[data-axreset]')
@@ -929,6 +934,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const axes: Record<string, string> = {}
       for (const k of Object.keys(DEF) as (keyof typeof DEF)[])
         if (S.current[k] !== DEF[k]) axes[k] = S.current[k]
+      /* Два сохранения подряд давали два одинаковых набора: сверяем состав
+         и не плодим копии, если такой сценарий уже лежит под другим именем. */
+      const same = (u.saved || []).find((x) => JSON.stringify(x.axes) === JSON.stringify(axes))
+      if (same && same.name !== name) {
+        if (inp) inp.value = ''
+        return toast(`Такой сценарий уже сохранён — «${same.name}»`)
+      }
       u.saved = [...(u.saved || []).filter((x) => x.name !== name), { name, axes, at: Date.now() }]
       storeSaved(u.saved)
       if (inp) inp.value = ''
@@ -979,7 +991,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const patchUi = useCallback((p: Partial<Ui>) => {
     Object.assign(U.current, p)
-    if ('scw' in p || 'scside' in p || 'sctab' in p) storePanel(U.current)
+    if ('scw' in p || 'scside' in p || 'sctab' in p || 'scgrp' in p) storePanel(U.current)
     bump()
   }, [])
 

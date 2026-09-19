@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { AXES, AX_OWN, AX_STYLE, AXCAT, PRESETS, DEF, SCREEN_NAMES, TITLES, MODALS, ICON_PACKS, iconSample, FONTS } from '@/legacy/prototype'
 import { useApp } from '@/state/store'
 import type { Scenario } from '@/state/types'
@@ -37,6 +37,7 @@ export function ScenarioPanel() {
   /* Ширина тянется за край: запоминаем, откуда начали, и считаем от этого —
      иначе на быстром движении курсор убегает от края панели. */
   const drag = useRef<{ x: number; w: number } | null>(null)
+  const box = useRef<HTMLElement>(null)
   const q = (U.scq || '').trim().toLowerCase()
   const hit = (s: string) => !q || s.toLowerCase().includes(q)
 
@@ -59,6 +60,24 @@ export function ScenarioPanel() {
   const width = U.scw || 420
   const collapsed = U.scgrp || []
 
+  /* Узкое окно: сохранённая ширина может не влезть — подрезаем на месте,
+     иначе панель закрывает прототип целиком. */
+  useEffect(() => {
+    const fit = () => { const w = U.scw || 420; if (w !== fitWidth(w)) patchUi({ scw: fitWidth(w) }) }
+    fit()
+    addEventListener('resize', fit)
+    return () => removeEventListener('resize', fit)
+  })
+
+  /* Панель ведёт себя как диалог: открылась — фокус внутрь, закрылась —
+     обратно на кнопку. Закрытая помечается inert, иначе в неё уезжает Tab. */
+  useEffect(() => {
+    if (panel) box.current?.focus({ preventScroll: true })
+    else if (box.current?.contains(document.activeElement)) {
+      (document.querySelector('.sct') as HTMLElement | null)?.focus({ preventScroll: true })
+    }
+  }, [panel])
+
   /* Ось попадает в список, если подходит под поиск и под активные фильтры */
   const visible = (k: Key) =>
     !STY(k) &&
@@ -74,6 +93,18 @@ export function ScenarioPanel() {
   const modals = modalList().filter(([, t]) => hit(t))
 
   const valOf = (k: Key) => (AXES[k].opts.find(([v]) => v === S[k]) || ['', S[k]])[1]
+
+  /* На вкладке «Стиль» поиск раньше не делал ничего: ищем по названию оси,
+     пояснению, подписям значений — а у шрифтов и наборов иконок ещё и по
+     их собственным именам. */
+  const hitAxis = (k: Key) =>
+    hit(AXES[k].label) || hit(AXES[k].note || '') || AXES[k].opts.some(([, t]) => hit(t))
+  const fonts = AXES.font.opts.filter(([v, t]: [string, string]) => hitAxis('font') || hit(t) || hit(FONTS[v].name))
+  const accents = AXES.accent.opts.filter(([, t]: [string, string]) => hitAxis('accent') || hit(t))
+  const packs = ICON_PACKS.filter(([, name, note]: [string, string, string]) =>
+    hitAxis('icons') || hit(name) || hit(note))
+  const styRows = (['radius', 'space'] as Key[]).filter(hitAxis)
+  const styEmpty = !fonts.length && !accents.length && !packs.length && !styRows.length
 
   const axisRow = (k: Key) => (
     <div className={`scg ${S[k] !== DEF[k] ? 'dirty' : ''}`} key={k}>
@@ -96,7 +127,8 @@ export function ScenarioPanel() {
       {AXES[k].note && <p className="scdesc">{AXES[k].note}</p>}
       <div className="sco">
         {AXES[k].opts.map(([v, t]) => (
-          <button data-axis={k} data-val={v} className={S[k] === v ? 'on' : ''} key={v}>{t}</button>
+          <button data-axis={k} data-val={v} className={S[k] === v ? 'on' : ''}
+            aria-pressed={S[k] === v} key={v}>{t}</button>
         ))}
       </div>
     </div>
@@ -148,8 +180,14 @@ export function ScenarioPanel() {
           не рисуем — у неё своя маска, и вторая только гасила бы окно. */}
       <div className={`scmask ${panel && !modal ? 'on' : ''}`} data-panel aria-hidden="true" />
       <aside
+        ref={box}
         className={`sc ${panel ? 'open' : ''} ${U.scside === 'left' ? 'dockl' : ''}`}
         style={{ width }}
+        role="dialog"
+        aria-modal={!modal}
+        aria-label="Сценарии — состояние прототипа"
+        tabIndex={-1}
+        inert={!panel}
       >
         <div
           className="scgrip"
@@ -191,13 +229,13 @@ export function ScenarioPanel() {
           <input className="scsearch" id="scq" placeholder="Найти ось, значение или экран" defaultValue={U.scq || ''} />
           {tab === 'ax' && (
             <>
-              <button className={`scchip ${onlyDirty ? 'on' : ''}`} data-onlydirty title="Только изменённые оси">
+              <button className={`scchip ${onlyDirty ? 'on' : ''}`} aria-pressed={onlyDirty} data-onlydirty title="Только изменённые оси">
                 Изменённые{changedAx.length > 0 && ` ${changedAx.length}`}
               </button>
-              <button className={`scchip ${onlyPin ? 'on' : ''}`} data-onlypin title="Только закреплённые оси">
+              <button className={`scchip ${onlyPin ? 'on' : ''}`} aria-pressed={onlyPin} data-onlypin title="Только закреплённые оси">
                 ★{pins.length > 0 && ` ${pins.length}`}
               </button>
-              <button className={`scchip ${onlyFigma ? 'on' : ''}`} data-onlyfigma title="Только оси, у которых есть кадр в макетах">
+              <button className={`scchip ${onlyFigma ? 'on' : ''}`} aria-pressed={onlyFigma} data-onlyfigma title="Только оси, у которых есть кадр в макетах">
                 Из макетов {keys.length - own.length}
               </button>
               <button className="scchip" data-sccol="all" title="Свернуть все группы">Свернуть</button>
@@ -247,11 +285,12 @@ export function ScenarioPanel() {
               </p>
             </div>
 
+            {!!fonts.length && (
             <section className="scsec">
-              <div className="scshead"><div className="scsect plain">Шрифт<span className="scqty">{AXES.font.opts.length}</span></div></div>
+              <div className="scshead"><div className="scsect plain">Шрифт<span className="scqty">{fonts.length}</span></div></div>
               <p className="scdesc">Gilroy — как в продукте, остальные из Google Fonts. Каждая кнопка набрана своей гарнитурой.</p>
               <div className="scfont">
-                {AXES.font.opts.map(([v, t]) => (
+                {fonts.map(([v, t]: [string, string]) => (
                   <button
                     key={v} data-axis="font" data-val={v}
                     className={S.font === v ? 'on' : ''}
@@ -260,12 +299,14 @@ export function ScenarioPanel() {
                 ))}
               </div>
             </section>
+            )}
 
+            {!!accents.length && (
             <section className="scsec">
               <div className="scshead"><div className="scsect plain">Акцентный цвет</div></div>
               <p className="scdesc">Кнопки, ссылки, активные пункты меню и обводка фокуса.</p>
               <div className="scsw">
-                {AXES.accent.opts.map(([v, t]) => (
+                {accents.map(([v, t]: [string, string]) => (
                   <button
                     key={v} data-axis="accent" data-val={v} title={t}
                     className={`${S.accent === v ? 'on' : ''} ${v === 'ds' ? 'dsw' : ''}`}
@@ -280,17 +321,21 @@ export function ScenarioPanel() {
                 <button className="scchip" data-eyedrop>Пипетка с экрана</button>
               </div>
             </section>
+            )}
 
+            {!!styRows.length && (
             <section className="scsec">
               <div className="scshead"><div className="scsect plain">Скругления и отступы</div></div>
-              {(['radius', 'space'] as Key[]).map(axisRow)}
+              {styRows.map(axisRow)}
             </section>
+            )}
 
+            {!!packs.length && (
             <section className="scsec">
-              <div className="scshead"><div className="scsect plain">Иконки<span className="scqty">{ICON_PACKS.length}</span></div></div>
+              <div className="scshead"><div className="scsect plain">Иконки<span className="scqty">{packs.length}</span></div></div>
               <p className="scdesc">Набор дизайн-системы и четыре открытых: Material Sharp, Lucide, Phosphor Thin, Material Design.</p>
               <div className="scpack">
-                {ICON_PACKS.map(([id, name, note]: [string, string, string]) => (
+                {packs.map(([id, name, note]: [string, string, string]) => (
                   <button key={id} data-axis="icons" data-val={id} className={S.icons === id ? 'on' : ''}>
                     <span className="scico" dangerouslySetInnerHTML={{ __html: iconSample(id) }} />
                     <b>{name}</b><i>{note}</i>
@@ -298,6 +343,10 @@ export function ScenarioPanel() {
                 ))}
               </div>
             </section>
+
+            )}
+
+            {styEmpty && <p className="scnote">Ничего не нашлось. Сбросьте поиск.</p>}
 
             <div className="scbar">
               <button className="scchip" data-styreset>Сбросить оформление</button>
